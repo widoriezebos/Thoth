@@ -1,5 +1,5 @@
 # Thoth
-Simple yet powerful markup based documentation system
+Simple yet powerful Markdown based documentation system
 
 COPYRIGHT
 ---- 
