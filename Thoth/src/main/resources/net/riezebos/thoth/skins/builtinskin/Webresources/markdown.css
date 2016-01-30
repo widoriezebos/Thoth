@@ -1,0 +1,71 @@
+<!-- Prince PDF related CSS -->
+body {
+    display: block;
+    page: main;
+}
+@page main {
+    @top {
+	content: string(doctitle);     	
+    }	
+    @bottom-right {
+        content: "Page " counter(page);
+    }
+    @bottom { 
+        content: "Thoth Documentation System";
+    }	
+}
+<!-- End of Prince PDF related CSS -->
+
+h1 { string-set: doctitle content() }
+  
+img { max-width: 100%; height: auto }
+table { table-layout: fixed; width: 100%; }
+table tr { border-bottom:1px solid #e9e9e9; }
+table thead td, th {border-left: 1px solid #f2f2f2; border-right: 1px solid #d5d5d5; background: #ddd repeat-x scroll 0 100% ; font-weight: bold; text-align:left;}
+table tr td, th { border:1px solid #D5D5D5; padding:15px;}
+table tr:hover { background:#fcfcfc;}
+table tr ul.actions {margin: 0;}
+table tr ul.actions li {display: inline; margin-right: 5px;}
+table td.last {
+    width: 1px;
+    white-space: nowrap;
+}
+
+table td {
+    prince-text-replace: '(' '(\200B' ')' ')\200B' '=' '=\200B' '[' '[\200B' 
+                         '+' '+\200B' '-' '-\200B' '*' '*\200B' '/' '/\200B' 
+                         '/' '/\200B' '.' '.\200B' '_' '_\200B' '%' '%\200B';
+    vertical-align: top;
+}
+
+h1 { page-break-before: always }
+h1 { page-break-after: avoid }
+
+dt { font-weight: bold; font-style: italic;}
+
+code { font-size: small; }
+
+pre
+{
+  font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  margin-bottom: 10px;
+  overflow: auto;
+  width: auto;
+  padding: 5px;
+  background-color: #eee;
+  width: 650px!ie7;
+  padding-bottom: 20px!ie7;
+  font-size: x-small;
+  
+  white-space: pre-wrap;       /* CSS 3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+img {
+   border-top:10px solid #ffffff;
+   background-color:#ffffff;
+   border-bottom:10px solid #ffffff;
+}

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <display-name>Documentation Server</display-name>
+
+  <!-- SERVLETS -->
+  <servlet>
+    <servlet-name>MarkdownServlet</servlet-name>
+    <servlet-class>net.riezebos.thoth.servlets.MarkdownServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>ResourceServlet</servlet-name>
+    <servlet-class>net.riezebos.thoth.servlets.ResourceServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>PdfServlet</servlet-name>
+    <servlet-class>net.riezebos.thoth.servlets.PdfServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>RawServlet</servlet-name>
+    <servlet-class>net.riezebos.thoth.servlets.RawServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>MetaServlet</servlet-name>
+    <servlet-class>net.riezebos.thoth.servlets.MetaServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>DiffServlet</servlet-name>
+    <servlet-class>net.riezebos.thoth.servlets.DiffServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>DiffServlet</servlet-name>
+    <url-pattern>*.diff</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MetaServlet</servlet-name>
+    <url-pattern>*.meta</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>RawServlet</servlet-name>
+    <url-pattern>*.raw</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>PdfServlet</servlet-name>
+    <url-pattern>*.pdf</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MarkdownServlet</servlet-name>
+    <url-pattern>*.md</url-pattern>
+    <url-pattern>*.marked</url-pattern>
+    <url-pattern>*.book</url-pattern>
+    <url-pattern>*.index</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ResourceServlet</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+</web-app>

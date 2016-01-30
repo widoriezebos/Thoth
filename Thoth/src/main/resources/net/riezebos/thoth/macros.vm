@@ -1,0 +1,19 @@
+####################
+## String manipulation 
+####################
+#macro(prepad $word $length $chr)
+#foreach($i in [$word.length()..$length])#if($velocityHasNext)$chr#end#end
+$word##
+#end
+####################
+#macro(postpad $word $length $chr)
+$word##
+#foreach($i in [$word.length()..$length])#if($velocityHasNext)$chr#end#end
+#end
+####################
+#macro(join $words $sep)
+#foreach($word in $words)
+$word#if($velocityHasNext)$sep#end
+#end
+#end
+####################
