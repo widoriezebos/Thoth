@@ -56,7 +56,7 @@ public class PdfServlet extends DocServlet {
       if (url.toLowerCase().endsWith(".pdf"))
         url = url.substring(0, url.length() - 4);
 
-      File tempFile = File.createTempFile("docservers", ".pdf");
+      File tempFile = File.createTempFile("thothtemp", ".pdf");
 
       Map<String, Object> args = getVariables(request);
       args.put("url", url);
