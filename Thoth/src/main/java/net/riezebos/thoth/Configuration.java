@@ -30,7 +30,9 @@ public class Configuration extends ConfigurationBase {
 
   public static final String CONFIGKEY = "configuration";
   public static final String WORKSPACELOCATION = "workspacelocation";
+  public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
   private static final String WORKSPACELOCATION_DEPRECATED = "libraryroot";
+  public static final String BUILTIN_SKIN = "classpath:" + REQUIRED_PREFIX + "builtinskin/skin.properties";
 
   private static Configuration _instance;
   private String workspaceLocation;
@@ -189,5 +191,9 @@ public class Configuration extends ConfigurationBase {
       branch = branches[0].trim();
     }
     return branch;
+  }
+
+  public String getDefaultSkin() {
+    return getValue("skin.default", BUILTIN_SKIN);
   }
 }

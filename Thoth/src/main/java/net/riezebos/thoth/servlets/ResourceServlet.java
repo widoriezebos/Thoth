@@ -123,8 +123,8 @@ public class ResourceServlet extends DocServlet {
   }
 
   protected void handleNativeResource(String path, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // We do not want to expose the entire server; so we require the path to start with net/riezebos/thoth/skins/
-    if (!path.startsWith(REQUIRED_PREFIX))
+    // We do not want to expose the entire server; so we require the path to start with REQUIRED_PREFIX (which is 'net/riezebos/thoth/skins/')
+    if (!path.startsWith(Configuration.REQUIRED_PREFIX))
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
     else {
       InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);

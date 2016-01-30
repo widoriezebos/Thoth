@@ -65,8 +65,6 @@ public abstract class DocServlet extends HttpServlet {
   private static final String TIMEMSTAMP_FORMAT = "dd-MM-yyyy HH:mm:ss";
   private static final String VELOCITY_PROPERTIES = "net/riezebos/thoth/velocity.properties";
   protected static final String NATIVERESOURCES = "/nativeresources/";
-  protected static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
-  protected static final String BUILTIN_SKIN = "classpath:" + REQUIRED_PREFIX + "builtinskin/skin.properties";
 
   protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
 
@@ -206,10 +204,12 @@ public abstract class DocServlet extends HttpServlet {
   public Skin getSkin(HttpServletRequest request) throws ServletException {
     try {
       Skin skin = null;
+      Configuration configuration = Configuration.getInstance();
 
       String branch = getBranch(request);
-      if (StringUtils.isBlank(branch))
-        branch = Configuration.getInstance().getGlobalSkinBranch();
+      if (StringUtils.isBlank(branch)) {
+        branch = configuration.getGlobalSkinBranch();
+      }
 
       CacheManager cacheManager = CacheManager.getInstance(branch);
       List<SkinMapping> skinMappings = cacheManager.getSkinMappings();
@@ -220,8 +220,9 @@ public abstract class DocServlet extends HttpServlet {
         String skinMappingFileName = branchFolder + SKINS_PROPERTIES;
         File skinMappingFile = new File(skinMappingFileName);
         if (!skinMappingFile.isFile()) {
-          LOG.warn("No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFileName + " so falling back to built in");
-          skinMappings.add(new SkinMapping(Pattern.compile(".*"), new Skin(branch, BUILTIN_SKIN)));
+          LOG.warn("No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFileName + " so falling back to built in which is "
+              + configuration.getDefaultSkin());
+          skinMappings.add(new SkinMapping(Pattern.compile(".*"), new Skin(branch, configuration.getDefaultSkin())));
         } else {
           skinMappings.addAll(createSkinMappingsFromFile(branch, skinMappingFileName));
         }
