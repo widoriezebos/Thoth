@@ -44,6 +44,9 @@ import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.MarkDownDocument;
@@ -120,36 +123,30 @@ public abstract class DocServlet extends HttpServlet {
     }
   }
 
-  protected String getAbsolutePath(HttpServletRequest request) throws ServletException, BranchNotFoundException, IOException {
+  protected String getFileSystemPath(HttpServletRequest request) throws ServletException, BranchNotFoundException, IOException {
     String path = getPath(request);
     String branch = getBranch(request);
-    return getContentManager().getAbsolutePath(branch, path);
+    return getContentManager().getFileSystemPath(branch, path);
   }
 
   protected String getTitle(HttpServletRequest request) {
     String path = getPath(request);
-    if (!StringUtils.isBlank(path)) {
-      int idx = path.lastIndexOf("/");
-      if (idx != -1)
-        path = path.substring(idx + 1);
-      idx = path.lastIndexOf('.');
-      if (idx != -1)
-        path = path.substring(0, idx);
-    }
+    path = ThothUtil.getPartAfterLast(path, "/");
+    path = ThothUtil.getPartBeforeLast(path, ".");
+    path = ThothUtil.stripPrefix(path, "/");
     return path;
   }
 
   protected String getPath(HttpServletRequest request) {
     String path = request.getServletPath();
-    if (path != null && path.startsWith("/")) {
-      path = path.substring(1);
+    path = ThothUtil.stripPrefix(path, "/");
+    
+    // Branch only? Then path is empty
+    if (path.indexOf("/") == -1)
+      path = "";
+    else
+      path = ThothUtil.getPartAfterFirst(path, "/");
 
-      int idx = path.indexOf('/');
-      if (idx != -1)
-        path = path.substring(idx + 1);
-      if (path.indexOf("/") == -1)
-        path = "";
-    }
     return path;
   }
 
@@ -159,13 +156,8 @@ public abstract class DocServlet extends HttpServlet {
 
   protected String getBranch(HttpServletRequest request) {
     String path = request.getServletPath();
-    if (path != null && path.startsWith("/")) {
-      path = path.substring(1);
-
-      int idx = path.indexOf('/');
-      if (idx != -1)
-        path = path.substring(0, idx);
-    }
+    path = ThothUtil.stripPrefix(path, "/");
+    path = ThothUtil.getPartBeforeFirst(path, "/");
     return path;
   }
 
@@ -178,21 +170,25 @@ public abstract class DocServlet extends HttpServlet {
     if (skin.isFromClassPath()) {
       skinBase = NATIVERESOURCES + baseUrl;
     } else {
-      skinBase = request.getContextPath() + baseUrl;
-      if (!skinBase.startsWith("/"))
-        skinBase = "/" + skinBase;
+      skinBase = prefixWithSlash(request.getContextPath() + baseUrl);
     }
 
+    String path = getPath(request);
+    path = prefixWithSlash(path);
     result.put("branch", branch);
     result.put("skinbase", skinBase);
-    result.put("branchurl",
-
-        getBranchUrl(request));
+    result.put("branchurl", getBranchUrl(request));
     result.put("contextpath", request.getContextPath());
-    result.put("path", getPath(request));
+    result.put("path", path);
     result.put("title", getTitle(request));
     result.put("refresh", getRefreshTimestamp(getContentManager()));
     return result;
+  }
+
+  protected String prefixWithSlash(String path) {
+    if (!StringUtils.isBlank(path) && !path.startsWith("/"))
+      path = "/" + path;
+    return path;
   }
 
   protected String getRefreshTimestamp(ContentManager contentManager) throws ServletException {
@@ -265,6 +261,18 @@ public abstract class DocServlet extends HttpServlet {
     return skinMappings;
   }
 
+  protected void executeJson(Map<String, Object> variables, HttpServletResponse response) throws ServletException {
+    try {
+      response.setContentType("application/json;charset=UTF-8");
+      boolean prettyPrintJson = Configuration.getInstance().isPrettyPrintJson();
+      ObjectMapper mapper = new ObjectMapper();
+      ObjectWriter writer = prettyPrintJson ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
+      writer.writeValue(response.getOutputStream(), variables);
+    } catch (Exception e) {
+      throw new ServletException(e);
+    }
+  }
+
   protected void executeVelocityTemplate(String template, String branch, Map<String, Object> variables, HttpServletResponse response)
       throws ContentManagerException, IOException, UnsupportedEncodingException {
     try (PrintWriter writer = response.getWriter()) {
@@ -306,4 +314,9 @@ public abstract class DocServlet extends HttpServlet {
     }
   }
 
+  protected boolean asJson(HttpServletRequest request) {
+    String mode = request.getParameter("mode");
+    boolean asJson = "json".equals(mode);
+    return asJson;
+  }
 }

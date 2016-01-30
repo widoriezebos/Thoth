@@ -44,11 +44,11 @@ public class Skin extends ConfigurationBase {
       if (is == null)
         throw new ContentManagerException("Could not find " + resourceName + " on the classpath");
       load(is);
-      this.skinBaseUrl = ThothUtil.getFolder(resourceName) + "/";
+      this.skinBaseUrl = ThothUtil.getFolder(resourceName);
     } else {
       String absFileName = ContentManagerFactory.getContentManager().getBranchFolder(branch) + skinPropertyFile;
       load(absFileName);
-      this.skinBaseUrl = branch + "/" + ThothUtil.getFolder(skinPropertyFile) + "/";
+      this.skinBaseUrl = branch + "/" + ThothUtil.getFolder(skinPropertyFile);
     }
     this.skinPropertyFile = skinPropertyFile;
     this.branch = branch;
@@ -100,7 +100,7 @@ public class Skin extends ConfigurationBase {
     if (fromClassPath) {
       if (tidyRelativePath.startsWith(CLASSPATH_PREFIX)) {
         tidyRelativePath = tidyRelativePath.substring(CLASSPATH_PREFIX.length());
-        return CLASSPATH_PREFIX + skinBaseUrl + tidyRelativePath;
+        return CLASSPATH_PREFIX + skinBaseUrl + "/" + tidyRelativePath;
       }
     }
     return skinBaseFolder + tidyRelativePath;

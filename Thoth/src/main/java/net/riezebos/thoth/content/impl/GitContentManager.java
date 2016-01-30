@@ -279,7 +279,6 @@ public class GitContentManager extends ContentManagerBase {
   protected Revision createFileRevision(DiffEntry diff, SimpleDiffFormatter df, RevCommit revCommit) throws IOException, UnsupportedEncodingException {
     Action action = translateAction(diff.getChangeType());
     Revision fileRevision = new Revision(action, action.equals(Action.DELETE) ? diff.getOldPath() : diff.getNewPath());
-    fileRevision.setDiff(df.getFormattedDiff(diff));
     fileRevision.setCommitMessage(revCommit.getFullMessage());
     fileRevision.setCommitId(ObjectId.toString(revCommit.getId()) + "/" + diff.getNewPath());
     return fileRevision;

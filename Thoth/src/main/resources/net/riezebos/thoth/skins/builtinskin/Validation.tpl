@@ -14,7 +14,7 @@ Very good, there are currently no validation errors in ${branch}
 <errors>
 #foreach($error in $errors)
 #if(${error.fileRelated})
-${error.file}(<a href="$branchurl/${error.file}">${error.line}</a>): ##
+${error.file}(<a href="${branchurl}${error.file}">${error.line}</a>): ##
 #end
 <strong>${error.errorMessage}</strong><br>
 #end

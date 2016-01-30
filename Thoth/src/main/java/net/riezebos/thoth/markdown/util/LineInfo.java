@@ -21,11 +21,19 @@ public class LineInfo implements Cloneable, Serializable {
   private String file;
   private int line;
 
+  public LineInfo(String file, int line) {
+    super();
+    setFile(file);
+    this.line = line;
+  }
+
   public String getFile() {
     return file;
   }
 
   public void setFile(String file) {
+    if (!file.startsWith("/"))
+      file = "/" + file;
     this.file = file;
   }
 
@@ -34,12 +42,6 @@ public class LineInfo implements Cloneable, Serializable {
   }
 
   public void setLine(int line) {
-    this.line = line;
-  }
-
-  public LineInfo(String file, int line) {
-    super();
-    this.file = file;
     this.line = line;
   }
 

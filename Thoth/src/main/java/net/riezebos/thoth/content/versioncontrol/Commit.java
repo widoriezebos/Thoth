@@ -61,7 +61,7 @@ public class Commit {
   }
 
   public void setMessage(String message) {
-    this.message = message;
+    this.message = message == null ? message : message.trim();
   }
 
   public List<Revision> getRevisions() {
@@ -69,7 +69,7 @@ public class Commit {
   }
 
   public void setShortMessage(String shortMessage) {
-    this.shortMessage = shortMessage;
+    this.shortMessage = shortMessage == null ? shortMessage : shortMessage.trim();
   }
 
   public String getShortMessage() {

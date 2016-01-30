@@ -26,11 +26,12 @@ public class Revision {
   private Commit commit;
   private Action action;
   private String path;
-  private String diff;
   private String commitMessage;
   private String commitId;
 
   public Revision(Action action, String path) {
+    if (!path.startsWith("/"))
+      path = "/" + path;
     this.action = action;
     this.path = path;
   }
@@ -64,16 +65,8 @@ public class Revision {
     return action + ": " + getPath();
   }
 
-  public void setDiff(String diff) {
-    this.diff = diff;
-  }
-
-  public String getDiff() {
-    return diff;
-  }
-
   public void setCommitMessage(String commitMessage) {
-    this.commitMessage = commitMessage;
+    this.commitMessage = commitMessage == null ? commitMessage : commitMessage.trim();
   }
 
   public String getCommitMessage() {

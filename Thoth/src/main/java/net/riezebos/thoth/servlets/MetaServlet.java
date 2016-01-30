@@ -49,8 +49,7 @@ public class MetaServlet extends DocServlet {
       throws ServletException, FileNotFoundException, IOException, ContentManagerException {
     long ms = System.currentTimeMillis();
 
-    response.setContentType("text/html;charset=UTF-8");
-    String absolutePath = getAbsolutePath(request);
+    String absolutePath = getFileSystemPath(request);
     if (absolutePath == null) {
       LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -95,8 +94,13 @@ public class MetaServlet extends DocServlet {
       variables.put("metatags", metatags);
       variables.put("errors", markDownDocument.getErrors());
 
-      String metaInformationTemplate = getSkin(request).getMetaInformationTemplate();
-      executeVelocityTemplate(metaInformationTemplate, branch, variables, response);
+      if (asJson(request))
+        executeJson(variables, response);
+      else {
+        response.setContentType("text/html;charset=UTF-8");
+        String metaInformationTemplate = getSkin(request).getMetaInformationTemplate();
+        executeVelocityTemplate(metaInformationTemplate, branch, variables, response);
+      }
     }
   }
 }

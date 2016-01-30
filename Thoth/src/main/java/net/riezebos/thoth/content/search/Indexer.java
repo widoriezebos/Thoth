@@ -225,7 +225,7 @@ public class Indexer {
         MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(branch, relativePath.toString());
         errors.addAll(markDownDocument.getErrors());
 
-        doc.add(new StringField(INDEX_PATH, relativePath.toString(), Field.Store.YES));
+        doc.add(new StringField(INDEX_PATH, "/" + relativePath.toString(), Field.Store.YES));
         doc.add(new TextField(INDEX_TITLE, markDownDocument.getTitle(), Store.YES));
         doc.add(new LongField(INDEX_MODIFIED, lastModified, Field.Store.NO));
         doc.add(new TextField(INDEX_CONTENTS, markDownDocument.getMarkdown(), Store.NO));

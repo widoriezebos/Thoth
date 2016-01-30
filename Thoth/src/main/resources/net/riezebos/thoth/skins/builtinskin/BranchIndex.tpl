@@ -24,9 +24,9 @@ Click <a href="${branchurl}?cmd=validationerrors">here</a> for the validation re
       <td>${category.name}</td>
       <td>
 #foreach($book in $category.books)
-         <a href="${branch}/${book.path}">${book.title}</a> (<a href="${branch}/${book.path}.pdf">pdf</a>&nbsp;
-                         <a href="${branch}/${book.path}.raw">md</a>
-			 <a href="${branch}/${book.path}.meta">meta</a>)<br/>
+         <a href="${branch}${book.path}">${book.title}</a> (<a href="${branch}${book.path}.pdf">pdf</a>&nbsp;
+                         <a href="${branch}${book.path}.raw">md</a>
+			 <a href="${branch}${book.path}.meta">meta</a>)<br/>
 #end
       </td>
   </tr>
@@ -41,8 +41,8 @@ Click <a href="${branchurl}?cmd=validationerrors">here</a> for the validation re
       <td>${folder.name}</td>
       <td>
 #foreach($book in $folder.books)
-         <a href="${branch}/${book.path}">${book.title}</a> (<a href="${branch}/${book.path}.pdf">pdf</a>&nbsp;
-                         <a href="${branch}/${book.path}.raw">md</a>)<br/>
+         <a href="${branch}${book.path}">${book.title}</a> (<a href="${branch}${book.path}.pdf">pdf</a>&nbsp;
+                         <a href="${branch}${book.path}.raw">md</a>)<br/>
 #end
       </td>
   </tr>

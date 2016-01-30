@@ -14,16 +14,12 @@
  */
 package net.riezebos.thoth.beans;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import net.riezebos.thoth.markdown.util.ProcessorError;
 
@@ -33,10 +29,11 @@ import net.riezebos.thoth.markdown.util.ProcessorError;
  * @author wido
  */
 public class MarkDownDocument {
-  private String markdown;
   private Map<String, String> metatags = new HashMap<String, String>();
   private List<ProcessorError> errors = new ArrayList<>();
   private DocumentNode documentStructure;
+  @JsonIgnore
+  private String markdown;
 
   public MarkDownDocument(String markdown, Map<String, String> metatags, List<ProcessorError> errors, DocumentNode documentStructure) {
     super();
@@ -90,14 +87,5 @@ public class MarkDownDocument {
       return getName();
     else
       return title;
-  }
-
-  public Reader getReader() {
-    try {
-      byte[] bytes = this.markdown.getBytes("UTF-8");
-      return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8));
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
   }
 }

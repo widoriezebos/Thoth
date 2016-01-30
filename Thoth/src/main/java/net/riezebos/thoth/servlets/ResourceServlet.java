@@ -96,8 +96,6 @@ public class ResourceServlet extends DocServlet {
     String branch = getBranch(request);
     Searcher searcher = SearchFactory.getInstance().getSearcher(branch);
 
-    response.setContentType("text/html;charset=UTF-8");
-
     String errorMessage = null;
     List<SearchResult> searchResults = new ArrayList<>();
     try {
@@ -118,8 +116,13 @@ public class ResourceServlet extends DocServlet {
     variables.put("searchResults", searchResults);
     variables.put("query", query);
 
-    String searchTemplate = getSkin(request).getSearchTemplate();
-    executeVelocityTemplate(searchTemplate, branch, variables, response);
+    if (asJson(request))
+      executeJson(variables, response);
+    else {
+      response.setContentType("text/html;charset=UTF-8");
+      String searchTemplate = getSkin(request).getSearchTemplate();
+      executeVelocityTemplate(searchTemplate, branch, variables, response);
+    }
   }
 
   protected void handleNativeResource(String path, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -138,7 +141,7 @@ public class ResourceServlet extends DocServlet {
 
   protected void handleResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, BranchNotFoundException, IOException {
     long ms = System.currentTimeMillis();
-    String absolutePath = getAbsolutePath(request);
+    String absolutePath = getFileSystemPath(request);
     if (absolutePath == null) {
       LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -156,21 +159,24 @@ public class ResourceServlet extends DocServlet {
   }
 
   protected void handleIndex(HttpServletRequest request, HttpServletResponse response) throws ContentManagerException, IOException, ServletException {
-    response.setContentType("text/html;charset=UTF-8");
     ContentManager contentManager = getContentManager();
-    String indexTemplate = getSkin(request).getIndexTemplate();
 
     List<String> branches = contentManager.getBranches();
     Map<String, Object> variables = getVariables(request);
     variables.put("branches", branches);
-    executeVelocityTemplate(indexTemplate, branches.get(0), variables, response);
+
+    if (asJson(request))
+      executeJson(variables, response);
+    else {
+      response.setContentType("text/html;charset=UTF-8");
+      String indexTemplate = getSkin(request).getIndexTemplate();
+      executeVelocityTemplate(indexTemplate, branches.get(0), variables, response);
+    }
   }
 
   protected void handleBranchIndex(HttpServletRequest request, HttpServletResponse response) throws ContentManagerException, IOException, ServletException {
-    response.setContentType("text/html;charset=UTF-8");
     ContentManager contentManager = getContentManager();
     String branch = getBranch(request);
-    String indexTemplate = getSkin(request).getBranchIndexTemplate();
     List<Book> books = contentManager.getBooks(branch);
     List<BookClassification> categories = contentManager.getClassification(books, "category", "Unclassified");
     List<BookClassification> audiences = contentManager.getClassification(books, "audience", "Unclassified");
@@ -187,12 +193,17 @@ public class ResourceServlet extends DocServlet {
     variables.put("folders", folders);
     variables.put("commitList", commitList);
 
-    executeVelocityTemplate(indexTemplate, branch, variables, response);
+    if (asJson(request))
+      executeJson(variables, response);
+    else {
+      response.setContentType("text/html;charset=UTF-8");
+      String indexTemplate = getSkin(request).getBranchIndexTemplate();
+      executeVelocityTemplate(indexTemplate, branch, variables, response);
+    }
   }
 
   protected void latestChanges(HttpServletRequest request, HttpServletResponse response, String branch)
       throws ServletException, IOException, ContentManagerException {
-    response.setContentType("text/html;charset=UTF-8");
     ContentManager contentManager = getContentManager();
 
     int maxRevisons = Configuration.getInstance().getBranchMaxRevisions();
@@ -202,33 +213,59 @@ public class ResourceServlet extends DocServlet {
     Map<String, Object> variables = getVariables(request);
     variables.put("commitList", commitList);
 
-    String revisionTemplate = getSkin(request).getRevisionTemplate();
-    executeVelocityTemplate(revisionTemplate, branch, variables, response);
+    if (asJson(request))
+      executeJson(variables, response);
+    else {
+      response.setContentType("text/html;charset=UTF-8");
+      String revisionTemplate = getSkin(request).getRevisionTemplate();
+      executeVelocityTemplate(revisionTemplate, branch, variables, response);
+    }
   }
 
   protected void validationErrors(HttpServletRequest request, HttpServletResponse response, String branch)
       throws ServletException, IOException, ContentManagerException {
-    response.setContentType("text/html;charset=UTF-8");
 
     List<ProcessorError> errors = SearchFactory.getInstance().getIndexer(branch).getValidationErrors();
 
     Map<String, Object> variables = getVariables(request);
     variables.put("errors", errors);
-    String validationTemplate = getSkin(request).getValidationTemplate();
-    executeVelocityTemplate(validationTemplate, branch, variables, response);
+
+    if (asJson(request))
+      executeJson(variables, response);
+    else {
+      response.setContentType("text/html;charset=UTF-8");
+      String validationTemplate = getSkin(request).getValidationTemplate();
+      executeVelocityTemplate(validationTemplate, branch, variables, response);
+    }
   }
 
   protected void pull(HttpServletRequest request, HttpServletResponse response) throws ContentManagerException, ServletException, IOException {
-    response.setContentType("text/plain;charset=UTF-8");
     ContentManager contentManager = getContentManager();
     String log = contentManager.refresh();
-    response.getWriter().println(log);
+    Map<String, Object> variables = getVariables(request);
+    variables.put("log", log);
+
+    if (asJson(request))
+      executeJson(variables, response);
+    else {
+      response.setContentType("text/plain;charset=UTF-8");
+      response.getWriter().println(log);
+    }
   }
 
   protected void reindex(HttpServletRequest request, HttpServletResponse response) throws ContentManagerException, ServletException, IOException {
-    response.setContentType("text/plain;charset=UTF-8");
     ContentManager contentManager = getContentManager();
     contentManager.reindex();
-    response.getWriter().println("Reindex requested. Running in the background now");
+
+    Map<String, Object> variables = getVariables(request);
+    String log = "Reindex requested. Running in the background now";
+    variables.put("log", log);
+
+    if (asJson(request))
+      executeJson(variables, response);
+    else {
+      response.setContentType("text/plain;charset=UTF-8");
+      response.getWriter().println(log);
+    }
   }
 }

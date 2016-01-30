@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -42,8 +43,7 @@ public class DiffServlet extends DocServlet {
       throws ServletException, FileNotFoundException, IOException, ContentManagerException {
     long ms = System.currentTimeMillis();
 
-    response.setContentType("text/html;charset=UTF-8");
-    String absolutePath = getAbsolutePath(request);
+    String absolutePath = getFileSystemPath(request);
     if (absolutePath == null) {
       LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -53,32 +53,47 @@ public class DiffServlet extends DocServlet {
 
       String commitId = request.getParameter("commitId");
       SourceDiff diff = contentManager.getDiff(branch, commitId);
+      String body = "Diff not found";
+      String timestamp = "00-00-0000 00:00:00";
+      String commitMessage = "Commit not found";
+      String author = "Diff not found";
+      LinkedList<Diff> diffs = new LinkedList<>();
+      if (diff != null) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        timestamp = sdf.format(diff.getTimeModified());
 
-      SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-      String timestamp = sdf.format(diff.getTimeModified());
+        String newSource = diff.getNewSource();
+        String oldSource = diff.getOldSource();
+        commitMessage = diff.getCommitMessage();
+        author = diff.getAuthor();
+        if (commitMessage != null)
+          commitMessage = commitMessage.trim();
 
-      String newSource = diff.getNewSource();
-      String oldSource = diff.getOldSource();
-      String commitMessage = diff.getCommitMessage();
-      if (commitMessage != null)
-        commitMessage = commitMessage.trim();
-
-      diff_match_patch dmp = new diff_match_patch();
-      LinkedList<Diff> diffs = dmp.diff_main(oldSource, newSource);
-      dmp.diff_cleanupSemantic(diffs);
-      String body = prettyPrintHtml(diffs);
+        diff_match_patch dmp = new diff_match_patch();
+        diffs = dmp.diff_main(oldSource, newSource);
+        dmp.diff_cleanupSemantic(diffs);
+        body = prettyPrintHtml(diffs);
+      }
+      boolean asJson = asJson(request);
 
       Map<String, Object> variables = getVariables(request);
-      variables.put("body", body);
-      variables.put("author", diff.getAuthor());
+      if (!asJson)
+        variables.put("body", body);
+      variables.put("author", author);
       variables.put("timestamp", timestamp);
       variables.put("commitMessage", commitMessage);
+      variables.put("diffs", diffs);
 
-      executeVelocityTemplate(getSkin(request).getDiffTemplate(), branch, variables, response);
+      if (asJson)
+        executeJson(variables, response);
+      else {
+        response.setContentType("text/html;charset=UTF-8");
+        executeVelocityTemplate(getSkin(request).getDiffTemplate(), branch, variables, response);
+      }
     }
   }
 
-  public String prettyPrintHtml(LinkedList<Diff> diffs) {
+  public String prettyPrintHtml(List<Diff> diffs) {
 
     StringBuilder html = new StringBuilder();
     int changeCounter = 1;

@@ -16,7 +16,7 @@
       <td>${commit.author}</td>
       <td>     
 #foreach($revision in $commit.revisions)
-      ${revision.action} ${revision.path} (<a href="${branchurl}/${revision.path}.diff?commitId=${revision.commitId}">Diff</a>)<br/>
+      ${revision.action} ${revision.path} (<a href="${branchurl}${revision.path}.diff?commitId=${revision.commitId}">Diff</a>)<br/>
 #end
       </td>
       <td>${commit.message}</td>

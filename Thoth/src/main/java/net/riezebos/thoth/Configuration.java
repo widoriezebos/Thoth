@@ -196,4 +196,8 @@ public class Configuration extends ConfigurationBase {
   public String getDefaultSkin() {
     return getValue("skin.default", BUILTIN_SKIN);
   }
+
+  public boolean isPrettyPrintJson() {
+    return "true".equalsIgnoreCase(getValue("json.prettyprint", "true"));
+  }
 }

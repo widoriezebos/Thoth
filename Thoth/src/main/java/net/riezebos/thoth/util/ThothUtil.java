@@ -190,4 +190,48 @@ public class ThothUtil {
     return title.trim();
   }
 
+  public static String getPartBeforeFirst(String path, String prefix) {
+    if (path != null) {
+      int idx = path.indexOf(prefix);
+      if (idx != -1)
+        path = path.substring(0, idx);
+    }
+    return path;
+  }
+
+  public static String getPartAfterFirst(String path, String prefix) {
+    if (path != null) {
+      int idx = path.indexOf(prefix);
+      if (idx != -1)
+        path = path.substring(idx + prefix.length());
+    }
+    return path;
+  }
+
+  public static String getPartAfterLast(String path, String prefix) {
+    if (path != null) {
+      int idx = path.lastIndexOf(prefix);
+      if (idx != -1)
+        path = path.substring(idx + prefix.length());
+    }
+    return path;
+  }
+
+  public static String getPartBeforeLast(String path, String prefix) {
+    if (path != null) {
+      int idx = path.lastIndexOf(prefix);
+      if (idx != -1)
+        path = path.substring(0, idx);
+    }
+    return path;
+  }
+
+  public static String stripPrefix(String path, String prefix) {
+    if (path != null) {
+      if (path.startsWith(prefix))
+        path = path.substring(prefix.length());
+    }
+    return path;
+  }
+
 }

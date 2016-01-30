@@ -63,7 +63,7 @@ public interface ContentManager {
 
   boolean accessAllowed(File file) throws IOException;
 
-  String getAbsolutePath(String branch, String path) throws BranchNotFoundException, IOException;
+  String getFileSystemPath(String branch, String path) throws BranchNotFoundException, IOException;
 
   public SourceDiff getDiff(String branch, String id) throws ContentManagerException;
 

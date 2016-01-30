@@ -192,8 +192,8 @@ public abstract class ContentManagerBase implements ContentManager {
               String canonicalPath = getConical(bookFile);
               if (canonicalPath.startsWith(branchFolder))
                 canonicalPath = canonicalPath.substring(branchFolder.length());
-              if (canonicalPath.startsWith("/"))
-                canonicalPath = canonicalPath.substring(1);
+              if (!canonicalPath.startsWith("/"))
+                canonicalPath = "/" + canonicalPath;
               Book book = new Book(file.getName(), canonicalPath);
               book.setMetaTags(includeProcessor.getMetaTags(new FileInputStream(file)));
               result.add(book);
@@ -305,7 +305,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public String getAbsolutePath(String branch, String path) throws BranchNotFoundException, IOException {
+  public String getFileSystemPath(String branch, String path) throws BranchNotFoundException, IOException {
     if (path.startsWith("/"))
       path = path.substring(1);
     String absolutePath = getBranchFolder(branch) + path;

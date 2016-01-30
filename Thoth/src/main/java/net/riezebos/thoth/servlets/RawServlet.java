@@ -36,7 +36,7 @@ public class RawServlet extends DocServlet {
     long ms = System.currentTimeMillis();
 
     response.setContentType("text/plain;charset=UTF-8");
-    String absolutePath = getAbsolutePath(request);
+    String absolutePath = getFileSystemPath(request);
     if (absolutePath == null) {
       LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
