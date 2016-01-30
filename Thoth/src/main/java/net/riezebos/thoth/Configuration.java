@@ -32,7 +32,7 @@ public class Configuration extends ConfigurationBase {
   public static final String WORKSPACELOCATION = "workspacelocation";
   public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
   private static final String WORKSPACELOCATION_DEPRECATED = "libraryroot";
-  public static final String BUILTIN_SKIN = "classpath:" + REQUIRED_PREFIX + "builtinskin/skin.properties";
+  public static final String BUILTIN_SKIN = "classpath:" + REQUIRED_PREFIX + "simpleskin/skin.properties";
 
   private static Configuration _instance;
   private String workspaceLocation;
