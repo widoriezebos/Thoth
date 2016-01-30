@@ -33,8 +33,7 @@ table td {
 }
 
 body {
-  string-set: doctitle content()	
-  background-color: #eee;
+  string-set: doctitle content();	
   color: #444;
 }
 
