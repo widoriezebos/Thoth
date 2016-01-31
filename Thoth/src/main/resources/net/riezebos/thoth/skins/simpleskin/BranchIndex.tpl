@@ -24,8 +24,8 @@ Click <a href="${branchurl}?cmd=validationerrors">here</a> for the validation re
       <td>${category.name}</td>
       <td>
 #foreach($book in $category.books)
-         <a href="${branch}${book.path}">${book.title}</a> (<a href="${branch}${book.path}.pdf">pdf</a>&nbsp;
-                         <a href="${branch}${book.path}.raw">md</a>
+         <a href="${branch}${book.path}">${book.title}</a> (<a href="${branch}${book.path}?output=pdf">pdf</a>&nbsp;
+                         <a href="${branch}${book.path}?output=raw">md</a>
 			 <a href="${branch}${book.path}.meta">meta</a>)<br/>
 #end
       </td>

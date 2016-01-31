@@ -15,16 +15,6 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
-    <servlet-name>PdfServlet</servlet-name>
-    <servlet-class>net.riezebos.thoth.servlets.PdfServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet>
-    <servlet-name>RawServlet</servlet-name>
-    <servlet-class>net.riezebos.thoth.servlets.RawServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet>
     <servlet-name>MetaServlet</servlet-name>
     <servlet-class>net.riezebos.thoth.servlets.MetaServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
@@ -42,14 +32,6 @@
   <servlet-mapping>
     <servlet-name>MetaServlet</servlet-name>
     <url-pattern>*.meta</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>RawServlet</servlet-name>
-    <url-pattern>*.raw</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>PdfServlet</servlet-name>
-    <url-pattern>*.pdf</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MarkdownServlet</servlet-name>

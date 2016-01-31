@@ -16,7 +16,7 @@ Simple yet powerful Markdown based Documentation System for professional documen
 ## Getting started, while still in a hurry
 Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Thoth inside Tomcat (either standalone or in Eclipse) just follow these simple steps:
 
-1. Copy the sample.configuration.properties file from the conf folder to anywhere on your machine. In this example we copy/rename it here: /Users/wido/Documents/Settings/wido.configuration.properties
+1. Copy the sample.configuration.properties file from the conf folder to anywhere on your machine. In this example we copy/rename it here: `/Users/wido/Documents/Settings/wido.configuration.properties`
 2. Open your property file and start setting the required properties:
 3. Determine where to store the working information (local Git repositories managed by Thoth, one per branch). The property to set is workspacelocation. For instance:  
 	`workspacelocation=/Users/wido/Documents/ThothWorkspace`

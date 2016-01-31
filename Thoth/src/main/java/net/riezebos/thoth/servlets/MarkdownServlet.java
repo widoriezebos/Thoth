@@ -14,10 +14,8 @@
  */
 package net.riezebos.thoth.servlets;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,67 +23,62 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.parboiled.Parboiled;
-import org.pegdown.LinkRenderer;
-import org.pegdown.RelaxedParser;
-import org.pegdown.ast.RootNode;
-import org.pegdown.plugins.PegDownPlugins;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.Configuration;
-import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.exceptions.ContentManagerException;
-import net.riezebos.thoth.util.CustomHtmlSerializer;
-import net.riezebos.thoth.util.ThothUtil;
+import net.riezebos.thoth.renderers.HtmlRenderer;
+import net.riezebos.thoth.renderers.PdfRenderer;
+import net.riezebos.thoth.renderers.RawRenderer;
+import net.riezebos.thoth.renderers.Renderer;
+import net.riezebos.thoth.renderers.Renderer.RenderResult;
 
 public class MarkdownServlet extends DocServlet {
   private static final Logger LOG = LoggerFactory.getLogger(MarkdownServlet.class);
 
   private static final long serialVersionUID = 1L;
 
+  private Map<String, Renderer> renderers = new HashMap<>();
+
+  public MarkdownServlet() {
+    setupRenderers();
+  }
+
+  protected void setupRenderers() {
+    registerRenderer(new HtmlRenderer());
+    registerRenderer(new PdfRenderer());
+    registerRenderer(new RawRenderer());
+  }
+
+  protected void registerRenderer(Renderer renderer) {
+    renderers.put(renderer.getTypeCode().toLowerCase(), renderer);
+  }
+
+  protected Renderer getRenderer(String typeCode) {
+    if (StringUtils.isBlank(typeCode))
+      typeCode = HtmlRenderer.TYPE;
+    return renderers.get(typeCode);
+  }
+
   protected void handleRequest(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, FileNotFoundException, IOException, ContentManagerException {
     long ms = System.currentTimeMillis();
 
-    response.setContentType("text/html;charset=UTF-8");
-    String absolutePath = getFileSystemPath(request);
-    if (absolutePath == null) {
+    Renderer renderer = getRenderer(request.getParameter("output"));
+    response.setContentType(renderer.getContentType());
+    RenderResult result = renderer.render(getBranch(request), getPath(request), getVariables(request), getSkin(request), response.getOutputStream());
+    switch (result) {
+    case NOT_FOUND:
+      LOG.info("404 on request " + request.getRequestURI());
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      break;
+    case FORBIDDEN:
       LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
-    } else {
-      File file = new File(absolutePath);
-      if (file.isFile()) {
-
-        Configuration configuration = Configuration.getInstance();
-        MarkDownDocument markdown = getMarkdown(request);
-        String markdownSource = markdown.getMarkdown();
-        Map<String, Object> metatags = new HashMap<>();
-        metatags.putAll(markdown.getMetatags());
-
-        int extensions = configuration.getMarkdownOptions();
-        long parseTimeOut = configuration.getParseTimeOut();
-
-        RelaxedParser parser =
-            Parboiled.createParser(RelaxedParser.class, extensions, parseTimeOut, RelaxedParser.DefaultParseRunnerProvider, PegDownPlugins.NONE);
-        RootNode ast = parser.parse(ThothUtil.wrapWithNewLines(markdownSource.toCharArray()));
-
-        CustomHtmlSerializer serializer = new CustomHtmlSerializer(new LinkRenderer());
-        String body = serializer.toHtml(ast);
-
-        PrintWriter writer = response.getWriter();
-        metatags.put("body", body);
-        String markDownTemplate = getSkin(request).getMarkDownTemplate();
-        if (markDownTemplate != null)
-          executeSimpleTemplate(writer, markDownTemplate, request, metatags);
-        else
-          response.getWriter().println(body);
-
-      } else {
-        LOG.info("404 on request " + request.getRequestURI());
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
-      }
-      LOG.debug("Handled request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
+      break;
+    default:
     }
+    LOG.debug("Handled request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
   }
 }
