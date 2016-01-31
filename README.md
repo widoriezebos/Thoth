@@ -16,22 +16,19 @@ Simple yet powerful Markdown based Documentation System for professional documen
 ## Getting started, while still in a hurry
 Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Thoth inside Tomcat (either standalone or in Eclipse) just follow these simple steps:
 
-1. Copy the sample.configuration.properties file from the conf folder to anywhere on your machine.  
-	For example place it here: /Users/wido/Documents/Settings/wido.configuration.properties
+1. Copy the sample.configuration.properties file from the conf folder to anywhere on your machine. In this example we copy/rename it here: /Users/wido/Documents/Settings/wido.configuration.properties
 2. Open your property file and start setting the required properties:
-3. Determine where to store the working information (local Git repositories managed by Thoth)  
-	The property to set is workspacelocation
-4. Set the git.username, git.password and git.repository properties to their correct values.  
-	For instance:  
-	`git.repository=https://my.gitserver.com/mycontext/documentation.git`  
-	`git.username=myuser`  
+3. Determine where to store the working information (local Git repositories managed by Thoth, one per branch). The property to set is workspacelocation. For instance:  
+	`workspacelocation=/Users/wido/Documents/ThothWorkspace`
+4. Set the git.username, git.password and git.repository properties to their correct values. For instance:  
+	`git.repository=https://github.com/widoriezebos/Thoth.git`  
+	`git.username=mygituser`  
 	`git.password=mysecret`
-5. Add a system variable or a system property to your launch configurationso that Thoth  
-	can find your configuration file:  
-	-Dconfiguration=/Users/wido/Documents/Settings/wido.configuration.properties
-6. Launch Tomcat. Your branches will be checked out to local Git repositories in your  
+5. Add a system variable or a system property to your launch configuration so that Thoth can find your configuration file. So launch the Java VM with an additional parameter:  
+	`-Dconfiguration=/Users/wido/Documents/Settings/wido.configuration.properties`
+6. Launch Tomcat. Your branches pulled to to local Git repositories in your  
 	workspace and they will be indexed automatically. When this is done you can connect  
-	with your browser and get going
+	with your browser and get going!
 
 ## Copyright
 Copyright (c) 2016 W.T.J. Riezebos
@@ -48,7 +45,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-## Acknowledgements 
+## Acknowledgements
 Thoth would not have been possible without the great help of the following projects (in arbitrary order):
 
 - Markdown, [https://daringfireball.net/projects/markdown/][2]
