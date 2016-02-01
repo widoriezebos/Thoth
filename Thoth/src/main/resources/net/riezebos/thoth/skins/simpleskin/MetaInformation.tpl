@@ -24,7 +24,7 @@ None
 #foreach($idx in [0..$documentNode.level])
 &nbsp;&nbsp;##
 #end
-<a href="$branchurl/${documentNode.path}">${documentNode.fileName}</a> (<a href="$branchurl/${documentNode.path}.meta">meta</a>)
+<a href="$branchurl/${documentNode.path}">${documentNode.fileName}</a> (<a href="$branchurl/${documentNode.path}?cmd=meta">meta</a>)
 #end
 </pre>	
 </documentstructure>		
@@ -44,7 +44,7 @@ ${error.file}(<a href="$branchurl/${error.file}">${error.line}</a>): ##
 <h3>Included by</h3>
 #if($usedBy)
 #foreach($documentPath in $usedBy)
-<a href="$branchurl/${documentPath}">${documentPath}</a> (<a href="$branchurl/${documentPath}.meta">meta</a>)<br/>
+<a href="$branchurl/${documentPath}">${documentPath}</a> (<a href="$branchurl/${documentPath}?cmd=meta">meta</a>)<br/>
 #end
 #else
 This document is not uncluded by any other document.
@@ -53,7 +53,7 @@ This document is not uncluded by any other document.
 #if($usedByIndirect)
 <h3>Included (indirectly) by</h3>
 #foreach($documentPath in $usedByIndirect)
-<a href="$branchurl/${documentPath}">${documentPath}</a> (<a href="$branchurl/${documentPath}.meta">meta</a>)<br/>
+<a href="$branchurl/${documentPath}">${documentPath}</a> (<a href="$branchurl/${documentPath}?cmd=meta">meta</a>)<br/>
 #end
 #end
 
@@ -67,7 +67,7 @@ This document is not uncluded by any other document.
       <td>${commit.author}</td>
       <td>     
 #foreach($revision in $commit.revisions)
-       ${revision.path} (<a href="$branchurl/${revision.fileName}.diff?commitId=${revision.commitId}">Diff</a>)<br/>
+       ${revision.path} (<a href="$branchurl/${revision.fileName}?cmd=diff&commitId=${revision.commitId}">Diff</a>)<br/>
 #end
       </td>
       <td>${commit.message}</td>
@@ -85,7 +85,7 @@ This document is not uncluded by any other document.
   <tr>
       <td>     
 #foreach($revision in $commit.revisions)
-      <a href="$branchurl/${documentNode.path}.diff?commitId=${revision.commitId}">${commit.formattedTimestamp}</a>
+      <a href="$branchurl/${documentNode.path}?cmd=diff&commitId=${revision.commitId}">${commit.formattedTimestamp}</a>
 #end
       </td>
       <td>${commit.author}</td>

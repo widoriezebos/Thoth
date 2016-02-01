@@ -234,4 +234,12 @@ public class ThothUtil {
     return path;
   }
 
+  public static String getExtension(String path) {
+    int idx = path.lastIndexOf('.');
+    if (idx != -1) {
+      return path.substring(idx + 1);
+    }
+    return null;
+  }
+
 }

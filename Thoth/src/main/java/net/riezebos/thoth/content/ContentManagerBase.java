@@ -32,13 +32,13 @@ import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.content.markdown.FileProcessor;
+import net.riezebos.thoth.content.markdown.IncludeProcessor;
+import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
-import net.riezebos.thoth.markdown.FileProcessor;
-import net.riezebos.thoth.markdown.IncludeProcessor;
-import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class ContentManagerBase implements ContentManager {

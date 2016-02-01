@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.markdown.util;
+package net.riezebos.thoth.content.markdown.util;
 
 import java.io.Serializable;
 

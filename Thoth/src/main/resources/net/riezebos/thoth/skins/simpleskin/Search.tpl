@@ -24,7 +24,7 @@ Sorry, no documents found for your query.
 #end
 #foreach($searchResult in $searchResults)
 <searchresult>
-Found in <a href="$branchurl${searchResult.document}">${searchResult.document}</a> (<a href="$branchurl${searchResult.document}.meta">meta</a>)
+Found in <a href="$branchurl${searchResult.document}">${searchResult.document}</a> (<a href="$branchurl${searchResult.document}?cmd=meta">meta</a>)
 #if(!${searchResult.bookReferences.isEmpty()})
 which is part of 
 #foreach($book in $searchResult.bookReferences)

@@ -25,10 +25,10 @@ import java.util.Map;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.SkinMapping;
+import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.IndexerException;
-import net.riezebos.thoth.markdown.util.ProcessorError;
 
 public class CacheManager {
   private static final String GLOBAL_SITE = "*global_site*";

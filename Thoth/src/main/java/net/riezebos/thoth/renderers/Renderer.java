@@ -24,7 +24,7 @@ public interface Renderer {
 
   public String getTypeCode();
 
-  public String getContentType();
+  public String getContentType(Map<String, Object> arguments);
 
-  public RenderResult render(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException;
+  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException;
 }

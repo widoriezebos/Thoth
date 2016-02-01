@@ -10,11 +10,11 @@
 	
 <h1>${branch} documentation</h1>
 
-<form action="${branchurl}" method="get">
+<form action="${branchurl}?cmd=search" method="get">
   Search all of ${branch}: <input type="text" name="query"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
 </form>
-Click <a href="${branchurl}?cmd=latestchanges">here</a> for the latest changes, or click on a meta link below to zoom in on a document.<br/>
-Click <a href="${branchurl}?cmd=validationerrors">here</a> for the validation report of this entire branch
+Click <a href="${branchurl}?cmd=revisions">here</a> for the latest changes, or click on a meta link below to zoom in on a document.<br/>
+Click <a href="${branchurl}?cmd=validationreport">here</a> for the validation report of this entire branch
 
 <h2>Books by Category</h2>
 <table>
@@ -26,7 +26,7 @@ Click <a href="${branchurl}?cmd=validationerrors">here</a> for the validation re
 #foreach($book in $category.books)
          <a href="${branch}${book.path}">${book.title}</a> (<a href="${branch}${book.path}?output=pdf">pdf</a>&nbsp;
                          <a href="${branch}${book.path}?output=raw">md</a>
-			 <a href="${branch}${book.path}.meta">meta</a>)<br/>
+			 <a href="${branch}${book.path}?cmd=meta">meta</a>)<br/>
 #end
       </td>
   </tr>
@@ -41,8 +41,8 @@ Click <a href="${branchurl}?cmd=validationerrors">here</a> for the validation re
       <td>${folder.name}</td>
       <td>
 #foreach($book in $folder.books)
-         <a href="${branch}${book.path}">${book.title}</a> (<a href="${branch}${book.path}.pdf">pdf</a>&nbsp;
-                         <a href="${branch}${book.path}.raw">md</a>)<br/>
+         <a href="${branch}${book.path}">${book.title}</a> (<a href="${branch}${book.path}?output=pdf">pdf</a>&nbsp;
+                         <a href="${branch}${book.path}?output=raw">md</a>)<br/>
 #end
       </td>
   </tr>

@@ -12,48 +12,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.renderers;
+package net.riezebos.thoth.commands;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-
-import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.util.RendererBase;
 
-public class RawRenderer extends RendererBase implements Renderer {
-  public static final String TYPE = "raw";
+public class ReindexCommand extends RendererBase implements Command {
 
+  @Override
   public String getTypeCode() {
-    return TYPE;
+    return "reindex";
   }
 
+  @Override
   public String getContentType(Map<String, Object> arguments) {
     return "text/plain;charset=UTF-8";
   }
 
   public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      RenderResult result = RenderResult.OK;
 
-      String absolutePath = getFileSystemPath(branch, path);
-      if (absolutePath == null) {
-        result = RenderResult.FORBIDDEN;
-      } else {
-        MarkDownDocument markDownDocument = getMarkDownDocument(branch, path);
-        String markdown = markDownDocument.getMarkdown();
-        InputStream is = new ByteArrayInputStream(markdown.getBytes("UTF-8"));
-        IOUtils.copy(is, outputStream);
+      ContentManager contentManager = getContentManager();
+      contentManager.reindex();
+      Map<String, Object> variables = new HashMap<>(arguments);
+      String log = "Reindex reuested. Running in the background";
+      variables.put("log", log);
+
+      if (asJson(arguments))
+        executeJson(variables, outputStream);
+      else {
+        try (PrintWriter writer = new PrintWriter(outputStream)) {
+          writer.println(log);
+        }
       }
-      return result;
+
+      return RenderResult.OK;
     } catch (Exception e) {
       throw new RenderException(e);
     }
   }
-
 }

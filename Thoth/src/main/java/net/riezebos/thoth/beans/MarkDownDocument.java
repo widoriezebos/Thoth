@@ -21,7 +21,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import net.riezebos.thoth.markdown.util.ProcessorError;
+import net.riezebos.thoth.content.markdown.util.ProcessorError;
 
 /**
  * Contains all information about a MarkDown document, including meta tags, document structure and any errors that arose during include and link processing.

@@ -15,7 +15,9 @@
 package net.riezebos.thoth.beans;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -98,9 +100,26 @@ public class DocumentNode {
     return ThothUtil.stripSuffix(sb.toString(), "\n");
   }
 
-  public List<DocumentNode> flatten() {
+  /**
+   * Returns the document structure as a list of nodes by flattening the tree.
+   *
+   * @param removeDuplicates when true then nodes with the same pas will only appear once in the result
+   * @return
+   */
+  public List<DocumentNode> flatten(boolean removeDuplicates) {
     List<DocumentNode> result = new ArrayList<DocumentNode>();
     visit(this, result);
+    if (removeDuplicates) {
+      Set<String> paths = new HashSet<>();
+
+      List<DocumentNode> nodups = new ArrayList<DocumentNode>();
+      for (DocumentNode node : result) {
+        if (!paths.contains(node.getPath()))
+          nodups.add(node);
+        paths.add(node.getPath());
+      }
+      result = nodups;
+    }
     return result;
   }
 

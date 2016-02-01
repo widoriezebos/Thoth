@@ -27,20 +27,21 @@ import org.apache.commons.io.IOUtils;
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.util.RendererBase;
 import net.riezebos.thoth.util.ThothUtil;
 
-public class PdfRenderer extends RendererBase {
+public class PdfRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "pdf";
 
   public String getTypeCode() {
     return TYPE;
   }
 
-  public String getContentType() {
+  public String getContentType(Map<String, Object> arguments) {
     return "application/pdf";
   }
 
-  public RenderResult render(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       RenderResult result = RenderResult.OK;
 

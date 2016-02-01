@@ -14,7 +14,7 @@
  */
 package net.riezebos.thoth.beans;
 
-import net.riezebos.thoth.markdown.util.LineInfo;
+import net.riezebos.thoth.content.markdown.util.LineInfo;
 
 public class BookmarkUsage {
 

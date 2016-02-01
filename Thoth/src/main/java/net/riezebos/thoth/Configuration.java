@@ -92,8 +92,16 @@ public class Configuration extends ConfigurationBase {
   }
 
   public List<String> getBookExtensions() {
+    return getValueAsSet("books", "marked,book,index");
+  }
+
+  public List<String> getDocumentExtensions() {
+    return getValueAsSet("documents", "marked,book,index,md");
+  }
+
+  protected List<String> getValueAsSet(String key, String defaultValue) {
     List<String> result = new ArrayList<>();
-    for (String extension : getValue("books", "").split("\\,"))
+    for (String extension : getValue(key, defaultValue).split("\\,"))
       if (StringUtils.isNotBlank(extension))
         result.add(extension.trim());
     Collections.sort(result);

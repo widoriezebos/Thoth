@@ -12,48 +12,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.renderers;
+package net.riezebos.thoth.commands;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-
-import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.Skin;
+import net.riezebos.thoth.content.markdown.util.ProcessorError;
+import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.util.RendererBase;
 
-public class RawRenderer extends RendererBase implements Renderer {
-  public static final String TYPE = "raw";
+public class ValidationReportCommand extends RendererBase implements Command {
 
+  @Override
   public String getTypeCode() {
-    return TYPE;
-  }
-
-  public String getContentType(Map<String, Object> arguments) {
-    return "text/plain;charset=UTF-8";
+    return "validationreport";
   }
 
   public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      RenderResult result = RenderResult.OK;
+      List<ProcessorError> errors = SearchFactory.getInstance().getIndexer(branch).getValidationErrors();
 
-      String absolutePath = getFileSystemPath(branch, path);
-      if (absolutePath == null) {
-        result = RenderResult.FORBIDDEN;
-      } else {
-        MarkDownDocument markDownDocument = getMarkDownDocument(branch, path);
-        String markdown = markDownDocument.getMarkdown();
-        InputStream is = new ByteArrayInputStream(markdown.getBytes("UTF-8"));
-        IOUtils.copy(is, outputStream);
+      Map<String, Object> variables = new HashMap<>(arguments);
+      variables.put("errors", errors);
+
+      if (asJson(arguments))
+        executeJson(variables, outputStream);
+      else {
+        String validationTemplate = skin.getValidationTemplate();
+        executeVelocityTemplate(validationTemplate, branch, variables, outputStream);
       }
-      return result;
+
+      return RenderResult.OK;
     } catch (Exception e) {
       throw new RenderException(e);
     }
   }
-
 }

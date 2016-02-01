@@ -57,10 +57,10 @@ import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.DocumentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.IndexerException;
-import net.riezebos.thoth.markdown.util.ProcessorError;
 
 public class Indexer {
   public static final String INDEX_CONTENTS = "contents";

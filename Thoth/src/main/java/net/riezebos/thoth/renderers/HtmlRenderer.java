@@ -30,20 +30,21 @@ import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.util.CustomHtmlSerializer;
+import net.riezebos.thoth.util.RendererBase;
 import net.riezebos.thoth.util.ThothUtil;
 
-public class HtmlRenderer extends RendererBase {
+public class HtmlRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "html";
 
   public String getTypeCode() {
     return TYPE;
   }
 
-  public String getContentType() {
+  public String getContentType(Map<String, Object> arguments) {
     return "text/html;charset=UTF-8";
   }
 
-  public RenderResult render(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       RenderResult result = RenderResult.OK;
 

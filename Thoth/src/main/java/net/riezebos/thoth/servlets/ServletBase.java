@@ -15,21 +15,19 @@
 package net.riezebos.thoth.servlets;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
@@ -37,15 +35,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.Configuration;
@@ -58,20 +50,17 @@ import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.util.ThothUtil;
 
-public abstract class DocServlet extends HttpServlet {
+public abstract class ServletBase extends HttpServlet {
   private static final long serialVersionUID = 1L;
-  private static final Logger LOG = LoggerFactory.getLogger(DocServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServletBase.class);
 
-  private static final String CLASSPATH_PREFIX = "classpath:";
-  private static final String VELOCITY_HELPER = "thothutil";
   private static final String SKINS_PROPERTIES = "skins.properties";
   private static final String TIMEMSTAMP_FORMAT = "dd-MM-yyyy HH:mm:ss";
-  private static final String VELOCITY_PROPERTIES = "net/riezebos/thoth/velocity.properties";
   protected static final String NATIVERESOURCES = "/nativeresources/";
 
   protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
 
-  public DocServlet() {
+  public ServletBase() {
     Configuration.getInstance().validate();
   }
 
@@ -140,7 +129,7 @@ public abstract class DocServlet extends HttpServlet {
   protected String getPath(HttpServletRequest request) {
     String path = request.getServletPath();
     path = ThothUtil.stripPrefix(path, "/");
-    
+
     // Branch only? Then path is empty
     if (path.indexOf("/") == -1)
       path = "";
@@ -159,30 +148,6 @@ public abstract class DocServlet extends HttpServlet {
     path = ThothUtil.stripPrefix(path, "/");
     path = ThothUtil.getPartBeforeFirst(path, "/");
     return path;
-  }
-
-  protected Map<String, Object> getVariables(HttpServletRequest request) throws ServletException {
-    Map<String, Object> result = new HashMap<>();
-    String branch = getBranch(request);
-    Skin skin = getSkin(request);
-    String skinBase;
-    String baseUrl = skin.getBaseUrl();
-    if (skin.isFromClassPath()) {
-      skinBase = NATIVERESOURCES + baseUrl;
-    } else {
-      skinBase = prefixWithSlash(request.getContextPath() + baseUrl);
-    }
-
-    String path = getPath(request);
-    path = prefixWithSlash(path);
-    result.put("branch", branch);
-    result.put("skinbase", skinBase);
-    result.put("branchurl", getBranchUrl(request));
-    result.put("contextpath", request.getContextPath());
-    result.put("path", path);
-    result.put("title", getTitle(request));
-    result.put("refresh", getRefreshTimestamp(getContentManager()));
-    return result;
   }
 
   protected String prefixWithSlash(String path) {
@@ -261,62 +226,34 @@ public abstract class DocServlet extends HttpServlet {
     return skinMappings;
   }
 
-  protected void executeJson(Map<String, Object> variables, HttpServletResponse response) throws ServletException {
-    try {
-      response.setContentType("application/json;charset=UTF-8");
-      boolean prettyPrintJson = Configuration.getInstance().isPrettyPrintJson();
-      ObjectMapper mapper = new ObjectMapper();
-      ObjectWriter writer = prettyPrintJson ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
-      writer.writeValue(response.getOutputStream(), variables);
-    } catch (Exception e) {
-      throw new ServletException(e);
+  protected Map<String, Object> getParameters(HttpServletRequest request) throws ServletException {
+    Map<String, Object> result = new HashMap<>();
+    
+    Enumeration<String> parameterNames = request.getParameterNames();
+    while (parameterNames.hasMoreElements()) {
+      String key = parameterNames.nextElement();
+      result.put(key, request.getParameter(key));
     }
-  }
 
-  protected void executeVelocityTemplate(String template, String branch, Map<String, Object> variables, HttpServletResponse response)
-      throws ContentManagerException, IOException, UnsupportedEncodingException {
-    try (PrintWriter writer = response.getWriter()) {
-      VelocityContext context = new VelocityContext(variables);
-      context.put(VELOCITY_HELPER, new ThothUtil());
-      VelocityEngine engine = new VelocityEngine();
-      Properties properties = new Properties();
-      properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(VELOCITY_PROPERTIES));
-      engine.init(properties);
-      engine.getTemplate(template).merge(context, writer);
-    } catch (Exception e) {
-      throw new ContentManagerException(e);
+    String branch = getBranch(request);
+    Skin skin = getSkin(request);
+    String skinBase;
+    String baseUrl = skin.getBaseUrl();
+    if (skin.isFromClassPath()) {
+      skinBase = NATIVERESOURCES + baseUrl;
+    } else {
+      skinBase = prefixWithSlash(request.getContextPath() + baseUrl);
     }
-  }
 
-  protected void executeSimpleTemplate(PrintWriter writer, String location, HttpServletRequest request, Map<String, Object> arguments)
-      throws BranchNotFoundException, ContentManagerException, IOException, ServletException {
-    if (!StringUtils.isBlank(location)) {
-
-      InputStream is = null;
-
-      if (location.startsWith(CLASSPATH_PREFIX)) {
-        is = Thread.currentThread().getContextClassLoader().getResourceAsStream(location.substring(CLASSPATH_PREFIX.length()));
-      }
-      File templateFile = new File(location);
-      if (templateFile.exists())
-        is = new FileInputStream(templateFile);
-
-      if (is == null) {
-        writer.print("Template file " + location + " not found\n");
-      } else {
-        Map<String, Object> variables = getVariables(request);
-        variables.putAll(arguments);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(5000);
-        IOUtils.copy(is, bos);
-        String template = ThothUtil.replaceKeywords(bos.toString("UTF-8"), variables);
-        writer.print(template);
-      }
-    }
-  }
-
-  protected boolean asJson(HttpServletRequest request) {
-    String mode = request.getParameter("mode");
-    boolean asJson = "json".equals(mode);
-    return asJson;
+    String path = getPath(request);
+    path = prefixWithSlash(path);
+    result.put("branch", branch);
+    result.put("skinbase", skinBase);
+    result.put("branchurl", getBranchUrl(request));
+    result.put("contextpath", request.getContextPath());
+    result.put("path", path);
+    result.put("title", getTitle(request));
+    result.put("refresh", getRefreshTimestamp(getContentManager()));
+    return result;
   }
 }

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.markdown;
+package net.riezebos.thoth.content.markdown;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,8 +34,8 @@ import java.util.regex.Pattern;
 
 import net.riezebos.thoth.beans.Bookmark;
 import net.riezebos.thoth.beans.BookmarkUsage;
-import net.riezebos.thoth.markdown.util.LineInfo;
-import net.riezebos.thoth.markdown.util.ProcessorError;
+import net.riezebos.thoth.content.markdown.util.LineInfo;
+import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
 
 /**
