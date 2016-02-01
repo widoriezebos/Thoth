@@ -57,6 +57,8 @@ import net.riezebos.thoth.renderers.Renderer.RenderResult;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class ThothServlet extends ServletBase {
+  private static final String PLAIN_TEXT = "text/plain;charset=UTF-8";
+
   private static final Logger LOG = LoggerFactory.getLogger(ThothServlet.class);
 
   private static final long serialVersionUID = 1L;
@@ -106,7 +108,7 @@ public class ThothServlet extends ServletBase {
       renderer.setContentType(customRendererDefinition.getContentType());
       renderer.setCommandLine(customRendererDefinition.getCommandLine());
       registerRenderer(renderer);
-      
+
       // Override default renderer?
       if (defaultRenderer.getTypeCode().equals(renderer.getTypeCode()))
         defaultRenderer = renderer;
@@ -206,8 +208,16 @@ public class ThothServlet extends ServletBase {
         LOG.warn("404 on request for native resource " + request.getRequestURI());
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
       } else
-        IOUtils.copy(is, response.getOutputStream());
+        guessMimeType(request.getServletPath(), response);
+      IOUtils.copy(is, response.getOutputStream());
     }
+  }
+
+  protected void guessMimeType(String path, HttpServletResponse response) {
+    if (path.toLowerCase().endsWith(".properties"))
+      response.setContentType(PLAIN_TEXT);
+    if (path.toLowerCase().endsWith(".txt"))
+      response.setContentType(PLAIN_TEXT);
   }
 
   protected void streamResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, BranchNotFoundException, IOException {
@@ -219,6 +229,7 @@ public class ThothServlet extends ServletBase {
     } else {
       File file = new File(absolutePath);
       if (file.isFile()) {
+        guessMimeType(request.getServletPath(), response);
         FileInputStream fis = new FileInputStream(file);
         IOUtils.copy(fis, response.getOutputStream());
       } else {
