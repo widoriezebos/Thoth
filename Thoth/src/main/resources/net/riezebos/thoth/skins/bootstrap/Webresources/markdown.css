@@ -1,0 +1,23 @@
+<!-- Prince PDF related CSS -->
+body {
+    display: block;
+    page: main;
+}
+@page main {
+    @top {
+	content: string(doctitle);     	
+    }	
+    @bottom-right {
+        content: "Page " counter(page);
+    }
+    @bottom { 
+        content: "© 2016 Eyefreight BV";
+    }	
+}
+<!-- End of Prince PDF related CSS -->
+
+table td {
+    prince-text-replace: '(' '(\200B' ')' ')\200B' '=' '=\200B' '[' '[\200B' 
+                         '+' '+\200B' '-' '-\200B' '*' '*\200B' '/' '/\200B' 
+                         '/' '/\200B' '.' '.\200B' '_' '_\200B' '%' '%\200B';
+}
