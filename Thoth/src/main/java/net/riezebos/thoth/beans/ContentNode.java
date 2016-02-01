@@ -10,18 +10,24 @@
  */
 package net.riezebos.thoth.beans;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class ContentNode {
+public class ContentNode implements Comparable<ContentNode> {
   private String path;
   private boolean isFolder;
+  private Date dateModified;
+  private long size;
   private List<ContentNode> children = new ArrayList<>();
 
-  public ContentNode(String path, boolean isFolder) {
+  public ContentNode(String path, File file) {
     super();
     this.path = path;
-    this.isFolder = isFolder;
+    this.isFolder = file.isDirectory();
+    this.dateModified = new Date(file.lastModified());
+    this.size = isFolder ? 0 : file.length();
   }
 
   public String getPath() {
@@ -48,4 +54,25 @@ public class ContentNode {
     this.children = children;
   }
 
+  @Override
+  public String toString() {
+    return getPath();
+  }
+
+  public Date getDateModified() {
+    return dateModified;
+  }
+
+  public long getSize() {
+    return size;
+  }
+
+  @Override
+  public int compareTo(ContentNode o) {
+    int result = new Boolean(isFolder).compareTo(o.isFolder);
+    if (result != 0)
+      return result;
+
+    return getPath().compareTo(o.getPath());
+  }
 }

@@ -55,8 +55,8 @@ public abstract class ServletBase extends HttpServlet {
   private static final Logger LOG = LoggerFactory.getLogger(ServletBase.class);
 
   private static final String SKINS_PROPERTIES = "skins.properties";
-  private static final String TIMEMSTAMP_FORMAT = "dd-MM-yyyy HH:mm:ss";
   protected static final String NATIVERESOURCES = "/nativeresources/";
+  private Skin defaultSkin = null;
 
   protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
 
@@ -157,8 +157,9 @@ public abstract class ServletBase extends HttpServlet {
   }
 
   protected String getRefreshTimestamp(ContentManager contentManager) throws ServletException {
-    String refresh =
-        getContentManager().getLatestRefresh() == null ? "Never" : new SimpleDateFormat(TIMEMSTAMP_FORMAT).format(contentManager.getLatestRefresh());
+    Configuration configuration = Configuration.getInstance();
+    SimpleDateFormat dateFormat = configuration.getDateFormat();
+    String refresh = getContentManager().getLatestRefresh() == null ? "Never" : dateFormat.format(contentManager.getLatestRefresh());
     return refresh;
   }
 
@@ -175,6 +176,7 @@ public abstract class ServletBase extends HttpServlet {
       CacheManager cacheManager = CacheManager.getInstance(branch);
       List<SkinMapping> skinMappings = cacheManager.getSkinMappings();
       if (skinMappings == null) {
+        defaultSkin = new Skin(branch, configuration.getDefaultSkin());
         skinMappings = new ArrayList<>();
 
         String branchFolder = ContentManagerFactory.getContentManager().getBranchFolder(branch);
@@ -183,7 +185,7 @@ public abstract class ServletBase extends HttpServlet {
         if (!skinMappingFile.isFile()) {
           LOG.warn("No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFileName + " so falling back to built in which is "
               + configuration.getDefaultSkin());
-          skinMappings.add(new SkinMapping(Pattern.compile(".*"), new Skin(branch, configuration.getDefaultSkin())));
+          skinMappings.add(new SkinMapping(Pattern.compile(".*"), defaultSkin));
         } else {
           skinMappings.addAll(createSkinMappingsFromFile(branch, skinMappingFileName));
         }
@@ -196,7 +198,7 @@ public abstract class ServletBase extends HttpServlet {
         if (mapping.getPattern().matcher(path).matches())
           skin = mapping.getSkin();
       if (skin == null)
-        throw new IllegalArgumentException("No skin mapping defined for request " + path);
+        skin = defaultSkin;
       return skin;
     } catch (Exception e) {
       throw new ServletException(e);
@@ -228,7 +230,7 @@ public abstract class ServletBase extends HttpServlet {
 
   protected Map<String, Object> getParameters(HttpServletRequest request) throws ServletException {
     Map<String, Object> result = new HashMap<>();
-    
+
     Enumeration<String> parameterNames = request.getParameterNames();
     while (parameterNames.hasMoreElements()) {
       String key = parameterNames.nextElement();

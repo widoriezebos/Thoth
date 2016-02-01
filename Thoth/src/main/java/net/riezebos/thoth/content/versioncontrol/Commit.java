@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.riezebos.thoth.Configuration;
+
 /**
  * TODO javadoc
  *
@@ -48,8 +50,9 @@ public class Commit {
   }
 
   public String getFormattedTimestamp() {
-    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-    return sdf.format(timestamp);
+    Configuration configuration = Configuration.getInstance();
+    SimpleDateFormat dateFormat = configuration.getDateFormat();
+    return dateFormat.format(timestamp);
   }
 
   public void setTimestamp(Date timestamp) {

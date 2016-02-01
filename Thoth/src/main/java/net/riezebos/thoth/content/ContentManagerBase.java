@@ -92,7 +92,7 @@ public abstract class ContentManagerBase implements ContentManager {
 
   @Override
   public MarkDownDocument getMarkDownDocument(String branch, String path) throws IOException, BranchNotFoundException {
-	String documentPath= ThothUtil.normalSlashes(path);
+    String documentPath = ThothUtil.normalSlashes(path);
     if (documentPath.startsWith("/"))
       documentPath = documentPath.substring(1);
     String physicalFilePath = getBranchFolder(branch) + documentPath;
@@ -337,12 +337,15 @@ public abstract class ContentManagerBase implements ContentManager {
         result.add(createContentNode(result, child.getAbsolutePath(), branchPath));
       }
     }
+    Collections.sort(result);
     return result;
   }
 
   protected ContentNode createContentNode(List<ContentNode> result, String fileSystemPath, Path branchPath) {
-    Path relativePath = Paths.get(fileSystemPath).relativize(branchPath);
-    return new ContentNode(relativePath.toString(), false);
+    Path filePath = Paths.get(fileSystemPath);
+    Path relativePath = branchPath.relativize(filePath);
+    File file = filePath.toFile();
+    return new ContentNode("/" + relativePath.toString(), file);
   }
 
 }

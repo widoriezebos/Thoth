@@ -95,6 +95,10 @@ public class Skin extends ConfigurationBase {
     return getPathProperty("template.search");
   }
 
+  public String getBrowseTemplate() {
+    return getPathProperty("template.browse");
+  }
+
   protected String getPathProperty(String key) {
     String tidyRelativePath = ThothUtil.tidyRelativePath(getValue(key));
     if (fromClassPath) {
@@ -118,4 +122,5 @@ public class Skin extends ConfigurationBase {
   public boolean isFromClassPath() {
     return fromClassPath;
   }
+
 }

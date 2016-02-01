@@ -14,6 +14,7 @@
  */
 package net.riezebos.thoth;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +28,8 @@ import net.riezebos.thoth.beans.CustomRendererDefinition;
 import net.riezebos.thoth.util.ConfigurationBase;
 
 public class Configuration extends ConfigurationBase {
+  private static final String DEFAULT_DATE_FMT = "dd-MM-yyyy HH:mm:ss";
+
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
   public static final String CONFIGKEY = "configuration";
@@ -228,5 +231,18 @@ public class Configuration extends ConfigurationBase {
     } while (renderer != null);
 
     return result;
+  }
+
+  public SimpleDateFormat getDateFormat() {
+    try {
+      return new SimpleDateFormat(getDateFormatMask());
+    } catch (Exception x) {
+      LOG.warn("Invalid format mask: " + getDateFormatMask());
+      return new SimpleDateFormat(DEFAULT_DATE_FMT);
+    }
+  }
+
+  public String getDateFormatMask() {
+    return getValue("formatmask", DEFAULT_DATE_FMT);
   }
 }

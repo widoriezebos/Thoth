@@ -15,6 +15,7 @@
 package net.riezebos.thoth.commands;
 
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,17 @@ public class BrowseCommand extends RendererBase implements Command {
 
     try {
       RenderResult result = RenderResult.OK;
-      List<ContentNode> list = getContentManager().list(branch, path);
+      List<ContentNode> contentNodes = getContentManager().list(branch, path);
+      boolean asJson = asJson(arguments);
+
+      Map<String, Object> variables = new HashMap<>(arguments);
+      variables.put("contentNodes", contentNodes);
+
+      if (asJson)
+        executeJson(variables, outputStream);
+      else {
+        executeVelocityTemplate(skin.getBrowseTemplate(), branch, variables, outputStream);
+      }
 
       return result;
     } catch (Exception e) {

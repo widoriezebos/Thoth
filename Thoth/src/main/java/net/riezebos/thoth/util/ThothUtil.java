@@ -25,13 +25,17 @@ public class ThothUtil {
   private static final int DEFAULT_ADDITIONAL_BUFFERSIZE = 10;
 
   public static String tidyRelativePath(String value) {
-    value = normalSlashes(value);
-    if (value.startsWith("/"))
-      value = value.substring(1);
+    if (value != null) {
+      value = normalSlashes(value);
+      if (value.startsWith("/"))
+        value = value.substring(1);
+    }
     return value;
   }
 
   public static String normalSlashes(String filespec) {
+    if (filespec == null)
+      return null;
     return filespec.replaceAll("\\\\", "/");
   }
 
@@ -72,7 +76,7 @@ public class ThothUtil {
   }
 
   public static String getFolder(String filespec) {
-	  String path = normalSlashes(filespec);
+    String path = normalSlashes(filespec);
     if (path != null) {
       int idx = path.lastIndexOf("/");
       if (idx != -1)
