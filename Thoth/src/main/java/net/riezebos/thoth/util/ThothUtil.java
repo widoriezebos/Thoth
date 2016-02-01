@@ -71,7 +71,8 @@ public class ThothUtil {
     return src;
   }
 
-  public static String getFolder(String path) {
+  public static String getFolder(String filespec) {
+	  String path = normalSlashes(filespec);
     if (path != null) {
       int idx = path.lastIndexOf("/");
       if (idx != -1)
