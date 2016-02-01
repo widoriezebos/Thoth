@@ -78,6 +78,12 @@ public class Indexer {
   private Set<String> extensions = new HashSet<>();
   private static Set<String> activeIndexers = new HashSet<>();
 
+  public static void main(String[] args) throws ContentManagerException {
+	Indexer indexer = SearchFactory.getInstance().getIndexer("Erasmus");
+	indexer.index();
+	System.out.println("Done");
+}
+  
   protected Indexer(ContentManager contentManager, String branch) throws BranchNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
     this.branch = branch;
@@ -193,7 +199,7 @@ public class Indexer {
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           try {
             indexDoc(writer, file, attrs.lastModifiedTime().toMillis(), indirectReverseIndex, directReverseIndex, errors);
-          } catch (IOException | BranchNotFoundException ignore) {
+          } catch (Exception ignore) {
             // don't index files that can't be read.
             LOG.warn("Not indexing " + file.toString() + " because of " + ignore.getMessage());
           }

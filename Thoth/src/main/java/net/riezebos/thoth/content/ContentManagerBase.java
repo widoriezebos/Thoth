@@ -91,7 +91,8 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public MarkDownDocument getMarkDownDocument(String branch, String documentPath) throws IOException, BranchNotFoundException {
+  public MarkDownDocument getMarkDownDocument(String branch, String path) throws IOException, BranchNotFoundException {
+	String documentPath= ThothUtil.normalSlashes(path);
     if (documentPath.startsWith("/"))
       documentPath = documentPath.substring(1);
     String physicalFilePath = getBranchFolder(branch) + documentPath;
@@ -210,7 +211,7 @@ public abstract class ContentManagerBase implements ContentManager {
 
   protected String getConical(File bookFile) {
     try {
-      return bookFile.getCanonicalPath();
+      return ThothUtil.normalSlashes(bookFile.getCanonicalPath());
     } catch (Exception e) {
       LOG.error(e.getMessage() + " for " + bookFile.getAbsolutePath());
       return bookFile.getAbsolutePath();
