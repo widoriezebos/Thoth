@@ -34,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.beans.CustomRenderer;
+import net.riezebos.thoth.beans.CustomRendererDefinition;
 import net.riezebos.thoth.commands.BranchIndexCommand;
 import net.riezebos.thoth.commands.Command;
 import net.riezebos.thoth.commands.DiffCommand;
@@ -48,7 +50,6 @@ import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.HtmlRenderer;
-import net.riezebos.thoth.renderers.PdfRenderer;
 import net.riezebos.thoth.renderers.RawRenderer;
 import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.renderers.Renderer.RenderResult;
@@ -63,7 +64,7 @@ public class ThothServlet extends ServletBase {
   private Map<String, Command> commands = new HashMap<>();
   private IndexCommand indexCommand;
   private BranchIndexCommand branchIndexCommand;
-  private HtmlRenderer htmlRenderer;
+  private Renderer defaultRenderer;
   private Set<String> renderedExtensions = new HashSet<>();
 
   @Override
@@ -91,10 +92,23 @@ public class ThothServlet extends ServletBase {
   }
 
   protected void setupRenderers() {
-    htmlRenderer = new HtmlRenderer();
-    registerRenderer(htmlRenderer);
-    registerRenderer(new PdfRenderer());
+    defaultRenderer = new HtmlRenderer();
+    registerRenderer(defaultRenderer);
     registerRenderer(new RawRenderer());
+
+    // Setup any custom renderers
+    List<CustomRendererDefinition> customRendererDefinitions = Configuration.getInstance().getCustomRenderers();
+    for (CustomRendererDefinition customRendererDefinition : customRendererDefinitions) {
+      CustomRenderer renderer = new CustomRenderer(customRendererDefinition);
+      renderer.setTypeCode(customRendererDefinition.getExtension());
+      renderer.setContentType(customRendererDefinition.getContentType());
+      renderer.setCommandLine(customRendererDefinition.getCommandLine());
+      registerRenderer(renderer);
+      
+      // Override default renderer?
+      if (defaultRenderer.getTypeCode().equals(renderer.getTypeCode()))
+        defaultRenderer = renderer;
+    }
   }
 
   protected void registerRenderer(Renderer renderer) {
@@ -108,7 +122,7 @@ public class ThothServlet extends ServletBase {
   protected Renderer getRenderer(String typeCode) {
     Renderer renderer = renderers.get(typeCode);
     if (renderer == null)
-      renderer = htmlRenderer;
+      renderer = defaultRenderer;
     return renderer;
   }
 

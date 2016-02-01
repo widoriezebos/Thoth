@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.renderers;
+package net.riezebos.thoth.beans;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,22 +23,55 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.util.RendererBase;
 import net.riezebos.thoth.util.ThothUtil;
 
-public class PdfRenderer extends RendererBase implements Renderer {
-  public static final String TYPE = "pdf";
+public class CustomRenderer extends RendererBase implements Renderer {
+  private static final Logger LOG = LoggerFactory.getLogger(CustomRenderer.class);
 
-  public String getTypeCode() {
-    return TYPE;
+  private String typeCode;
+  private String contentType;
+  private String commandLine;
+
+  public CustomRenderer() {
   }
 
+  public CustomRenderer(CustomRendererDefinition definition) {
+    setTypeCode(definition.getExtension());
+    setContentType(definition.getContentType());
+    setCommandLine(definition.getCommandLine());
+  }
+
+  public String getTypeCode() {
+    return typeCode;
+  }
+
+  public void setTypeCode(String typeCode) {
+    this.typeCode = typeCode;
+  }
+
+  @Override
   public String getContentType(Map<String, Object> arguments) {
-    return "application/pdf";
+    return contentType;
+  }
+
+  public void setContentType(String contentType) {
+    this.contentType = contentType;
+  }
+
+  protected String getCommandLine(Configuration configuration) {
+    return commandLine;
+  }
+
+  public void setCommandLine(String commandLine) {
+    this.commandLine = commandLine;
   }
 
   public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
@@ -52,11 +85,11 @@ public class PdfRenderer extends RendererBase implements Renderer {
         Configuration configuration = Configuration.getInstance();
         String url = (configuration.getLocalHostUrl() + branch + "/" + path).replaceAll(" ", "%20");
 
-        File tempFile = File.createTempFile("thothtemp", ".pdf");
+        File tempFile = File.createTempFile("thothtemp", "." + typeCode);
 
         arguments.put("url", url);
         arguments.put("output", tempFile.getAbsolutePath());
-        String command = ThothUtil.replaceKeywords(configuration.getPdfCommand(), arguments);
+        String command = ThothUtil.replaceKeywords(getCommandLine(configuration), arguments);
 
         execute(command);
 
@@ -71,16 +104,16 @@ public class PdfRenderer extends RendererBase implements Renderer {
     }
   }
 
-  protected String execute(String command) throws IOException {
-    String result = "";
+  protected void execute(String command) throws IOException {
+    LOG.debug("Executing " + command);
+
     String line;
     Process p = Runtime.getRuntime().exec(command);
     BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
     while ((line = input.readLine()) != null) {
-      result += line + "\n";
+      LOG.debug(line);
     }
     input.close();
-    return result;
   }
 
 }

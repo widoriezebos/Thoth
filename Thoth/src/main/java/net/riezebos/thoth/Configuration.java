@@ -23,6 +23,7 @@ import org.pegdown.Extensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.beans.CustomRendererDefinition;
 import net.riezebos.thoth.util.ConfigurationBase;
 
 public class Configuration extends ConfigurationBase {
@@ -158,7 +159,7 @@ public class Configuration extends ConfigurationBase {
   }
 
   public String getLocalHostUrl() {
-    String url = getValue("pdf.localhost", null);
+    String url = getValue("localhost", null);
     if (!url.endsWith("/"))
       url += "/";
     return url;
@@ -207,5 +208,25 @@ public class Configuration extends ConfigurationBase {
 
   public boolean isPrettyPrintJson() {
     return "true".equalsIgnoreCase(getValue("json.prettyprint", "true"));
+  }
+
+  public List<CustomRendererDefinition> getCustomRenderers() {
+    List<CustomRendererDefinition> result = new ArrayList<>();
+
+    CustomRendererDefinition renderer = null;
+    int idx = 0;
+    do {
+      renderer = null;
+      idx++;
+      String extension = getValue("renderer." + idx + ".extension", null);
+      String contenttype = getValue("renderer." + idx + ".contenttype", null);
+      String command = getValue("renderer." + idx + ".command", null);
+      if (extension != null) {
+        renderer = new CustomRendererDefinition(extension, contenttype, command);
+        result.add(renderer);
+      }
+    } while (renderer != null);
+
+    return result;
   }
 }
