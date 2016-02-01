@@ -21,6 +21,7 @@ import java.util.List;
 
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
+import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -68,5 +69,7 @@ public interface ContentManager {
   public SourceDiff getDiff(String branch, String id) throws ContentManagerException;
 
   void reindex();
+
+  List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException;
 
 }

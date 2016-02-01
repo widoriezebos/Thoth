@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.CustomRendererDefinition;
 import net.riezebos.thoth.commands.BranchIndexCommand;
+import net.riezebos.thoth.commands.BrowseCommand;
 import net.riezebos.thoth.commands.Command;
 import net.riezebos.thoth.commands.DiffCommand;
 import net.riezebos.thoth.commands.IndexCommand;
@@ -89,6 +90,7 @@ public class ThothServlet extends ServletBase {
     registerCommand(new RevisionsCommand());
     registerCommand(new SearchCommand());
     registerCommand(new ValidationReportCommand());
+    registerCommand(new BrowseCommand());
   }
 
   protected void setupRenderers() {

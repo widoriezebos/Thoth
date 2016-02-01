@@ -17,6 +17,8 @@ package net.riezebos.thoth.content;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -31,6 +33,7 @@ import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
+import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.markdown.FileProcessor;
 import net.riezebos.thoth.content.markdown.IncludeProcessor;
@@ -313,6 +316,32 @@ public abstract class ContentManagerBase implements ContentManager {
       return null;
     else
       return absolutePath;
+  }
+
+  @Override
+  public List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException {
+
+    List<ContentNode> result = new ArrayList<>();
+
+    String fileSystemPath = getFileSystemPath(branch, path);
+    String branchFolder = getBranchFolder(branch);
+
+    Path branchPath = Paths.get(branchFolder);
+
+    File file = new File(fileSystemPath);
+    if (file.isFile()) {
+      result.add(createContentNode(result, fileSystemPath, branchPath));
+    } else {
+      for (File child : file.listFiles()) {
+        result.add(createContentNode(result, child.getAbsolutePath(), branchPath));
+      }
+    }
+    return result;
+  }
+
+  protected ContentNode createContentNode(List<ContentNode> result, String fileSystemPath, Path branchPath) {
+    Path relativePath = Paths.get(fileSystemPath).relativize(branchPath);
+    return new ContentNode(relativePath.toString(), false);
   }
 
 }

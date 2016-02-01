@@ -375,4 +375,5 @@ public class GitContentManager extends ContentManagerBase {
     LOG.error(e.getMessage(), e);
     log.append("ERROR: " + e.getMessage() + "\n");
   }
+
 }
