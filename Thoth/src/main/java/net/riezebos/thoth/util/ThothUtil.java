@@ -86,8 +86,11 @@ public class ThothUtil {
     return value;
   }
 
-  public static String encodeBookmark(String text) {
-    return text.replaceAll("[^\\w\\_]", "").toLowerCase();
+  public static String encodeBookmark(String text, boolean toLowercase) {
+    String bookmark = text.replaceAll("[^\\w\\_]", "");
+    if (toLowercase)
+      bookmark = bookmark.toLowerCase();
+    return bookmark;
   }
 
   public static String replaceKeywords(String messageTemplate, Map<String, Object> args) {

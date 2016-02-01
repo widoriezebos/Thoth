@@ -43,10 +43,8 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
       }
     }
     if (StringUtils.isNoneBlank(combinedName)) {
-      String ref = ThothUtil.encodeBookmark(combinedName);
-
-      // We add a style to the link because PDF generation requires a block style to be able to link to
-      printer.print("<a name=\"" + ref + "\" style=\"display:block\"></a>");
+      String ref = ThothUtil.encodeBookmark(combinedName, false);
+      writeBookmark(ref);
 
       // Also add abookmark that excludes any (potentially) generated numbers as a prefix of the title
       int idx = 0;
@@ -56,10 +54,16 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
       }
       if (idx != 0) {
         String alternate = ref.substring(idx).trim();
-        printer.print("<a name=\"" + alternate + "\" style=\"display:block\"></a>");
+        writeBookmark(alternate);
       }
     }
     printBreakBeforeTag(node, "h" + node.getLevel());
+  }
+
+  protected void writeBookmark(String alias) {
+    printer.print("<a name=\"" + alias + "\" style=\"display:block\"></a>");
+    if (!alias.equals(alias.toLowerCase()))
+      writeBookmark(alias.toLowerCase());
   }
 
   public void visit(TableNode node) {

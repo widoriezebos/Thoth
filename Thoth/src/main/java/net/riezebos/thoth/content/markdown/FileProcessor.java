@@ -234,7 +234,7 @@ public class FileProcessor {
     }
 
     String title = line.substring(level).trim();
-    String id = ThothUtil.encodeBookmark(title);
+    String id = ThothUtil.encodeBookmark(title, true);
 
     // Make sure we do not get into trouble with HTML tags in the title
     title = title.replaceAll("\\<", "\\\\<");
