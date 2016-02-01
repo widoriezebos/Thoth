@@ -208,7 +208,7 @@ public abstract class ContentManagerBase implements ContentManager {
 
   protected String getConical(File bookFile) {
     try {
-      return bookFile.getCanonicalPath();
+      return ThothUtil.normalSlashes(bookFile.getCanonicalPath());
     } catch (Exception e) {
       LOG.error(e.getMessage() + " for " + bookFile.getAbsolutePath());
       return bookFile.getAbsolutePath();
