@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.Configuration;
-import net.riezebos.thoth.beans.CustomRenderer;
 import net.riezebos.thoth.beans.CustomRendererDefinition;
 import net.riezebos.thoth.commands.BranchIndexCommand;
 import net.riezebos.thoth.commands.Command;
@@ -49,6 +48,7 @@ import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.renderers.CustomRenderer;
 import net.riezebos.thoth.renderers.HtmlRenderer;
 import net.riezebos.thoth.renderers.RawRenderer;
 import net.riezebos.thoth.renderers.Renderer;

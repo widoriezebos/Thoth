@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.beans;
+package net.riezebos.thoth.renderers;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,9 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.beans.CustomRendererDefinition;
 import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.util.RendererBase;
 import net.riezebos.thoth.util.ThothUtil;
 
