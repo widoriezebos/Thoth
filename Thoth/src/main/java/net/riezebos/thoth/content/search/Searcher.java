@@ -39,10 +39,10 @@ import org.apache.lucene.search.highlight.TextFragment;
 import org.apache.lucene.store.FSDirectory;
 
 import net.riezebos.thoth.Configuration;
-import net.riezebos.thoth.beans.DocumentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
+import net.riezebos.thoth.content.markdown.util.DocumentNode;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.SearchException;
 

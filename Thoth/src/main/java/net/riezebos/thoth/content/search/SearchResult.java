@@ -17,7 +17,7 @@ package net.riezebos.thoth.content.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.riezebos.thoth.beans.DocumentNode;
+import net.riezebos.thoth.content.markdown.util.DocumentNode;
 
 public class SearchResult {
 

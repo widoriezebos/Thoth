@@ -21,6 +21,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import net.riezebos.thoth.content.markdown.util.DocumentNode;
 import net.riezebos.thoth.content.markdown.util.ProcessorError;
 
 /**

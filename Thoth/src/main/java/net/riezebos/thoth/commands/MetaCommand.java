@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.riezebos.thoth.Configuration;
-import net.riezebos.thoth.beans.DocumentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.Skin;
+import net.riezebos.thoth.content.markdown.util.DocumentNode;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.content.versioncontrol.Commit;

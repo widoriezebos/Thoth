@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.beans;
+package net.riezebos.thoth.content.markdown.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -110,7 +110,7 @@ public class DocumentNode {
     List<DocumentNode> result = new ArrayList<DocumentNode>();
     visit(this, result);
     if (removeDuplicates) {
-      Set<String> paths = new HashSet<>();
+      Set<String> paths = new HashSet<String>();
 
       List<DocumentNode> nodups = new ArrayList<DocumentNode>();
       for (DocumentNode node : result) {

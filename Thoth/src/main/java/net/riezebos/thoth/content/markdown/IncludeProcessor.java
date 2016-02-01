@@ -33,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.riezebos.thoth.beans.BookmarkUsage;
-import net.riezebos.thoth.beans.DocumentNode;
+import net.riezebos.thoth.content.markdown.util.DocumentNode;
 import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
 

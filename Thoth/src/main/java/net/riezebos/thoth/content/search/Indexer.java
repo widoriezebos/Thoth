@@ -54,9 +54,9 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.Configuration;
-import net.riezebos.thoth.beans.DocumentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.markdown.util.DocumentNode;
 import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;

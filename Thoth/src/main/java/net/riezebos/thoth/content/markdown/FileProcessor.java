@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -36,6 +35,7 @@ import net.riezebos.thoth.beans.Bookmark;
 import net.riezebos.thoth.beans.BookmarkUsage;
 import net.riezebos.thoth.content.markdown.util.LineInfo;
 import net.riezebos.thoth.content.markdown.util.ProcessorError;
+import net.riezebos.thoth.content.markdown.util.SoftLinkTranslation;
 import net.riezebos.thoth.util.ThothUtil;
 
 /**
@@ -60,7 +60,7 @@ public class FileProcessor {
   private boolean stripTrailingWhitespace = true;
   private String softLinkFileName = "softlinks.properties";
   private Map<String, String> softLinkMappings = new HashMap<String, String>();
-  private Map<String, String> softLinkTranslations = new HashMap<String, String>();
+  private List<SoftLinkTranslation> softLinkTranslations = new ArrayList<SoftLinkTranslation>();
   protected List<BookmarkUsage> bookmarkUsages = new ArrayList<BookmarkUsage>();
 
   /**
@@ -135,14 +135,12 @@ public class FileProcessor {
       Object value = getSoftLinkMappings().get(key.toLowerCase());
       if (value != null)
         return String.valueOf(value);
-      for (Entry<String, String> entry : getSoftLinkTranslations().entrySet()) {
-        String from = entry.getKey();
-        String to = entry.getValue();
+      for (SoftLinkTranslation translation : getSoftLinkTranslations()) {
 
-        Pattern pattern = Pattern.compile(from.replaceAll("\\*", "(.*)"));
+        Pattern pattern = translation.getPattern();
         Matcher matcher = pattern.matcher(key);
         if (matcher.matches()) {
-          link = matcher.replaceAll(to);
+          link = matcher.replaceAll(translation.getReplacePattern());
           break;
         }
       }
@@ -508,7 +506,7 @@ public class FileProcessor {
    */
   protected void loadSoftLinks() throws IOException {
     softLinkMappings = new HashMap<String, String>();
-    softLinkTranslations = new HashMap<String, String>();
+    softLinkTranslations = new ArrayList<SoftLinkTranslation>();
     String softLinkFileName = getSoftLinkFileName();
     if (softLinkFileName.startsWith("/"))
       softLinkFileName = softLinkFileName.substring(1);
@@ -527,7 +525,7 @@ public class FileProcessor {
             String key = line.substring(0, idx).trim();
             String value = line.substring(idx + 1).trim();
             if (key.indexOf('*') != -1) {
-              softLinkTranslations.put(key, value);
+              softLinkTranslations.add(new SoftLinkTranslation(key, value));
             } else {
               if (value.startsWith("/"))
                 value = value.replaceAll(" ", "%20");
@@ -547,7 +545,7 @@ public class FileProcessor {
     return softLinkMappings;
   }
 
-  public Map<String, String> getSoftLinkTranslations() {
+  public List<SoftLinkTranslation> getSoftLinkTranslations() {
     return softLinkTranslations;
   }
 
