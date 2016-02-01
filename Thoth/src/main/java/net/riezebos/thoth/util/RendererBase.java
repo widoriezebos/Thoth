@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -79,7 +80,7 @@ public abstract class RendererBase implements Renderer {
           is = new FileInputStream(templateFile);
       }
 
-      try (PrintWriter writer = new PrintWriter(outputStream)) {
+      try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"))) {
         if (is == null) {
           writer.print("Template file " + templateFileName + " not found\n");
         } else {
