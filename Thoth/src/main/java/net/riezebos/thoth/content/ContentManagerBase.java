@@ -334,7 +334,8 @@ public abstract class ContentManagerBase implements ContentManager {
       result.add(createContentNode(result, fileSystemPath, branchPath));
     } else {
       for (File child : file.listFiles()) {
-        result.add(createContentNode(result, child.getAbsolutePath(), branchPath));
+        if (!child.getName().startsWith("."))
+          result.add(createContentNode(result, child.getAbsolutePath(), branchPath));
       }
     }
     Collections.sort(result);

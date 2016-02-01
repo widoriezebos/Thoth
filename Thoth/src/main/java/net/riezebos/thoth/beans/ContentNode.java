@@ -11,9 +11,12 @@
 package net.riezebos.thoth.beans;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import net.riezebos.thoth.Configuration;
 
 public class ContentNode implements Comparable<ContentNode> {
   private String path;
@@ -61,6 +64,11 @@ public class ContentNode implements Comparable<ContentNode> {
 
   public Date getDateModified() {
     return dateModified;
+  }
+
+  public String getDateModifiedString() {
+    SimpleDateFormat dateFormat = Configuration.getInstance().getDateFormat();
+    return dateFormat.format(dateModified);
   }
 
   public long getSize() {

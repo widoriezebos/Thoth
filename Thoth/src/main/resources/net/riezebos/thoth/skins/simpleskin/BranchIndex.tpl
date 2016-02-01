@@ -13,8 +13,9 @@
 <form action="${branchurl}?cmd=search" method="get">
   Search all of ${branch}: <input type="text" name="query"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
 </form>
-Click <a href="${branchurl}?cmd=revisions">here</a> for the latest changes, or click on a meta link below to zoom in on a document.<br/>
-Click <a href="${branchurl}?cmd=validationreport">here</a> for the validation report of this entire branch
+Click <a href="${branchurl}/?cmd=revisions">here</a> for the latest changes, or click on a meta link below to zoom in on a document.<br/>
+Click <a href="${branchurl}/?cmd=validationreport">here</a> for the validation report of this entire branch<br/>
+Click <a href="${branchurl}/?cmd=browse">here</a> to browse the library
 
 <h2>Books by Category</h2>
 <table>

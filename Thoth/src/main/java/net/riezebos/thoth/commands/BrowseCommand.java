@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -40,6 +42,8 @@ public class BrowseCommand extends RendererBase implements Command {
 
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("contentNodes", contentNodes);
+      boolean atRoot = StringUtils.isBlank(path);
+      variables.put("atRoot", atRoot);
 
       if (asJson)
         executeJson(variables, outputStream);

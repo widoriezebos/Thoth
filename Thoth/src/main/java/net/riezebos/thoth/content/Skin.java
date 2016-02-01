@@ -52,7 +52,7 @@ public class Skin extends ConfigurationBase {
     }
     this.skinPropertyFile = skinPropertyFile;
     this.branch = branch;
-    this.skinBaseFolder = ThothUtil.getFolder(getPropertyFileName()) + "/";
+    this.skinBaseFolder = ThothUtil.getFolder(skinPropertyFile) + "/";
   }
 
   public String getSkinPropertyFile() {
