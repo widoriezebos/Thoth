@@ -385,7 +385,8 @@ public class FileProcessor {
    */
   protected String fixFolderSpec(String path) {
     if (path != null) {
-      path = path.replaceAll("\\\\", "\\");
+        path = path.replaceAll("\\\\", "/");
+        path = path.replaceAll("//", "/");
       if (!path.endsWith("/"))
         path += "/";
     }
@@ -489,9 +490,7 @@ public class FileProcessor {
 
     try {
       File file = new File(fileName);
-      String canonicalPath = file.getCanonicalPath();
-      if (file.isDirectory())
-        canonicalPath += "/";
+      String canonicalPath =  fixFolderSpec(file.getCanonicalPath());
       return canonicalPath;
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
