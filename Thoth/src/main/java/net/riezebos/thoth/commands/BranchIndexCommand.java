@@ -24,11 +24,11 @@ import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.Skin;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.util.RendererBase;
+import net.riezebos.thoth.renderers.RendererBase;
 
 public class BranchIndexCommand extends RendererBase implements Command {
 

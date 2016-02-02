@@ -24,14 +24,14 @@ import java.util.Map;
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.content.markdown.util.DocumentNode;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.util.RendererBase;
+import net.riezebos.thoth.renderers.RendererBase;
 
 public class MetaCommand extends RendererBase implements Command {
 

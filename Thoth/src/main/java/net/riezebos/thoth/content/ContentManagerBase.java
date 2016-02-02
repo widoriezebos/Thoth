@@ -41,6 +41,8 @@ import net.riezebos.thoth.content.markdown.IncludeProcessor;
 import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
+import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.content.skinning.SkinInheritance;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.util.ThothUtil;
@@ -378,4 +380,30 @@ public abstract class ContentManagerBase implements ContentManager {
       }
     }
   }
+
+  public String getInheritedPath(String path, String branch) throws BranchNotFoundException, IOException {
+    String result = null;
+    String inheritedPath = handleBranchBasedInheritance(branch, path);
+    if (inheritedPath != null)
+      if (inheritedPath.startsWith(Configuration.CLASSPATH_PREFIX))
+        result = inheritedPath;
+      else
+        result = getFileSystemPath(branch, inheritedPath);
+    return result;
+  }
+
+  protected String handleBranchBasedInheritance(String branch, String path) {
+    String result = null;
+
+    CacheManager cacheManager = CacheManager.getInstance(branch);
+    SkinInheritance skinInheritance = cacheManager.getSkinInheritance(path);
+    if (skinInheritance != null) {
+      String baseFolder = ThothUtil.stripPrefix(skinInheritance.getChild().getSkinBaseFolder(), "/");
+      String remainder = path.substring(baseFolder.length());
+      Skin parent = skinInheritance.getParent();
+      result = parent.getSkinBaseFolder() + remainder;
+    }
+    return result;
+  }
+
 }

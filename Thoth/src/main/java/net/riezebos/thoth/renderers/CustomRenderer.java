@@ -28,9 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.CustomRendererDefinition;
-import net.riezebos.thoth.content.Skin;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.util.RendererBase;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class CustomRenderer extends RendererBase implements Renderer {

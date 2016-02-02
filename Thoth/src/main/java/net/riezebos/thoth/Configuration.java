@@ -39,7 +39,7 @@ public class Configuration extends ConfigurationBase {
   public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
   public static final String CLASSPATH_PREFIX = "classpath:";
   public static final String SKIN_PROPERTIES = "skin.properties";
-  public static final String BUILTIN_SKIN = CLASSPATH_PREFIX + REQUIRED_PREFIX + "simpleskin/" + SKIN_PROPERTIES;
+  public static final String BUILTIN_SKIN = "SimpleSkin";
 
   private static Configuration _instance;
   private String workspaceLocation;

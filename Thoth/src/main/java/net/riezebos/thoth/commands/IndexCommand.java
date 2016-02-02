@@ -19,9 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.riezebos.thoth.content.Skin;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.util.RendererBase;
+import net.riezebos.thoth.renderers.RendererBase;
 
 public class IndexCommand extends RendererBase implements Command {
 

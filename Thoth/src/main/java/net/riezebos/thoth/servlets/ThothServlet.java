@@ -46,6 +46,7 @@ import net.riezebos.thoth.commands.ReindexCommand;
 import net.riezebos.thoth.commands.RevisionsCommand;
 import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -142,8 +143,8 @@ public class ThothServlet extends ServletBase {
 
       String branch = getBranch(request);
       String path = getPath(request);
-      if (("/" + branch + "/").equalsIgnoreCase(NATIVERESOURCES))
-        handleNativeResource(path, request, response);
+      if (("/" + branch + "/").equalsIgnoreCase(ContentManager.NATIVERESOURCES))
+        streamClassPathResource(path, request, response);
       else if (StringUtils.isBlank(branch) && StringUtils.isBlank(path))
         executeCommand(indexCommand, request, response);
       else if (StringUtils.isBlank(path))
@@ -198,12 +199,70 @@ public class ThothServlet extends ServletBase {
     command.execute(getBranch(request), getPath(request), parameters, getSkin(request), response.getOutputStream());
   }
 
-  protected void handleNativeResource(String path, HttpServletRequest request, HttpServletResponse response) throws IOException {
+  protected void streamResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, BranchNotFoundException, IOException {
+    long ms = System.currentTimeMillis();
+    ContentManager contentManager = getContentManager();
+
+    String path = getPath(request);
+    String branch = getBranch(request);
+    String absolutePath = contentManager.getFileSystemPath(branch, path);
+
+    if (absolutePath == null) {
+      LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
+      response.sendError(HttpServletResponse.SC_FORBIDDEN);
+    } else {
+      InputStream is = null;
+
+      // First check whether the file exists; because then we are done.
+      File file = new File(absolutePath);
+      if (!file.isFile()) {
+        // Not found; then check for any inheritance of skin related paths.
+        // Complication is that we might move from the library into the classpath so we need
+        // to handle that as well here
+        absolutePath = contentManager.getInheritedPath(path, branch);
+        // Moving into classpath now?
+        if (absolutePath.startsWith(Configuration.CLASSPATH_PREFIX)) {
+          String resourceName = absolutePath.substring(Configuration.CLASSPATH_PREFIX.length());
+          is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+        } else {
+          // Ok not moved into the classpath. We have to check for the inherited file now:
+          if (absolutePath != null)
+            file = new File(absolutePath);
+        }
+      }
+
+      // If the inputstream is set now; it came from the classpath.
+      // If it is not set; then it will have to come from the file now; if it exists
+      if (is == null && file.isFile())
+        is = new FileInputStream(file);
+
+      // Now we should have found the original file; inherited from classpath or inherited from library
+      // If we still do not have anything then we should give a 404
+      if (is != null) {
+        guessMimeType(request.getServletPath(), response);
+        IOUtils.copy(is, response.getOutputStream());
+      } else {
+        LOG.warn("404 on request " + request.getRequestURI());
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      }
+      LOG.debug("Handled request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
+    }
+
+  }
+
+  protected void streamClassPathResource(String path, HttpServletRequest request, HttpServletResponse response) throws IOException {
     // We do not want to expose the entire server; so we require the path to start with REQUIRED_PREFIX (which is 'net/riezebos/thoth/skins/')
     if (!path.startsWith(Configuration.REQUIRED_PREFIX))
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
     else {
+      // First try the path as is
       InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+      // if (is == null) {
+      // // Not found; then check for any inheritance of skin related paths:
+      // String inheritedPath = handleInheritance(null, path);
+      // if (inheritedPath != null)
+      // is = Thread.currentThread().getContextClassLoader().getResourceAsStream(inheritedPath);
+      // }
       if (is == null) {
         LOG.warn("404 on request for native resource " + request.getRequestURI());
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -220,25 +279,4 @@ public class ThothServlet extends ServletBase {
     if (path.toLowerCase().endsWith(".txt"))
       response.setContentType(PLAIN_TEXT);
   }
-
-  protected void streamResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, BranchNotFoundException, IOException {
-    long ms = System.currentTimeMillis();
-    String absolutePath = getFileSystemPath(request);
-    if (absolutePath == null) {
-      LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
-      response.sendError(HttpServletResponse.SC_FORBIDDEN);
-    } else {
-      File file = new File(absolutePath);
-      if (file.isFile()) {
-        guessMimeType(request.getServletPath(), response);
-        FileInputStream fis = new FileInputStream(file);
-        IOUtils.copy(fis, response.getOutputStream());
-      } else {
-        LOG.warn("404 on request " + request.getRequestURI());
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
-      }
-      LOG.debug("Handled request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
-    }
-  }
-
 }

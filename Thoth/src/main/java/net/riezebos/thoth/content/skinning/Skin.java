@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.content;
+package net.riezebos.thoth.content.skinning;
 
 import java.io.InputStream;
 import java.util.UUID;
 
+import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.util.ConfigurationBase;
@@ -26,10 +27,13 @@ public class Skin extends ConfigurationBase {
   private static final String CLASSPATH_PREFIX = "classpath:";
   private String skinPropertyFile;
   private String branch;
+  private String branchFolder;
   private String skinBaseFolder;
   private String skinBaseUrl;
   private boolean fromClassPath = false;
   private String name;
+  private String inheritsFrom;
+  private Skin superSkin = null;
 
   /**
    * Sets up a Skin configuration
@@ -39,6 +43,7 @@ public class Skin extends ConfigurationBase {
    * @throws BranchNotFoundException
    */
   public Skin(String branch, String skinPropertyFile) throws BranchNotFoundException, ContentManagerException {
+    branchFolder = ContentManagerFactory.getContentManager().getBranchFolder(branch);
     if (skinPropertyFile.startsWith(CLASSPATH_PREFIX)) {
       fromClassPath = true;
       String resourceName = skinPropertyFile.substring(CLASSPATH_PREFIX.length());
@@ -48,14 +53,15 @@ public class Skin extends ConfigurationBase {
       load(is);
       this.skinBaseUrl = ThothUtil.getFolder(resourceName);
     } else {
-      String absFileName = ContentManagerFactory.getContentManager().getBranchFolder(branch) + skinPropertyFile;
+      String absFileName = branchFolder + ThothUtil.stripPrefix(skinPropertyFile, "/");
       load(absFileName);
-      this.skinBaseUrl = branch + "/" + ThothUtil.getFolder(skinPropertyFile);
+      this.skinBaseUrl = branch + ThothUtil.getFolder(skinPropertyFile);
     }
     this.skinPropertyFile = skinPropertyFile;
     this.branch = branch;
     this.skinBaseFolder = ThothUtil.getFolder(skinPropertyFile) + "/";
     this.name = getValue("name", UUID.randomUUID().toString());
+    this.inheritsFrom = getValue("inheritsfrom", null);
   }
 
   public String getName() {
@@ -108,13 +114,28 @@ public class Skin extends ConfigurationBase {
 
   protected String getPathProperty(String key) {
     String tidyRelativePath = ThothUtil.tidyRelativePath(getValue(key));
-    if (fromClassPath) {
-      if (tidyRelativePath.startsWith(CLASSPATH_PREFIX)) {
-        tidyRelativePath = tidyRelativePath.substring(CLASSPATH_PREFIX.length());
-        return CLASSPATH_PREFIX + skinBaseUrl + "/" + tidyRelativePath;
-      }
+    if (isFromClassPath()) {
+      return CLASSPATH_PREFIX + skinBaseUrl + "/" + tidyRelativePath;
     }
-    return skinBaseFolder + tidyRelativePath;
+    boolean gotItFromSuper = (super.getValue(key, null) == null && getValue(key, null) != null);
+    String prefix = ThothUtil.stripPrefix(gotItFromSuper ? getSuper().skinBaseFolder : skinBaseFolder, "/");
+    String result;
+    
+    // If we move into the classpath now; then do not ass the branchfolder
+    if(prefix.startsWith(CLASSPATH_PREFIX)) result = prefix+tidyRelativePath;
+    else result = branchFolder + prefix + tidyRelativePath;
+    return result;
+  }
+
+  /**
+   * Implement getting inherited values (i.e. when not set get value from super)
+   */
+  @Override
+  public String getValue(String key, String dflt) {
+    String ownValue = super.getValue(key, null);
+    if (ownValue == null && getSuper() != null)
+      ownValue = getSuper().getValue(key, dflt);
+    return ownValue;
   }
 
   @Override
@@ -126,8 +147,23 @@ public class Skin extends ConfigurationBase {
     return skinBaseUrl;
   }
 
+  public String getSkinBaseFolder() {
+    return skinBaseFolder;
+  }
+
   public boolean isFromClassPath() {
     return fromClassPath;
   }
 
+  public String getInheritsFrom() {
+    return inheritsFrom;
+  }
+
+  public Skin getSuper() {
+    return superSkin;
+  }
+
+  public void setSuper(Skin superSkin) {
+    this.superSkin = superSkin;
+  }
 }

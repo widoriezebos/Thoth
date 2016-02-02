@@ -19,11 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.content.search.SearchFactory;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.util.RendererBase;
+import net.riezebos.thoth.renderers.RendererBase;
 
 public class ValidationReportCommand extends RendererBase implements Command {
 

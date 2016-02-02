@@ -13,7 +13,7 @@ package net.riezebos.thoth.renderers;
 import java.io.OutputStream;
 import java.util.Map;
 
-import net.riezebos.thoth.content.Skin;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 
 public interface Renderer {

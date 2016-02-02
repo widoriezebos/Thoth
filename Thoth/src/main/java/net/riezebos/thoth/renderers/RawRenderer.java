@@ -22,9 +22,8 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
-import net.riezebos.thoth.content.Skin;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.util.RendererBase;
 
 public class RawRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "raw";

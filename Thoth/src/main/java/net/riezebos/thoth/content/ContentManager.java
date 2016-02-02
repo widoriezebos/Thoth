@@ -30,6 +30,8 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 
 public interface ContentManager {
 
+  public String NATIVERESOURCES = "/nativeresources/";
+
   String refresh() throws ContentManagerException;
 
   MarkDownDocument getMarkDownDocument(String branch, String documentPath) throws IOException, BranchNotFoundException;
@@ -73,5 +75,7 @@ public interface ContentManager {
   List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException;
 
   public List<ContentNode> find(String branch, String fileSpec, boolean recursive) throws BranchNotFoundException, IOException;
+
+  public String getInheritedPath(String path, String branch) throws BranchNotFoundException, IOException;
 
 }

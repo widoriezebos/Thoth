@@ -18,21 +18,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
-import net.riezebos.thoth.content.Skin;
-import net.riezebos.thoth.content.SkinMapping;
 import net.riezebos.thoth.content.markdown.util.ProcessorError;
+import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.content.skinning.SkinInheritance;
+import net.riezebos.thoth.content.skinning.SkinMapping;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.IndexerException;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class CacheManager {
   private static final Logger LOG = LoggerFactory.getLogger(CacheManager.class);
@@ -42,7 +46,9 @@ public class CacheManager {
   private static Object fileLock = new Object();
 
   private List<SkinMapping> skinMappings = null;
+  private Map<String, SkinInheritance> skinInheritances = new HashMap<>();
   private Map<String, Skin> skinsByName = new HashMap<>();
+  private List<Skin> skins = new ArrayList<>();
   private Map<String, Map<String, List<String>>> reverseIndexes = new HashMap<>();
   private Map<String, List<ProcessorError>> errorMap = new HashMap<>();
   private String branch;
@@ -183,8 +189,10 @@ public class CacheManager {
       if (existing != null) {
         LOG.warn("There are multiple skins with the name '" + skin.getName() //
             + "'. Found at " + skin.getPropertyFileName() + " and " + existing.getPropertyFileName());
+      } else {
+        skinsByName.put(key, skin);
+        skins.add(skin);
       }
-      skinsByName.put(key, skin);
     }
   }
 
@@ -198,5 +206,21 @@ public class CacheManager {
 
   public List<SkinMapping> getSkinMappings() {
     return skinMappings;
+  }
+
+  public List<Skin> getSkins() {
+    return skins;
+  }
+
+  public void registerSkinInheritance(SkinInheritance skinInheritance) {
+    String key = ThothUtil.stripPrefix(skinInheritance.getChild().getSkinBaseFolder(), "/");
+    skinInheritances.put(key,  skinInheritance);
+  }
+
+  public SkinInheritance getSkinInheritance(String path) {
+    for (Entry<String, SkinInheritance> entry : skinInheritances.entrySet())
+      if (path.startsWith(entry.getKey()))
+        return entry.getValue();
+    return null;
   }
 }

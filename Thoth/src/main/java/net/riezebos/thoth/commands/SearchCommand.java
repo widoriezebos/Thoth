@@ -23,12 +23,12 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.Configuration;
-import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.content.search.SearchResult;
 import net.riezebos.thoth.content.search.Searcher;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.util.RendererBase;
+import net.riezebos.thoth.renderers.RendererBase;
 
 public class SearchCommand extends RendererBase implements Command {
 
