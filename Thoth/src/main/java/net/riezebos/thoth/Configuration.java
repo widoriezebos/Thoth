@@ -248,4 +248,14 @@ public class Configuration extends ConfigurationBase {
   public String getDateFormatMask() {
     return getValue("formatmask", DEFAULT_DATE_FMT);
   }
+
+  public int getMaxSearchResults() {
+    String value = getValue("search.maxresults", "25");
+    try {
+      return Integer.parseInt(value);
+    } catch (NumberFormatException e) {
+      LOG.error("Invalid value for search.maxresults in configuration: " + value);
+      return 25;
+    }
+  }
 }
