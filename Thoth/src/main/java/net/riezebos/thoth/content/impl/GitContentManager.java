@@ -67,7 +67,9 @@ public class GitContentManager extends ContentManagerBase {
   protected synchronized String cloneOrPull() throws ContentManagerException {
     StringBuilder log = new StringBuilder();
     try {
-      info(log, "Refreshing git repositories...");
+      String message = "Pulling git repositories for changes";
+      info(log, message);
+      LOG.info(message);
       Configuration config = Configuration.getInstance();
       String repositoryUrl = config.getValue("git.repository");
       String workspaceLocation = config.getWorkspaceLocation();

@@ -73,28 +73,23 @@ public class Indexer {
   private String indexPath;
   private String branch;
   private Path docDir;
-  private boolean recreate = false;
+  private boolean recreate = true;
   private ContentManager contentManager;
   private Set<String> extensions = new HashSet<>();
   private static Set<String> activeIndexers = new HashSet<>();
 
   public static void main(String[] args) throws ContentManagerException {
-	Indexer indexer = SearchFactory.getInstance().getIndexer("Erasmus");
-	indexer.index();
-	System.out.println("Done");
-}
-  
+    Indexer indexer = SearchFactory.getInstance().getIndexer("Erasmus");
+    indexer.index();
+    System.out.println("Done");
+  }
+
   protected Indexer(ContentManager contentManager, String branch) throws BranchNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
     this.branch = branch;
     this.indexPath = contentManager.getIndexFolder(branch);
     this.docDir = Paths.get(contentManager.getBranchFolder(branch));
     this.setIndexExtensions(Configuration.getInstance().getIndexExtensions());
-    File indexFolder = new File(indexPath);
-    recreate = true;
-    if (indexFolder.isDirectory() && indexFolder.listFiles().length > 0) {
-      recreate = false;
-    }
   }
 
   public void index() throws ContentManagerException {
