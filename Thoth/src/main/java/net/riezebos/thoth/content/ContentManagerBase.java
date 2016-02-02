@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -331,22 +332,50 @@ public abstract class ContentManagerBase implements ContentManager {
 
     File file = new File(fileSystemPath);
     if (file.isFile()) {
-      result.add(createContentNode(result, fileSystemPath, branchPath));
+      result.add(createContentNode(fileSystemPath, branchPath));
     } else {
       for (File child : file.listFiles()) {
         if (!child.getName().startsWith("."))
-          result.add(createContentNode(result, child.getAbsolutePath(), branchPath));
+          result.add(createContentNode(child.getAbsolutePath(), branchPath));
       }
     }
     Collections.sort(result);
     return result;
   }
 
-  protected ContentNode createContentNode(List<ContentNode> result, String fileSystemPath, Path branchPath) {
+  protected ContentNode createContentNode(String fileSystemPath, Path branchPath) {
     Path filePath = Paths.get(fileSystemPath);
     Path relativePath = branchPath.relativize(filePath);
     File file = filePath.toFile();
     return new ContentNode("/" + relativePath.toString(), file);
   }
 
+  @Override
+  public List<ContentNode> find(String branch, String fileSpec, boolean recursive) throws BranchNotFoundException, IOException {
+    List<ContentNode> result = new ArrayList<>();
+
+    String folderPart = ThothUtil.getFolder(fileSpec);
+    String spec = ThothUtil.getFileName(fileSpec);
+    if (fileSpec.indexOf('/') == -1)
+      folderPart = "/";
+
+    String folder = getFileSystemPath(branch, folderPart);
+    Path root = Paths.get(getBranchFolder(branch));
+
+    Pattern pattern = Pattern.compile(ThothUtil.fileSpec2regExp(spec));
+    traverseFolders(result, pattern, root, new File(folder), recursive);
+    Collections.sort(result);
+    return result;
+  }
+
+  protected void traverseFolders(List<ContentNode> result, Pattern pattern, Path root, File currentFolder, boolean recursive) throws IOException {
+    for (File file : currentFolder.listFiles()) {
+      if (file.isDirectory()) {
+        if (recursive)
+          traverseFolders(result, pattern, root, file, recursive);
+      } else if (pattern.matcher(file.getName()).matches()) {
+        result.add(createContentNode(file.getCanonicalPath(), root));
+      }
+    }
+  }
 }

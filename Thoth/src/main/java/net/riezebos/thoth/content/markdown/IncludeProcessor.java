@@ -277,7 +277,8 @@ public class IncludeProcessor extends FileProcessor {
   protected void include(String currentFolder, String fileToInclude, PrintStream out, Stack<DocumentNode> includeStack, int headerIndent)
       throws FileNotFoundException, IOException {
 
-    String fileName = translateSoftLink(fileToInclude);
+    String softTranslated = translateSoftLink(fileToInclude);
+    String fileName = softTranslated;
     String pathname;
 
     if (fileName.startsWith("/")) {
@@ -291,6 +292,7 @@ public class IncludeProcessor extends FileProcessor {
     File file = new File(pathname.replaceAll("%20", " "));
     if (!file.exists()) {
       String errorMessage = "Include not found: " + fileToInclude;
+      if(!fileToInclude.equals(softTranslated)) errorMessage += " (translated by softlink to '"+softTranslated+"')";
       error(errorMessage.trim());
     } else {
       String newFolder = pathname;

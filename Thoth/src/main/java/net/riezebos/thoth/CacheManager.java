@@ -22,8 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
+import net.riezebos.thoth.content.Skin;
 import net.riezebos.thoth.content.SkinMapping;
 import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
@@ -31,12 +35,14 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.IndexerException;
 
 public class CacheManager {
+  private static final Logger LOG = LoggerFactory.getLogger(CacheManager.class);
   private static final String GLOBAL_SITE = "*global_site*";
 
   private static Map<String, CacheManager> instances = new HashMap<>();
   private static Object fileLock = new Object();
 
   private List<SkinMapping> skinMappings = null;
+  private Map<String, Skin> skinsByName = new HashMap<>();
   private Map<String, Map<String, List<String>>> reverseIndexes = new HashMap<>();
   private Map<String, List<ProcessorError>> errorMap = new HashMap<>();
   private String branch;
@@ -168,6 +174,26 @@ public class CacheManager {
 
   public void registerSkinMappings(List<SkinMapping> skinMappings) {
     this.skinMappings = skinMappings;
+  }
+
+  public void registerSkin(Skin skin) {
+    synchronized (skinsByName) {
+      String key = skin.getName().toLowerCase();
+      Skin existing = skinsByName.get(key);
+      if (existing != null) {
+        LOG.warn("There are multiple skins with the name '" + skin.getName() //
+            + "'. Found at " + skin.getPropertyFileName() + " and " + existing.getPropertyFileName());
+      }
+      skinsByName.put(key, skin);
+    }
+  }
+
+  public Skin getSkinByName(String name) {
+    if (name == null)
+      return null;
+    synchronized (skinsByName) {
+      return skinsByName == null ? null : skinsByName.get(name.toLowerCase());
+    }
   }
 
   public List<SkinMapping> getSkinMappings() {

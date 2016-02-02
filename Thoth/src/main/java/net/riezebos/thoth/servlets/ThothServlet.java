@@ -207,9 +207,10 @@ public class ThothServlet extends ServletBase {
       if (is == null) {
         LOG.warn("404 on request for native resource " + request.getRequestURI());
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
-      } else
+      } else {
         guessMimeType(request.getServletPath(), response);
-      IOUtils.copy(is, response.getOutputStream());
+        IOUtils.copy(is, response.getOutputStream());
+      }
     }
   }
 

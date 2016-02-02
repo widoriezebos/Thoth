@@ -72,4 +72,6 @@ public interface ContentManager {
 
   List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException;
 
+  public List<ContentNode> find(String branch, String fileSpec, boolean recursive) throws BranchNotFoundException, IOException;
+
 }

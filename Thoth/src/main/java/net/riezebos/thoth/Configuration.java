@@ -28,15 +28,18 @@ import net.riezebos.thoth.beans.CustomRendererDefinition;
 import net.riezebos.thoth.util.ConfigurationBase;
 
 public class Configuration extends ConfigurationBase {
+
   private static final String DEFAULT_DATE_FMT = "dd-MM-yyyy HH:mm:ss";
 
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+  private static final String WORKSPACELOCATION_DEPRECATED = "libraryroot";
 
   public static final String CONFIGKEY = "configuration";
   public static final String WORKSPACELOCATION = "workspacelocation";
   public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
-  private static final String WORKSPACELOCATION_DEPRECATED = "libraryroot";
-  public static final String BUILTIN_SKIN = "classpath:" + REQUIRED_PREFIX + "simpleskin/skin.properties";
+  public static final String CLASSPATH_PREFIX = "classpath:";
+  public static final String SKIN_PROPERTIES = "skin.properties";
+  public static final String BUILTIN_SKIN = CLASSPATH_PREFIX + REQUIRED_PREFIX + "simpleskin/" + SKIN_PROPERTIES;
 
   private static Configuration _instance;
   private String workspaceLocation;

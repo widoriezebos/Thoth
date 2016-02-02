@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
@@ -51,6 +52,7 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class ServletBase extends HttpServlet {
+  public static final String BUILTIN_SKIN_LIST = "net/riezebos/thoth/skins/builtinskins.txt";
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(ServletBase.class);
 
@@ -176,7 +178,9 @@ public abstract class ServletBase extends HttpServlet {
       CacheManager cacheManager = CacheManager.getInstance(branch);
       List<SkinMapping> skinMappings = cacheManager.getSkinMappings();
       if (skinMappings == null) {
-        defaultSkin = new Skin(branch, configuration.getDefaultSkin());
+
+        defaultSkin = registerBuiltinSkins(branch);
+        registerLocalSkins(branch);
         skinMappings = new ArrayList<>();
 
         String branchFolder = ContentManagerFactory.getContentManager().getBranchFolder(branch);
@@ -194,21 +198,84 @@ public abstract class ServletBase extends HttpServlet {
 
       String path = getPath(request);
 
-      for (SkinMapping mapping : skinMappings)
-        if (mapping.getPattern().matcher(path).matches())
-          skin = mapping.getSkin();
-      if (skin == null)
-        skin = defaultSkin;
+      // First check for a skin override; i.e. a request with ?skin=name in it
+      String skinOverride = request.getParameter("skin");
+      if (StringUtils.isNotBlank(skinOverride)) {
+        skin = cacheManager.getSkinByName(skinOverride);
+        if (skin == null)
+          LOG.warn("Skin with name = " + skinOverride + " not found. Ignoring override.");
+      }
+
+      // No override (or valid) so do normal processing
+      if (skin == null) {
+        for (SkinMapping mapping : skinMappings)
+          if (mapping.getPattern().matcher(path).matches())
+            skin = mapping.getSkin();
+        if (skin == null)
+          skin = defaultSkin;
+      }
       return skin;
     } catch (Exception e) {
       throw new ServletException(e);
     }
   }
 
+  protected void registerLocalSkins(String branch) throws BranchNotFoundException, IOException, ContentManagerException {
+    List<String> skinDescriptors = new ArrayList<>();
+    for (ContentNode node : ContentManagerFactory.getContentManager().find(branch, "skin.properties", true))
+      skinDescriptors.add(node.getPath());
+
+    CacheManager cacheManager = CacheManager.getInstance(branch);
+    createSkins(cacheManager, branch, skinDescriptors, false);
+  }
+
+  /**
+   * Returns the Builtin skin
+   */
+  protected Skin registerBuiltinSkins(String branch) {
+    InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(BUILTIN_SKIN_LIST);
+    if (is == null)
+      throw new IllegalArgumentException("Builtin skin definition file " + BUILTIN_SKIN_LIST + " not found!");
+    List<String> skinDescriptors = new ArrayList<>();
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+      String line = br.readLine();
+      while (line != null) {
+        if (StringUtils.isNotBlank(line) && !line.trim().startsWith("#")) {
+          skinDescriptors.add(ThothUtil.getFolder(BUILTIN_SKIN_LIST) + "/" + line.trim() + "/" + Configuration.SKIN_PROPERTIES);
+        }
+        line = br.readLine();
+      }
+    } catch (IOException e) {
+      LOG.error(e.getMessage(), e);
+    }
+    CacheManager cacheManager = CacheManager.getInstance(branch);
+    Skin fallbackSkin = createSkins(cacheManager, branch, skinDescriptors, true);
+    Skin defaultSkin = cacheManager.getSkinByName("Simpleskin");
+    if (defaultSkin == null) {
+      LOG.error("Default builtin skin named 'Simpleskin' not found. Falling back on first available which is " + fallbackSkin);
+      defaultSkin = fallbackSkin;
+    }
+    return defaultSkin;
+  }
+
+  protected Skin createSkins(CacheManager cacheManager, String branch, List<String> skinDescriptors, boolean fromClasspath) {
+    Skin fallbackSkin = null;
+    for (String skinDescriptor : skinDescriptors) {
+      try {
+        Skin skin = new Skin(branch, (fromClasspath ? Configuration.CLASSPATH_PREFIX : "") + skinDescriptor);
+        fallbackSkin = skin;
+        cacheManager.registerSkin(skin);
+      } catch (Exception e) {
+        LOG.error(e.getMessage(), e);
+      }
+    }
+    return fallbackSkin;
+  }
+
   protected List<SkinMapping> createSkinMappingsFromFile(String branch, String skinMappingFileName)
       throws FileNotFoundException, IOException, BranchNotFoundException, ContentManagerException, UnsupportedEncodingException {
     List<SkinMapping> skinMappings = new ArrayList<>();
-
+    CacheManager cacheManager = CacheManager.getInstance(branch);
     InputStream is = new FileInputStream(skinMappingFileName);
     try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
       String line = br.readLine();
@@ -216,16 +283,24 @@ public abstract class ServletBase extends HttpServlet {
         int idx = line.indexOf('=');
         if (!line.startsWith("#") && idx != -1) {
           String patternSpec = line.substring(0, idx).trim();
-          String skinFileName = line.substring(idx + 1).trim();
-          if (skinFileName.startsWith("/"))
-            skinFileName = skinFileName.substring(1);
+          String skinName = line.substring(idx + 1).trim();
           Pattern pattern = Pattern.compile(ThothUtil.fileSpec2regExp(patternSpec));
-          skinMappings.add(new SkinMapping(pattern, new Skin(branch, skinFileName)));
+          Skin skin = cacheManager.getSkinByName(skinName);
+          if (skin == null)
+            LOG.error("Skin with name " + skinName + " not found. Mapping " + line + " ignored");
+          skinMappings.add(new SkinMapping(pattern, skin));
         }
         line = br.readLine();
       }
     }
     return skinMappings;
+  }
+
+  protected Skin createAndRegisterSkin(String branch, String skinFileName) throws BranchNotFoundException, ContentManagerException {
+    Skin skin = new Skin(branch, skinFileName);
+    CacheManager instance = CacheManager.getInstance(branch);
+    instance.registerSkin(skin);
+    return skin;
   }
 
   protected Map<String, Object> getParameters(HttpServletRequest request) throws ServletException {

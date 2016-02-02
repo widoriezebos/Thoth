@@ -1,0 +1,5 @@
+# This file defines what skins to use as a builtin skin. The name listed below
+# must be  the name of a folder located at the same location as this file.
+
+bootstrap
+simpleskin

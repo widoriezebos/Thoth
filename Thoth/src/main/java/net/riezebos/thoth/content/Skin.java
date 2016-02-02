@@ -15,6 +15,7 @@
 package net.riezebos.thoth.content;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -28,6 +29,7 @@ public class Skin extends ConfigurationBase {
   private String skinBaseFolder;
   private String skinBaseUrl;
   private boolean fromClassPath = false;
+  private String name;
 
   /**
    * Sets up a Skin configuration
@@ -53,6 +55,11 @@ public class Skin extends ConfigurationBase {
     this.skinPropertyFile = skinPropertyFile;
     this.branch = branch;
     this.skinBaseFolder = ThothUtil.getFolder(skinPropertyFile) + "/";
+    this.name = getValue("name", UUID.randomUUID().toString());
+  }
+
+  public String getName() {
+    return name;
   }
 
   public String getSkinPropertyFile() {
@@ -112,7 +119,7 @@ public class Skin extends ConfigurationBase {
 
   @Override
   public String toString() {
-    return "Skin :" + getSkinPropertyFile();
+    return "Skin " + getSkinPropertyFile();
   }
 
   public String getBaseUrl() {
