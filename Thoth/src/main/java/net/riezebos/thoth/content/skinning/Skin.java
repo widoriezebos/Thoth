@@ -113,18 +113,23 @@ public class Skin extends ConfigurationBase {
   }
 
   protected String getPathProperty(String key) {
+    if(shouldGetFromSuper(key)) return getSuper().getPathProperty(key);
+    
     String tidyRelativePath = ThothUtil.tidyRelativePath(getValue(key));
     if (isFromClassPath()) {
       return CLASSPATH_PREFIX + skinBaseUrl + "/" + tidyRelativePath;
     }
-    boolean gotItFromSuper = (super.getValue(key, null) == null && getValue(key, null) != null);
-    String prefix = ThothUtil.stripPrefix(gotItFromSuper ? getSuper().skinBaseFolder : skinBaseFolder, "/");
+    String prefix = ThothUtil.stripPrefix(skinBaseFolder, "/");
+
     String result;
-    
     // If we move into the classpath now; then do not ass the branchfolder
     if(prefix.startsWith(CLASSPATH_PREFIX)) result = prefix+tidyRelativePath;
     else result = branchFolder + prefix + tidyRelativePath;
     return result;
+  }
+
+  protected boolean shouldGetFromSuper(String key) {
+    return super.getValue(key, null)==null && getSuper() != null;
   }
 
   /**
