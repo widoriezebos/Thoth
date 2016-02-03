@@ -18,6 +18,15 @@ import net.riezebos.thoth.exceptions.RenderException;
 
 public interface Renderer {
 
+  String CONTEXTPATH_PARAMETER = "contextpath";
+  String BRANCHURL_PARAMETER = "branchurl";
+  String BRANCH_PARAMETER = "branch";
+  String PATH_PARAMETER = "path";
+  String TITLE_PARAMETER = "title";
+  String BODY_PARAMETER = "body";
+  String SKINBASE_PARAMETER = "skinbase";
+  String REFRESH_PARAMETER = "refresh";
+
   public enum RenderResult {
     OK, NOT_FOUND, FORBIDDEN
   };

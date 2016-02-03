@@ -69,9 +69,14 @@ public class HtmlRenderer extends RendererBase implements Renderer {
           String body = serializer.toHtml(ast);
 
           Map<String, Object> variables = new HashMap<>();
-          variables.putAll(markdown.getMetatags());
+          // We do not allow metatags to override built in variables.
+          Map<String, String> metatags = markdown.getMetatags();
+          variables.putAll(metatags);
           variables.putAll(arguments);
-          variables.put("body", body);
+          // Except for the title metatag that is
+          if (metatags.containsKey(Renderer.TITLE_PARAMETER))
+            variables.put(Renderer.TITLE_PARAMETER, metatags.get(Renderer.TITLE_PARAMETER));
+          variables.put(Renderer.BODY_PARAMETER, body);
 
           String markdownTemplate = skin.getMarkDownTemplate();
           renderTemplate(markdownTemplate, branch, variables, outputStream);

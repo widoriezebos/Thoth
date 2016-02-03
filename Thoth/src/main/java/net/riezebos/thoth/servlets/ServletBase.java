@@ -41,6 +41,7 @@ import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.content.skinning.SkinMapping;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class ServletBase extends HttpServlet {
@@ -179,8 +180,10 @@ public abstract class ServletBase extends HttpServlet {
       // No override (or valid) so do normal processing
       if (skin == null) {
         for (SkinMapping mapping : skinMappings)
-          if (mapping.getPattern().matcher(path).matches())
+          if (mapping.getPattern().matcher(path).matches()) {
             skin = mapping.getSkin();
+            break;
+          }
         if (skin == null)
           skin = defaultSkin;
       }
@@ -211,13 +214,13 @@ public abstract class ServletBase extends HttpServlet {
 
     String path = getPath(request);
     path = prefixWithSlash(path);
-    result.put("branch", branch);
-    result.put("skinbase", skinBase);
-    result.put("branchurl", getBranchUrl(request));
-    result.put("contextpath", request.getContextPath());
-    result.put("path", path);
-    result.put("title", getTitle(request));
-    result.put("refresh", getRefreshTimestamp(getContentManager()));
+    result.put(Renderer.BRANCH_PARAMETER, branch);
+    result.put(Renderer.SKINBASE_PARAMETER, skinBase);
+    result.put(Renderer.BRANCHURL_PARAMETER, getBranchUrl(request));
+    result.put(Renderer.CONTEXTPATH_PARAMETER, request.getContextPath());
+    result.put(Renderer.PATH_PARAMETER, path);
+    result.put(Renderer.TITLE_PARAMETER, getTitle(request));
+    result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(getContentManager()));
     return result;
   }
 }
