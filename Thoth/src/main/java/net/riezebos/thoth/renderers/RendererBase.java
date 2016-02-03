@@ -14,8 +14,10 @@
  */
 package net.riezebos.thoth.renderers;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -86,7 +88,8 @@ public abstract class RendererBase implements Renderer {
 
   protected void renderTemplate(String template, String branch, Map<String, Object> variables, OutputStream outputStream)
       throws ContentManagerException, IOException, UnsupportedEncodingException {
-    try (PrintWriter writer = new PrintWriter(outputStream)) {
+
+    try (PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8")), true)) {
       VelocityContext context = new VelocityContext(variables);
       context.put(VELOCITY_HELPER, new ThothUtil());
       VelocityEngine engine = new VelocityEngine();
