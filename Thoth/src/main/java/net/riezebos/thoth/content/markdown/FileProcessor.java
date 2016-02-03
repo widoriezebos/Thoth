@@ -385,8 +385,8 @@ public class FileProcessor {
    */
   protected String fixFolderSpec(String path) {
     if (path != null) {
-        path = path.replaceAll("\\\\", "/");
-        path = path.replaceAll("//", "/");
+      path = path.replaceAll("\\\\", "/");
+      path = path.replaceAll("//", "/");
       if (!path.endsWith("/"))
         path += "/";
     }
@@ -490,7 +490,7 @@ public class FileProcessor {
 
     try {
       File file = new File(fileName);
-      String canonicalPath =  fixFolderSpec(file.getCanonicalPath());
+      String canonicalPath = fixFolderSpec(file.getCanonicalPath());
       return canonicalPath;
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
@@ -619,11 +619,15 @@ public class FileProcessor {
   protected String makeRelativeToLibrary(File file) throws IOException {
     String canonicalFile = ThothUtil.normalSlashes(file.getCanonicalFile().getAbsolutePath());
     String library = getLibrary();
-    if (!canonicalFile.startsWith(library))
-      throw new IOException("Path " + canonicalFile + " is not located in library " + library);
-    String result = canonicalFile.substring(library.length());
-    if (result.startsWith("/"))
-      result = result.substring(1);
+    String result;
+    if (!canonicalFile.startsWith(library)) {
+      error("Path " + canonicalFile + " is not located in library " + library);
+      result = file.getAbsolutePath();
+    } else {
+      result = canonicalFile.substring(library.length());
+      if (result.startsWith("/"))
+        result = result.substring(1);
+    }
     return result;
   }
 
