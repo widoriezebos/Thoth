@@ -50,7 +50,7 @@ public class RevisionsCommand extends RendererBase implements Command {
         executeJson(variables, outputStream);
       else {
         String revisionTemplate = skin.getRevisionTemplate();
-        executeVelocityTemplate(revisionTemplate, branch, variables, outputStream);
+        renderTemplate(revisionTemplate, branch, variables, outputStream);
       }
 
       return RenderResult.OK;

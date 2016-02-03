@@ -90,7 +90,7 @@ public class MetaCommand extends RendererBase implements Command {
           executeJson(variables, outputStream);
         else {
           String metaInformationTemplate = skin.getMetaInformationTemplate();
-          executeVelocityTemplate(metaInformationTemplate, branch, variables, outputStream);
+          renderTemplate(metaInformationTemplate, branch, variables, outputStream);
         }
       }
       return result;

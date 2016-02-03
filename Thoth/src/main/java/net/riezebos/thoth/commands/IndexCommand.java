@@ -40,7 +40,7 @@ public class IndexCommand extends RendererBase implements Command {
         executeJson(variables, outputStream);
       else {
         String indexTemplate = skin.getIndexTemplate();
-        executeVelocityTemplate(indexTemplate, branches.get(0), variables, outputStream);
+        renderTemplate(indexTemplate, branches.get(0), variables, outputStream);
       }
 
       return RenderResult.OK;

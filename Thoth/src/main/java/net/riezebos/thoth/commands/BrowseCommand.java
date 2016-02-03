@@ -48,7 +48,7 @@ public class BrowseCommand extends RendererBase implements Command {
       if (asJson)
         executeJson(variables, outputStream);
       else {
-        executeVelocityTemplate(skin.getBrowseTemplate(), branch, variables, outputStream);
+        renderTemplate(skin.getBrowseTemplate(), branch, variables, outputStream);
       }
 
       return result;

@@ -66,7 +66,7 @@ public class SearchCommand extends RendererBase implements Command {
         executeJson(variables, outputStream);
       else {
         String searchTemplate = skin.getSearchTemplate();
-        executeVelocityTemplate(searchTemplate, branch, variables, outputStream);
+        renderTemplate(searchTemplate, branch, variables, outputStream);
       }
       return RenderResult.OK;
     } catch (Exception e) {

@@ -60,7 +60,7 @@ public class BranchIndexCommand extends RendererBase implements Command {
         executeJson(variables, outputStream);
       else {
         String indexTemplate = skin.getBranchIndexTemplate();
-        executeVelocityTemplate(indexTemplate, branch, variables, outputStream);
+        renderTemplate(indexTemplate, branch, variables, outputStream);
       }
 
       return RenderResult.OK;

@@ -68,13 +68,13 @@ public class HtmlRenderer extends RendererBase implements Renderer {
           CustomHtmlSerializer serializer = new CustomHtmlSerializer(new LinkRenderer());
           String body = serializer.toHtml(ast);
 
-          Map<String, Object> parameters = new HashMap<>();
-          parameters.putAll(markdown.getMetatags());
-          parameters.putAll(arguments);
-          parameters.put("body", body);
+          Map<String, Object> variables = new HashMap<>();
+          variables.putAll(markdown.getMetatags());
+          variables.putAll(arguments);
+          variables.put("body", body);
 
-          executeSimpleTemplate(skin.getMarkDownTemplate(), parameters, outputStream);
-
+          String markdownTemplate = skin.getMarkDownTemplate();
+          renderTemplate(markdownTemplate, branch, variables, outputStream);
         } else {
           result = RenderResult.NOT_FOUND;
         }

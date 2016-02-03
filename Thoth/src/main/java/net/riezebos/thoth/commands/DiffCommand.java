@@ -82,7 +82,7 @@ public class DiffCommand extends RendererBase implements Command {
         if (asJson)
           executeJson(variables, outputStream);
         else {
-          executeVelocityTemplate(skin.getDiffTemplate(), branch, variables, outputStream);
+          renderTemplate(skin.getDiffTemplate(), branch, variables, outputStream);
         }
       }
       return result;

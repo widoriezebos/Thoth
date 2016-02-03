@@ -43,7 +43,7 @@ public class ValidationReportCommand extends RendererBase implements Command {
         executeJson(variables, outputStream);
       else {
         String validationTemplate = skin.getValidationTemplate();
-        executeVelocityTemplate(validationTemplate, branch, variables, outputStream);
+        renderTemplate(validationTemplate, branch, variables, outputStream);
       }
 
       return RenderResult.OK;
