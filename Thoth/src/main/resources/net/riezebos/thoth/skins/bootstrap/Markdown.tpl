@@ -29,9 +29,32 @@ body {
 <script src="https://code.jquery.com/jquery-2.2.0.min.js" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha256-KXn5puMvxCw+dAYznun+drMdG1IFl3agK0p/pqT9KAo= sha512-2e8qq0ETcfWRI4HJBzQiA3UoyFk6tbNyG+qSaIBZLyW9Xf3sWZHN/lxe9fTh1U45DpPf07yj94KsUHHWe4Yk1A==" crossorigin="anonymous"></script>
 <script type="text/javascript">
+	/*
 	$(function() {
 		$( "table" ).addClass( "table table-striped table-hover" );
 		$( "img" ).addClass( "img-responsive" );
+	});*/
+	
+	document.addEventListener("DOMContentLoaded", function(event) { 
+  		var tables = document.querySelectorAll('table');
+  		Array.prototype.forEach.call(tables, function(el, i){
+			if (el.classList) {
+  				el.classList.add("table");
+  				el.classList.add("table-striped");
+  				el.classList.add("table-hover");
+ 			} else {
+  				el.className += ' ' + "table table-striped table-hover";
+  			}
+		});
+		
+		var imgs = document.querySelectorAll('table');
+  		Array.prototype.forEach.call(imgs, function(el, i){
+			if (el.classList) {
+  				el.classList.add("img-responsive");
+ 			} else {
+  				el.className += ' ' + "img-responsive";
+  			}
+		});
 	});
 </script>
 </head>
