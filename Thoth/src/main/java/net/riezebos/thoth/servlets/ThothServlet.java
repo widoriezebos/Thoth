@@ -219,15 +219,20 @@ public class ThothServlet extends ServletBase {
         // Not found; then check for any inheritance of skin related paths.
         // Complication is that we might move from the library into the classpath so we need
         // to handle that as well here
-        absolutePath = contentManager.getInheritedPath(path, branch);
-        // Moving into classpath now?
-        if (absolutePath.startsWith(Configuration.CLASSPATH_PREFIX)) {
-          String resourceName = absolutePath.substring(Configuration.CLASSPATH_PREFIX.length());
-          is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-        } else {
-          // Ok not moved into the classpath. We have to check for the inherited file now:
-          if (absolutePath != null)
-            file = new File(absolutePath);
+        String inheritedPath = contentManager.getInheritedPath(path, branch);
+        while (inheritedPath != null && is == null && !file.isFile()) {
+          absolutePath = inheritedPath;
+          // Moving into classpath now?
+          if (absolutePath.startsWith(Configuration.CLASSPATH_PREFIX)) {
+            String resourceName = absolutePath.substring(Configuration.CLASSPATH_PREFIX.length());
+            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+          } else {
+            // Ok not moved into the classpath. We have to check for the inherited file now:
+            if (absolutePath != null)
+              file = new File(absolutePath);
+          }
+          // Do we need to move up the hierarchy still?
+          inheritedPath = contentManager.getInheritedPath(inheritedPath, branch);
         }
       }
 
