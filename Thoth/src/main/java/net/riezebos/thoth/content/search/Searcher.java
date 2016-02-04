@@ -73,24 +73,30 @@ public class Searcher {
         Document document = searcher.doc(scoreDoc.doc);
         IndexableField field = document.getField(Indexer.INDEX_PATH);
         String documentPath = field.stringValue();
-
-        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(branch, documentPath);
-        String contents = markDownDocument.getMarkdown();
-
-        SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
-        Highlighter highlighter = new Highlighter(htmlFormatter, new QueryScorer(query, Indexer.INDEX_CONTENTS));
-        highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
         SearchResult searchResult = new SearchResult();
         searchResult.setDocument(documentPath);
 
-        TokenStream tokenStream = analyzer.tokenStream(Indexer.INDEX_CONTENTS, contents);
+        if (Indexer.TYPE_DOCUMENT.equals(document.get(Indexer.INDEX_TYPE))) {
+          searchResult.setResource(false);
+          MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(branch, documentPath);
+          String contents = markDownDocument.getMarkdown();
 
-        TextFragment[] frags = highlighter.getBestTextFragments(tokenStream, contents, false, 99999);
-        for (TextFragment frag : frags) {
-          if ((frag != null) && (frag.getScore() > 0)) {
-            String fragmentText = frag.toString();
-            searchResult.addFragment(new Fragment(fragmentText));
+          SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
+          Highlighter highlighter = new Highlighter(htmlFormatter, new QueryScorer(query, Indexer.INDEX_CONTENTS));
+          highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
+
+          TokenStream tokenStream = analyzer.tokenStream(Indexer.INDEX_CONTENTS, contents);
+
+          TextFragment[] frags = highlighter.getBestTextFragments(tokenStream, contents, false, 99999);
+          for (TextFragment frag : frags) {
+            if ((frag != null) && (frag.getScore() > 0)) {
+              String fragmentText = frag.toString();
+              searchResult.addFragment(new Fragment(fragmentText));
+            }
           }
+        } else {
+          searchResult.setResource(true);
+          searchResult.addFragment(new Fragment(document.get(Indexer.INDEX_TITLE)));
         }
         searchResults.add(searchResult);
       }
@@ -118,7 +124,7 @@ public class Searcher {
           if (idx != -1) {
             String ext = name.substring(idx + 1);
             if (bookExtensions.contains(ext)) {
-              searchResult.addBookReference(new DocumentNode(name, 0, 0));
+              searchResult.addBookReference(new DocumentNode(name, name, 0, 0));
             }
           }
         }

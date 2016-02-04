@@ -17,7 +17,9 @@ package net.riezebos.thoth;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.pegdown.Extensions;
@@ -44,6 +46,7 @@ public class Configuration extends ConfigurationBase {
   private static Configuration _instance;
   private String workspaceLocation;
   private Integer markdownOptions;
+  private Set<String> imageExtensions = new HashSet<>();
 
   public static Configuration getInstance() {
     if (_instance == null) {
@@ -64,6 +67,12 @@ public class Configuration extends ConfigurationBase {
 
   private Configuration(String propertyPath) {
     load(propertyPath);
+    imageExtensions.add("png");
+    imageExtensions.add("jpeg");
+    imageExtensions.add("jpg");
+    imageExtensions.add("gif");
+    imageExtensions.add("tiff");
+    imageExtensions.add("bmp");
   }
 
   public String getWorkspaceLocation() {
@@ -257,5 +266,12 @@ public class Configuration extends ConfigurationBase {
       LOG.error("Invalid value for search.maxresults in configuration: " + value);
       return 25;
     }
+  }
+
+  public boolean isImageExtension(String extension) {
+    if (extension == null)
+      return false;
+    return imageExtensions.contains(extension.toLowerCase());
+
   }
 }

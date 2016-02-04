@@ -58,7 +58,7 @@ public class IncludeProcessor extends FileProcessor {
     String path = fileName == null ? STDIN : fileName;
     startNewFile(path);
     Stack<DocumentNode> includeStack = new Stack<DocumentNode>();
-    documentStructure = new DocumentNode(path, 0, 0);
+    documentStructure = new DocumentNode(path, ThothUtil.getNameOnly(fileName), 0, 0);
     includeStack.push(documentStructure);
     processFile(getRootFolder(), in, result, includeStack, 0);
     result.flush();
@@ -168,14 +168,15 @@ public class IncludeProcessor extends FileProcessor {
 
           // Process soft links here
           pathSpec = translateSoftLink(pathSpec);
+          String description = matcher.group(1);
           if (pathSpec.startsWith("/")) {
 
             String actualLocation = resolveLibraryPath(pathSpec);
 
             if (embed)
-              createDocumentNode(pathSpec, includeStack);
+              createDocumentNode(pathSpec, description, includeStack);
 
-            String newLink = "[" + matcher.group(1) + "](" + actualLocation + ")";
+            String newLink = "[" + description + "](" + actualLocation + ")";
             line = line.substring(0, start) + newLink + line.substring(end);
             idx = start + newLink.length();
             matcher = hyperlink.matcher(line);
@@ -207,9 +208,9 @@ public class IncludeProcessor extends FileProcessor {
             }
 
             if (embed)
-              createDocumentNode(makeRelativeToLibrary(new File(pathname)), includeStack);
+              createDocumentNode(makeRelativeToLibrary(new File(pathname)), description, includeStack);
 
-            String newLink = "[" + matcher.group(1) + "](" + actualLocation + (afterPath != null ? " " + afterPath : "") + ")";
+            String newLink = "[" + description + "](" + actualLocation + (afterPath != null ? " " + afterPath : "") + ")";
             line = line.substring(0, start) + newLink + line.substring(end);
             idx = start + newLink.length();
             matcher = hyperlink.matcher(line);
@@ -220,11 +221,11 @@ public class IncludeProcessor extends FileProcessor {
     return line;
   }
 
-  protected void createDocumentNode(String actualLocation, Stack<DocumentNode> includeStack) {
+  protected void createDocumentNode(String actualLocation, String description, Stack<DocumentNode> includeStack) {
     // Do not create document nodes for local bookmarks
     if (!actualLocation.startsWith("#") && actualLocation.indexOf("://") == -1) {
-      DocumentNode includeUsage = new DocumentNode(actualLocation, getCurrentLineInfo().getLine(), includeStack.size());
-      includeStack.peek().addChild(includeUsage);
+      DocumentNode documentNode = new DocumentNode(actualLocation, description, getCurrentLineInfo().getLine(), includeStack.size());
+      includeStack.peek().addChild(documentNode);
     }
   }
 
@@ -292,7 +293,8 @@ public class IncludeProcessor extends FileProcessor {
     File file = new File(pathname.replaceAll("%20", " "));
     if (!file.exists()) {
       String errorMessage = "Include not found: " + fileToInclude;
-      if(!fileToInclude.equals(softTranslated)) errorMessage += " (translated by softlink to '"+softTranslated+"')";
+      if (!fileToInclude.equals(softTranslated))
+        errorMessage += " (translated by softlink to '" + softTranslated + "')";
       error(errorMessage.trim());
     } else {
       String newFolder = pathname;
@@ -300,7 +302,8 @@ public class IncludeProcessor extends FileProcessor {
       if (lastIdx != -1)
         newFolder = newFolder.substring(0, lastIdx + 1);
 
-      DocumentNode includeUsage = new DocumentNode(makeRelativeToLibrary(file), getCurrentLineInfo().getLine(), includeStack.size());
+      DocumentNode includeUsage =
+          new DocumentNode(makeRelativeToLibrary(file), ThothUtil.getNameOnly(fileToInclude), getCurrentLineInfo().getLine(), includeStack.size());
       includeStack.peek().addChild(includeUsage);
       includeStack.push(includeUsage);
       startNewFile(pathname);

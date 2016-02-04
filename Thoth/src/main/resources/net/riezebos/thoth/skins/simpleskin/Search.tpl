@@ -32,10 +32,14 @@ which is part of
 #end
 #end
 <br/>
+#if(${searchResult.image})
+<img src="$branchurl${searchResult.document}" alt="$branchurl${searchResult.document}">&nbsp;
+#else
 #foreach($fragment in ${searchResult.fragments})
 <fragment>
 $fragment
 </fragment>
+#end
 #end
 </searchresult>
 <br>

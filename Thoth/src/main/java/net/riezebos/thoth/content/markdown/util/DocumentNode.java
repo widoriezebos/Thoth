@@ -23,13 +23,14 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class DocumentNode {
   private String path;
+  private String description;
   private String fileName;
   private String folder;
   private int includePosition;
   private int level;
   private List<DocumentNode> children = new ArrayList<DocumentNode>();
 
-  public DocumentNode(String absolutefilePath, int includePosition, int level) {
+  public DocumentNode(String absolutefilePath, String description, int includePosition, int level) {
     String path = ThothUtil.normalSlashes(absolutefilePath);
     if (!path.startsWith("/"))
       path = "/" + path;
@@ -40,6 +41,7 @@ public class DocumentNode {
       path = path.substring(0, idx);
 
     this.path = path;
+    this.description = (description == null || description.isEmpty()) ? ThothUtil.getFileName(path) : description;
     this.includePosition = includePosition;
     this.fileName = ThothUtil.getFileName(path);
     this.folder = ThothUtil.getFolder(path);
@@ -85,6 +87,10 @@ public class DocumentNode {
   @Override
   public String toString() {
     return toString(0);
+  }
+
+  public String getDescription() {
+    return description;
   }
 
   public String toString(int level) {

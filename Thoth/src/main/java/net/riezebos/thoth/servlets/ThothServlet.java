@@ -139,20 +139,25 @@ public class ThothServlet extends ServletBase {
   @Override
   protected void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException {
 
-    if (!handleCommand(request, response)) {
+    try {
+      if (!handleCommand(request, response)) {
 
-      String branch = getBranch(request);
-      String path = getPath(request);
-      if (("/" + branch + "/").equalsIgnoreCase(ContentManager.NATIVERESOURCES))
-        streamClassPathResource(path, request, response);
-      else if (StringUtils.isBlank(branch) && StringUtils.isBlank(path))
-        executeCommand(indexCommand, request, response);
-      else if (StringUtils.isBlank(path))
-        executeCommand(branchIndexCommand, request, response);
-      else {
-        if (!renderDocument(request, response))
-          streamResource(request, response);
+        String branch = getBranch(request);
+        String path = getPath(request);
+        if (("/" + branch + "/").equalsIgnoreCase(ContentManager.NATIVERESOURCES))
+          streamClassPathResource(path, request, response);
+        else if (StringUtils.isBlank(branch) && StringUtils.isBlank(path))
+          executeCommand(indexCommand, request, response);
+        else if (StringUtils.isBlank(path))
+          executeCommand(branchIndexCommand, request, response);
+        else {
+          if (!renderDocument(request, response))
+            streamResource(request, response);
+        }
       }
+    } catch (BranchNotFoundException e) {
+      LOG.info("404 on request " + request.getRequestURI());
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
   }
 

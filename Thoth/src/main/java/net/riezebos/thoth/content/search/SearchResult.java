@@ -17,13 +17,16 @@ package net.riezebos.thoth.content.search;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.content.markdown.util.DocumentNode;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class SearchResult {
 
   private String document;
   private List<Fragment> fragments = new ArrayList<>();
   private List<DocumentNode> bookReferences = new ArrayList<>();
+  private boolean isResource = false;
 
   public String getDocument() {
     return document;
@@ -52,6 +55,19 @@ public class SearchResult {
 
   public List<DocumentNode> getBookReferences() {
     return bookReferences;
+  }
+
+  public boolean isResource() {
+    return isResource;
+  }
+
+  public void setResource(boolean isResource) {
+    this.isResource = isResource;
+  }
+
+  public boolean isImage() {
+    String extension = ThothUtil.getExtension(document);
+    return Configuration.getInstance().isImageExtension(extension);
   }
 
 }

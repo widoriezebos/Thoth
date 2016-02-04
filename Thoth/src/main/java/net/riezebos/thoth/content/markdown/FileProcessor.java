@@ -356,10 +356,13 @@ public class FileProcessor {
     for (Bookmark bookmark : bookmarks)
       minimumLevel = Math.min(minimumLevel, bookmark.getLevel());
 
+    boolean first = true;
     for (Bookmark bookmark : bookmarks) {
+      if (first)
+        toc.append("<tableofcontents>");
+      first = false;
       if (bookmark.getLevel() == minimumLevel)
         toc.append("\n");
-
       String tocLine = String.format("[%s](#%s)", bookmark.getTitle(), bookmark.getId());
       if (bookmark.getLevel() > minimumLevel) {
         tocLine = "- " + tocLine;
@@ -372,6 +375,8 @@ public class FileProcessor {
       if (bookmark.getLevel() == minimumLevel)
         toc.append("\n");
     }
+    if (!bookmarks.isEmpty())
+      toc.append("</tableofcontents>");
     document = document.replaceAll("\\\\tableofcontents", toc.toString().trim() + "\n");
     return document;
   }

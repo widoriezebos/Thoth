@@ -15,6 +15,7 @@
 package net.riezebos.thoth.content.search;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -40,7 +41,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -64,9 +64,12 @@ import net.riezebos.thoth.exceptions.IndexerException;
 
 public class Indexer {
   public static final String INDEX_CONTENTS = "contents";
+  public static final String INDEX_TYPE = "type";
   public static final String INDEX_TITLE = "title";
   public static final String INDEX_PATH = "path";
   public static final String INDEX_MODIFIED = "modified";
+  public static final String TYPE_DOCUMENT = "document";
+  public static final String TYPE_OTHER = "other";
 
   private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
@@ -128,36 +131,15 @@ public class Indexer {
 
       IndexWriter writer = new IndexWriter(dir, iwc);
 
-      Map<String, List<String>> indirectReverseIndex = new HashMap<>();
-      Map<String, List<String>> directReverseIndex = new HashMap<>();
-      List<ProcessorError> errors = new ArrayList<>();
+      IndexingContext context = new IndexingContext();
 
-      indexDocs(writer, docDir, indirectReverseIndex, directReverseIndex, errors);
+      indexDocs(writer, docDir, context);
 
-      sortIndexLists(indirectReverseIndex);
-      sortIndexLists(directReverseIndex);
-      Collections.sort(errors);
+      sortIndexLists(context.getIndirectReverseIndex());
+      sortIndexLists(context.getDirectReverseIndex());
+      Collections.sort(context.getErrors());
 
-      String reverseIndexFile = contentManager.getReverseIndexFileName(branch);
-      String indirectReverseIndexFile = contentManager.getReverseIndexIndirectFileName(branch);
-      String errorFile = contentManager.getErrorFileName(branch);
-
-      synchronized (CacheManager.getFileLock()) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(reverseIndexFile)))) {
-          oos.writeObject(directReverseIndex);
-        }
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(indirectReverseIndexFile)))) {
-          oos.writeObject(indirectReverseIndex);
-        }
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(errorFile)))) {
-          oos.writeObject(errors);
-        }
-      }
-
-      CacheManager cacheManager = CacheManager.getInstance(branch);
-      cacheManager.cacheReverseIndex(true, indirectReverseIndex);
-      cacheManager.cacheReverseIndex(false, directReverseIndex);
-      cacheManager.cacheErrors(errors);
+      cacheResults(context);
 
       // NOTE: if you want to maximize search performance,
       // you can optionally call forceMerge here. This can be
@@ -180,20 +162,42 @@ public class Indexer {
     }
   }
 
+  protected void cacheResults(IndexingContext context) throws BranchNotFoundException, IOException, FileNotFoundException {
+    String reverseIndexFile = contentManager.getReverseIndexFileName(branch);
+    String indirectReverseIndexFile = contentManager.getReverseIndexIndirectFileName(branch);
+    String errorFile = contentManager.getErrorFileName(branch);
+
+    synchronized (CacheManager.getFileLock()) {
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(reverseIndexFile)))) {
+        oos.writeObject(context.getDirectReverseIndex());
+      }
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(indirectReverseIndexFile)))) {
+        oos.writeObject(context.getIndirectReverseIndex());
+      }
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(errorFile)))) {
+        oos.writeObject(context.getErrors());
+      }
+    }
+
+    CacheManager cacheManager = CacheManager.getInstance(branch);
+    cacheManager.cacheReverseIndex(true, context.getIndirectReverseIndex());
+    cacheManager.cacheReverseIndex(false, context.getDirectReverseIndex());
+    cacheManager.cacheErrors(context.getErrors());
+  }
+
   protected void sortIndexLists(Map<String, List<String>> map) {
     for (Entry<String, List<String>> entry : map.entrySet())
       Collections.sort(entry.getValue());
   }
 
-  void indexDocs(final IndexWriter writer, Path path, final Map<String, List<String>> indirectReverseIndex, final Map<String, List<String>> directReverseIndex,
-      final List<ProcessorError> errors) throws IOException, BranchNotFoundException {
+  void indexDocs(final IndexWriter writer, Path path, final IndexingContext context) throws IOException, BranchNotFoundException {
 
     if (Files.isDirectory(path)) {
       Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           try {
-            indexDoc(writer, file, attrs.lastModifiedTime().toMillis(), indirectReverseIndex, directReverseIndex, errors);
+            indexDoc(writer, file, attrs.lastModifiedTime().toMillis(), context);
           } catch (Exception ignore) {
             // don't index files that can't be read.
             LOG.warn("Not indexing " + file.toString() + " because of " + ignore.getMessage());
@@ -202,7 +206,7 @@ public class Indexer {
         }
       });
     } else {
-      indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis(), indirectReverseIndex, directReverseIndex, errors);
+      indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis(), context);
     }
   }
 
@@ -211,43 +215,61 @@ public class Indexer {
    * 
    * @param indirectReverseIndex
    * @param directReverseIndex
+   * @param referencedLocalResources
    * @param errors
    * @throws BranchNotFoundException
    */
-  void indexDoc(IndexWriter writer, Path file, long lastModified, Map<String, List<String>> indirectReverseIndex, Map<String, List<String>> directReverseIndex,
-      List<ProcessorError> errors) throws IOException, BranchNotFoundException {
+  void indexDoc(IndexWriter writer, Path file, long lastModified, IndexingContext context) throws IOException, BranchNotFoundException {
 
     Path relativePath = docDir.relativize(file);
-    if (!ignore(relativePath)) {
+    if (!ignore(relativePath.toString())) {
       // make a new, empty document
-      Document doc = new Document();
 
       try {
-        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(branch, relativePath.toString());
-        errors.addAll(markDownDocument.getErrors());
+        String resourcePath = relativePath.toString();
+        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(branch, resourcePath);
+        context.getErrors().addAll(markDownDocument.getErrors());
 
-        doc.add(new StringField(INDEX_PATH, "/" + relativePath.toString(), Field.Store.YES));
-        doc.add(new TextField(INDEX_TITLE, markDownDocument.getTitle(), Store.YES));
-        doc.add(new LongField(INDEX_MODIFIED, lastModified, Field.Store.NO));
-        doc.add(new TextField(INDEX_CONTENTS, markDownDocument.getMarkdown(), Store.NO));
-
-        updateReverseIndex(indirectReverseIndex, true, markDownDocument);
-        updateReverseIndex(directReverseIndex, false, markDownDocument);
-
-        if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
-          // New index, so we just add the document (no old document can be there):
-          LOG.debug("Indexer for branch " + this.branch + " added " + relativePath);
-          writer.addDocument(doc);
-        } else {
-          // Existing index (an old copy of this document may have been indexed) so
-          // we use updateDocument instead to replace the old one matching the exact
-          // path, if present:
-          LOG.debug("Indexer for branch " + this.branch + " updated " + relativePath);
-          writer.updateDocument(new Term(INDEX_PATH, relativePath.toString()), doc);
+        // Also index non-documents if referenced and stored locally
+        for (DocumentNode node : markDownDocument.getDocumentStructure().flatten(true)) {
+          String path = node.getPath();
+          if (ignore(path) && !context.getReferencedLocalResources().contains(path)) {
+            context.getReferencedLocalResources().add(path);
+            String body = node.getDescription().trim();
+            String tokenized = body.replaceAll("\\W", " ").replaceAll("  ", "");
+            if (!body.equals(tokenized))
+              body = body + " " + tokenized;
+            addToIndex(writer, path, TYPE_OTHER, node.getFileName(), body);
+          }
         }
+
+        updateReverseIndex(context.getIndirectReverseIndex(), true, markDownDocument);
+        updateReverseIndex(context.getDirectReverseIndex(), false, markDownDocument);
+
+        addToIndex(writer, "/" + resourcePath, TYPE_DOCUMENT, markDownDocument.getTitle(), markDownDocument.getMarkdown());
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }
+    }
+  }
+
+  protected void addToIndex(IndexWriter writer, String resourcePath, String resourceType, String title, String contents) throws IOException {
+    Document doc = new Document();
+    doc.add(new StringField(INDEX_PATH, resourcePath, Field.Store.YES));
+    doc.add(new TextField(INDEX_TYPE, resourceType, Store.YES));
+    doc.add(new TextField(INDEX_TITLE, title, Store.YES));
+    doc.add(new TextField(INDEX_CONTENTS, contents, Store.NO));
+
+    if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
+      // New index, so we just add the document (no old document can be there):
+      LOG.debug("Indexer for branch " + this.branch + " added " + resourcePath);
+      writer.addDocument(doc);
+    } else {
+      // Existing index (an old copy of this document may have been indexed) so
+      // we use updateDocument instead to replace the old one matching the exact
+      // path, if present:
+      LOG.debug("Indexer for branch " + this.branch + " updated " + resourcePath);
+      writer.updateDocument(new Term(INDEX_PATH, resourcePath), doc);
     }
   }
 
@@ -294,8 +316,7 @@ public class Indexer {
       extensions.add(ext.trim().toLowerCase());
   }
 
-  protected boolean ignore(Path path) {
-    String pathName = path.toString();
+  protected boolean ignore(String pathName) {
     if (pathName.startsWith("."))
       return true;
     int idx = pathName.lastIndexOf('.');
@@ -311,5 +332,29 @@ public class Indexer {
 
   public List<ProcessorError> getValidationErrors() throws IndexerException {
     return CacheManager.getInstance(branch).getValidationErrors();
+  }
+
+  class IndexingContext {
+    private Map<String, List<String>> indirectReverseIndex = new HashMap<>();
+    private Map<String, List<String>> directReverseIndex = new HashMap<>();
+    private List<ProcessorError> errors = new ArrayList<>();
+    private Set<String> referencedLocalResources = new HashSet<>();
+
+    public Map<String, List<String>> getIndirectReverseIndex() {
+      return indirectReverseIndex;
+    }
+
+    public Map<String, List<String>> getDirectReverseIndex() {
+      return directReverseIndex;
+    }
+
+    public List<ProcessorError> getErrors() {
+      return errors;
+    }
+
+    public Set<String> getReferencedLocalResources() {
+      return referencedLocalResources;
+    }
+
   }
 }
