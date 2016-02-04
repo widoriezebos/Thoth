@@ -39,16 +39,15 @@ public class SearchCommand extends RendererBase implements Command {
 
   public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      String query = getString(arguments, "query");
-      Searcher searcher = SearchFactory.getInstance().getSearcher(branch);
-
-      String errorMessage = null;
       List<SearchResult> searchResults = new ArrayList<>();
+      String errorMessage = null;
+      String query = getString(arguments, "query");
       try {
+        Searcher searcher = SearchFactory.getInstance().getSearcher(branch);
         if (StringUtils.isBlank(query))
           errorMessage = "Do you feel lucky?";
         else
-          searchResults = searcher.search(query, Configuration.getInstance().getMaxSearchResults());
+          searchResults.addAll(searcher.search(query, Configuration.getInstance().getMaxSearchResults()));
       } catch (Exception x) {
 
         errorMessage = x.getMessage();

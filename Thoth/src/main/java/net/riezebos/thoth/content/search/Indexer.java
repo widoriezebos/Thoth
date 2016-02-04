@@ -43,10 +43,17 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
@@ -54,8 +61,10 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.markdown.util.DocumentNode;
 import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
@@ -67,6 +76,7 @@ public class Indexer {
   public static final String INDEX_TYPE = "type";
   public static final String INDEX_TITLE = "title";
   public static final String INDEX_PATH = "path";
+  public static final String INDEX_USED = "used";
   public static final String INDEX_MODIFIED = "modified";
   public static final String TYPE_DOCUMENT = "document";
   public static final String TYPE_OTHER = "other";
@@ -109,30 +119,8 @@ public class Indexer {
       Date start = new Date();
       LOG.info("Indexing " + this.branch + " to directory '" + indexPath + "'...");
 
-      Directory dir = FSDirectory.open(Paths.get(indexPath));
-      Analyzer analyzer = new StandardAnalyzer();
-      IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-
-      if (recreate) {
-        // Create a new index in the directory, removing any
-        // previously indexed documents:
-        iwc.setOpenMode(OpenMode.CREATE);
-      } else {
-        // Add new documents to an existing index:
-        iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
-      }
-
-      // Optional: for better indexing performance, if you
-      // are indexing many documents, increase the RAM
-      // buffer. But if you do this, increase the max heap
-      // size to the JVM (eg add -Xmx512m or -Xmx1g):
-      //
-      // iwc.setRAMBufferSizeMB(256.0);
-
-      IndexWriter writer = new IndexWriter(dir, iwc);
-
+      IndexWriter writer = getWriter(recreate);
       IndexingContext context = new IndexingContext();
-
       indexDocs(writer, docDir, context);
 
       sortIndexLists(context.getIndirectReverseIndex());
@@ -151,6 +139,8 @@ public class Indexer {
 
       writer.close();
 
+      markUnusedDocuments(context.getDirectReverseIndex());
+
       Date end = new Date();
       LOG.info("Indexing branch " + this.branch + " took " + (end.getTime() - start.getTime()) + " milliseconds");
     } catch (IOException e) {
@@ -158,6 +148,42 @@ public class Indexer {
     } finally {
       synchronized (activeIndexers) {
         activeIndexers.remove(this.branch);
+      }
+    }
+  }
+
+  protected IndexWriter getWriter(boolean wipeIndex) throws IOException {
+    Directory dir = FSDirectory.open(Paths.get(indexPath));
+    Analyzer analyzer = new StandardAnalyzer();
+    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+
+    if (wipeIndex) {
+      iwc.setOpenMode(OpenMode.CREATE);
+    } else {
+      iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
+    }
+
+    IndexWriter writer = new IndexWriter(dir, iwc);
+    return writer;
+  }
+
+  protected void markUnusedDocuments(Map<String, List<String>> directReverseIndex) throws IOException, ContentManagerException {
+
+    String indexFolder = contentManager.getIndexFolder(branch);
+
+    try (IndexWriter writer = getWriter(false); IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)))) {
+      IndexSearcher searcher = new IndexSearcher(reader);
+      for (ContentNode node : ContentManagerFactory.getContentManager().getUnusedFragments(branch)) {
+        TermQuery query = new TermQuery(new Term(Indexer.INDEX_PATH, node.getPath()));
+
+        TopDocs results = searcher.search(query, 10, Sort.RELEVANCE);
+        ScoreDoc[] hits = results.scoreDocs;
+
+        for (ScoreDoc scoreDoc : hits) {
+          Document document = searcher.doc(scoreDoc.doc);
+          document.add(new TextField(INDEX_USED, "false", Store.YES));
+          writer.updateDocument(new Term(INDEX_PATH, node.getPath()), document);
+        }
       }
     }
   }
@@ -254,22 +280,23 @@ public class Indexer {
   }
 
   protected void addToIndex(IndexWriter writer, String resourcePath, String resourceType, String title, String contents) throws IOException {
-    Document doc = new Document();
-    doc.add(new StringField(INDEX_PATH, resourcePath, Field.Store.YES));
-    doc.add(new TextField(INDEX_TYPE, resourceType, Store.YES));
-    doc.add(new TextField(INDEX_TITLE, title, Store.YES));
-    doc.add(new TextField(INDEX_CONTENTS, contents, Store.NO));
+    Document document = new Document();
+    document.add(new StringField(INDEX_PATH, resourcePath, Field.Store.YES));
+    document.add(new TextField(INDEX_TYPE, resourceType, Store.YES));
+    document.add(new TextField(INDEX_TITLE, title, Store.YES));
+    document.add(new TextField(INDEX_CONTENTS, contents, Store.NO));
+    document.add(new TextField(INDEX_USED, "true", Store.YES));
 
     if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
       // New index, so we just add the document (no old document can be there):
       LOG.debug("Indexer for branch " + this.branch + " added " + resourcePath);
-      writer.addDocument(doc);
+      writer.addDocument(document);
     } else {
       // Existing index (an old copy of this document may have been indexed) so
       // we use updateDocument instead to replace the old one matching the exact
       // path, if present:
       LOG.debug("Indexer for branch " + this.branch + " updated " + resourcePath);
-      writer.updateDocument(new Term(INDEX_PATH, resourcePath), doc);
+      writer.updateDocument(new Term(INDEX_PATH, resourcePath), document);
     }
   }
 

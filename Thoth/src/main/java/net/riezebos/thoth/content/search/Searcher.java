@@ -58,7 +58,6 @@ public class Searcher {
     try {
       ContentManager contentManager = ContentManagerFactory.getContentManager();
       String indexFolder = contentManager.getIndexFolder(branch);
-
       IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)));
       IndexSearcher searcher = new IndexSearcher(reader);
       Analyzer analyzer = new StandardAnalyzer();

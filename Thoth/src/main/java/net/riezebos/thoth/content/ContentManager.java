@@ -78,4 +78,6 @@ public interface ContentManager {
 
   public String getInheritedPath(String path, String branch) throws BranchNotFoundException, IOException;
 
+  List<ContentNode> getUnusedFragments(String branch) throws IOException, ContentManagerException;
+
 }

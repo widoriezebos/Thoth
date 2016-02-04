@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.beans.CustomRendererDefinition;
 import net.riezebos.thoth.util.ConfigurationBase;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class Configuration extends ConfigurationBase {
 
@@ -47,6 +48,8 @@ public class Configuration extends ConfigurationBase {
   private String workspaceLocation;
   private Integer markdownOptions;
   private Set<String> imageExtensions = new HashSet<>();
+  private Set<String> _fragmentExtensions = null;
+  private Set<String> _bookExtensions = null;
 
   public static Configuration getInstance() {
     if (_instance == null) {
@@ -272,6 +275,44 @@ public class Configuration extends ConfigurationBase {
     if (extension == null)
       return false;
     return imageExtensions.contains(extension.toLowerCase());
+  }
 
+  public boolean isFragment(String path) {
+    if (_fragmentExtensions == null) {
+      Set<String> fragmentExtensions = new HashSet<>();
+      fragmentExtensions.addAll(getDocumentExtensions());
+      fragmentExtensions.removeAll(getBookExtensions());
+      _fragmentExtensions = fragmentExtensions;
+    }
+    if (ThothUtil.getFileName(path).startsWith("."))
+      return false;
+
+    String extension = ThothUtil.getExtension(path);
+    if (extension == null)
+      return false;
+    else
+      extension = extension.toLowerCase();
+    return _fragmentExtensions.contains(extension);
+  }
+
+  public boolean isBook(String path) {
+    if (_bookExtensions == null) {
+      Set<String> bookExtensions = new HashSet<>();
+      bookExtensions.removeAll(getBookExtensions());
+      _bookExtensions = bookExtensions;
+    }
+    if (ThothUtil.getFileName(path).startsWith("."))
+      return false;
+
+    String extension = ThothUtil.getExtension(path);
+    if (extension == null)
+      return false;
+    else
+      extension = extension.toLowerCase();
+    return _bookExtensions.contains(extension);
+  }
+
+  public boolean isResource(String path) {
+    return !isFragment(path) && !isBook(path);
   }
 }

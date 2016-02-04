@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -323,64 +324,6 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException {
-
-    List<ContentNode> result = new ArrayList<>();
-
-    String fileSystemPath = getFileSystemPath(branch, path);
-    String branchFolder = getBranchFolder(branch);
-
-    Path branchPath = Paths.get(branchFolder);
-
-    File file = new File(fileSystemPath);
-    if (file.isFile()) {
-      result.add(createContentNode(fileSystemPath, branchPath));
-    } else {
-      for (File child : file.listFiles()) {
-        if (!child.getName().startsWith("."))
-          result.add(createContentNode(child.getAbsolutePath(), branchPath));
-      }
-    }
-    Collections.sort(result);
-    return result;
-  }
-
-  protected ContentNode createContentNode(String fileSystemPath, Path branchPath) {
-    Path filePath = Paths.get(fileSystemPath);
-    Path relativePath = branchPath.relativize(filePath);
-    File file = filePath.toFile();
-    return new ContentNode("/" + relativePath.toString(), file);
-  }
-
-  @Override
-  public List<ContentNode> find(String branch, String fileSpec, boolean recursive) throws BranchNotFoundException, IOException {
-    List<ContentNode> result = new ArrayList<>();
-
-    String folderPart = ThothUtil.getFolder(fileSpec);
-    String spec = ThothUtil.getFileName(fileSpec);
-    if (fileSpec.indexOf('/') == -1)
-      folderPart = "/";
-
-    String folder = getFileSystemPath(branch, folderPart);
-    Path root = Paths.get(getBranchFolder(branch));
-
-    Pattern pattern = Pattern.compile(ThothUtil.fileSpec2regExp(spec));
-    traverseFolders(result, pattern, root, new File(folder), recursive);
-    Collections.sort(result);
-    return result;
-  }
-
-  protected void traverseFolders(List<ContentNode> result, Pattern pattern, Path root, File currentFolder, boolean recursive) throws IOException {
-    for (File file : currentFolder.listFiles()) {
-      if (file.isDirectory()) {
-        if (recursive)
-          traverseFolders(result, pattern, root, file, recursive);
-      } else if (pattern.matcher(file.getName()).matches()) {
-        result.add(createContentNode(file.getCanonicalPath(), root));
-      }
-    }
-  }
-
   public String getInheritedPath(String path, String branch) throws BranchNotFoundException, IOException {
     String result = null;
     String inheritedPath = handleBranchBasedInheritance(branch, path);
@@ -404,6 +347,83 @@ public abstract class ContentManagerBase implements ContentManager {
       result = parent.getSkinBaseFolder() + remainder;
     }
     return result;
+  }
+
+  @Override
+  public List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException {
+
+    List<ContentNode> result = new ArrayList<>();
+
+    String fileSystemPath = getFileSystemPath(branch, path);
+    String branchFolder = getBranchFolder(branch);
+
+    Path branchPath = Paths.get(branchFolder);
+
+    File file = new File(fileSystemPath);
+    if (file.isFile()) {
+      result.add(createContentNode(fileSystemPath, branchPath));
+    } else {
+      for (File child : file.listFiles()) {
+        if (!child.getName().startsWith("."))
+          result.add(createContentNode(child.getAbsolutePath(), branchPath));
+      }
+    }
+    Collections.sort(result);
+    return result;
+  }
+
+  @Override
+  public List<ContentNode> find(String branch, String fileSpec, boolean recursive) throws BranchNotFoundException, IOException {
+    List<ContentNode> result = new ArrayList<>();
+
+    String folderPart = ThothUtil.getFolder(fileSpec);
+    String spec = ThothUtil.getFileName(fileSpec);
+    if (fileSpec.indexOf('/') == -1)
+      folderPart = "/";
+
+    String folder = getFileSystemPath(branch, folderPart);
+    Path root = Paths.get(getBranchFolder(branch));
+
+    Pattern pattern = Pattern.compile(ThothUtil.fileSpec2regExp(spec));
+    traverseFolders(result, value -> pattern.matcher(ThothUtil.getFileName(value)).matches(), root, new File(folder), recursive);
+    Collections.sort(result);
+    return result;
+  }
+
+  protected void traverseFolders(List<ContentNode> result, Predicate<String> matcher, Path root, File currentFolder, boolean recursive) throws IOException {
+    for (File file : currentFolder.listFiles()) {
+      if (file.isDirectory()) {
+        if (recursive)
+          traverseFolders(result, matcher, root, file, recursive);
+      } else {
+        ContentNode node = createContentNode(file.getCanonicalPath(), root);
+        if (matcher.test(node.getPath()))
+          result.add(node);
+      }
+    }
+  }
+
+  @Override
+  public List<ContentNode> getUnusedFragments(String branch) throws IOException, ContentManagerException {
+    List<ContentNode> result = new ArrayList<>();
+
+    Path root = Paths.get(getBranchFolder(branch));
+    CacheManager cacheManager = CacheManager.getInstance(branch);
+    Map<String, List<String>> reverseIndex = cacheManager.getReverseIndex(false);
+    traverseFolders(result, value -> isFragment(branch, value) && !reverseIndex.containsKey(value), root, root.toFile(), true);
+    Collections.sort(result);
+    return result;
+  }
+
+  public boolean isFragment(String branch, String path) {
+    return Configuration.getInstance().isFragment(path);
+  }
+
+  protected ContentNode createContentNode(String fileSystemPath, Path branchPath) {
+    Path filePath = Paths.get(fileSystemPath);
+    Path relativePath = branchPath.relativize(filePath);
+    File file = filePath.toFile();
+    return new ContentNode("/" + relativePath.toString(), file);
   }
 
 }
