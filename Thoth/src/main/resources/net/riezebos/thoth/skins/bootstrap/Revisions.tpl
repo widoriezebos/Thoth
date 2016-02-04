@@ -39,7 +39,7 @@ Showing page ${page}<br/>
 #end
 </table>
 
-<br/><br/>Latest successfull refresh was at ${refresh} 
+<br/><br/>Latest successfull Pull request was at ${refresh} 
 
 </body>
 </html>

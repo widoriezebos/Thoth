@@ -50,7 +50,7 @@ Click <a href="${branchurl}/?cmd=browse">here</a> to browse the library
 #end	
 </table>
 
-<br/><br/>Latest successfull refresh was at ${refresh} 
+<br/><br/>Latest successfull Pull request was at ${refresh} 
 
 </body>
 </html>
