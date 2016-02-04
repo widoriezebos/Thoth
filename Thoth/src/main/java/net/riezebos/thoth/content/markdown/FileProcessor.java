@@ -43,6 +43,8 @@ import net.riezebos.thoth.util.ThothUtil;
  */
 public class FileProcessor {
 
+  public static final String TABLEOFCONTENTS_TAG = "tableofcontents";
+
   protected static int DEFAULT_NUMBERING_LEVEL = 3;
   protected static final String STDIN = "stdin";
 
@@ -359,7 +361,7 @@ public class FileProcessor {
     boolean first = true;
     for (Bookmark bookmark : bookmarks) {
       if (first)
-        toc.append("<tableofcontents>");
+        toc.append("<" + TABLEOFCONTENTS_TAG + ">");
       first = false;
       if (bookmark.getLevel() == minimumLevel)
         toc.append("\n");
@@ -376,7 +378,7 @@ public class FileProcessor {
         toc.append("\n");
     }
     if (!bookmarks.isEmpty())
-      toc.append("</tableofcontents>");
+      toc.append("</" + TABLEOFCONTENTS_TAG + ">");
     document = document.replaceAll("\\\\tableofcontents", toc.toString().trim() + "\n");
     return document;
   }
