@@ -55,6 +55,7 @@ import net.riezebos.thoth.content.versioncontrol.Revision.Action;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.util.PagedList;
 
 public class GitContentManager extends ContentManagerBase {
 
@@ -139,12 +140,7 @@ public class GitContentManager extends ContentManagerBase {
     return Git.open(target);
   }
 
-  public List<Commit> getLatestCommits(String branch, String path, int maxRevisions) throws ContentManagerException {
-    return getCommits(branch, path, 0, maxRevisions);
-  }
-
-  public List<Commit> getCommits(String branch, String path, int startIdx, int endIdx) throws ContentManagerException {
-
+  public PagedList<Commit> getCommits(String branch, String path, int pageNumber, int pageSize) throws ContentManagerException {
     path = ensureRelative(path);
     try (Git repos = getRepository(branch)) {
       Repository repository = repos.getRepository();
@@ -154,12 +150,19 @@ public class GitContentManager extends ContentManagerBase {
         log = log.addPath(path);
       Iterable<RevCommit> revisions = log.call();
       Iterator<RevCommit> iterator = revisions.iterator();
-      int i = endIdx;
-      while (iterator.hasNext() && --i > 0) {
+
+      // First skip over the pages we are not interested in
+      int skipCount = (pageNumber - 1) * pageSize;
+      while (skipCount-- > 0 && iterator.hasNext())
+        iterator.next();
+
+      // Now add the revisions
+      while (iterator.hasNext() && commits.size() < pageSize) {
         RevCommit revCommit = iterator.next();
         commits.add(getCommit(repository, revCommit, path));
       }
-      return commits;
+      PagedList<Commit> pagedList = new PagedList<>(commits, iterator.hasNext());
+      return pagedList;
     } catch (IOException | GitAPIException e) {
       throw new ContentManagerException(e);
     }

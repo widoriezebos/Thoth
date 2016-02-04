@@ -29,6 +29,7 @@ import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.util.PagedList;
 
 public class BranchIndexCommand extends RendererBase implements Command {
 
@@ -45,8 +46,9 @@ public class BranchIndexCommand extends RendererBase implements Command {
       List<BookClassification> audiences = contentManager.getClassification(books, "audience", "Unclassified");
       List<BookClassification> folders = contentManager.getClassification(books, "folder", "Unclassified");
 
-      int maxRevisons = Configuration.getInstance().getBranchMaxRevisions();
-      List<Commit> commitList = contentManager.getLatestCommits(branch, null, maxRevisons);
+      int pageSize = Configuration.getInstance().getBranchMaxRevisions();
+      PagedList<Commit> pagedList = contentManager.getCommits(branch, null, 1, pageSize);
+      List<Commit> commitList = pagedList.getList();
       Collections.sort(commitList, new CommitComparator());
 
       Map<String, Object> variables = new HashMap<>(arguments);

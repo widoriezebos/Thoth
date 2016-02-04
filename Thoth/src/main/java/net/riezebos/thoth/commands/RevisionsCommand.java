@@ -27,6 +27,7 @@ import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.util.PagedList;
 
 public class RevisionsCommand extends RendererBase implements Command {
 
@@ -39,12 +40,20 @@ public class RevisionsCommand extends RendererBase implements Command {
     try {
       ContentManager contentManager = getContentManager();
 
-      int maxRevisons = Configuration.getInstance().getBranchMaxRevisions();
-      List<Commit> commitList = contentManager.getLatestCommits(branch, null, maxRevisons);
+      Integer pageNumber = getInteger(arguments, "page");
+      if (pageNumber == null)
+        pageNumber = 1;
+
+      int pageSize = Configuration.getInstance().getBranchMaxRevisions();
+      PagedList<Commit> pagedList = contentManager.getCommits(branch, null, pageNumber, pageSize);
+      List<Commit> commitList = pagedList.getList();
+      boolean hasMore = pagedList.hasMore();
       Collections.sort(commitList, new CommitComparator());
 
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("commitList", commitList);
+      variables.put("page", pageNumber);
+      variables.put("hasmore", hasMore);
 
       if (asJson(arguments))
         executeJson(variables, outputStream);

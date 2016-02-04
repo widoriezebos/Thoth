@@ -14,12 +14,16 @@
  */
 package net.riezebos.thoth.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 public class ThothUtil {
   private static final int DEFAULT_ADDITIONAL_BUFFERSIZE = 10;
@@ -31,6 +35,18 @@ public class ThothUtil {
         value = value.substring(1);
     }
     return value;
+  }
+
+  public static String escapeHtml(String html) {
+    return StringEscapeUtils.escapeHtml(html);
+  }
+
+  public static String encodeUrl(String url) {
+    try {
+      return URLEncoder.encode(url, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+    }
+    return url;
   }
 
   public static String normalSlashes(String filespec) {
@@ -249,5 +265,4 @@ public class ThothUtil {
     }
     return null;
   }
-
 }

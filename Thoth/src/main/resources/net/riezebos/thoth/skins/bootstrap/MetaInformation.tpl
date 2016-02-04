@@ -8,6 +8,7 @@
 <head>
 <body>
 <h1>${document.name}</h1>
+Full path: $path
 <h3>Meta tags</h3>
 <metatags>
 #foreach($key in $metatagKeys)
@@ -67,7 +68,7 @@ This document is not uncluded by any other document.
       <td>${commit.author}</td>
       <td>     
 #foreach($revision in $commit.revisions)
-       ${revision.path} (<a href="$branchurl/${revision.fileName}?cmd=diff&commitId=${revision.commitId}">Diff</a>)<br/>
+       ${revision.path} (<a href="$branchurl/${revision.fileName}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
 #end
       </td>
       <td>${commit.message}</td>
@@ -85,7 +86,7 @@ This document is not uncluded by any other document.
   <tr>
       <td>     
 #foreach($revision in $commit.revisions)
-      <a href="$branchurl/${documentNode.path}?cmd=diff&commitId=${revision.commitId}">${commit.formattedTimestamp}</a>
+      <a href="$branchurl/${documentNode.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">${commit.formattedTimestamp}</a>
 #end
       </td>
       <td>${commit.author}</td>

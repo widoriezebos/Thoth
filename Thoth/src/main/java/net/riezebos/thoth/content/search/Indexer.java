@@ -267,21 +267,22 @@ public class Indexer {
             String tokenized = body.replaceAll("\\W", " ").replaceAll("  ", "");
             if (!body.equals(tokenized))
               body = body + " " + tokenized;
-            addToIndex(writer, path, TYPE_OTHER, node.getFileName(), body);
+            addToIndex(writer, path, TYPE_OTHER, node.getFileName(), body, new HashMap<>());
           }
         }
 
         updateReverseIndex(context.getIndirectReverseIndex(), true, markDownDocument);
         updateReverseIndex(context.getDirectReverseIndex(), false, markDownDocument);
 
-        addToIndex(writer, "/" + resourcePath, TYPE_DOCUMENT, markDownDocument.getTitle(), markDownDocument.getMarkdown());
+        addToIndex(writer, "/" + resourcePath, TYPE_DOCUMENT, markDownDocument.getTitle(), markDownDocument.getMarkdown(), markDownDocument.getMetatags());
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }
     }
   }
 
-  protected void addToIndex(IndexWriter writer, String resourcePath, String resourceType, String title, String contents) throws IOException {
+  protected void addToIndex(IndexWriter writer, String resourcePath, String resourceType, String title, String contents, Map<String, String> metaTags)
+      throws IOException {
     String extension = ThothUtil.getExtension(resourcePath);
     if (extension == null)
       extension = "";
@@ -292,8 +293,11 @@ public class Indexer {
     document.add(new TextField(INDEX_TYPE, resourceType, Store.YES));
     document.add(new TextField(INDEX_TITLE, title, Store.YES));
     document.add(new TextField(INDEX_CONTENTS, contents, Store.NO));
-    document.add(new TextField(INDEX_USED, "true", Store.YES));
-    document.add(new TextField(INDEX_EXTENSION, extension.toLowerCase(), Store.YES));
+    document.add(new TextField(INDEX_USED, "true", Store.NO));
+    document.add(new TextField(INDEX_EXTENSION, extension.toLowerCase(), Store.NO));
+    for (Entry<String, String> entry : metaTags.entrySet()) {
+      document.add(new TextField(entry.getKey().toLowerCase(), String.valueOf(entry.getValue()), Store.NO));
+    }
 
     if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
       // New index, so we just add the document (no old document can be there):

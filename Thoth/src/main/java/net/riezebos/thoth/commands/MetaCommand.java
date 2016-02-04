@@ -54,12 +54,12 @@ public class MetaCommand extends RendererBase implements Command {
 
         DocumentNode root = markDownDocument.getDocumentStructure();
         List<DocumentNode> documentNodes = root.flatten(true);
-        int maxRevisons = Configuration.getInstance().getFileMaxRevisions();
+        int pageSize = Configuration.getInstance().getFileMaxRevisions();
 
         Map<String, List<Commit>> commitMap = new HashMap<>();
         List<Commit> commitList = new ArrayList<>();
         for (DocumentNode node : documentNodes) {
-          List<Commit> latestCommits = contentManager.getLatestCommits(branch, node.getPath(), maxRevisons);
+          List<Commit> latestCommits = contentManager.getCommits(branch, node.getPath(), 1, pageSize).getList();
           commitMap.put(node.getPath(), latestCommits);
           commitList.addAll(latestCommits);
         }

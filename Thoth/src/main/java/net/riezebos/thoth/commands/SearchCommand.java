@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.Configuration;
@@ -30,6 +29,7 @@ import net.riezebos.thoth.content.search.Searcher;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.util.PagedList;
 
 public class SearchCommand extends RendererBase implements Command {
 
@@ -43,9 +43,9 @@ public class SearchCommand extends RendererBase implements Command {
       List<SearchResult> searchResults = new ArrayList<>();
       String errorMessage = null;
       String query = getString(arguments, "query");
-      Integer currentPage = getInteger(arguments, "page");
-      if (currentPage == null)
-        currentPage = 1;
+      Integer pageNumber = getInteger(arguments, "page");
+      if (pageNumber == null)
+        pageNumber = 1;
       boolean hasMore = false;
 
       try {
@@ -54,8 +54,9 @@ public class SearchCommand extends RendererBase implements Command {
           errorMessage = "Do you feel lucky?";
         else {
           int pageSize = Configuration.getInstance().getMaxSearchResults();
-          searchResults.addAll(searcher.search(query, currentPage, pageSize));
-          hasMore = searcher.hasMore();
+          PagedList<SearchResult> pagedList = searcher.search(query, pageNumber, pageSize);
+          searchResults.addAll(pagedList.getList());
+          hasMore = pagedList.hasMore();
         }
       } catch (Exception x) {
 
@@ -66,12 +67,11 @@ public class SearchCommand extends RendererBase implements Command {
       }
 
       Map<String, Object> variables = new HashMap<>(arguments);
-      variables.put("page", currentPage);
+      variables.put("page", pageNumber);
       variables.put("hasmore", hasMore);
       variables.put("errorMessage", errorMessage);
       variables.put("searchResults", searchResults);
       variables.put("query", query);
-      variables.put("queryencoded", StringEscapeUtils.escapeHtml(query));
 
       if (asJson(arguments))
         executeJson(variables, outputStream);

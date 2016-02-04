@@ -45,17 +45,17 @@ import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.markdown.util.DocumentNode;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.SearchException;
+import net.riezebos.thoth.util.PagedList;
 
 public class Searcher {
 
   private String branch;
-  private boolean hasMore = false;
 
   protected Searcher(String branch) {
     this.branch = branch;
   }
 
-  public List<SearchResult> search(String queryExpression, int pageNumber, int pageSize) throws SearchException {
+  public PagedList<SearchResult> search(String queryExpression, int pageNumber, int pageSize) throws SearchException {
     try {
       ContentManager contentManager = ContentManagerFactory.getContentManager();
       String indexFolder = contentManager.getIndexFolder(branch);
@@ -71,7 +71,7 @@ public class Searcher {
       TopDocs results = searcher.search(query, maxResults, Sort.RELEVANCE);
       ScoreDoc[] hits = results.scoreDocs;
 
-      setHadMore(hits.length == maxResults);
+      boolean hadMore = (hits.length == maxResults);
 
       List<SearchResult> searchResults = new ArrayList<>();
       int idx = 0;
@@ -114,18 +114,11 @@ public class Searcher {
       }
       reader.close();
       linkBooks(searchResults);
-      return searchResults;
+      PagedList<SearchResult> pagedList = new PagedList<>(searchResults, hadMore);
+      return pagedList;
     } catch (Exception e) {
       throw new SearchException(e);
     }
-  }
-
-  protected void setHadMore(boolean b) {
-    this.hasMore = b;
-  }
-
-  public boolean hasMore() {
-    return hasMore;
   }
 
   protected void linkBooks(List<SearchResult> searchResults) throws ContentManagerException {

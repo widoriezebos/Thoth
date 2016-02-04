@@ -11,7 +11,7 @@
 #foreach($branch in $branches)
 <a href="${branch}">${branch}</a><br/>
 #end	
-<br/><br>Latest successfull refresh was at ${refresh}
+<br/><br>Latest successfull Pull request was at ${refresh}
 <br/>To update the site to the latest version right now; you can <a href=".?cmd=pull">Pull manually</a> or click <a href=".?cmd=reindex">here</a> to force a reindex<br/>
 </body>
 </html>

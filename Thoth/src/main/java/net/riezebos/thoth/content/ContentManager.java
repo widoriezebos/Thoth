@@ -27,6 +27,7 @@ import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.util.PagedList;
 
 public interface ContentManager {
 
@@ -56,9 +57,7 @@ public interface ContentManager {
 
   String getErrorFileName(String branch) throws BranchNotFoundException;
 
-  List<Commit> getLatestCommits(String branch, String path, int maxRevisons) throws ContentManagerException;
-
-  public List<Commit> getCommits(String branch, String path, int startIdx, int endIdx) throws ContentManagerException;
+  PagedList<Commit> getCommits(String branch, String path, int pageNumber, int pageSize) throws ContentManagerException;
 
   List<Book> getBooks(String branch) throws BranchNotFoundException, IOException;
 
