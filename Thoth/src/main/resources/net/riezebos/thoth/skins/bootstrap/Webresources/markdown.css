@@ -11,7 +11,7 @@ body {
         content: "Page " counter(page);
     }
     @bottom { 
-        content: "© 2016 Eyefreight BV";
+        content: "Thoth Documentation System";
     }	
 }
 <!-- End of Prince PDF related CSS -->

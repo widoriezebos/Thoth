@@ -70,6 +70,7 @@ import net.riezebos.thoth.content.markdown.util.ProcessorError;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.IndexerException;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class Indexer {
   public static final String INDEX_CONTENTS = "contents";
@@ -77,6 +78,7 @@ public class Indexer {
   public static final String INDEX_TITLE = "title";
   public static final String INDEX_PATH = "path";
   public static final String INDEX_USED = "used";
+  public static final String INDEX_EXTENSION = "ext";
   public static final String INDEX_MODIFIED = "modified";
   public static final String TYPE_DOCUMENT = "document";
   public static final String TYPE_OTHER = "other";
@@ -280,12 +282,18 @@ public class Indexer {
   }
 
   protected void addToIndex(IndexWriter writer, String resourcePath, String resourceType, String title, String contents) throws IOException {
+    String extension = ThothUtil.getExtension(resourcePath);
+    if (extension == null)
+      extension = "";
+    extension = extension.toLowerCase();
+
     Document document = new Document();
     document.add(new StringField(INDEX_PATH, resourcePath, Field.Store.YES));
     document.add(new TextField(INDEX_TYPE, resourceType, Store.YES));
     document.add(new TextField(INDEX_TITLE, title, Store.YES));
     document.add(new TextField(INDEX_CONTENTS, contents, Store.NO));
     document.add(new TextField(INDEX_USED, "true", Store.YES));
+    document.add(new TextField(INDEX_EXTENSION, extension.toLowerCase(), Store.YES));
 
     if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
       // New index, so we just add the document (no old document can be there):

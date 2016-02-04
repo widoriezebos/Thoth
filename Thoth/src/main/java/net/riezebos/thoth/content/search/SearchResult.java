@@ -27,6 +27,7 @@ public class SearchResult {
   private List<Fragment> fragments = new ArrayList<>();
   private List<DocumentNode> bookReferences = new ArrayList<>();
   private boolean isResource = false;
+  private int indexNumber;
 
   public String getDocument() {
     return document;
@@ -68,6 +69,14 @@ public class SearchResult {
   public boolean isImage() {
     String extension = ThothUtil.getExtension(document);
     return Configuration.getInstance().isImageExtension(extension);
+  }
+
+  public void setIndexNumber(int indexNumber) {
+    this.indexNumber = indexNumber;
+  }
+
+  public int getIndexNumber() {
+    return indexNumber;
   }
 
 }

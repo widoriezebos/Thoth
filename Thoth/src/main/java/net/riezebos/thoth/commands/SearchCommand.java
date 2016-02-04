@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.Configuration;
@@ -42,12 +43,20 @@ public class SearchCommand extends RendererBase implements Command {
       List<SearchResult> searchResults = new ArrayList<>();
       String errorMessage = null;
       String query = getString(arguments, "query");
+      Integer currentPage = getInteger(arguments, "page");
+      if (currentPage == null)
+        currentPage = 1;
+      boolean hasMore = false;
+
       try {
         Searcher searcher = SearchFactory.getInstance().getSearcher(branch);
         if (StringUtils.isBlank(query))
           errorMessage = "Do you feel lucky?";
-        else
-          searchResults.addAll(searcher.search(query, Configuration.getInstance().getMaxSearchResults()));
+        else {
+          int pageSize = Configuration.getInstance().getMaxSearchResults();
+          searchResults.addAll(searcher.search(query, currentPage, pageSize));
+          hasMore = searcher.hasMore();
+        }
       } catch (Exception x) {
 
         errorMessage = x.getMessage();
@@ -57,9 +66,12 @@ public class SearchCommand extends RendererBase implements Command {
       }
 
       Map<String, Object> variables = new HashMap<>(arguments);
+      variables.put("page", currentPage);
+      variables.put("hasmore", hasMore);
       variables.put("errorMessage", errorMessage);
       variables.put("searchResults", searchResults);
       variables.put("query", query);
+      variables.put("queryencoded", StringEscapeUtils.escapeHtml(query));
 
       if (asJson(arguments))
         executeJson(variables, outputStream);
@@ -72,4 +84,5 @@ public class SearchCommand extends RendererBase implements Command {
       throw new RenderException(e);
     }
   }
+
 }

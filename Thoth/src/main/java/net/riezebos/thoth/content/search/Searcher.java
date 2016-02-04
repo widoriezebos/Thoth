@@ -49,12 +49,13 @@ import net.riezebos.thoth.exceptions.SearchException;
 public class Searcher {
 
   private String branch;
+  private boolean hasMore = false;
 
   protected Searcher(String branch) {
     this.branch = branch;
   }
 
-  public List<SearchResult> search(String queryExpression, int maxResults) throws SearchException {
+  public List<SearchResult> search(String queryExpression, int pageNumber, int pageSize) throws SearchException {
     try {
       ContentManager contentManager = ContentManagerFactory.getContentManager();
       String indexFolder = contentManager.getIndexFolder(branch);
@@ -64,40 +65,52 @@ public class Searcher {
 
       QueryParser parser = new QueryParser(Indexer.INDEX_CONTENTS, analyzer);
       Query query = parser.parse(queryExpression);
+
+      // We add 1 to determine if there is more to be found after the current page
+      int maxResults = pageSize * pageNumber + 1;
       TopDocs results = searcher.search(query, maxResults, Sort.RELEVANCE);
       ScoreDoc[] hits = results.scoreDocs;
 
+      setHadMore(hits.length == maxResults);
+
       List<SearchResult> searchResults = new ArrayList<>();
+      int idx = 0;
       for (ScoreDoc scoreDoc : hits) {
-        Document document = searcher.doc(scoreDoc.doc);
-        IndexableField field = document.getField(Indexer.INDEX_PATH);
-        String documentPath = field.stringValue();
-        SearchResult searchResult = new SearchResult();
-        searchResult.setDocument(documentPath);
+        if (searchResults.size() == pageSize)
+          break;
+        idx++;
+        if (idx >= (pageNumber - 1) * pageSize) {
+          Document document = searcher.doc(scoreDoc.doc);
+          IndexableField field = document.getField(Indexer.INDEX_PATH);
+          String documentPath = field.stringValue();
+          SearchResult searchResult = new SearchResult();
+          searchResult.setIndexNumber((pageNumber - 1) * pageSize + idx);
+          searchResult.setDocument(documentPath);
 
-        if (Indexer.TYPE_DOCUMENT.equals(document.get(Indexer.INDEX_TYPE))) {
-          searchResult.setResource(false);
-          MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(branch, documentPath);
-          String contents = markDownDocument.getMarkdown();
+          if (Indexer.TYPE_DOCUMENT.equals(document.get(Indexer.INDEX_TYPE))) {
+            searchResult.setResource(false);
+            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(branch, documentPath);
+            String contents = markDownDocument.getMarkdown();
 
-          SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
-          Highlighter highlighter = new Highlighter(htmlFormatter, new QueryScorer(query, Indexer.INDEX_CONTENTS));
-          highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
+            SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
+            Highlighter highlighter = new Highlighter(htmlFormatter, new QueryScorer(query, Indexer.INDEX_CONTENTS));
+            highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
 
-          TokenStream tokenStream = analyzer.tokenStream(Indexer.INDEX_CONTENTS, contents);
+            TokenStream tokenStream = analyzer.tokenStream(Indexer.INDEX_CONTENTS, contents);
 
-          TextFragment[] frags = highlighter.getBestTextFragments(tokenStream, contents, false, 99999);
-          for (TextFragment frag : frags) {
-            if ((frag != null) && (frag.getScore() > 0)) {
-              String fragmentText = frag.toString();
-              searchResult.addFragment(new Fragment(fragmentText));
+            TextFragment[] frags = highlighter.getBestTextFragments(tokenStream, contents, false, 99999);
+            for (TextFragment frag : frags) {
+              if ((frag != null) && (frag.getScore() > 0)) {
+                String fragmentText = frag.toString();
+                searchResult.addFragment(new Fragment(fragmentText));
+              }
             }
+          } else {
+            searchResult.setResource(true);
+            searchResult.addFragment(new Fragment(document.get(Indexer.INDEX_TITLE)));
           }
-        } else {
-          searchResult.setResource(true);
-          searchResult.addFragment(new Fragment(document.get(Indexer.INDEX_TITLE)));
+          searchResults.add(searchResult);
         }
-        searchResults.add(searchResult);
       }
       reader.close();
       linkBooks(searchResults);
@@ -105,6 +118,14 @@ public class Searcher {
     } catch (Exception e) {
       throw new SearchException(e);
     }
+  }
+
+  protected void setHadMore(boolean b) {
+    this.hasMore = b;
+  }
+
+  public boolean hasMore() {
+    return hasMore;
   }
 
   protected void linkBooks(List<SearchResult> searchResults) throws ContentManagerException {

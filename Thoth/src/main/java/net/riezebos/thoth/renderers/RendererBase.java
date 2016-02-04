@@ -69,6 +69,12 @@ public abstract class RendererBase implements Renderer {
     return String.valueOf(value);
   }
 
+  protected Integer getInteger(Map<String, Object> arguments, String key) {
+    String stringValue = getString(arguments, key);
+    if(StringUtils.isBlank(stringValue)) return null;
+    return Integer.parseInt(stringValue);
+  }
+
   protected boolean asJson(Map<String, Object> arguments) {
     String mode = getString(arguments, "mode");
     boolean asJson = "json".equals(mode);

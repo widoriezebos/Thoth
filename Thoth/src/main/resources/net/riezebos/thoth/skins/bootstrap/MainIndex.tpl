@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-<title>Eyefreight Documentation Index</title>
-<link rel="icon" href="${skinbase}/Webresources/eyefreight-favicon.png" type="image/png" />
-<link rel="shortcut icon" href="${skinbase}/Webresources/eyefreight-favicon.png" type="image/png" />
+<title>Documentation Index</title>
+<link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
+<link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
 <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
 </head>
 <body>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <title>${document.name} Meta Info</title>
-<link rel="icon" href="${skinbase}/Webresources/eyefreight-favicon.png" type="image/png" />
-<link rel="shortcut icon" href="${skinbase}/Webresources/eyefreight-favicon.png" type="image/png" />
+<link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
+<link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
 <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
 <body>
 <h1>Validation report</h1>

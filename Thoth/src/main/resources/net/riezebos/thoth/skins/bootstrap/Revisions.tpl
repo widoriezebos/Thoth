@@ -2,8 +2,8 @@
 <html lang="en-US">
 <head>
 <title>${branch} Documentation Index</title>
-<link rel="icon" href="${skinbase}/Webresources/eyefreight-favicon.png" type="image/png" />
-<link rel="shortcut icon" href="${skinbase}/Webresources/eyefreight-favicon.png" type="image/png" />
+<link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
+<link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
 <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
 </head>
 <body>
