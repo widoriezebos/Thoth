@@ -6,7 +6,7 @@
 <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
 <body>
 <form action="${branchurl}" method="get">
-  Search all of ${branch}: <input type="text" name="query" value="${thothutil.encodeUrl($query)}"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
+  Search all of ${branch}: <input type="text" name="query" value="${thothutil.escapeHtml($query)}"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
 </form>
 Showing page ${page}<br/>
 #set($prevpage=${page}+-1)
