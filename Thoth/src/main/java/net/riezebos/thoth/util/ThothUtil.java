@@ -41,6 +41,13 @@ public class ThothUtil {
     return StringEscapeUtils.escapeHtml(html);
   }
 
+  public static String escapeHtmlExcept(String tag, String html) {
+    String result = escapeHtml(html);
+    result = result.replaceAll("&lt;"+tag+"&gt;", "<"+tag+">");
+    result = result.replaceAll("&lt;/"+tag+"&gt;", "</"+tag+">");
+    return result;
+  }
+
   public static String encodeUrl(String url) {
     try {
       return URLEncoder.encode(url, "UTF-8");
@@ -265,4 +272,5 @@ public class ThothUtil {
     }
     return null;
   }
+
 }

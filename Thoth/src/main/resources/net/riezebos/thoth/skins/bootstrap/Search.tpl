@@ -51,7 +51,7 @@ which is part of
 #else
 #foreach($fragment in ${searchResult.fragments})
 <fragment>
-$fragment
+$fragment.text
 </fragment>
 #end
 #end

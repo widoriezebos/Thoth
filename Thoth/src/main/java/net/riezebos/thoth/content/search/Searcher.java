@@ -46,6 +46,7 @@ import net.riezebos.thoth.content.markdown.util.DocumentNode;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.SearchException;
 import net.riezebos.thoth.util.PagedList;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class Searcher {
 
@@ -102,7 +103,7 @@ public class Searcher {
             for (TextFragment frag : frags) {
               if ((frag != null) && (frag.getScore() > 0)) {
                 String fragmentText = frag.toString();
-                searchResult.addFragment(new Fragment(fragmentText));
+                searchResult.addFragment(new Fragment(ThothUtil.escapeHtmlExcept("B", fragmentText)));
               }
             }
           } else {
