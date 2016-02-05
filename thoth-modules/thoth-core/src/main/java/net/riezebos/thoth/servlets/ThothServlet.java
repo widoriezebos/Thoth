@@ -14,10 +14,13 @@
  */
 package net.riezebos.thoth.servlets;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +41,7 @@ import net.riezebos.thoth.commands.BranchIndexCommand;
 import net.riezebos.thoth.commands.BrowseCommand;
 import net.riezebos.thoth.commands.Command;
 import net.riezebos.thoth.commands.DiffCommand;
+import net.riezebos.thoth.commands.ErrorPageCommand;
 import net.riezebos.thoth.commands.IndexCommand;
 import net.riezebos.thoth.commands.MetaCommand;
 import net.riezebos.thoth.commands.PullCommand;
@@ -46,6 +50,7 @@ import net.riezebos.thoth.commands.RevisionsCommand;
 import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -80,6 +85,57 @@ public class ThothServlet extends ServletBase {
     renderedExtensions.addAll(documentExtensions);
   }
 
+  @Override
+  protected void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException {
+
+    try {
+      if (!handleCommand(request, response)) {
+
+        String branch = getBranch(request);
+        String path = getPath(request);
+        if (("/" + branch + "/").equalsIgnoreCase(ContentManager.NATIVERESOURCES))
+          streamClassPathResource(path, request, response);
+        else if (StringUtils.isBlank(branch) && StringUtils.isBlank(path))
+          executeCommand(indexCommand, request, response);
+        else if (StringUtils.isBlank(path))
+          executeCommand(branchIndexCommand, request, response);
+        else {
+          if (!renderDocument(request, response))
+            streamResource(request, response);
+        }
+      }
+    } catch (BranchNotFoundException e) {
+      LOG.info("404 on request " + request.getRequestURI());
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+  }
+
+  @Override
+  protected void handleError(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
+    Command errorPageCommand = getCommand(ErrorPageCommand.COMMAND);
+    if (errorPageCommand == null)
+      errorPageCommand = new ErrorPageCommand(); // Fallback; we should not fail here
+
+    String branch = getBranchNoFail(request);
+    String path = getPathNoFail(request);
+    Skin skin = getSkinNoFail(request);
+    Map<String, Object> parameters = getParametersNoFail(request);
+    parameters.put("message", e.getMessage());
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+      e.printStackTrace(new PrintWriter(bos, true));
+      parameters.put("stack", new String(bos.toByteArray(), "UTF-8"));
+    }
+    try {
+      response.setContentType(errorPageCommand.getContentType(getParameters(request)));
+      errorPageCommand.execute(branch, path, parameters, skin, response.getOutputStream());
+    } catch (RenderException e1) {
+      // Well if this fails; we leave it up to the container. Let's throw new original exception
+      // But we still want to know what failed on the error page; so:
+      LOG.error(e1.getMessage(), e1);
+      throw new ServletException(e);
+    }
+  }
+
   protected void setupCommands() {
     indexCommand = new IndexCommand();
     branchIndexCommand = new BranchIndexCommand();
@@ -94,6 +150,7 @@ public class ThothServlet extends ServletBase {
     registerCommand(new SearchCommand());
     registerCommand(new ValidationReportCommand());
     registerCommand(new BrowseCommand());
+    registerCommand(new ErrorPageCommand());
   }
 
   protected void setupRenderers() {
@@ -136,31 +193,6 @@ public class ThothServlet extends ServletBase {
     return command;
   }
 
-  @Override
-  protected void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException {
-
-    try {
-      if (!handleCommand(request, response)) {
-
-        String branch = getBranch(request);
-        String path = getPath(request);
-        if (("/" + branch + "/").equalsIgnoreCase(ContentManager.NATIVERESOURCES))
-          streamClassPathResource(path, request, response);
-        else if (StringUtils.isBlank(branch) && StringUtils.isBlank(path))
-          executeCommand(indexCommand, request, response);
-        else if (StringUtils.isBlank(path))
-          executeCommand(branchIndexCommand, request, response);
-        else {
-          if (!renderDocument(request, response))
-            streamResource(request, response);
-        }
-      }
-    } catch (BranchNotFoundException e) {
-      LOG.info("404 on request " + request.getRequestURI());
-      response.sendError(HttpServletResponse.SC_NOT_FOUND);
-    }
-  }
-
   protected boolean renderDocument(HttpServletRequest request, HttpServletResponse response) throws RenderException, ServletException, IOException {
     boolean result = false;
     String path = getPath(request);
@@ -168,8 +200,8 @@ public class ThothServlet extends ServletBase {
     if (extension != null && renderedExtensions.contains(extension)) {
       long ms = System.currentTimeMillis();
       Renderer renderer = getRenderer(request.getParameter("output"));
-      response.setContentType(renderer.getContentType(getParameters(request)));
-      RenderResult renderResult = renderer.execute(getBranch(request), getPath(request), getParameters(request), getSkin(request), response.getOutputStream());
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      RenderResult renderResult = renderer.execute(getBranch(request), getPath(request), getParameters(request), getSkin(request), bos);
       switch (renderResult) {
       case NOT_FOUND:
         LOG.info("404 on request " + request.getRequestURI());
@@ -180,6 +212,11 @@ public class ThothServlet extends ServletBase {
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
         break;
       default:
+        // Only now will we touch the response; this to avoid sending stuff out already and then
+        // encountering an error. This might complicate error handling (rendering an error page)
+        // otherwise
+        response.setContentType(renderer.getContentType(getParameters(request)));
+        IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
       }
       LOG.debug("Handled request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
       result = true;
@@ -200,8 +237,13 @@ public class ThothServlet extends ServletBase {
   protected void executeCommand(Command command, HttpServletRequest request, HttpServletResponse response)
       throws RenderException, ServletException, IOException {
     Map<String, Object> parameters = getParameters(request);
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    command.execute(getBranch(request), getPath(request), parameters, getSkin(request), bos);
+    // Only now will we touch the response; this to avoid sending stuff out already and then
+    // encountering an error. This might complicate error handling (rendering an error page)
+    // otherwise
     response.setContentType(command.getContentType(parameters));
-    command.execute(getBranch(request), getPath(request), parameters, getSkin(request), response.getOutputStream());
+    IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
   }
 
   protected void streamResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException {

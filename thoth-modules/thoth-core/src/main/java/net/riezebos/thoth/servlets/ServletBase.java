@@ -70,9 +70,13 @@ public abstract class ServletBase extends HttpServlet {
     } catch (BranchNotFoundException e) {
       LOG.info("404 on branch of " + request.getRequestURI());
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
-    } catch (ContentManagerException e) {
-      LOG.error(e.getMessage(), e);
+    } catch (ContentManagerException | IOException e) {
+      handleError(request, response, e);
     }
+  }
+
+  protected void handleError(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
+    LOG.error(e.getMessage(), e);
   }
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -231,6 +235,46 @@ public abstract class ServletBase extends HttpServlet {
     if (this.skinManager == null)
       this.skinManager = new SkinManager();
     return this.skinManager;
+  }
+
+  protected Skin getSkinNoFail(HttpServletRequest request) {
+    Skin result;
+    try {
+      result = getSkin(request);
+    } catch (Exception e2) {
+      result = getSkinManager().getDefaultSkin();
+    }
+    return result;
+  }
+
+  protected Map<String, Object> getParametersNoFail(HttpServletRequest request) {
+    Map<String, Object> result;
+    try {
+      result = getParameters(request);
+    } catch (Exception e2) {
+      result = new HashMap<>();
+    }
+    return result;
+  }
+
+  protected String getBranchNoFail(HttpServletRequest request) {
+    String branch;
+    try {
+      branch = getBranch(request);
+    } catch (Exception e2) {
+      branch = null;
+    }
+    return branch;
+  }
+
+  protected String getPathNoFail(HttpServletRequest request) {
+    String path;
+    try {
+      path = getPath(request);
+    } catch (Exception e2) {
+      path = "";
+    }
+    return path;
   }
 
 }

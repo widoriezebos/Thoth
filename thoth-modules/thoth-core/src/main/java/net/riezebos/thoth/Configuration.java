@@ -26,6 +26,7 @@ import org.pegdown.Extensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 import net.riezebos.thoth.util.ConfigurationBase;
 import net.riezebos.thoth.util.ThothUtil;
@@ -42,7 +43,6 @@ public class Configuration extends ConfigurationBase {
   public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
   public static final String CLASSPATH_PREFIX = "classpath:";
   public static final String SKIN_PROPERTIES = "skin.properties";
-  public static final String BUILTIN_SKIN = "SimpleSkin";
 
   private static Configuration _instance;
   private String workspaceLocation;
@@ -221,7 +221,16 @@ public class Configuration extends ConfigurationBase {
   }
 
   public String getDefaultSkin() {
-    return getValue("skin.default", BUILTIN_SKIN);
+    return getValue("skin.default", Skin.SKIN_PARENT_OF_ALL);
+  }
+
+  public Set<String> getBranchIndexClassifications() {
+    String value = getValue("branch.classifications", "category,audience,folder");
+    Set<String> classifications = new HashSet<>();
+    for (String name : value.split("\\,")) {
+      classifications.add(name.trim());
+    }
+    return classifications;
   }
 
   public boolean isPrettyPrintJson() {

@@ -15,22 +15,19 @@
 package net.riezebos.thoth.commands;
 
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
-import net.riezebos.thoth.content.versioncontrol.Commit;
-import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.util.Classifier;
-import net.riezebos.thoth.util.PagedList;
 
 public class BranchIndexCommand extends RendererBase implements Command {
 
@@ -45,21 +42,18 @@ public class BranchIndexCommand extends RendererBase implements Command {
       Classifier classifier = new Classifier();
 
       List<Book> books = contentManager.getBooks(branch);
-      List<BookClassification> categories = classifier.getClassifications(books, "category", "Unclassified");
-      List<BookClassification> audiences = classifier.getClassifications(books, "audience", "Unclassified");
-      List<BookClassification> folders = classifier.getClassifications(books, "folder", "Unclassified");
 
-      int pageSize = Configuration.getInstance().getBranchMaxRevisions();
-      PagedList<Commit> pagedList = contentManager.getCommits(branch, null, 1, pageSize);
-      List<Commit> commitList = pagedList.getList();
-      Collections.sort(commitList, new CommitComparator());
+      Set<String> classificationNames = Configuration.getInstance().getBranchIndexClassifications();
+      classificationNames.add("folder");
 
-      Map<String, Object> variables = new HashMap<>(arguments);
+      // The order is important: to not allow a name clash to overwrite built in variables
+      Map<String, Object> variables = new HashMap<>();
+      for (String classificationName : classificationNames) {
+        List<BookClassification> classifications = classifier.getClassifications(books, classificationName, "Unclassified");
+        variables.put("classification_" + classificationName, classifications);
+      }
+      variables.putAll(arguments);
       variables.put("books", books);
-      variables.put("audiences", audiences);
-      variables.put("categories", categories);
-      variables.put("folders", folders);
-      variables.put("commitList", commitList);
 
       if (asJson(arguments))
         executeJson(variables, outputStream);

@@ -38,6 +38,7 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.util.ThothCoreUtil;
 
 public abstract class RendererBase implements Renderer {
@@ -105,7 +106,7 @@ public abstract class RendererBase implements Renderer {
       engine.init(properties);
       engine.getTemplate(template).merge(context, writer);
     } catch (Exception e) {
-      throw new ContentManagerException(e);
+      throw new RenderException(e);
     }
   }
 

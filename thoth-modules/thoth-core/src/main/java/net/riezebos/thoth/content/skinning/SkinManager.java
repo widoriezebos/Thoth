@@ -126,9 +126,10 @@ public class SkinManager {
     }
     CacheManager cacheManager = CacheManager.getInstance(branch);
     Skin fallbackSkin = createSkins(cacheManager, branch, skinDescriptors, true);
-    Skin defaultSkin = cacheManager.getSkinByName(Configuration.getInstance().getDefaultSkin());
+    String defaultSkinName = Configuration.getInstance().getDefaultSkin();
+    Skin defaultSkin = cacheManager.getSkinByName(defaultSkinName);
     if (defaultSkin == null) {
-      LOG.error("Default builtin skin named 'Simpleskin' not found. Falling back on first available which is " + fallbackSkin);
+      LOG.error("Default skin named '" + defaultSkinName + "' not found. Falling back on first available which is " + fallbackSkin);
       defaultSkin = fallbackSkin;
     }
     return defaultSkin;
@@ -178,7 +179,7 @@ public class SkinManager {
     instance.registerSkin(skin);
     return skin;
   }
-  
+
   public String getInheritedPath(String path, String branch) throws IOException, ContentManagerException {
     String result = null;
     String inheritedPath = handleBranchBasedInheritance(branch, path);

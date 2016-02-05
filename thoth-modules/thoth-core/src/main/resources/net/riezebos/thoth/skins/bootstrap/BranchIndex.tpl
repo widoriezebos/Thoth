@@ -20,7 +20,7 @@ Click <a href="${branchurl}/?cmd=browse">here</a> to browse the library
 <h2>Books by Category</h2>
 <table>
   <tr><th>Category</th><th>Books</th></tr>
-#foreach($category in $categories)
+#foreach($category in $classification_category)
   <tr>
       <td>${category.name}</td>
       <td>
@@ -37,7 +37,7 @@ Click <a href="${branchurl}/?cmd=browse">here</a> to browse the library
 <h2>Books by folder</h2>
 <table>
   <tr><th>Folder</th><th>Books</th></tr>
-#foreach($folder in $folders)
+#foreach($folder in $$classification_folder)
   <tr>
       <td>${folder.name}</td>
       <td>

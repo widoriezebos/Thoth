@@ -17,6 +17,8 @@ package net.riezebos.thoth.content.skinning;
 import java.io.InputStream;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -24,6 +26,7 @@ import net.riezebos.thoth.util.ConfigurationBase;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class Skin extends ConfigurationBase {
+  public static final String SKIN_PARENT_OF_ALL = "SimpleSkin";
   private static final String CLASSPATH_PREFIX = "classpath:";
   private String skinPropertyFile;
   private String branch;
@@ -62,6 +65,12 @@ public class Skin extends ConfigurationBase {
     this.skinBaseFolder = ThothUtil.getFolder(skinPropertyFile) + "/";
     this.name = getValue("name", UUID.randomUUID().toString());
     this.inheritsFrom = getValue("inheritsfrom", null);
+
+    if (StringUtils.isBlank(this.inheritsFrom)) {
+      if (!SKIN_PARENT_OF_ALL.equalsIgnoreCase(name))
+        inheritsFrom = SKIN_PARENT_OF_ALL;
+    }
+
   }
 
   public String getName() {
@@ -112,9 +121,14 @@ public class Skin extends ConfigurationBase {
     return getPathProperty("template.browse");
   }
 
+  public String getErrorTemplate() {
+    return getPathProperty("template.error");
+  }
+
   protected String getPathProperty(String key) {
-    if(shouldGetFromSuper(key)) return getSuper().getPathProperty(key);
-    
+    if (shouldGetFromSuper(key))
+      return getSuper().getPathProperty(key);
+
     String tidyRelativePath = ThothUtil.tidyRelativePath(getValue(key));
     if (isFromClassPath()) {
       return CLASSPATH_PREFIX + skinBaseUrl + "/" + tidyRelativePath;
@@ -123,13 +137,15 @@ public class Skin extends ConfigurationBase {
 
     String result;
     // If we move into the classpath now; then do not ass the branchfolder
-    if(prefix.startsWith(CLASSPATH_PREFIX)) result = prefix+tidyRelativePath;
-    else result = branchFolder + prefix + tidyRelativePath;
+    if (prefix.startsWith(CLASSPATH_PREFIX))
+      result = prefix + tidyRelativePath;
+    else
+      result = branchFolder + prefix + tidyRelativePath;
     return result;
   }
 
   protected boolean shouldGetFromSuper(String key) {
-    return super.getValue(key, null)==null && getSuper() != null;
+    return super.getValue(key, null) == null && getSuper() != null;
   }
 
   /**
