@@ -11,6 +11,7 @@
     <module>thoth-lib</module>
     <module>thoth-core</module>
     <module>thoth-server</module>
+    <module>thoth-standalone</module>
   </modules>
 
   <properties>

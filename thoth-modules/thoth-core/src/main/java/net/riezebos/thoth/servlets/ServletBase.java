@@ -119,7 +119,7 @@ public abstract class ServletBase extends HttpServlet {
   }
 
   protected String getPath(HttpServletRequest request) {
-    String path = request.getServletPath();
+    String path = getRequestPath(request);
     path = ThothUtil.stripPrefix(path, "/");
 
     // Branch only? Then path is empty
@@ -135,8 +135,16 @@ public abstract class ServletBase extends HttpServlet {
     return request.getContextPath() + "/" + getBranch(request);
   }
 
+  // Handle some differences between servlet mappings like '/' and '/*'
+  // and end any confusion right here
+  protected String getRequestPath(HttpServletRequest request) {
+    String servletPath = request.getServletPath();
+    String pathInfo = request.getPathInfo();
+    return StringUtils.isBlank(pathInfo) ? servletPath : pathInfo;
+  }
+
   protected String getBranch(HttpServletRequest request) {
-    String path = request.getServletPath();
+    String path = getRequestPath(request);
     path = ThothUtil.stripPrefix(path, "/");
     path = ThothUtil.getPartBeforeFirst(path, "/");
     return path;

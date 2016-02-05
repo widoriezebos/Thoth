@@ -291,7 +291,7 @@ public class ThothServlet extends ServletBase {
       // Now we should have found the original file; inherited from classpath or inherited from library
       // If we still do not have anything then we should give a 404
       if (is != null) {
-        guessMimeType(request.getServletPath(), response);
+        guessMimeType(getRequestPath(request), response);
         IOUtils.copy(is, response.getOutputStream());
       } else {
         LOG.warn("404 on request " + request.getRequestURI());
@@ -319,7 +319,7 @@ public class ThothServlet extends ServletBase {
         LOG.warn("404 on request for native resource " + request.getRequestURI());
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
       } else {
-        guessMimeType(request.getServletPath(), response);
+        guessMimeType(getRequestPath(request), response);
         IOUtils.copy(is, response.getOutputStream());
       }
     }

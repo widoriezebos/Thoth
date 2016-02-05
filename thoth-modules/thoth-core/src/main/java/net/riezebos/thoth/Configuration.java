@@ -53,9 +53,7 @@ public class Configuration extends ConfigurationBase {
 
   public static Configuration getInstance() {
     if (_instance == null) {
-      String propertyPath = System.getProperty(CONFIGKEY);
-      if (propertyPath == null)
-        propertyPath = System.getenv(CONFIGKEY);
+      String propertyPath = determinePropertyPath();
       if (propertyPath == null) {
         String msg = "There is no configuration defined. Please set either environment or system property '" + CONFIGKEY + "' and restart";
         LOG.error(msg);
@@ -66,6 +64,13 @@ public class Configuration extends ConfigurationBase {
       }
     }
     return _instance;
+  }
+
+  public static String determinePropertyPath() {
+    String propertyPath = System.getProperty(CONFIGKEY);
+    if (propertyPath == null)
+      propertyPath = System.getenv(CONFIGKEY);
+    return propertyPath;
   }
 
   private Configuration(String propertyPath) {
@@ -197,6 +202,18 @@ public class Configuration extends ConfigurationBase {
 
   public int getFileMaxRevisions() {
     return Integer.parseInt(getValue("versioncontrol.maxfilerevisions", "10"));
+  }
+
+  public int getEmbeddedServerPort() {
+    return Integer.parseInt(getValue("embedded.port", "8080"));
+  }
+
+  public String getEmbeddedServerName() {
+    return getValue("embedded.servername", "localhost");
+  }
+
+  public int getEmbeddedIdleTimeout() {
+    return Integer.parseInt(getValue("embedded.idletimeout", "30"));
   }
 
   public int getBranchMaxRevisions() {
