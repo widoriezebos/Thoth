@@ -94,8 +94,9 @@ public class Thoth {
         System.out.println("Did not recognize command. Please reenter.");
     } while (!stop);
 
-    System.out.println("Stopping server. (First waiting for any auto refresh to finish though)");
+    System.out.println("Stopping server.\n(First waiting for any auto refresh to finish though)");
     server.stop();
+    server.join();
     contentManager.disableAutoRefresh();
   }
 
