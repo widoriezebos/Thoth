@@ -9,4 +9,20 @@
   <artifactId>thoth-lib</artifactId>
   <packaging>jar</packaging>
 
+  <!-- This project uses JDK 1.6 as a class format to make sure that command line
+       tools used on installations with an older JDK on it do not run into trouble
+  -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

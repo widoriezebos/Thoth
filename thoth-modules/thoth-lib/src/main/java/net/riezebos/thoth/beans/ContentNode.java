@@ -24,7 +24,7 @@ public class ContentNode implements Comparable<ContentNode> {
   private boolean isFolder;
   private Date dateModified;
   private long size;
-  private List<ContentNode> children = new ArrayList<>();
+  private List<ContentNode> children = new ArrayList<ContentNode>();
 
   public ContentNode(String path, File file) {
     super();

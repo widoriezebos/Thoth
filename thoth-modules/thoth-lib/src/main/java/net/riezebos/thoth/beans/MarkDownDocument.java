@@ -29,7 +29,7 @@ import net.riezebos.thoth.markdown.util.ProcessorError;
  */
 public class MarkDownDocument {
   private Map<String, String> metatags = new HashMap<String, String>();
-  private List<ProcessorError> errors = new ArrayList<>();
+  private List<ProcessorError> errors = new ArrayList<ProcessorError>();
   private DocumentNode documentStructure;
   private String markdown;
 

@@ -25,7 +25,7 @@ public class Book implements Comparable<Book> {
   private String path;
   private String folder;
   private String title;
-  private Map<String, String> metaTags = new HashMap<>();
+  private Map<String, String> metaTags = new HashMap<String, String>();
 
   public Book(String name, String path) {
     super();
@@ -87,7 +87,7 @@ public class Book implements Comparable<Book> {
   }
 
   public List<String> getMetaTagKeys() {
-    List<String> keys = new ArrayList<>(metaTags.keySet());
+    List<String> keys = new ArrayList<String>(metaTags.keySet());
     Collections.sort(keys);
     return keys;
   }
