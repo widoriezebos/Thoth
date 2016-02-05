@@ -35,7 +35,7 @@ import net.riezebos.thoth.servlets.ThothServlet;
 public class Thoth {
 
   public void start(String args[]) throws Exception {
-    System.out.println("Thoth is firing up. Please hang on");
+    System.out.println("Thoth is firing up. Please hang on...");
     String configurationFile = Configuration.determinePropertyPath();
 
     if (args.length > 0) {
