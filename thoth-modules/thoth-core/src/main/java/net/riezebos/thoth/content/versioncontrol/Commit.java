@@ -22,8 +22,6 @@ import java.util.List;
 import net.riezebos.thoth.Configuration;
 
 /**
- * TODO javadoc
- *
  * @author wido
  */
 public class Commit {

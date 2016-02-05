@@ -17,8 +17,6 @@ package net.riezebos.thoth.content.versioncontrol;
 import java.util.Date;
 
 /**
- * TODO javadoc
- *
  * @author wido
  */
 public class SourceDiff {

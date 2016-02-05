@@ -178,4 +178,30 @@ public class SkinManager {
     instance.registerSkin(skin);
     return skin;
   }
+  
+  public String getInheritedPath(String path, String branch) throws IOException, ContentManagerException {
+    String result = null;
+    String inheritedPath = handleBranchBasedInheritance(branch, path);
+    if (inheritedPath != null)
+      if (inheritedPath.startsWith(Configuration.CLASSPATH_PREFIX))
+        result = inheritedPath;
+      else
+        result = ContentManagerFactory.getContentManager().getFileSystemPath(branch, inheritedPath);
+    return result;
+  }
+
+  protected String handleBranchBasedInheritance(String branch, String path) {
+    String result = null;
+
+    CacheManager cacheManager = CacheManager.getInstance(branch);
+    SkinInheritance skinInheritance = cacheManager.getSkinInheritance(path);
+    if (skinInheritance != null) {
+      String baseFolder = ThothUtil.stripPrefix(skinInheritance.getChild().getSkinBaseFolder(), "/");
+      String remainder = path.substring(baseFolder.length());
+      Skin parent = skinInheritance.getParent();
+      result = parent.getSkinBaseFolder() + remainder;
+    }
+    return result;
+  }
+
 }

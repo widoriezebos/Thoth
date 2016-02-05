@@ -204,7 +204,7 @@ public class ThothServlet extends ServletBase {
     command.execute(getBranch(request), getPath(request), parameters, getSkin(request), response.getOutputStream());
   }
 
-  protected void streamResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, BranchNotFoundException, IOException {
+  protected void streamResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException {
     long ms = System.currentTimeMillis();
     ContentManager contentManager = getContentManager();
 
@@ -224,7 +224,7 @@ public class ThothServlet extends ServletBase {
         // Not found; then check for any inheritance of skin related paths.
         // Complication is that we might move from the library into the classpath so we need
         // to handle that as well here
-        String inheritedPath = contentManager.getInheritedPath(path, branch);
+        String inheritedPath = getSkinManager().getInheritedPath(path, branch);
         while (inheritedPath != null && is == null && !file.isFile()) {
           absolutePath = inheritedPath;
           // Moving into classpath now?
@@ -237,7 +237,7 @@ public class ThothServlet extends ServletBase {
               file = new File(absolutePath);
           }
           // Do we need to move up the hierarchy still?
-          inheritedPath = contentManager.getInheritedPath(inheritedPath, branch);
+          inheritedPath = getSkinManager().getInheritedPath(inheritedPath, branch);
         }
       }
 

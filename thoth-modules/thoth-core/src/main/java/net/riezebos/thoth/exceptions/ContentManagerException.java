@@ -24,4 +24,9 @@ public class ContentManagerException extends Exception {
   public ContentManagerException(String message) {
     super(message);
   }
+
+  public ContentManagerException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
 }

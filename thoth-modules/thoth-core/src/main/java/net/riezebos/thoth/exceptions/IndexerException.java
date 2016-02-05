@@ -25,4 +25,8 @@ public class IndexerException extends ContentManagerException {
     super(message);
   }
 
+  public IndexerException(String message, Throwable e) {
+    super(message, e);
+  }
+
 }

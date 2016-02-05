@@ -17,6 +17,7 @@ package net.riezebos.thoth.servlets;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ public abstract class ServletBase extends HttpServlet {
   private static final Logger LOG = LoggerFactory.getLogger(ServletBase.class);
 
   private Skin defaultSkin = null;
+  private SkinManager skinManager = null;
 
   protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
 
@@ -145,7 +147,8 @@ public abstract class ServletBase extends HttpServlet {
   protected String getRefreshTimestamp(ContentManager contentManager) throws ServletException {
     Configuration configuration = Configuration.getInstance();
     SimpleDateFormat dateFormat = configuration.getDateFormat();
-    String refresh = getContentManager().getLatestRefresh() == null ? "Never" : dateFormat.format(contentManager.getLatestRefresh());
+    Date latestRefresh = getContentManager().getLatestRefresh(null);
+    String refresh = latestRefresh == null ? "Never" : dateFormat.format(contentManager.getLatestRefresh(null));
     return refresh;
   }
 
@@ -223,4 +226,11 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(getContentManager()));
     return result;
   }
+
+  protected SkinManager getSkinManager() {
+    if (this.skinManager == null)
+      this.skinManager = new SkinManager();
+    return this.skinManager;
+  }
+
 }

@@ -35,6 +35,7 @@ import net.riezebos.thoth.content.skinning.SkinMapping;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.IndexerException;
+import net.riezebos.thoth.markdown.util.LineInfo;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -142,12 +143,18 @@ public class CacheManager {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(errorFile))) {
               errors = (List<ProcessorError>) ois.readObject();
               cacheErrors(errors);
+            } catch (ClassNotFoundException e) {
+              // This is no doubt caused by loading an old version of the serialized object stream.
+              // Let's ignore it and delete the file. Will be fine after the next re-index
+              errorFile.delete();
+              errors = new ArrayList<ProcessorError>();
+              errors.add(new ProcessorError(new LineInfo(".", 0), "Error messages out of date. Please reindex"));
             }
           }
         }
       }
-    } catch (IOException | ClassNotFoundException | BranchNotFoundException e) {
-      throw new IndexerException(branch);
+    } catch (IOException | BranchNotFoundException e) {
+      throw new IndexerException(branch + ": " + e.getMessage(), e);
     }
     return errors;
   }
@@ -214,7 +221,7 @@ public class CacheManager {
 
   public void registerSkinInheritance(SkinInheritance skinInheritance) {
     String key = ThothUtil.stripPrefix(skinInheritance.getChild().getSkinBaseFolder(), "/");
-    skinInheritances.put(key,  skinInheritance);
+    skinInheritances.put(key, skinInheritance);
   }
 
   public SkinInheritance getSkinInheritance(String path) {

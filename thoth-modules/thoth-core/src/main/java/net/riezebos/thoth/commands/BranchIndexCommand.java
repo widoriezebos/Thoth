@@ -29,6 +29,7 @@ import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.util.Classifier;
 import net.riezebos.thoth.util.PagedList;
 
 public class BranchIndexCommand extends RendererBase implements Command {
@@ -41,10 +42,12 @@ public class BranchIndexCommand extends RendererBase implements Command {
   public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       ContentManager contentManager = getContentManager();
+      Classifier classifier = new Classifier();
+
       List<Book> books = contentManager.getBooks(branch);
-      List<BookClassification> categories = contentManager.getClassification(books, "category", "Unclassified");
-      List<BookClassification> audiences = contentManager.getClassification(books, "audience", "Unclassified");
-      List<BookClassification> folders = contentManager.getClassification(books, "folder", "Unclassified");
+      List<BookClassification> categories = classifier.getClassifications(books, "category", "Unclassified");
+      List<BookClassification> audiences = classifier.getClassifications(books, "audience", "Unclassified");
+      List<BookClassification> folders = classifier.getClassifications(books, "folder", "Unclassified");
 
       int pageSize = Configuration.getInstance().getBranchMaxRevisions();
       PagedList<Commit> pagedList = contentManager.getCommits(branch, null, 1, pageSize);

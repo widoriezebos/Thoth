@@ -61,7 +61,7 @@ This document is not uncluded by any other document.
 <h3>Version history (summary)</h3>
 	
 <table>
-  <tr><th>Timestamp</th><th>Author</th><th>Diff</th><th>Comment</th></tr>
+  <tr><th>Timestamp</th><th>Author</th><th>Document</th><th>Comment</th></tr>
 #foreach($commit in $commitList)
   <tr>
       <td>${commit.formattedTimestamp}</td>
@@ -71,7 +71,11 @@ This document is not uncluded by any other document.
        ${revision.path} (<a href="$branchurl/${revision.fileName}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
 #end
       </td>
-      <td>${commit.message}</td>
+      <td>
+#foreach($revision in $commit.revisions)
+       ${revision.action}:
+#end
+      ${commit.message}</td>
   </tr>    
 #end
 </table>
@@ -87,10 +91,14 @@ This document is not uncluded by any other document.
       <td>     
 #foreach($revision in $commit.revisions)
       <a href="$branchurl/${documentNode.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">${commit.formattedTimestamp}</a>
-#end
+#end  
       </td>
       <td>${commit.author}</td>
-      <td>${commit.message}</td>
+      <td>
+#foreach($revision in $commit.revisions)
+${revision.action}:
+#end  
+      ${commit.message}</td>
   </tr>    
 #end	
   <tr><td colspan="3"></td></tr>

@@ -46,11 +46,7 @@ public class AutoRefresher extends Thread {
     while (!cancelRequested) {
       try {
         sleep(interval);
-        if (contentManager.isRefreshing())
-          LOG.info("AutoRefresher is currently active. Ignoring this automatic refresh");
-        else {
           contentManager.refresh();
-        }
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }

@@ -34,13 +34,10 @@ import org.slf4j.LoggerFactory;
 import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.Book;
-import net.riezebos.thoth.beans.BookClassification;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
-import net.riezebos.thoth.content.skinning.Skin;
-import net.riezebos.thoth.content.skinning.SkinInheritance;
 import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.markdown.FileProcessor;
@@ -60,6 +57,10 @@ public abstract class ContentManagerBase implements ContentManager {
 
   @Override
   public synchronized String refresh() throws ContentManagerException {
+
+    if (isRefreshing())
+      return "Refresh action is currently executing. Ignoring this request";
+
     try {
       markRefreshStart();
       return cloneOrPull();
@@ -122,7 +123,6 @@ public abstract class ContentManagerBase implements ContentManager {
     return markdown;
   }
 
-  @Override
   public Date getLatestRefresh() {
     Date result = null;
     synchronized (latestRefresh) {
@@ -158,7 +158,6 @@ public abstract class ContentManagerBase implements ContentManager {
     autoRefresher = autoRefreshIntervalMs <= 0 ? null : new AutoRefresher(autoRefreshIntervalMs, this);
   }
 
-  @Override
   public boolean isRefreshing() {
     return this.refreshing;
   }
@@ -279,40 +278,6 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<BookClassification> getClassification(List<Book> books, String metaTagName, String defaultValue) {
-    Map<String, BookClassification> classificationMap = new HashMap<>();
-
-    for (Book book : books) {
-
-      String classificationSpec = book.getMetaTag(metaTagName);
-
-      if (classificationSpec == null) {
-        if ("folder".equalsIgnoreCase(metaTagName))
-          classificationSpec = book.getFolder();
-        else
-          classificationSpec = defaultValue;
-      }
-
-      for (String classificationName : ThothUtil.tokenize(classificationSpec)) {
-        BookClassification classification = classificationMap.get(classificationName);
-        if (classification == null) {
-          classification = new BookClassification(classificationName);
-          classificationMap.put(classificationName, classification);
-        }
-        classification.getBooks().add(book);
-      }
-    }
-
-    for (BookClassification classification : classificationMap.values())
-      classification.sortBooks();
-
-    List<BookClassification> result = new ArrayList<>();
-    result.addAll(classificationMap.values());
-    Collections.sort(result);
-    return result;
-  }
-
-  @Override
   public String getFileSystemPath(String branch, String path) throws BranchNotFoundException, IOException {
     if (path.startsWith("/"))
       path = path.substring(1);
@@ -321,32 +286,6 @@ public abstract class ContentManagerBase implements ContentManager {
       return null;
     else
       return absolutePath;
-  }
-
-  @Override
-  public String getInheritedPath(String path, String branch) throws BranchNotFoundException, IOException {
-    String result = null;
-    String inheritedPath = handleBranchBasedInheritance(branch, path);
-    if (inheritedPath != null)
-      if (inheritedPath.startsWith(Configuration.CLASSPATH_PREFIX))
-        result = inheritedPath;
-      else
-        result = getFileSystemPath(branch, inheritedPath);
-    return result;
-  }
-
-  protected String handleBranchBasedInheritance(String branch, String path) {
-    String result = null;
-
-    CacheManager cacheManager = CacheManager.getInstance(branch);
-    SkinInheritance skinInheritance = cacheManager.getSkinInheritance(path);
-    if (skinInheritance != null) {
-      String baseFolder = ThothUtil.stripPrefix(skinInheritance.getChild().getSkinBaseFolder(), "/");
-      String remainder = path.substring(baseFolder.length());
-      Skin parent = skinInheritance.getParent();
-      result = parent.getSkinBaseFolder() + remainder;
-    }
-    return result;
   }
 
   @Override

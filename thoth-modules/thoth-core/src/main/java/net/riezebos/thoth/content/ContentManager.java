@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 
 import net.riezebos.thoth.beans.Book;
-import net.riezebos.thoth.beans.BookClassification;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.versioncontrol.Commit;
@@ -35,15 +34,27 @@ public interface ContentManager {
 
   String refresh() throws ContentManagerException;
 
+  void reindex();
+
+  boolean accessAllowed(File file) throws IOException;
+
   MarkDownDocument getMarkDownDocument(String branch, String documentPath) throws IOException, BranchNotFoundException;
 
-  Date getLatestRefresh();
+  List<Book> getBooks(String branch) throws BranchNotFoundException, IOException;
+
+  PagedList<Commit> getCommits(String branch, String path, int pageNumber, int pageSize) throws ContentManagerException;
+
+  public SourceDiff getDiff(String branch, String id) throws ContentManagerException;
+
+  List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException;
+
+  public List<ContentNode> find(String branch, String fileSpec, boolean recursive) throws BranchNotFoundException, IOException;
+
+  List<ContentNode> getUnusedFragments(String branch) throws IOException, ContentManagerException;
 
   Date getLatestRefresh(String branch);
 
   void enableAutoRefresh();
-
-  boolean isRefreshing();
 
   List<String> getBranches();
 
@@ -57,26 +68,6 @@ public interface ContentManager {
 
   String getErrorFileName(String branch) throws BranchNotFoundException;
 
-  PagedList<Commit> getCommits(String branch, String path, int pageNumber, int pageSize) throws ContentManagerException;
-
-  List<Book> getBooks(String branch) throws BranchNotFoundException, IOException;
-
-  List<BookClassification> getClassification(List<Book> books, String metaTagName, String defaultValue);
-
-  boolean accessAllowed(File file) throws IOException;
-
   String getFileSystemPath(String branch, String path) throws BranchNotFoundException, IOException;
-
-  public SourceDiff getDiff(String branch, String id) throws ContentManagerException;
-
-  void reindex();
-
-  List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException;
-
-  public List<ContentNode> find(String branch, String fileSpec, boolean recursive) throws BranchNotFoundException, IOException;
-
-  public String getInheritedPath(String path, String branch) throws BranchNotFoundException, IOException;
-
-  List<ContentNode> getUnusedFragments(String branch) throws IOException, ContentManagerException;
 
 }
