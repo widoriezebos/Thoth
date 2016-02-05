@@ -92,7 +92,7 @@ public abstract class ContentManagerBase implements ContentManager {
     };
 
     indexerThread.start();
-    LOG.info("Launched indexer thread for branch " + branch);
+    LOG.info("Contents updated. Launched indexer thread for branch " + branch);
   }
 
   @Override
@@ -152,10 +152,21 @@ public abstract class ContentManagerBase implements ContentManager {
 
   @Override
   public void enableAutoRefresh() {
-    if (autoRefresher != null)
-      autoRefresher.cancel();
-    long autoRefreshIntervalMs = Configuration.getInstance().getAutoRefreshIntervalMs();
-    autoRefresher = autoRefreshIntervalMs <= 0 ? null : new AutoRefresher(autoRefreshIntervalMs, this);
+    synchronized (this) {
+      if (autoRefresher != null)
+        autoRefresher.cancel();
+      long autoRefreshIntervalMs = Configuration.getInstance().getAutoRefreshIntervalMs();
+      autoRefresher = autoRefreshIntervalMs <= 0 ? null : new AutoRefresher(autoRefreshIntervalMs, this);
+    }
+  }
+
+  @Override
+  public void disableAutoRefresh() {
+    synchronized (this) {
+      if (autoRefresher != null)
+        autoRefresher.cancel();
+      autoRefresher = null;
+    }
   }
 
   public boolean isRefreshing() {

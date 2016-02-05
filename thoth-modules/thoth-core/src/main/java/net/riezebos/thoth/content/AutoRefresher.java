@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class AutoRefresher extends Thread {
   private static final Logger LOG = LoggerFactory.getLogger(AutoRefresher.class);
+  private static int SLICE = 100;
 
   private static final int MINIMUM_INTERVAL = 30000;
   private long interval;
@@ -42,16 +43,19 @@ public class AutoRefresher extends Thread {
 
   @Override
   public void run() {
-    LOG.info("AutoRefresher started it's work");
+    LOG.debug("AutoRefresher started it's work");
     while (!cancelRequested) {
       try {
-        sleep(interval);
+        for (int i = 0; i < SLICE && !cancelRequested; i++) {
+          sleep(interval / SLICE);
+        }
+        if (!cancelRequested)
           contentManager.refresh();
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }
     }
-    LOG.info("AutoRefresher done");
+    LOG.debug("AutoRefresher done");
   }
 
 }

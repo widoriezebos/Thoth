@@ -56,6 +56,8 @@ public interface ContentManager {
 
   void enableAutoRefresh();
 
+  void disableAutoRefresh();
+
   List<String> getBranches();
 
   String getBranchFolder(String branch) throws BranchNotFoundException;

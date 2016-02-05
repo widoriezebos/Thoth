@@ -25,6 +25,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 
 import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.servlets.ThothServlet;
 
 /**
@@ -33,7 +35,7 @@ import net.riezebos.thoth.servlets.ThothServlet;
 public class Thoth {
 
   public void start(String args[]) throws Exception {
-
+    System.out.println("Thoth is firing up. Please hang on");
     String configurationFile = Configuration.determinePropertyPath();
 
     if (args.length > 0) {
@@ -74,19 +76,27 @@ public class Thoth {
     context.setHandler(handler);
 
     server.setHandler(context);
+    ContentManager contentManager = ContentManagerFactory.getContentManager();
+
     server.start();
-    System.out.println("\nThoth server started");
-    System.out.println("Just enter 'stop' to stop the server");
+    System.out.println("Thoth server started.\n"//
+        + "You can now access Thoth at http://"//
+        + configuration.getEmbeddedServerName() //
+        + ":" + configuration.getEmbeddedServerPort());
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+
     boolean stop = false;
     do {
+      System.out.println("Just enter 'stop' to stop the server");
       String line = br.readLine();
       stop = "stop".equalsIgnoreCase(line);
       if (!stop)
         System.out.println("Did not recognize command. Please reenter.");
     } while (!stop);
+
+    System.out.println("Stopping server. (First waiting for any auto refresh to finish though)");
     server.stop();
-    System.out.println("\nThoth server stopped.");
+    contentManager.disableAutoRefresh();
   }
 
   protected String tryConfigFile(String defaultConfigFileName) {

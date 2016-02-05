@@ -3,7 +3,7 @@
   <parent>
     <groupId>net.riezebos.toth</groupId>
     <artifactId>thoth-modules</artifactId>
-    <version>${project.version}</version>
+    <version>0.0.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>thoth-core</artifactId>
@@ -13,7 +13,7 @@
     <dependency>
       <groupId>net.riezebos.toth</groupId>
       <artifactId>thoth-lib</artifactId>
-      <version>${project.version}</version>
+      <version>0.0.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
