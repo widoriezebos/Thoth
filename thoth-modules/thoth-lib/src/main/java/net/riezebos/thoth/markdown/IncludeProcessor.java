@@ -58,8 +58,8 @@ public class IncludeProcessor extends FileProcessor {
     String path = fileName == null ? STDIN : fileName;
     startNewFile(path);
     Stack<DocumentNode> includeStack = new Stack<DocumentNode>();
-    documentStructure = new DocumentNode(path, ThothUtil.getNameOnly(fileName), 0, 0);
-    includeStack.push(documentStructure);
+    setDocumentStructure(new DocumentNode(path, ThothUtil.getNameOnly(fileName), 0, 0));
+    includeStack.push(getDocumentStructure());
     processFile(getRootFolder(), in, result, includeStack, 0);
     result.flush();
 
@@ -426,6 +426,10 @@ public class IncludeProcessor extends FileProcessor {
       System.out.println("Written to " + target);
     } else
       System.out.println(result);
+  }
+
+  private void setDocumentStructure(DocumentNode documentStructure) {
+    this.documentStructure = documentStructure;
   }
 
 }
