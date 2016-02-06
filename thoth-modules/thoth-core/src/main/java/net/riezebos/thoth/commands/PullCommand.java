@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
@@ -38,8 +39,7 @@ public class PullCommand extends RendererBase implements Command {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      ContentManager contentManager = getContentManager(context);
-      String log = contentManager.refresh();
+      String log = ContentManagerFactory.pullAll();
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("log", log);
 

@@ -94,4 +94,13 @@ public class ContentManagerFactory {
     for (String context : configuration.getContexts())
       getContentManager(context).disableAutoRefresh();
   }
+
+  public static String pullAll() throws ContentManagerException {
+    StringBuilder report = new StringBuilder();
+
+    Configuration configuration = ConfigurationFactory.getConfiguration();
+    for (String context : configuration.getContexts())
+      report.append(getContentManager(context).refresh());
+    return report.toString();
+  }
 }

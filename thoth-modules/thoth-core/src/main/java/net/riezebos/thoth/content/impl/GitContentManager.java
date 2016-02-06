@@ -72,7 +72,6 @@ public class GitContentManager extends ContentManagerBase {
   protected synchronized String cloneOrPull() throws ContentManagerException {
     StringBuilder log = new StringBuilder();
     try {
-      info(log, "Pulling git repositories for changes");
       Configuration config = ConfigurationFactory.getConfiguration();
       RepositoryDefinition repositoryDefinition = getContextDefinition().getRepositoryDefinition();
       String repositoryUrl = repositoryDefinition.getUrl();
@@ -89,14 +88,13 @@ public class GitContentManager extends ContentManagerBase {
           CredentialsProvider credentialsProvider = getCredentialsProvider();
 
           if (target.isDirectory()) {
-            info(log, "\nRepository for context " + getContext() + " found at " + contextFolder);
             try (Git repos = getRepository()) {
 
               Repository repository = repos.getRepository();
               ObjectId oldHead = repository.resolve(HEAD_TREE);
 
               PullResult pullResult = repos.pull().setCredentialsProvider(credentialsProvider).call();
-              info(log, pullResult.isSuccessful() ? "Pull was successful" : "Pull failed");
+              info(log, pullResult.isSuccessful() ? "Pulling " + getContext() + " was successful" : "Pull of " + getContext() + " failed");
               ObjectId newHead = repository.resolve(HEAD_TREE);
 
               if ((oldHead == null && newHead != null)//
@@ -126,7 +124,6 @@ public class GitContentManager extends ContentManagerBase {
           severe(log, e);
         }
       }
-      info(log, "Git refresh completed");
 
     } catch (Exception e) {
       throw new ContentManagerException(e);
