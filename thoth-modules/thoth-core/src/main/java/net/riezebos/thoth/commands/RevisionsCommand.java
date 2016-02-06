@@ -36,7 +36,7 @@ public class RevisionsCommand extends RendererBase implements Command {
     return "revisions";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       ContentManager contentManager = getContentManager();
 
@@ -44,8 +44,8 @@ public class RevisionsCommand extends RendererBase implements Command {
       if (pageNumber == null)
         pageNumber = 1;
 
-      int pageSize = Configuration.getInstance().getBranchMaxRevisions();
-      PagedList<Commit> pagedList = contentManager.getCommits(branch, null, pageNumber, pageSize);
+      int pageSize = Configuration.getInstance().getContextMaxRevisions();
+      PagedList<Commit> pagedList = contentManager.getCommits(context, null, pageNumber, pageSize);
       List<Commit> commitList = pagedList.getList();
       boolean hasMore = pagedList.hasMore();
       Collections.sort(commitList, new CommitComparator());
@@ -59,7 +59,7 @@ public class RevisionsCommand extends RendererBase implements Command {
         executeJson(variables, outputStream);
       else {
         String revisionTemplate = skin.getRevisionTemplate();
-        renderTemplate(revisionTemplate, branch, variables, outputStream);
+        renderTemplate(revisionTemplate, context, variables, outputStream);
       }
 
       return RenderResult.OK;

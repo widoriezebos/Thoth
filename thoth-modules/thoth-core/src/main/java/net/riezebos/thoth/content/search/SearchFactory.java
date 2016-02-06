@@ -28,13 +28,13 @@ public class SearchFactory {
     return instance;
   }
 
-  public Searcher getSearcher(String branch) throws ContentManagerException {
-    return new Searcher(branch);
+  public Searcher getSearcher(String context) throws ContentManagerException {
+    return new Searcher(context);
   }
 
-  public Indexer getIndexer(String branch) throws ContentManagerException {
+  public Indexer getIndexer(String context) throws ContentManagerException {
     ContentManager contentManager = ContentManagerFactory.getContentManager();
-    return new Indexer(contentManager, branch);
+    return new Indexer(contentManager, context);
   }
 
 }

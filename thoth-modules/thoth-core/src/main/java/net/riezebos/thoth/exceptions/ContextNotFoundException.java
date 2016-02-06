@@ -14,10 +14,10 @@
  */
 package net.riezebos.thoth.exceptions;
 
-public class BranchNotFoundException extends ContentManagerException {
+public class ContextNotFoundException extends ContentManagerException {
   private static final long serialVersionUID = 1L;
 
-  public BranchNotFoundException(String branch) {
-    super("Branch " + branch + " is not defined");
+  public ContextNotFoundException(String context) {
+    super("Context " + context + " is not defined");
   }
 }

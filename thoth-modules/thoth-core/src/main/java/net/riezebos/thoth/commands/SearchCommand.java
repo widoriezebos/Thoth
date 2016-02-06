@@ -38,7 +38,7 @@ public class SearchCommand extends RendererBase implements Command {
     return "search";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       List<SearchResult> searchResults = new ArrayList<>();
       String errorMessage = null;
@@ -49,7 +49,7 @@ public class SearchCommand extends RendererBase implements Command {
       boolean hasMore = false;
 
       try {
-        Searcher searcher = SearchFactory.getInstance().getSearcher(branch);
+        Searcher searcher = SearchFactory.getInstance().getSearcher(context);
         if (StringUtils.isBlank(query))
           errorMessage = "Do you feel lucky?";
         else {
@@ -77,7 +77,7 @@ public class SearchCommand extends RendererBase implements Command {
         executeJson(variables, outputStream);
       else {
         String searchTemplate = skin.getSearchTemplate();
-        renderTemplate(searchTemplate, branch, variables, outputStream);
+        renderTemplate(searchTemplate, context, variables, outputStream);
       }
       return RenderResult.OK;
     } catch (Exception e) {

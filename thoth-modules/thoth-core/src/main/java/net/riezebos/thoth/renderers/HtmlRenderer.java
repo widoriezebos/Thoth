@@ -43,11 +43,11 @@ public class HtmlRenderer extends RendererBase implements Renderer {
     return "text/html;charset=UTF-8";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       RenderResult result = RenderResult.OK;
 
-      String absolutePath = getFileSystemPath(branch, path);
+      String absolutePath = getFileSystemPath(context, path);
       if (absolutePath == null) {
         result = RenderResult.FORBIDDEN;
       } else {
@@ -55,7 +55,7 @@ public class HtmlRenderer extends RendererBase implements Renderer {
         if (file.isFile()) {
 
           Configuration configuration = Configuration.getInstance();
-          MarkDownDocument markdown = getMarkDownDocument(branch, path);
+          MarkDownDocument markdown = getMarkDownDocument(context, path);
           String markdownSource = markdown.getMarkdown();
 
           int extensions = configuration.getMarkdownOptions();
@@ -79,7 +79,7 @@ public class HtmlRenderer extends RendererBase implements Renderer {
           variables.put(Renderer.BODY_PARAMETER, body);
 
           String markdownTemplate = skin.getMarkDownTemplate();
-          renderTemplate(markdownTemplate, branch, variables, outputStream);
+          renderTemplate(markdownTemplate, context, variables, outputStream);
         } else {
           result = RenderResult.NOT_FOUND;
         }

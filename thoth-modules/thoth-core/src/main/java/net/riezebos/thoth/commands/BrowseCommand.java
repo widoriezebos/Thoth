@@ -33,11 +33,11 @@ public class BrowseCommand extends RendererBase implements Command {
     return "browse";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
 
     try {
       RenderResult result = RenderResult.OK;
-      List<ContentNode> contentNodes = getContentManager().list(branch, path);
+      List<ContentNode> contentNodes = getContentManager().list(context, path);
       boolean asJson = asJson(arguments);
 
       Map<String, Object> variables = new HashMap<>(arguments);
@@ -48,7 +48,7 @@ public class BrowseCommand extends RendererBase implements Command {
       if (asJson)
         executeJson(variables, outputStream);
       else {
-        renderTemplate(skin.getBrowseTemplate(), branch, variables, outputStream);
+        renderTemplate(skin.getBrowseTemplate(), context, variables, outputStream);
       }
 
       return result;

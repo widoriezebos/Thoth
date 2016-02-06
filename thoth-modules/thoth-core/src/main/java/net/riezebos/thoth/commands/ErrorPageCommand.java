@@ -31,12 +31,12 @@ public class ErrorPageCommand extends RendererBase implements Command {
     return COMMAND;
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
 
     try {
       RenderResult result = RenderResult.OK;
       Map<String, Object> variables = new HashMap<>(arguments);
-      renderTemplate(skin.getErrorTemplate(), branch, variables, outputStream);
+      renderTemplate(skin.getErrorTemplate(), context, variables, outputStream);
       return result;
     } catch (Exception e) {
       throw new RenderException(e);

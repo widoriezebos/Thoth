@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.Configuration;
-import net.riezebos.thoth.commands.BranchIndexCommand;
+import net.riezebos.thoth.commands.ContextIndexCommand;
 import net.riezebos.thoth.commands.BrowseCommand;
 import net.riezebos.thoth.commands.Command;
 import net.riezebos.thoth.commands.DiffCommand;
@@ -51,7 +51,7 @@ import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.CustomRenderer;
@@ -72,7 +72,7 @@ public class ThothServlet extends ServletBase {
   private Map<String, Renderer> renderers = new HashMap<>();
   private Map<String, Command> commands = new HashMap<>();
   private IndexCommand indexCommand;
-  private BranchIndexCommand branchIndexCommand;
+  private ContextIndexCommand contextIndexCommand;
   private Renderer defaultRenderer;
   private Set<String> renderedExtensions = new HashSet<>();
 
@@ -91,20 +91,20 @@ public class ThothServlet extends ServletBase {
     try {
       if (!handleCommand(request, response)) {
 
-        String branch = getBranch(request);
+        String context = getContext(request);
         String path = getPath(request);
-        if (("/" + branch + "/").equalsIgnoreCase(ContentManager.NATIVERESOURCES))
+        if (("/" + context + "/").equalsIgnoreCase(ContentManager.NATIVERESOURCES))
           streamClassPathResource(path, request, response);
-        else if (StringUtils.isBlank(branch) && StringUtils.isBlank(path))
+        else if (StringUtils.isBlank(context) && StringUtils.isBlank(path))
           executeCommand(indexCommand, request, response);
         else if (StringUtils.isBlank(path))
-          executeCommand(branchIndexCommand, request, response);
+          executeCommand(contextIndexCommand, request, response);
         else {
           if (!renderDocument(request, response))
             streamResource(request, response);
         }
       }
-    } catch (BranchNotFoundException e) {
+    } catch (ContextNotFoundException e) {
       LOG.info("404 on request " + request.getRequestURI());
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
@@ -116,7 +116,7 @@ public class ThothServlet extends ServletBase {
     if (errorPageCommand == null)
       errorPageCommand = new ErrorPageCommand(); // Fallback; we should not fail here
 
-    String branch = getBranchNoFail(request);
+    String context = getContextNoFail(request);
     String path = getPathNoFail(request);
     Skin skin = getSkinNoFail(request);
     Map<String, Object> parameters = getParametersNoFail(request);
@@ -127,7 +127,7 @@ public class ThothServlet extends ServletBase {
     }
     try {
       response.setContentType(errorPageCommand.getContentType(getParameters(request)));
-      errorPageCommand.execute(branch, path, parameters, skin, response.getOutputStream());
+      errorPageCommand.execute(context, path, parameters, skin, response.getOutputStream());
     } catch (RenderException e1) {
       // Well if this fails; we leave it up to the container. Let's throw new original exception
       // But we still want to know what failed on the error page; so:
@@ -138,9 +138,9 @@ public class ThothServlet extends ServletBase {
 
   protected void setupCommands() {
     indexCommand = new IndexCommand();
-    branchIndexCommand = new BranchIndexCommand();
+    contextIndexCommand = new ContextIndexCommand();
 
-    registerCommand(branchIndexCommand);
+    registerCommand(contextIndexCommand);
     registerCommand(new DiffCommand());
     registerCommand(indexCommand);
     registerCommand(new MetaCommand());
@@ -201,7 +201,7 @@ public class ThothServlet extends ServletBase {
       long ms = System.currentTimeMillis();
       Renderer renderer = getRenderer(request.getParameter("output"));
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      RenderResult renderResult = renderer.execute(getBranch(request), getPath(request), getParameters(request), getSkin(request), bos);
+      RenderResult renderResult = renderer.execute(getContext(request), getPath(request), getParameters(request), getSkin(request), bos);
       switch (renderResult) {
       case NOT_FOUND:
         LOG.info("404 on request " + request.getRequestURI());
@@ -238,7 +238,7 @@ public class ThothServlet extends ServletBase {
       throws RenderException, ServletException, IOException {
     Map<String, Object> parameters = getParameters(request);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    command.execute(getBranch(request), getPath(request), parameters, getSkin(request), bos);
+    command.execute(getContext(request), getPath(request), parameters, getSkin(request), bos);
     // Only now will we touch the response; this to avoid sending stuff out already and then
     // encountering an error. This might complicate error handling (rendering an error page)
     // otherwise
@@ -251,8 +251,8 @@ public class ThothServlet extends ServletBase {
     ContentManager contentManager = getContentManager();
 
     String path = getPath(request);
-    String branch = getBranch(request);
-    String absolutePath = contentManager.getFileSystemPath(branch, path);
+    String context = getContext(request);
+    String absolutePath = contentManager.getFileSystemPath(context, path);
 
     if (absolutePath == null) {
       LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
@@ -266,7 +266,7 @@ public class ThothServlet extends ServletBase {
         // Not found; then check for any inheritance of skin related paths.
         // Complication is that we might move from the library into the classpath so we need
         // to handle that as well here
-        String inheritedPath = getSkinManager().getInheritedPath(path, branch);
+        String inheritedPath = getSkinManager().getInheritedPath(path, context);
         while (inheritedPath != null && is == null && !file.isFile()) {
           absolutePath = inheritedPath;
           // Moving into classpath now?
@@ -279,7 +279,7 @@ public class ThothServlet extends ServletBase {
               file = new File(absolutePath);
           }
           // Do we need to move up the hierarchy still?
-          inheritedPath = getSkinManager().getInheritedPath(inheritedPath, branch);
+          inheritedPath = getSkinManager().getInheritedPath(inheritedPath, context);
         }
       }
 

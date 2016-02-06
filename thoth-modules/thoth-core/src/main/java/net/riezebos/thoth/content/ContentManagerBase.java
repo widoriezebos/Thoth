@@ -38,7 +38,7 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.markdown.FileProcessor;
 import net.riezebos.thoth.markdown.IncludeProcessor;
@@ -71,18 +71,18 @@ public abstract class ContentManagerBase implements ContentManager {
 
   @Override
   public void reindex() {
-    for (String branch : getBranches()) {
-      notifyBranchContentsChanged(branch);
+    for (String context : getContexts()) {
+      notifyContextContentsChanged(context);
     }
   }
 
-  protected void notifyBranchContentsChanged(final String branch) {
-    CacheManager.expire(branch);
+  protected void notifyContextContentsChanged(final String context) {
+    CacheManager.expire(context);
 
     Thread indexerThread = new Thread() {
       public void run() {
         try {
-          Indexer indexer = SearchFactory.getInstance().getIndexer(branch);
+          Indexer indexer = SearchFactory.getInstance().getIndexer(context);
           indexer.setIndexExtensions(Configuration.getInstance().getIndexExtensions());
           indexer.index();
         } catch (ContentManagerException e) {
@@ -92,18 +92,18 @@ public abstract class ContentManagerBase implements ContentManager {
     };
 
     indexerThread.start();
-    LOG.info("Contents updated. Launched indexer thread for branch " + branch);
+    LOG.info("Contents updated. Launched indexer thread for context " + context);
   }
 
   @Override
-  public MarkDownDocument getMarkDownDocument(String branch, String path) throws IOException, BranchNotFoundException {
+  public MarkDownDocument getMarkDownDocument(String context, String path) throws IOException, ContextNotFoundException {
     String documentPath = ThothUtil.normalSlashes(path);
     if (documentPath.startsWith("/"))
       documentPath = documentPath.substring(1);
-    String physicalFilePath = getBranchFolder(branch) + documentPath;
+    String physicalFilePath = getContextFolder(context) + documentPath;
     File file = new File(physicalFilePath);
     IncludeProcessor processor = new IncludeProcessor();
-    processor.setLibrary(getBranchFolder(branch));
+    processor.setLibrary(getContextFolder(context));
     processor.setRootFolder(ThothUtil.getFolder(physicalFilePath));
 
     try (FileInputStream in = new FileInputStream(file)) {
@@ -135,18 +135,18 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public Date getLatestRefresh(String branch) {
-    if (branch == null)
+  public Date getLatestRefresh(String context) {
+    if (context == null)
       return getLatestRefresh();
 
     synchronized (latestRefresh) {
-      return latestRefresh.get(branch);
+      return latestRefresh.get(context);
     }
   }
 
-  protected void setLatestRefresh(String branch, Date date) {
+  protected void setLatestRefresh(String context, Date date) {
     synchronized (latestRefresh) {
-      latestRefresh.put(branch, date);
+      latestRefresh.put(context, date);
     }
   }
 
@@ -182,15 +182,15 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<String> getBranches() {
+  public List<String> getContexts() {
     Configuration config = Configuration.getInstance();
-    return config.getBranches();
+    return config.getContexts();
   }
 
   @Override
-  public List<Book> getBooks(String branch) throws BranchNotFoundException, IOException {
-    String branchFolder = getBranchFolder(branch);
-    File folder = new File(branchFolder);
+  public List<Book> getBooks(String context) throws ContextNotFoundException, IOException {
+    String contextFolder = getContextFolder(context);
+    File folder = new File(contextFolder);
     List<Book> result = new ArrayList<>();
 
     collectBooks(getConical(folder), folder, result, Configuration.getInstance().getBookExtensions());
@@ -198,7 +198,7 @@ public abstract class ContentManagerBase implements ContentManager {
     return result;
   }
 
-  protected void collectBooks(String branchFolder, File folder, List<Book> result, List<String> bookExtensions) throws IOException {
+  protected void collectBooks(String contextFolder, File folder, List<Book> result, List<String> bookExtensions) throws IOException {
     FileProcessor includeProcessor = new IncludeProcessor();
     if (folder.isDirectory()) {
       for (File file : folder.listFiles()) {
@@ -208,8 +208,8 @@ public abstract class ContentManagerBase implements ContentManager {
               String absolutePath = file.getAbsolutePath();
               File bookFile = new File(absolutePath);
               String canonicalPath = getConical(bookFile);
-              if (canonicalPath.startsWith(branchFolder))
-                canonicalPath = canonicalPath.substring(branchFolder.length());
+              if (canonicalPath.startsWith(contextFolder))
+                canonicalPath = canonicalPath.substring(contextFolder.length());
               if (!canonicalPath.startsWith("/"))
                 canonicalPath = "/" + canonicalPath;
               Book book = new Book(file.getName(), canonicalPath);
@@ -218,7 +218,7 @@ public abstract class ContentManagerBase implements ContentManager {
               break;
             }
         } else if (file.isDirectory())
-          collectBooks(branchFolder, file, result, bookExtensions);
+          collectBooks(contextFolder, file, result, bookExtensions);
       }
     }
   }
@@ -233,43 +233,43 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public String getBranchFolder(String branch) throws BranchNotFoundException {
-    validateBranch(branch);
+  public String getContextFolder(String context) throws ContextNotFoundException {
+    validateContext(context);
     Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + branch + "/";
+    return config.getWorkspaceLocation() + context + "/";
   }
 
   @Override
-  public String getIndexFolder(String branch) throws BranchNotFoundException {
-    validateBranch(branch);
+  public String getIndexFolder(String context) throws ContextNotFoundException {
+    validateContext(context);
     Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + branch + "-index/lucene/";
+    return config.getWorkspaceLocation() + context + "-index/lucene/";
   }
 
   @Override
-  public String getReverseIndexFileName(String branch) throws BranchNotFoundException {
-    validateBranch(branch);
+  public String getReverseIndexFileName(String context) throws ContextNotFoundException {
+    validateContext(context);
     Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + branch + "-index/reverseindex.bin";
+    return config.getWorkspaceLocation() + context + "-index/reverseindex.bin";
   }
 
   @Override
-  public String getReverseIndexIndirectFileName(String branch) throws BranchNotFoundException {
-    validateBranch(branch);
+  public String getReverseIndexIndirectFileName(String context) throws ContextNotFoundException {
+    validateContext(context);
     Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + branch + "-index/indirectreverseindex.bin";
+    return config.getWorkspaceLocation() + context + "-index/indirectreverseindex.bin";
   }
 
   @Override
-  public String getErrorFileName(String branch) throws BranchNotFoundException {
-    validateBranch(branch);
+  public String getErrorFileName(String context) throws ContextNotFoundException {
+    validateContext(context);
     Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + branch + "-index/errors.bin";
+    return config.getWorkspaceLocation() + context + "-index/errors.bin";
   }
 
-  protected void validateBranch(String branch) throws BranchNotFoundException {
-    if (!getBranches().contains(branch))
-      throw new BranchNotFoundException(branch);
+  protected void validateContext(String context) throws ContextNotFoundException {
+    if (!getContexts().contains(context))
+      throw new ContextNotFoundException(context);
   }
 
   @Override
@@ -289,10 +289,10 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public String getFileSystemPath(String branch, String path) throws BranchNotFoundException, IOException {
+  public String getFileSystemPath(String context, String path) throws ContextNotFoundException, IOException {
     if (path.startsWith("/"))
       path = path.substring(1);
-    String absolutePath = getBranchFolder(branch) + path;
+    String absolutePath = getContextFolder(context) + path;
     if (!accessAllowed(new File(absolutePath)))
       return null;
     else
@@ -300,22 +300,22 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException {
+  public List<ContentNode> list(String context, String path) throws ContextNotFoundException, IOException {
 
     List<ContentNode> result = new ArrayList<>();
 
-    String fileSystemPath = getFileSystemPath(branch, path);
-    String branchFolder = getBranchFolder(branch);
+    String fileSystemPath = getFileSystemPath(context, path);
+    String contextFolder = getContextFolder(context);
 
-    Path branchPath = Paths.get(branchFolder);
+    Path contextPath = Paths.get(contextFolder);
 
     File file = new File(fileSystemPath);
     if (file.isFile()) {
-      result.add(createContentNode(fileSystemPath, branchPath));
+      result.add(createContentNode(fileSystemPath, contextPath));
     } else {
       for (File child : file.listFiles()) {
         if (!child.getName().startsWith("."))
-          result.add(createContentNode(child.getAbsolutePath(), branchPath));
+          result.add(createContentNode(child.getAbsolutePath(), contextPath));
       }
     }
     Collections.sort(result);
@@ -323,7 +323,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<ContentNode> find(String branch, String fileSpec, boolean recursive) throws BranchNotFoundException, IOException {
+  public List<ContentNode> find(String context, String fileSpec, boolean recursive) throws ContextNotFoundException, IOException {
     List<ContentNode> result = new ArrayList<>();
 
     String folderPart = ThothUtil.getFolder(fileSpec);
@@ -331,8 +331,8 @@ public abstract class ContentManagerBase implements ContentManager {
     if (fileSpec.indexOf('/') == -1)
       folderPart = "/";
 
-    String folder = getFileSystemPath(branch, folderPart);
-    Path root = Paths.get(getBranchFolder(branch));
+    String folder = getFileSystemPath(context, folderPart);
+    Path root = Paths.get(getContextFolder(context));
 
     Pattern pattern = Pattern.compile(ThothUtil.fileSpec2regExp(spec));
     traverseFolders(result, value -> pattern.matcher(ThothUtil.getFileName(value)).matches(), root, new File(folder), recursive);
@@ -354,24 +354,24 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<ContentNode> getUnusedFragments(String branch) throws IOException, ContentManagerException {
+  public List<ContentNode> getUnusedFragments(String context) throws IOException, ContentManagerException {
     List<ContentNode> result = new ArrayList<>();
 
-    Path root = Paths.get(getBranchFolder(branch));
-    CacheManager cacheManager = CacheManager.getInstance(branch);
+    Path root = Paths.get(getContextFolder(context));
+    CacheManager cacheManager = CacheManager.getInstance(context);
     Map<String, List<String>> reverseIndex = cacheManager.getReverseIndex(false);
-    traverseFolders(result, value -> isFragment(branch, value) && !reverseIndex.containsKey(value), root, root.toFile(), true);
+    traverseFolders(result, value -> isFragment(context, value) && !reverseIndex.containsKey(value), root, root.toFile(), true);
     Collections.sort(result);
     return result;
   }
 
-  public boolean isFragment(String branch, String path) {
+  public boolean isFragment(String context, String path) {
     return Configuration.getInstance().isFragment(path);
   }
 
-  protected ContentNode createContentNode(String fileSystemPath, Path branchPath) {
+  protected ContentNode createContentNode(String fileSystemPath, Path contextPath) {
     Path filePath = Paths.get(fileSystemPath);
-    Path relativePath = branchPath.relativize(filePath);
+    Path relativePath = contextPath.relativize(filePath);
     File file = filePath.toFile();
     return new ContentNode("/" + relativePath.toString(), file);
   }

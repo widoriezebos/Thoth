@@ -36,7 +36,7 @@ public class ReindexCommand extends RendererBase implements Command {
     return "text/plain;charset=UTF-8";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
 
       ContentManager contentManager = getContentManager();

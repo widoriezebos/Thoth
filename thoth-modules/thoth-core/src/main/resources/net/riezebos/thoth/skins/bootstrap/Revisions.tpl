@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-<title>${branch} Documentation Index</title>
+<title>${context} Documentation Index</title>
 <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
 <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
 <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
@@ -11,13 +11,13 @@
 Showing page ${page}<br/>
 #set($prevpage=${page}+-1)
 #if($prevpage > 0)
-<a href="${branchurl}?cmd=revisions&amp;page=${prevpage}">Previous page</a>
+<a href="${contexturl}?cmd=revisions&amp;page=${prevpage}">Previous page</a>
 #else
 (First page)
 #end
 #if($hasmore)
 #set($nextpage=${page}+1)
-<a href="${branchurl}?cmd=revisions&amp;page=${nextpage}">Next page</a>
+<a href="${contexturl}?cmd=revisions&amp;page=${nextpage}">Next page</a>
 #else
  (last page)
 #end
@@ -31,7 +31,7 @@ Showing page ${page}<br/>
       <td>${commit.author}</td>
       <td>     
 #foreach($revision in $commit.revisions)
-      ${revision.action} ${revision.path} (<a href="${branchurl}${revision.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
+      ${revision.action} ${revision.path} (<a href="${contexturl}${revision.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
 #end
       </td>
       <td>${commit.message}</td>

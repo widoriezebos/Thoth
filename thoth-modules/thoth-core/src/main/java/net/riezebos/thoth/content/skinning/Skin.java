@@ -20,7 +20,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.content.ContentManagerFactory;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.util.ConfigurationBase;
 import net.riezebos.thoth.util.ThothUtil;
@@ -29,8 +29,8 @@ public class Skin extends ConfigurationBase {
   public static final String SKIN_PARENT_OF_ALL = "SimpleSkin";
   private static final String CLASSPATH_PREFIX = "classpath:";
   private String skinPropertyFile;
-  private String branch;
-  private String branchFolder;
+  private String context;
+  private String contextFolder;
   private String skinBaseFolder;
   private String skinBaseUrl;
   private boolean fromClassPath = false;
@@ -41,12 +41,12 @@ public class Skin extends ConfigurationBase {
   /**
    * Sets up a Skin configuration
    * 
-   * @param skinPropertyFile relative path to the skin.properties file in the branch
+   * @param skinPropertyFile relative path to the skin.properties file in the context
    * @throws ContentManagerException
-   * @throws BranchNotFoundException
+   * @throws ContextNotFoundException
    */
-  public Skin(String branch, String skinPropertyFile) throws BranchNotFoundException, ContentManagerException {
-    branchFolder = ContentManagerFactory.getContentManager().getBranchFolder(branch);
+  public Skin(String context, String skinPropertyFile) throws ContextNotFoundException, ContentManagerException {
+    contextFolder = ContentManagerFactory.getContentManager().getContextFolder(context);
     if (skinPropertyFile.startsWith(CLASSPATH_PREFIX)) {
       fromClassPath = true;
       String resourceName = skinPropertyFile.substring(CLASSPATH_PREFIX.length());
@@ -56,12 +56,12 @@ public class Skin extends ConfigurationBase {
       load(is);
       this.skinBaseUrl = ThothUtil.getFolder(resourceName);
     } else {
-      String absFileName = branchFolder + ThothUtil.stripPrefix(skinPropertyFile, "/");
+      String absFileName = contextFolder + ThothUtil.stripPrefix(skinPropertyFile, "/");
       load(absFileName);
-      this.skinBaseUrl = branch + ThothUtil.getFolder(skinPropertyFile);
+      this.skinBaseUrl = context + ThothUtil.getFolder(skinPropertyFile);
     }
     this.skinPropertyFile = skinPropertyFile;
-    this.branch = branch;
+    this.context = context;
     this.skinBaseFolder = ThothUtil.getFolder(skinPropertyFile) + "/";
     this.name = getValue("name", UUID.randomUUID().toString());
     this.inheritsFrom = getValue("inheritsfrom", null);
@@ -81,8 +81,8 @@ public class Skin extends ConfigurationBase {
     return skinPropertyFile;
   }
 
-  public String getBranch() {
-    return branch;
+  public String getContext() {
+    return context;
   }
 
   public String getMarkDownTemplate() {
@@ -97,8 +97,8 @@ public class Skin extends ConfigurationBase {
     return getPathProperty("template.mainindex");
   }
 
-  public String getBranchIndexTemplate() {
-    return getPathProperty("template.branchindex");
+  public String getContextIndexTemplate() {
+    return getPathProperty("template.contextindex");
   }
 
   public String getMetaInformationTemplate() {
@@ -136,11 +136,11 @@ public class Skin extends ConfigurationBase {
     String prefix = ThothUtil.stripPrefix(skinBaseFolder, "/");
 
     String result;
-    // If we move into the classpath now; then do not ass the branchfolder
+    // If we move into the classpath now; then do not ass the contextfolder
     if (prefix.startsWith(CLASSPATH_PREFIX))
       result = prefix + tidyRelativePath;
     else
-      result = branchFolder + prefix + tidyRelativePath;
+      result = contextFolder + prefix + tidyRelativePath;
     return result;
   }
 

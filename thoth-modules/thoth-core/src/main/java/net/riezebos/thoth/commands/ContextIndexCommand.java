@@ -29,21 +29,21 @@ import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.util.Classifier;
 
-public class BranchIndexCommand extends RendererBase implements Command {
+public class ContextIndexCommand extends RendererBase implements Command {
 
   @Override
   public String getTypeCode() {
-    return "branchindex";
+    return "contextindex";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       ContentManager contentManager = getContentManager();
       Classifier classifier = new Classifier();
 
-      List<Book> books = contentManager.getBooks(branch);
+      List<Book> books = contentManager.getBooks(context);
 
-      Set<String> classificationNames = Configuration.getInstance().getBranchIndexClassifications();
+      Set<String> classificationNames = Configuration.getInstance().getContextIndexClassifications();
       classificationNames.add("folder");
 
       // The order is important: to not allow a name clash to overwrite built in variables
@@ -58,8 +58,8 @@ public class BranchIndexCommand extends RendererBase implements Command {
       if (asJson(arguments))
         executeJson(variables, outputStream);
       else {
-        String indexTemplate = skin.getBranchIndexTemplate();
-        renderTemplate(indexTemplate, branch, variables, outputStream);
+        String indexTemplate = skin.getContextIndexTemplate();
+        renderTemplate(indexTemplate, context, variables, outputStream);
       }
 
       return RenderResult.OK;

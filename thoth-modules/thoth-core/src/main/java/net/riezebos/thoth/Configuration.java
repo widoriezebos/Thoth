@@ -106,11 +106,11 @@ public class Configuration extends ConfigurationBase {
     return Long.parseLong(getValue("parsetimeout", "4000"));
   }
 
-  public List<String> getBranches() {
+  public List<String> getContexts() {
     List<String> result = new ArrayList<>();
-    for (String branch : getValue("branches", "").split("\\,"))
-      if (StringUtils.isNotBlank(branch))
-        result.add(branch.trim());
+    for (String context : getValue("contexts", "").split("\\,"))
+      if (StringUtils.isNotBlank(context))
+        result.add(context.trim());
     Collections.sort(result);
     return result;
   }
@@ -221,8 +221,8 @@ public class Configuration extends ConfigurationBase {
     return Integer.parseInt(getValue("embedded.idletimeout", "30"));
   }
 
-  public int getBranchMaxRevisions() {
-    return Integer.parseInt(getValue("versioncontrol.maxbranchrevisions", "10"));
+  public int getContextMaxRevisions() {
+    return Integer.parseInt(getValue("versioncontrol.maxcontextrevisions", "10"));
   }
 
   public String getVersionControlType() {
@@ -233,21 +233,21 @@ public class Configuration extends ConfigurationBase {
     return getValue("index.extensions", "md,book,marked,txt").toLowerCase();
   }
 
-  public String getGlobalSkinBranch() {
-    String branch = getValue("skin.globalbranch", null);
-    if (StringUtils.isBlank(branch)) {
-      String[] branches = getValue("branches", "[branches property not set]").split("\\,");
-      branch = branches[0].trim();
+  public String getGlobalSkinContext() {
+    String context = getValue("skin.globalcontext", null);
+    if (StringUtils.isBlank(context)) {
+      String[] contexts = getValue("contexts", "[contexts property not set]").split("\\,");
+      context = contexts[0].trim();
     }
-    return branch;
+    return context;
   }
 
   public String getDefaultSkin() {
     return getValue("skin.default", Skin.SKIN_PARENT_OF_ALL);
   }
 
-  public Set<String> getBranchIndexClassifications() {
-    String value = getValue("branch.classifications", "category,audience,folder");
+  public Set<String> getContextIndexClassifications() {
+    String value = getValue("context.classifications", "category,audience,folder");
     Set<String> classifications = new HashSet<>();
     for (String name : value.split("\\,")) {
       classifications.add(name.trim());

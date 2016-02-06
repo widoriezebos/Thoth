@@ -34,7 +34,7 @@ import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.content.ContentManagerFactory;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -46,22 +46,22 @@ public class SkinManager {
 
   private Skin defaultSkin;
 
-  public List<SkinMapping> setupSkins(Configuration configuration, String branch, CacheManager cacheManager)
-      throws BranchNotFoundException, IOException, ContentManagerException, FileNotFoundException, UnsupportedEncodingException {
+  public List<SkinMapping> setupSkins(Configuration configuration, String context, CacheManager cacheManager)
+      throws ContextNotFoundException, IOException, ContentManagerException, FileNotFoundException, UnsupportedEncodingException {
     List<SkinMapping> skinMappings;
-    defaultSkin = registerBuiltinSkins(branch);
-    registerLocalSkins(branch);
+    defaultSkin = registerBuiltinSkins(context);
+    registerLocalSkins(context);
     skinMappings = new ArrayList<>();
 
-    String branchFolder = ContentManagerFactory.getContentManager().getBranchFolder(branch);
-    String skinMappingFileName = branchFolder + SKINS_PROPERTIES;
+    String contextFolder = ContentManagerFactory.getContentManager().getContextFolder(context);
+    String skinMappingFileName = contextFolder + SKINS_PROPERTIES;
     File skinMappingFile = new File(skinMappingFileName);
     if (!skinMappingFile.isFile()) {
       LOG.warn("No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFileName + " so falling back to built in which is "
           + configuration.getDefaultSkin());
       skinMappings.add(new SkinMapping(Pattern.compile(".*"), defaultSkin));
     } else {
-      skinMappings.addAll(createSkinMappingsFromFile(branch, skinMappingFileName));
+      skinMappings.addAll(createSkinMappingsFromFile(context, skinMappingFileName));
     }
     cacheManager.registerSkinMappings(skinMappings);
 
@@ -96,19 +96,19 @@ public class SkinManager {
     return defaultSkin;
   }
 
-  protected void registerLocalSkins(String branch) throws BranchNotFoundException, IOException, ContentManagerException {
+  protected void registerLocalSkins(String context) throws ContextNotFoundException, IOException, ContentManagerException {
     List<String> skinDescriptors = new ArrayList<>();
-    for (ContentNode node : ContentManagerFactory.getContentManager().find(branch, "skin.properties", true))
+    for (ContentNode node : ContentManagerFactory.getContentManager().find(context, "skin.properties", true))
       skinDescriptors.add(node.getPath());
 
-    CacheManager cacheManager = CacheManager.getInstance(branch);
-    createSkins(cacheManager, branch, skinDescriptors, false);
+    CacheManager cacheManager = CacheManager.getInstance(context);
+    createSkins(cacheManager, context, skinDescriptors, false);
   }
 
   /**
    * Returns the Builtin skin
    */
-  protected Skin registerBuiltinSkins(String branch) {
+  protected Skin registerBuiltinSkins(String context) {
     InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(BUILTIN_SKIN_LIST);
     if (is == null)
       throw new IllegalArgumentException("Builtin skin definition file " + BUILTIN_SKIN_LIST + " not found!");
@@ -124,8 +124,8 @@ public class SkinManager {
     } catch (IOException e) {
       LOG.error(e.getMessage(), e);
     }
-    CacheManager cacheManager = CacheManager.getInstance(branch);
-    Skin fallbackSkin = createSkins(cacheManager, branch, skinDescriptors, true);
+    CacheManager cacheManager = CacheManager.getInstance(context);
+    Skin fallbackSkin = createSkins(cacheManager, context, skinDescriptors, true);
     String defaultSkinName = Configuration.getInstance().getDefaultSkin();
     Skin defaultSkin = cacheManager.getSkinByName(defaultSkinName);
     if (defaultSkin == null) {
@@ -135,11 +135,11 @@ public class SkinManager {
     return defaultSkin;
   }
 
-  protected Skin createSkins(CacheManager cacheManager, String branch, List<String> skinDescriptors, boolean fromClasspath) {
+  protected Skin createSkins(CacheManager cacheManager, String context, List<String> skinDescriptors, boolean fromClasspath) {
     Skin fallbackSkin = null;
     for (String skinDescriptor : skinDescriptors) {
       try {
-        Skin skin = new Skin(branch, (fromClasspath ? Configuration.CLASSPATH_PREFIX : "") + skinDescriptor);
+        Skin skin = new Skin(context, (fromClasspath ? Configuration.CLASSPATH_PREFIX : "") + skinDescriptor);
         fallbackSkin = skin;
         cacheManager.registerSkin(skin);
       } catch (Exception e) {
@@ -149,10 +149,10 @@ public class SkinManager {
     return fallbackSkin;
   }
 
-  protected List<SkinMapping> createSkinMappingsFromFile(String branch, String skinMappingFileName)
-      throws FileNotFoundException, IOException, BranchNotFoundException, ContentManagerException, UnsupportedEncodingException {
+  protected List<SkinMapping> createSkinMappingsFromFile(String context, String skinMappingFileName)
+      throws FileNotFoundException, IOException, ContextNotFoundException, ContentManagerException, UnsupportedEncodingException {
     List<SkinMapping> skinMappings = new ArrayList<>();
-    CacheManager cacheManager = CacheManager.getInstance(branch);
+    CacheManager cacheManager = CacheManager.getInstance(context);
     InputStream is = new FileInputStream(skinMappingFileName);
     try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
       String line = br.readLine();
@@ -173,28 +173,28 @@ public class SkinManager {
     return skinMappings;
   }
 
-  protected Skin createAndRegisterSkin(String branch, String skinFileName) throws BranchNotFoundException, ContentManagerException {
-    Skin skin = new Skin(branch, skinFileName);
-    CacheManager instance = CacheManager.getInstance(branch);
+  protected Skin createAndRegisterSkin(String context, String skinFileName) throws ContextNotFoundException, ContentManagerException {
+    Skin skin = new Skin(context, skinFileName);
+    CacheManager instance = CacheManager.getInstance(context);
     instance.registerSkin(skin);
     return skin;
   }
 
-  public String getInheritedPath(String path, String branch) throws IOException, ContentManagerException {
+  public String getInheritedPath(String path, String context) throws IOException, ContentManagerException {
     String result = null;
-    String inheritedPath = handleBranchBasedInheritance(branch, path);
+    String inheritedPath = handleContextBasedInheritance(context, path);
     if (inheritedPath != null)
       if (inheritedPath.startsWith(Configuration.CLASSPATH_PREFIX))
         result = inheritedPath;
       else
-        result = ContentManagerFactory.getContentManager().getFileSystemPath(branch, inheritedPath);
+        result = ContentManagerFactory.getContentManager().getFileSystemPath(context, inheritedPath);
     return result;
   }
 
-  protected String handleBranchBasedInheritance(String branch, String path) {
+  protected String handleContextBasedInheritance(String context, String path) {
     String result = null;
 
-    CacheManager cacheManager = CacheManager.getInstance(branch);
+    CacheManager cacheManager = CacheManager.getInstance(context);
     SkinInheritance skinInheritance = cacheManager.getSkinInheritance(path);
     if (skinInheritance != null) {
       String baseFolder = ThothUtil.stripPrefix(skinInheritance.getChild().getSkinBaseFolder(), "/");

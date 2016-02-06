@@ -5,19 +5,19 @@
 <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
 <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
 <body>
-<form action="${branchurl}" method="get">
-  Search all of ${branch}: <input type="text" name="query" value="${thothutil.escapeHtml($query)}"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
+<form action="${contexturl}" method="get">
+  Search all of ${context}: <input type="text" name="query" value="${thothutil.escapeHtml($query)}"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
 </form>
 Showing page ${page}<br/>
 #set($prevpage=${page}+-1)
 #if($prevpage > 0)
-<a href="${branchurl}?cmd=search&amp;query=${thothutil.encodeUrl($query)}&amp;page=${prevpage}">Previous page</a>
+<a href="${contexturl}?cmd=search&amp;query=${thothutil.encodeUrl($query)}&amp;page=${prevpage}">Previous page</a>
 #else
 (First page)
 #end
 #if($hasmore)
 #set($nextpage=${page}+1)
-<a href="${branchurl}?cmd=search&amp;query=${thothutil.encodeUrl($query)}&amp;page=${nextpage}">Next page</a>
+<a href="${contexturl}?cmd=search&amp;query=${thothutil.encodeUrl($query)}&amp;page=${nextpage}">Next page</a>
 #else
  (last page)
 #end
@@ -38,16 +38,16 @@ Sorry, no documents found for your query.
 #end
 #foreach($searchResult in $searchResults)
 <searchresult>
-${searchResult.indexNumber}. Found in <a href="$branchurl${searchResult.document}">${searchResult.document}</a> (<a href="$branchurl${searchResult.document}?cmd=meta">meta</a>)
+${searchResult.indexNumber}. Found in <a href="$contexturl${searchResult.document}">${searchResult.document}</a> (<a href="$contexturl${searchResult.document}?cmd=meta">meta</a>)
 #if(!${searchResult.bookReferences.isEmpty()})
 which is part of 
 #foreach($book in $searchResult.bookReferences)
-<a href="$branchurl${book.path}">${book.fileName}</a>&nbsp;
+<a href="$contexturl${book.path}">${book.fileName}</a>&nbsp;
 #end
 #end
 <br/>
 #if(${searchResult.image})
-<img src="$branchurl${searchResult.document}" alt="$branchurl${searchResult.document}">&nbsp;
+<img src="$contexturl${searchResult.document}" alt="$contexturl${searchResult.document}">&nbsp;
 #else
 #foreach($fragment in ${searchResult.fragments})
 <fragment>

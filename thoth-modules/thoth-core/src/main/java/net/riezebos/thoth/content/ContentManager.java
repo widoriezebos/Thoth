@@ -24,7 +24,7 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.util.PagedList;
 
@@ -38,38 +38,38 @@ public interface ContentManager {
 
   boolean accessAllowed(File file) throws IOException;
 
-  MarkDownDocument getMarkDownDocument(String branch, String documentPath) throws IOException, BranchNotFoundException;
+  MarkDownDocument getMarkDownDocument(String context, String documentPath) throws IOException, ContextNotFoundException;
 
-  List<Book> getBooks(String branch) throws BranchNotFoundException, IOException;
+  List<Book> getBooks(String context) throws ContextNotFoundException, IOException;
 
-  PagedList<Commit> getCommits(String branch, String path, int pageNumber, int pageSize) throws ContentManagerException;
+  PagedList<Commit> getCommits(String context, String path, int pageNumber, int pageSize) throws ContentManagerException;
 
-  public SourceDiff getDiff(String branch, String id) throws ContentManagerException;
+  public SourceDiff getDiff(String context, String id) throws ContentManagerException;
 
-  List<ContentNode> list(String branch, String path) throws BranchNotFoundException, IOException;
+  List<ContentNode> list(String context, String path) throws ContextNotFoundException, IOException;
 
-  public List<ContentNode> find(String branch, String fileSpec, boolean recursive) throws BranchNotFoundException, IOException;
+  public List<ContentNode> find(String context, String fileSpec, boolean recursive) throws ContextNotFoundException, IOException;
 
-  List<ContentNode> getUnusedFragments(String branch) throws IOException, ContentManagerException;
+  List<ContentNode> getUnusedFragments(String context) throws IOException, ContentManagerException;
 
-  Date getLatestRefresh(String branch);
+  Date getLatestRefresh(String context);
 
   void enableAutoRefresh();
 
   void disableAutoRefresh();
 
-  List<String> getBranches();
+  List<String> getContexts();
 
-  String getBranchFolder(String branch) throws BranchNotFoundException;
+  String getContextFolder(String context) throws ContextNotFoundException;
 
-  String getIndexFolder(String branch) throws BranchNotFoundException;
+  String getIndexFolder(String context) throws ContextNotFoundException;
 
-  String getReverseIndexFileName(String branch) throws BranchNotFoundException;
+  String getReverseIndexFileName(String context) throws ContextNotFoundException;
 
-  public String getReverseIndexIndirectFileName(String branch) throws BranchNotFoundException;
+  public String getReverseIndexIndirectFileName(String context) throws ContextNotFoundException;
 
-  String getErrorFileName(String branch) throws BranchNotFoundException;
+  String getErrorFileName(String context) throws ContextNotFoundException;
 
-  String getFileSystemPath(String branch, String path) throws BranchNotFoundException, IOException;
+  String getFileSystemPath(String context, String path) throws ContextNotFoundException, IOException;
 
 }

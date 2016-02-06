@@ -65,8 +65,8 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.IndexerException;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.markdown.util.ProcessorError;
@@ -86,7 +86,7 @@ public class Indexer {
   private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
   private String indexPath;
-  private String branch;
+  private String context;
   private Path docDir;
   private boolean recreate = true;
   private ContentManager contentManager;
@@ -99,27 +99,27 @@ public class Indexer {
     System.out.println("Done");
   }
 
-  protected Indexer(ContentManager contentManager, String branch) throws BranchNotFoundException, ContentManagerException {
+  protected Indexer(ContentManager contentManager, String context) throws ContextNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
-    this.branch = branch;
-    this.indexPath = contentManager.getIndexFolder(branch);
-    this.docDir = Paths.get(contentManager.getBranchFolder(branch));
+    this.context = context;
+    this.indexPath = contentManager.getIndexFolder(context);
+    this.docDir = Paths.get(contentManager.getContextFolder(context));
     this.setIndexExtensions(Configuration.getInstance().getIndexExtensions());
   }
 
   public void index() throws ContentManagerException {
 
     synchronized (activeIndexers) {
-      if (activeIndexers.contains(this.branch)) {
-        LOG.warn("Indexer for branch " + this.branch + " is already (still?) active. Not starting a new index operation");
+      if (activeIndexers.contains(this.context)) {
+        LOG.warn("Indexer for context " + this.context + " is already (still?) active. Not starting a new index operation");
         return;
       }
-      activeIndexers.add(this.branch);
+      activeIndexers.add(this.context);
     }
 
     try {
       Date start = new Date();
-      LOG.info("Indexing " + this.branch + " to directory '" + indexPath + "'...");
+      LOG.info("Indexing " + this.context + " to directory '" + indexPath + "'...");
 
       IndexWriter writer = getWriter(recreate);
       IndexingContext context = new IndexingContext();
@@ -144,12 +144,12 @@ public class Indexer {
       markUnusedDocuments(context.getDirectReverseIndex());
 
       Date end = new Date();
-      LOG.info("Indexing branch " + this.branch + " took " + (end.getTime() - start.getTime()) + " milliseconds");
+      LOG.info("Indexing context " + this.context + " took " + (end.getTime() - start.getTime()) + " milliseconds");
     } catch (IOException e) {
       throw new ContentManagerException(e);
     } finally {
       synchronized (activeIndexers) {
-        activeIndexers.remove(this.branch);
+        activeIndexers.remove(this.context);
       }
     }
   }
@@ -171,11 +171,11 @@ public class Indexer {
 
   protected void markUnusedDocuments(Map<String, List<String>> directReverseIndex) throws IOException, ContentManagerException {
 
-    String indexFolder = contentManager.getIndexFolder(branch);
+    String indexFolder = contentManager.getIndexFolder(context);
 
     try (IndexWriter writer = getWriter(false); IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)))) {
       IndexSearcher searcher = new IndexSearcher(reader);
-      for (ContentNode node : ContentManagerFactory.getContentManager().getUnusedFragments(branch)) {
+      for (ContentNode node : ContentManagerFactory.getContentManager().getUnusedFragments(context)) {
         TermQuery query = new TermQuery(new Term(Indexer.INDEX_PATH, node.getPath()));
 
         TopDocs results = searcher.search(query, 10, Sort.RELEVANCE);
@@ -190,27 +190,27 @@ public class Indexer {
     }
   }
 
-  protected void cacheResults(IndexingContext context) throws BranchNotFoundException, IOException, FileNotFoundException {
-    String reverseIndexFile = contentManager.getReverseIndexFileName(branch);
-    String indirectReverseIndexFile = contentManager.getReverseIndexIndirectFileName(branch);
-    String errorFile = contentManager.getErrorFileName(branch);
+  protected void cacheResults(IndexingContext indexingContext) throws ContextNotFoundException, IOException, FileNotFoundException {
+    String reverseIndexFile = contentManager.getReverseIndexFileName(context);
+    String indirectReverseIndexFile = contentManager.getReverseIndexIndirectFileName(context);
+    String errorFile = contentManager.getErrorFileName(context);
 
     synchronized (CacheManager.getFileLock()) {
       try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(reverseIndexFile)))) {
-        oos.writeObject(context.getDirectReverseIndex());
+        oos.writeObject(indexingContext.getDirectReverseIndex());
       }
       try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(indirectReverseIndexFile)))) {
-        oos.writeObject(context.getIndirectReverseIndex());
+        oos.writeObject(indexingContext.getIndirectReverseIndex());
       }
       try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(errorFile)))) {
-        oos.writeObject(context.getErrors());
+        oos.writeObject(indexingContext.getErrors());
       }
     }
 
-    CacheManager cacheManager = CacheManager.getInstance(branch);
-    cacheManager.cacheReverseIndex(true, context.getIndirectReverseIndex());
-    cacheManager.cacheReverseIndex(false, context.getDirectReverseIndex());
-    cacheManager.cacheErrors(context.getErrors());
+    CacheManager cacheManager = CacheManager.getInstance(context);
+    cacheManager.cacheReverseIndex(true, indexingContext.getIndirectReverseIndex());
+    cacheManager.cacheReverseIndex(false, indexingContext.getDirectReverseIndex());
+    cacheManager.cacheErrors(indexingContext.getErrors());
   }
 
   protected void sortIndexLists(Map<String, List<String>> map) {
@@ -218,7 +218,7 @@ public class Indexer {
       Collections.sort(entry.getValue());
   }
 
-  void indexDocs(final IndexWriter writer, Path path, final IndexingContext context) throws IOException, BranchNotFoundException {
+  void indexDocs(final IndexWriter writer, Path path, final IndexingContext context) throws IOException, ContextNotFoundException {
 
     if (Files.isDirectory(path)) {
       Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -245,9 +245,9 @@ public class Indexer {
    * @param directReverseIndex
    * @param referencedLocalResources
    * @param errors
-   * @throws BranchNotFoundException
+   * @throws ContextNotFoundException
    */
-  void indexDoc(IndexWriter writer, Path file, long lastModified, IndexingContext context) throws IOException, BranchNotFoundException {
+  void indexDoc(IndexWriter writer, Path file, long lastModified, IndexingContext indexingContext) throws IOException, ContextNotFoundException {
 
     Path relativePath = docDir.relativize(file);
     if (!ignore(relativePath.toString())) {
@@ -255,14 +255,14 @@ public class Indexer {
 
       try {
         String resourcePath = relativePath.toString();
-        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(branch, resourcePath);
-        context.getErrors().addAll(markDownDocument.getErrors());
+        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(context, resourcePath);
+        indexingContext.getErrors().addAll(markDownDocument.getErrors());
 
         // Also index non-documents if referenced and stored locally
         for (DocumentNode node : markDownDocument.getDocumentStructure().flatten(true)) {
           String path = node.getPath();
-          if (ignore(path) && !context.getReferencedLocalResources().contains(path)) {
-            context.getReferencedLocalResources().add(path);
+          if (ignore(path) && !indexingContext.getReferencedLocalResources().contains(path)) {
+            indexingContext.getReferencedLocalResources().add(path);
             String body = node.getDescription().trim();
             String tokenized = body.replaceAll("\\W", " ").replaceAll("  ", "");
             if (!body.equals(tokenized))
@@ -271,8 +271,8 @@ public class Indexer {
           }
         }
 
-        updateReverseIndex(context.getIndirectReverseIndex(), true, markDownDocument);
-        updateReverseIndex(context.getDirectReverseIndex(), false, markDownDocument);
+        updateReverseIndex(indexingContext.getIndirectReverseIndex(), true, markDownDocument);
+        updateReverseIndex(indexingContext.getDirectReverseIndex(), false, markDownDocument);
 
         addToIndex(writer, "/" + resourcePath, TYPE_DOCUMENT, markDownDocument.getTitle(), markDownDocument.getMarkdown(), markDownDocument.getMetatags());
       } catch (Exception e) {
@@ -301,13 +301,13 @@ public class Indexer {
 
     if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
       // New index, so we just add the document (no old document can be there):
-      LOG.debug("Indexer for branch " + this.branch + " added " + resourcePath);
+      LOG.debug("Indexer for context " + this.context + " added " + resourcePath);
       writer.addDocument(document);
     } else {
       // Existing index (an old copy of this document may have been indexed) so
       // we use updateDocument instead to replace the old one matching the exact
       // path, if present:
-      LOG.debug("Indexer for branch " + this.branch + " updated " + resourcePath);
+      LOG.debug("Indexer for context " + this.context + " updated " + resourcePath);
       writer.updateDocument(new Term(INDEX_PATH, resourcePath), document);
     }
   }
@@ -365,12 +365,12 @@ public class Indexer {
     return !extensions.contains(pathName.substring(idx + 1).toLowerCase());
   }
 
-  public Map<String, List<String>> getReverseIndex(String branch, boolean indirect) throws BranchNotFoundException, ContentManagerException {
-    return CacheManager.getInstance(branch).getReverseIndex(indirect);
+  public Map<String, List<String>> getReverseIndex(String context, boolean indirect) throws ContextNotFoundException, ContentManagerException {
+    return CacheManager.getInstance(context).getReverseIndex(indirect);
   }
 
   public List<ProcessorError> getValidationErrors() throws IndexerException {
-    return CacheManager.getInstance(branch).getValidationErrors();
+    return CacheManager.getInstance(context).getValidationErrors();
   }
 
   class IndexingContext {

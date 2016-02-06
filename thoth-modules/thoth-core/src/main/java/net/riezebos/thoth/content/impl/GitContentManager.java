@@ -53,7 +53,7 @@ import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.Revision;
 import net.riezebos.thoth.content.versioncontrol.Revision.Action;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.util.PagedList;
 
@@ -78,15 +78,15 @@ public class GitContentManager extends ContentManagerBase {
       if (!file.isDirectory()) {
         severe(log, "The library path " + workspaceLocation + " does not exist. Cannot initialize content manager");
       } else {
-        for (String branch : config.getBranches()) {
+        for (String context : config.getContexts()) {
           try {
-            String branchFolder = getBranchFolder(branch);
-            File target = new File(branchFolder);
+            String contextFolder = getContextFolder(context);
+            File target = new File(contextFolder);
             CredentialsProvider credentialsProvider = getCredentialsProvider();
 
             if (target.isDirectory()) {
-              info(log, "\nRepository for branch " + branch + " found at " + branchFolder);
-              try (Git repos = getRepository(branch)) {
+              info(log, "\nRepository for context " + context + " found at " + contextFolder);
+              try (Git repos = getRepository(context)) {
 
                 Repository repository = repos.getRepository();
                 ObjectId oldHead = repository.resolve(HEAD_TREE);
@@ -97,23 +97,23 @@ public class GitContentManager extends ContentManagerBase {
 
                 if ((oldHead == null && newHead != null)//
                     || (oldHead != null && !oldHead.equals(newHead)))
-                  notifyBranchContentsChanged(branch);
+                  notifyContextContentsChanged(context);
 
-                setLatestRefresh(branch, new Date());
+                setLatestRefresh(context, new Date());
               } catch (Exception e) {
                 severe(log, e);
               }
             } else {
-              info(log, "Cloning from " + repositoryUrl + " to " + branchFolder);
+              info(log, "Cloning from " + repositoryUrl + " to " + contextFolder);
               target.mkdirs();
               try (Git result = Git.cloneRepository()//
                   .setURI(repositoryUrl)//
-                  .setBranch(branch)//
+                  .setBranch(context)//
                   .setCredentialsProvider(credentialsProvider)//
                   .setDirectory(target).call()) {
                 info(log, "Cloned repository: " + result.getRepository().getDirectory());
-                setLatestRefresh(branch, new Date());
-                notifyBranchContentsChanged(branch);
+                setLatestRefresh(context, new Date());
+                notifyContextContentsChanged(context);
               } catch (Exception e) {
                 severe(log, e);
               }
@@ -132,15 +132,15 @@ public class GitContentManager extends ContentManagerBase {
     return log.toString();
   }
 
-  protected Git getRepository(String branch) throws BranchNotFoundException, IOException {
-    String branchFolder = getBranchFolder(branch);
-    File target = new File(branchFolder);
+  protected Git getRepository(String context) throws ContextNotFoundException, IOException {
+    String contextFolder = getContextFolder(context);
+    File target = new File(contextFolder);
     return Git.open(target);
   }
 
-  public PagedList<Commit> getCommits(String branch, String path, int pageNumber, int pageSize) throws ContentManagerException {
+  public PagedList<Commit> getCommits(String context, String path, int pageNumber, int pageSize) throws ContentManagerException {
     path = ensureRelative(path);
-    try (Git repos = getRepository(branch)) {
+    try (Git repos = getRepository(context)) {
       Repository repository = repos.getRepository();
       List<Commit> commits = new ArrayList<>();
       LogCommand log = repos.log();
@@ -218,7 +218,7 @@ public class GitContentManager extends ContentManagerBase {
     return commit;
   }
 
-  public SourceDiff getDiff(String branch, String diffSpec) throws ContentManagerException {
+  public SourceDiff getDiff(String context, String diffSpec) throws ContentManagerException {
 
     int idx = diffSpec.indexOf('/');
     if (idx == -1)
@@ -232,7 +232,7 @@ public class GitContentManager extends ContentManagerBase {
 
     SourceDiff result = null;
 
-    try (Git git = getRepository(branch); RevWalk revWalk = new RevWalk(git.getRepository()); SimpleDiffFormatter df = new SimpleDiffFormatter()) {
+    try (Git git = getRepository(context); RevWalk revWalk = new RevWalk(git.getRepository()); SimpleDiffFormatter df = new SimpleDiffFormatter()) {
       Repository repository = git.getRepository();
 
       RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(id));

@@ -32,9 +32,9 @@ public class ValidationReportCommand extends RendererBase implements Command {
     return "validationreport";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      List<ProcessorError> errors = SearchFactory.getInstance().getIndexer(branch).getValidationErrors();
+      List<ProcessorError> errors = SearchFactory.getInstance().getIndexer(context).getValidationErrors();
 
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("errors", errors);
@@ -43,7 +43,7 @@ public class ValidationReportCommand extends RendererBase implements Command {
         executeJson(variables, outputStream);
       else {
         String validationTemplate = skin.getValidationTemplate();
-        renderTemplate(validationTemplate, branch, variables, outputStream);
+        renderTemplate(validationTemplate, context, variables, outputStream);
       }
 
       return RenderResult.OK;

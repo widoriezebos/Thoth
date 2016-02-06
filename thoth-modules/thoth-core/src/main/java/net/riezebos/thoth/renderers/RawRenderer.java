@@ -36,15 +36,15 @@ public class RawRenderer extends RendererBase implements Renderer {
     return "text/plain;charset=UTF-8";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       RenderResult result = RenderResult.OK;
 
-      String absolutePath = getFileSystemPath(branch, path);
+      String absolutePath = getFileSystemPath(context, path);
       if (absolutePath == null) {
         result = RenderResult.FORBIDDEN;
       } else {
-        MarkDownDocument markDownDocument = getMarkDownDocument(branch, path);
+        MarkDownDocument markDownDocument = getMarkDownDocument(context, path);
         String markdown = markDownDocument.getMarkdown();
         InputStream is = new ByteArrayInputStream(markdown.getBytes("UTF-8"));
         IOUtils.copy(is, outputStream);

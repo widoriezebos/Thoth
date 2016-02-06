@@ -40,17 +40,17 @@ public class MetaCommand extends RendererBase implements Command {
     return "meta";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
 
     try {
       RenderResult result = RenderResult.OK;
-      String absolutePath = getFileSystemPath(branch, path);
+      String absolutePath = getFileSystemPath(context, path);
       if (absolutePath == null) {
         result = RenderResult.FORBIDDEN;
       } else {
         ContentManager contentManager = getContentManager();
 
-        MarkDownDocument markDownDocument = getMarkDownDocument(branch, path);
+        MarkDownDocument markDownDocument = getMarkDownDocument(context, path);
 
         DocumentNode root = markDownDocument.getDocumentStructure();
         List<DocumentNode> documentNodes = root.flatten(true);
@@ -59,16 +59,16 @@ public class MetaCommand extends RendererBase implements Command {
         Map<String, List<Commit>> commitMap = new HashMap<>();
         List<Commit> commitList = new ArrayList<>();
         for (DocumentNode node : documentNodes) {
-          List<Commit> latestCommits = contentManager.getCommits(branch, node.getPath(), 1, pageSize).getList();
+          List<Commit> latestCommits = contentManager.getCommits(context, node.getPath(), 1, pageSize).getList();
           commitMap.put(node.getPath(), latestCommits);
           commitList.addAll(latestCommits);
         }
         Collections.sort(commitList, new CommitComparator());
 
         SearchFactory searchFactory = SearchFactory.getInstance();
-        Indexer indexer = searchFactory.getIndexer(branch);
-        Map<String, List<String>> reverseIndex = indexer.getReverseIndex(branch, false);
-        Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(branch, true);
+        Indexer indexer = searchFactory.getIndexer(context);
+        Map<String, List<String>> reverseIndex = indexer.getReverseIndex(context, false);
+        Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(context, true);
         List<String> usedBy = reverseIndex.get("/" + path);
         List<String> usedByIndirect = reverseIndexIndirect.get("/" + path);
         Map<String, String> metatags = markDownDocument.getMetatags();
@@ -90,7 +90,7 @@ public class MetaCommand extends RendererBase implements Command {
           executeJson(variables, outputStream);
         else {
           String metaInformationTemplate = skin.getMetaInformationTemplate();
-          renderTemplate(metaInformationTemplate, branch, variables, outputStream);
+          renderTemplate(metaInformationTemplate, context, variables, outputStream);
         }
       }
       return result;

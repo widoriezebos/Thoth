@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-<title>${branch} Documentation Index</title>
+<title>${context} Documentation Index</title>
 <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
 <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
 <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
@@ -16,7 +16,7 @@
       <td>${commit.author}</td>
       <td>     
 #foreach($revision in $commit.revisions)
-      ${revision.action} ${revision.path} (<a href="${branchurl}${revision.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
+      ${revision.action} ${revision.path} (<a href="${contexturl}${revision.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
 #end
       </td>
       <td>${commit.message}</td>

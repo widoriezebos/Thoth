@@ -32,7 +32,7 @@ import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinInheritance;
 import net.riezebos.thoth.content.skinning.SkinMapping;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.IndexerException;
 import net.riezebos.thoth.markdown.util.LineInfo;
@@ -52,33 +52,33 @@ public class CacheManager {
   private List<Skin> skins = new ArrayList<>();
   private Map<String, Map<String, List<String>>> reverseIndexes = new HashMap<>();
   private Map<String, List<ProcessorError>> errorMap = new HashMap<>();
-  private String branch;
+  private String context;
 
-  public CacheManager(String branch) {
-    this.branch = branch;
+  public CacheManager(String context) {
+    this.context = context;
   }
 
-  public static CacheManager getInstance(String branch) {
-    if (branch == null)
-      branch = GLOBAL_SITE;
+  public static CacheManager getInstance(String context) {
+    if (context == null)
+      context = GLOBAL_SITE;
     CacheManager cacheManager;
     synchronized (instances) {
-      cacheManager = instances.get(branch);
+      cacheManager = instances.get(context);
     }
     if (cacheManager == null) {
-      cacheManager = new CacheManager(branch);
+      cacheManager = new CacheManager(context);
       synchronized (instances) {
-        instances.put(branch, cacheManager);
+        instances.put(context, cacheManager);
       }
     }
     return cacheManager;
   }
 
-  public static void expire(String branch) {
-    if (branch == null)
-      branch = GLOBAL_SITE;
+  public static void expire(String context) {
+    if (context == null)
+      context = GLOBAL_SITE;
     synchronized (instances) {
-      instances.remove(branch);
+      instances.remove(context);
       // We do not know where the global site is getting it's data from so expire that one as well just to be safe
       instances.remove(GLOBAL_SITE);
     }
@@ -89,15 +89,15 @@ public class CacheManager {
   }
 
   /**
-   * Returns a 'used by' map for documents. Returns null when indexing has not yet completed (ever) for the given branch.
+   * Returns a 'used by' map for documents. Returns null when indexing has not yet completed (ever) for the given context.
    *
-   * @param branch
+   * @param context
    * @return
-   * @throws BranchNotFoundException
+   * @throws ContextNotFoundException
    * @throws ContentManagerException
    */
   @SuppressWarnings("unchecked")
-  public Map<String, List<String>> getReverseIndex(boolean indirect) throws BranchNotFoundException, ContentManagerException {
+  public Map<String, List<String>> getReverseIndex(boolean indirect) throws ContextNotFoundException, ContentManagerException {
     String key = getCacheKey(indirect);
     Map<String, List<String>> map;
 
@@ -107,8 +107,8 @@ public class CacheManager {
 
     try {
       if (map == null) {
-        String indexFileName = indirect ? getContentManager().getReverseIndexIndirectFileName(branch)//
-            : getContentManager().getReverseIndexFileName(branch);
+        String indexFileName = indirect ? getContentManager().getReverseIndexIndirectFileName(context)//
+            : getContentManager().getReverseIndexFileName(context);
 
         File reverseIndexFile = new File(indexFileName);
         if (reverseIndexFile.isFile()) {
@@ -121,7 +121,7 @@ public class CacheManager {
         }
       }
     } catch (IOException | ClassNotFoundException e) {
-      throw new IndexerException(branch);
+      throw new IndexerException(context);
     }
     return map;
   }
@@ -130,12 +130,12 @@ public class CacheManager {
   public List<ProcessorError> getValidationErrors() throws IndexerException {
     List<ProcessorError> errors;
     synchronized (errorMap) {
-      errors = errorMap.get(branch);
+      errors = errorMap.get(context);
     }
 
     try {
       if (errors == null) {
-        String errorFileName = getContentManager().getErrorFileName(branch);
+        String errorFileName = getContentManager().getErrorFileName(context);
 
         File errorFile = new File(errorFileName);
         if (errorFile.isFile()) {
@@ -153,8 +153,8 @@ public class CacheManager {
           }
         }
       }
-    } catch (IOException | BranchNotFoundException e) {
-      throw new IndexerException(branch + ": " + e.getMessage(), e);
+    } catch (IOException | ContextNotFoundException e) {
+      throw new IndexerException(context + ": " + e.getMessage(), e);
     }
     return errors;
   }
@@ -168,7 +168,7 @@ public class CacheManager {
   }
 
   protected String getCacheKey(boolean indirect) {
-    String key = indirect + branch;
+    String key = indirect + context;
     return key;
   }
 
@@ -181,7 +181,7 @@ public class CacheManager {
 
   public void cacheErrors(List<ProcessorError> errors) {
     synchronized (errorMap) {
-      errorMap.put(branch, errors);
+      errorMap.put(context, errors);
     }
   }
 

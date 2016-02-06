@@ -50,16 +50,16 @@ import net.riezebos.thoth.util.ThothCoreUtil;
 
 public class Searcher {
 
-  private String branch;
+  private String context;
 
-  protected Searcher(String branch) {
-    this.branch = branch;
+  protected Searcher(String context) {
+    this.context = context;
   }
 
   public PagedList<SearchResult> search(String queryExpression, int pageNumber, int pageSize) throws SearchException {
     try {
       ContentManager contentManager = ContentManagerFactory.getContentManager();
-      String indexFolder = contentManager.getIndexFolder(branch);
+      String indexFolder = contentManager.getIndexFolder(context);
       IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)));
       IndexSearcher searcher = new IndexSearcher(reader);
       Analyzer analyzer = new StandardAnalyzer();
@@ -90,7 +90,7 @@ public class Searcher {
 
           if (Indexer.TYPE_DOCUMENT.equals(document.get(Indexer.INDEX_TYPE))) {
             searchResult.setResource(false);
-            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(branch, documentPath);
+            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(context, documentPath);
             String contents = markDownDocument.getMarkdown();
 
             SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
@@ -125,8 +125,8 @@ public class Searcher {
   protected void linkBooks(List<SearchResult> searchResults) throws ContentManagerException {
 
     SearchFactory searchFactory = SearchFactory.getInstance();
-    Indexer indexer = searchFactory.getIndexer(branch);
-    Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(branch, true);
+    Indexer indexer = searchFactory.getIndexer(context);
+    Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(context, true);
 
     List<String> bookExtensions = Configuration.getInstance().getBookExtensions();
     for (SearchResult searchResult : searchResults) {

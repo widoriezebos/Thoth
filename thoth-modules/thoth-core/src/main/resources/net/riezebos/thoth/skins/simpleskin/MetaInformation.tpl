@@ -25,7 +25,7 @@ None
 #foreach($idx in [0..$documentNode.level])
 &nbsp;&nbsp;##
 #end
-<a href="$branchurl/${documentNode.path}">${documentNode.fileName}</a> (<a href="$branchurl/${documentNode.path}?cmd=meta">meta</a>)
+<a href="$contexturl/${documentNode.path}">${documentNode.fileName}</a> (<a href="$contexturl/${documentNode.path}?cmd=meta">meta</a>)
 #end
 </pre>	
 </documentstructure>		
@@ -35,7 +35,7 @@ None
 <errors>
 #foreach($error in $errors)
 #if(${error.fileRelated})
-${error.file}(<a href="$branchurl/${error.file}">${error.line}</a>): ##
+${error.file}(<a href="$contexturl/${error.file}">${error.line}</a>): ##
 #end
 <strong>${error.errorMessage}</strong><br>
 #end
@@ -45,7 +45,7 @@ ${error.file}(<a href="$branchurl/${error.file}">${error.line}</a>): ##
 <h3>Included by</h3>
 #if($usedBy)
 #foreach($documentPath in $usedBy)
-<a href="$branchurl/${documentPath}">${documentPath}</a> (<a href="$branchurl/${documentPath}?cmd=meta">meta</a>)<br/>
+<a href="$contexturl/${documentPath}">${documentPath}</a> (<a href="$contexturl/${documentPath}?cmd=meta">meta</a>)<br/>
 #end
 #else
 This document is not uncluded by any other document.
@@ -54,7 +54,7 @@ This document is not uncluded by any other document.
 #if($usedByIndirect)
 <h3>Included (indirectly) by</h3>
 #foreach($documentPath in $usedByIndirect)
-<a href="$branchurl/${documentPath}">${documentPath}</a> (<a href="$branchurl/${documentPath}?cmd=meta">meta</a>)<br/>
+<a href="$contexturl/${documentPath}">${documentPath}</a> (<a href="$contexturl/${documentPath}?cmd=meta">meta</a>)<br/>
 #end
 #end
 
@@ -68,7 +68,7 @@ This document is not uncluded by any other document.
       <td>${commit.author}</td>
       <td>     
 #foreach($revision in $commit.revisions)
-       ${revision.path} (<a href="$branchurl/${revision.fileName}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
+       ${revision.path} (<a href="$contexturl/${revision.fileName}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
 #end
       </td>
       <td>${commit.message}</td>
@@ -79,14 +79,14 @@ This document is not uncluded by any other document.
 <h3>Version history per fragment</h3>
 <table>
 #foreach($documentNode in $documentNodes)
-  <tr><th colspan="3"><a href="$branchurl/${documentNode.path}">${documentNode.fileName}</a></th></tr>
+  <tr><th colspan="3"><a href="$contexturl/${documentNode.path}">${documentNode.fileName}</a></th></tr>
 #set($commits = $commitMap.get(${documentNode.path}))
   <tr><th>Timestamp</th><th>Author</th><th>Comment</th></tr>
 #foreach($commit in $commits)
   <tr>
       <td>     
 #foreach($revision in $commit.revisions)
-      <a href="$branchurl/${documentNode.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">${commit.formattedTimestamp}</a>
+      <a href="$contexturl/${documentNode.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">${commit.formattedTimestamp}</a>
 #end
       </td>
       <td>${commit.author}</td>

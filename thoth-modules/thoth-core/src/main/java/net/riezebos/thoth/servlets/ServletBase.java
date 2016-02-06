@@ -40,7 +40,7 @@ import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.content.skinning.SkinMapping;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.util.ThothUtil;
@@ -67,8 +67,8 @@ public abstract class ServletBase extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try {
       handleRequest(request, response);
-    } catch (BranchNotFoundException e) {
-      LOG.info("404 on branch of " + request.getRequestURI());
+    } catch (ContextNotFoundException e) {
+      LOG.info("404 on context of " + request.getRequestURI());
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
     } catch (ContentManagerException | IOException e) {
       handleError(request, response, e);
@@ -84,16 +84,16 @@ public abstract class ServletBase extends HttpServlet {
   }
 
   protected MarkDownDocument getMarkdown(HttpServletRequest request)
-      throws BranchNotFoundException, FileNotFoundException, ContentManagerException, IOException, ServletException {
+      throws ContextNotFoundException, FileNotFoundException, ContentManagerException, IOException, ServletException {
     return getMarkdown(request, null);
   }
 
   protected MarkDownDocument getMarkdown(HttpServletRequest request, String suffix)
-      throws BranchNotFoundException, ContentManagerException, FileNotFoundException, IOException, ServletException {
+      throws ContextNotFoundException, ContentManagerException, FileNotFoundException, IOException, ServletException {
     String relativePath = ThothUtil.stripSuffix(getPath(request), suffix);
-    String branch = getBranch(request);
+    String context = getContext(request);
 
-    return getContentManager().getMarkDownDocument(branch, relativePath);
+    return getContentManager().getMarkDownDocument(context, relativePath);
   }
 
   /**
@@ -122,7 +122,7 @@ public abstract class ServletBase extends HttpServlet {
     String path = getRequestPath(request);
     path = ThothUtil.stripPrefix(path, "/");
 
-    // Branch only? Then path is empty
+    // Context only? Then path is empty
     if (path.indexOf("/") == -1)
       path = "";
     else
@@ -131,8 +131,8 @@ public abstract class ServletBase extends HttpServlet {
     return path;
   }
 
-  protected String getBranchUrl(HttpServletRequest request) {
-    return request.getContextPath() + "/" + getBranch(request);
+  protected String getContextUrl(HttpServletRequest request) {
+    return request.getContextPath() + "/" + getContext(request);
   }
 
   // Handle some differences between servlet mappings like '/' and '/*'
@@ -143,7 +143,7 @@ public abstract class ServletBase extends HttpServlet {
     return StringUtils.isBlank(pathInfo) ? servletPath : pathInfo;
   }
 
-  protected String getBranch(HttpServletRequest request) {
+  protected String getContext(HttpServletRequest request) {
     String path = getRequestPath(request);
     path = ThothUtil.stripPrefix(path, "/");
     path = ThothUtil.getPartBeforeFirst(path, "/");
@@ -169,16 +169,16 @@ public abstract class ServletBase extends HttpServlet {
       Skin skin = null;
       Configuration configuration = Configuration.getInstance();
 
-      String branch = getBranch(request);
-      if (StringUtils.isBlank(branch)) {
-        branch = configuration.getGlobalSkinBranch();
+      String context = getContext(request);
+      if (StringUtils.isBlank(context)) {
+        context = configuration.getGlobalSkinContext();
       }
 
-      CacheManager cacheManager = CacheManager.getInstance(branch);
+      CacheManager cacheManager = CacheManager.getInstance(context);
       List<SkinMapping> skinMappings = cacheManager.getSkinMappings();
       if (skinMappings == null) {
         SkinManager skinManager = new SkinManager();
-        skinMappings = skinManager.setupSkins(configuration, branch, cacheManager);
+        skinMappings = skinManager.setupSkins(configuration, context, cacheManager);
         defaultSkin = skinManager.getDefaultSkin();
       }
 
@@ -217,7 +217,7 @@ public abstract class ServletBase extends HttpServlet {
       result.put(key, request.getParameter(key));
     }
 
-    String branch = getBranch(request);
+    String context = getContext(request);
     Skin skin = getSkin(request);
     String skinBase;
     String baseUrl = skin.getBaseUrl();
@@ -229,9 +229,9 @@ public abstract class ServletBase extends HttpServlet {
 
     String path = getPath(request);
     path = prefixWithSlash(path);
-    result.put(Renderer.BRANCH_PARAMETER, branch);
+    result.put(Renderer.BRANCH_PARAMETER, context);
     result.put(Renderer.SKINBASE_PARAMETER, skinBase);
-    result.put(Renderer.BRANCHURL_PARAMETER, getBranchUrl(request));
+    result.put(Renderer.BRANCHURL_PARAMETER, getContextUrl(request));
     result.put(Renderer.CONTEXTPATH_PARAMETER, request.getContextPath());
     result.put(Renderer.PATH_PARAMETER, path);
     result.put(Renderer.TITLE_PARAMETER, getTitle(request));
@@ -265,14 +265,14 @@ public abstract class ServletBase extends HttpServlet {
     return result;
   }
 
-  protected String getBranchNoFail(HttpServletRequest request) {
-    String branch;
+  protected String getContextNoFail(HttpServletRequest request) {
+    String context;
     try {
-      branch = getBranch(request);
+      context = getContext(request);
     } catch (Exception e2) {
-      branch = null;
+      context = null;
     }
-    return branch;
+    return context;
   }
 
   protected String getPathNoFail(HttpServletRequest request) {

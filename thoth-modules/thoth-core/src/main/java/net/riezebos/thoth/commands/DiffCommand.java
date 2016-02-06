@@ -37,10 +37,10 @@ public class DiffCommand extends RendererBase implements Command {
     return "diff";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       RenderResult result = RenderResult.OK;
-      String absolutePath = getFileSystemPath(branch, path);
+      String absolutePath = getFileSystemPath(context, path);
       if (absolutePath == null) {
         result = RenderResult.FORBIDDEN;
       } else {
@@ -48,7 +48,7 @@ public class DiffCommand extends RendererBase implements Command {
         Configuration configuration = Configuration.getInstance();
         SimpleDateFormat dateFormat = configuration.getDateFormat();
         String commitId = getString(arguments, "commitId");
-        SourceDiff diff = contentManager.getDiff(branch, commitId);
+        SourceDiff diff = contentManager.getDiff(context, commitId);
         String body = "Diff not found";
         String timestamp = "00-00-0000 00:00:00";
         String commitMessage = "Commit not found";
@@ -82,7 +82,7 @@ public class DiffCommand extends RendererBase implements Command {
         if (asJson)
           executeJson(variables, outputStream);
         else {
-          renderTemplate(skin.getDiffTemplate(), branch, variables, outputStream);
+          renderTemplate(skin.getDiffTemplate(), context, variables, outputStream);
         }
       }
       return result;

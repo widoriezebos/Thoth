@@ -30,17 +30,17 @@ public class IndexCommand extends RendererBase implements Command {
     return "index";
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      List<String> branches = getContentManager().getBranches();
+      List<String> contexts = getContentManager().getContexts();
       Map<String, Object> variables = new HashMap<>(arguments);
-      variables.put("branches", branches);
+      variables.put("contexts", contexts);
 
       if (asJson(arguments))
         executeJson(variables, outputStream);
       else {
         String indexTemplate = skin.getIndexTemplate();
-        renderTemplate(indexTemplate, branches.get(0), variables, outputStream);
+        renderTemplate(indexTemplate, contexts.get(0), variables, outputStream);
       }
 
       return RenderResult.OK;

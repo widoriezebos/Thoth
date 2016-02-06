@@ -73,16 +73,16 @@ public class CustomRenderer extends RendererBase implements Renderer {
     this.commandLine = commandLine;
   }
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       RenderResult result = RenderResult.OK;
 
-      String absolutePath = getFileSystemPath(branch, path);
+      String absolutePath = getFileSystemPath(context, path);
       if (absolutePath == null) {
         result = RenderResult.FORBIDDEN;
       } else {
         Configuration configuration = Configuration.getInstance();
-        String url = (configuration.getLocalHostUrl() + branch + "/" + path).replaceAll(" ", "%20");
+        String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
 
         File tempFile = File.createTempFile("thothtemp", "." + typeCode);
 

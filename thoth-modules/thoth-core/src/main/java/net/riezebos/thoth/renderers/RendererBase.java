@@ -36,8 +36,8 @@ import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
-import net.riezebos.thoth.exceptions.BranchNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.util.ThothCoreUtil;
 
@@ -51,16 +51,16 @@ public abstract class RendererBase implements Renderer {
     return asJson(arguments) ? "application/json;charset=UTF-8" : "text/html;charset=UTF-8";
   }
 
-  protected MarkDownDocument getMarkDownDocument(String branch, String path) throws IOException, ContentManagerException {
-    return getContentManager().getMarkDownDocument(branch, path);
+  protected MarkDownDocument getMarkDownDocument(String context, String path) throws IOException, ContentManagerException {
+    return getContentManager().getMarkDownDocument(context, path);
   }
 
   protected ContentManager getContentManager() throws ContentManagerException {
     return ContentManagerFactory.getContentManager();
   }
 
-  protected String getFileSystemPath(String branch, String path) throws BranchNotFoundException, IOException, ContentManagerException {
-    return getContentManager().getFileSystemPath(branch, path);
+  protected String getFileSystemPath(String context, String path) throws ContextNotFoundException, IOException, ContentManagerException {
+    return getContentManager().getFileSystemPath(context, path);
   }
 
   protected String getString(Map<String, Object> arguments, String key) {
@@ -94,17 +94,17 @@ public abstract class RendererBase implements Renderer {
     }
   }
 
-  protected void renderTemplate(String template, String branch, Map<String, Object> variables, OutputStream outputStream)
+  protected void renderTemplate(String template, String context, Map<String, Object> variables, OutputStream outputStream)
       throws ContentManagerException, IOException, UnsupportedEncodingException {
 
     try (PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8")), true)) {
-      VelocityContext context = new VelocityContext(variables);
-      context.put(VELOCITY_HELPER, new ThothCoreUtil());
+      VelocityContext velocityContext = new VelocityContext(variables);
+      velocityContext.put(VELOCITY_HELPER, new ThothCoreUtil());
       VelocityEngine engine = new VelocityEngine();
       Properties properties = new Properties();
       properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(VELOCITY_PROPERTIES));
       engine.init(properties);
-      engine.getTemplate(template).merge(context, writer);
+      engine.getTemplate(template).merge(velocityContext, writer);
     } catch (Exception e) {
       throw new RenderException(e);
     }

@@ -23,8 +23,8 @@ import net.riezebos.thoth.exceptions.RenderException;
 public interface Renderer {
 
   String CONTEXTPATH_PARAMETER = "contextpath";
-  String BRANCHURL_PARAMETER = "branchurl";
-  String BRANCH_PARAMETER = "branch";
+  String BRANCHURL_PARAMETER = "contexturl";
+  String BRANCH_PARAMETER = "context";
   String PATH_PARAMETER = "path";
   String TITLE_PARAMETER = "title";
   String BODY_PARAMETER = "body";
@@ -39,5 +39,5 @@ public interface Renderer {
 
   public String getContentType(Map<String, Object> arguments);
 
-  public RenderResult execute(String branch, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException;
+  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException;
 }
