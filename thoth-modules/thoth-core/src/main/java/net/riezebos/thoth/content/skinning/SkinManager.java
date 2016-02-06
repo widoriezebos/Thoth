@@ -31,11 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.CacheManager;
-import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.ContentNode;
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManagerFactory;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class SkinManager {
@@ -53,7 +54,7 @@ public class SkinManager {
     registerLocalSkins(context);
     skinMappings = new ArrayList<>();
 
-    String contextFolder = ContentManagerFactory.getContentManager().getContextFolder(context);
+    String contextFolder = ContentManagerFactory.getContentManager(context).getContextFolder();
     String skinMappingFileName = contextFolder + SKINS_PROPERTIES;
     File skinMappingFile = new File(skinMappingFileName);
     if (!skinMappingFile.isFile()) {
@@ -98,7 +99,7 @@ public class SkinManager {
 
   protected void registerLocalSkins(String context) throws ContextNotFoundException, IOException, ContentManagerException {
     List<String> skinDescriptors = new ArrayList<>();
-    for (ContentNode node : ContentManagerFactory.getContentManager().find(context, "skin.properties", true))
+    for (ContentNode node : ContentManagerFactory.getContentManager(context).find("skin.properties", true))
       skinDescriptors.add(node.getPath());
 
     CacheManager cacheManager = CacheManager.getInstance(context);
@@ -126,7 +127,7 @@ public class SkinManager {
     }
     CacheManager cacheManager = CacheManager.getInstance(context);
     Skin fallbackSkin = createSkins(cacheManager, context, skinDescriptors, true);
-    String defaultSkinName = Configuration.getInstance().getDefaultSkin();
+    String defaultSkinName = ConfigurationFactory.getConfiguration().getDefaultSkin();
     Skin defaultSkin = cacheManager.getSkinByName(defaultSkinName);
     if (defaultSkin == null) {
       LOG.error("Default skin named '" + defaultSkinName + "' not found. Falling back on first available which is " + fallbackSkin);
@@ -187,7 +188,7 @@ public class SkinManager {
       if (inheritedPath.startsWith(Configuration.CLASSPATH_PREFIX))
         result = inheritedPath;
       else
-        result = ContentManagerFactory.getContentManager().getFileSystemPath(context, inheritedPath);
+        result = ContentManagerFactory.getContentManager(context).getFileSystemPath(inheritedPath);
     return result;
   }
 

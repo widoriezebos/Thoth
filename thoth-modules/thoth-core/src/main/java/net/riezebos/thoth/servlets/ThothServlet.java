@@ -36,10 +36,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.Configuration;
-import net.riezebos.thoth.commands.ContextIndexCommand;
 import net.riezebos.thoth.commands.BrowseCommand;
 import net.riezebos.thoth.commands.Command;
+import net.riezebos.thoth.commands.ContextIndexCommand;
 import net.riezebos.thoth.commands.DiffCommand;
 import net.riezebos.thoth.commands.ErrorPageCommand;
 import net.riezebos.thoth.commands.IndexCommand;
@@ -49,10 +48,12 @@ import net.riezebos.thoth.commands.ReindexCommand;
 import net.riezebos.thoth.commands.RevisionsCommand;
 import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.CustomRenderer;
 import net.riezebos.thoth.renderers.HtmlRenderer;
@@ -81,7 +82,7 @@ public class ThothServlet extends ServletBase {
     super.init();
     setupCommands();
     setupRenderers();
-    List<String> documentExtensions = Configuration.getInstance().getDocumentExtensions();
+    List<String> documentExtensions = ConfigurationFactory.getConfiguration().getDocumentExtensions();
     renderedExtensions.addAll(documentExtensions);
   }
 
@@ -159,7 +160,7 @@ public class ThothServlet extends ServletBase {
     registerRenderer(new RawRenderer());
 
     // Setup any custom renderers
-    List<CustomRendererDefinition> customRendererDefinitions = Configuration.getInstance().getCustomRenderers();
+    List<CustomRendererDefinition> customRendererDefinitions = ConfigurationFactory.getConfiguration().getCustomRenderers();
     for (CustomRendererDefinition customRendererDefinition : customRendererDefinitions) {
       CustomRenderer renderer = new CustomRenderer(customRendererDefinition);
       renderer.setTypeCode(customRendererDefinition.getExtension());
@@ -248,11 +249,11 @@ public class ThothServlet extends ServletBase {
 
   protected void streamResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException {
     long ms = System.currentTimeMillis();
-    ContentManager contentManager = getContentManager();
 
     String path = getPath(request);
     String context = getContext(request);
-    String absolutePath = contentManager.getFileSystemPath(context, path);
+    ContentManager contentManager = getContentManager(context);
+    String absolutePath = contentManager.getFileSystemPath(path);
 
     if (absolutePath == null) {
       LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");

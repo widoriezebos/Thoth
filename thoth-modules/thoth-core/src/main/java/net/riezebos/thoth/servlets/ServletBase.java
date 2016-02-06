@@ -16,8 +16,6 @@ package net.riezebos.thoth.servlets;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -33,8 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.CacheManager;
-import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
@@ -55,13 +54,6 @@ public abstract class ServletBase extends HttpServlet {
   protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
 
   public ServletBase() {
-    Configuration.getInstance().validate();
-  }
-
-  @Override
-  public void init() throws ServletException {
-    super.init();
-    getContentManager();
   }
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -93,7 +85,7 @@ public abstract class ServletBase extends HttpServlet {
     String relativePath = ThothUtil.stripSuffix(getPath(request), suffix);
     String context = getContext(request);
 
-    return getContentManager().getMarkDownDocument(context, relativePath);
+    return getContentManager(context).getMarkDownDocument(relativePath);
   }
 
   /**
@@ -102,9 +94,9 @@ public abstract class ServletBase extends HttpServlet {
    * @return
    * @throws ServletException
    */
-  protected ContentManager getContentManager() throws ServletException {
+  protected ContentManager getContentManager(String context) throws ServletException {
     try {
-      return ContentManagerFactory.getContentManager();
+      return ContentManagerFactory.getContentManager(context);
     } catch (ContentManagerException e) {
       throw new ServletException(e);
     }
@@ -156,24 +148,17 @@ public abstract class ServletBase extends HttpServlet {
     return path;
   }
 
-  protected String getRefreshTimestamp(ContentManager contentManager) throws ServletException {
-    Configuration configuration = Configuration.getInstance();
-    SimpleDateFormat dateFormat = configuration.getDateFormat();
-    Date latestRefresh = getContentManager().getLatestRefresh(null);
-    String refresh = latestRefresh == null ? "Never" : dateFormat.format(contentManager.getLatestRefresh(null));
-    return refresh;
-  }
-
   public Skin getSkin(HttpServletRequest request) throws ServletException {
     try {
       Skin skin = null;
-      Configuration configuration = Configuration.getInstance();
+      Configuration configuration = ConfigurationFactory.getConfiguration();
 
       String context = getContext(request);
       if (StringUtils.isBlank(context)) {
         context = configuration.getGlobalSkinContext();
       }
-
+      if (context == null)
+        throw new ServletException("No contexts defined. Please setup Thoth.");
       CacheManager cacheManager = CacheManager.getInstance(context);
       List<SkinMapping> skinMappings = cacheManager.getSkinMappings();
       if (skinMappings == null) {
@@ -217,7 +202,7 @@ public abstract class ServletBase extends HttpServlet {
       result.put(key, request.getParameter(key));
     }
 
-    String context = getContext(request);
+    String contextName = getContext(request);
     Skin skin = getSkin(request);
     String skinBase;
     String baseUrl = skin.getBaseUrl();
@@ -229,14 +214,23 @@ public abstract class ServletBase extends HttpServlet {
 
     String path = getPath(request);
     path = prefixWithSlash(path);
-    result.put(Renderer.BRANCH_PARAMETER, context);
+    result.put(Renderer.CONTEXT_PARAMETER, contextName);
     result.put(Renderer.SKINBASE_PARAMETER, skinBase);
-    result.put(Renderer.BRANCHURL_PARAMETER, getContextUrl(request));
+    result.put(Renderer.CONTEXTURL_PARAMETER, getContextUrl(request));
     result.put(Renderer.CONTEXTPATH_PARAMETER, request.getContextPath());
     result.put(Renderer.PATH_PARAMETER, path);
     result.put(Renderer.TITLE_PARAMETER, getTitle(request));
-    result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(getContentManager()));
+    result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(contextName));
     return result;
+  }
+
+  private String getRefreshTimestamp(String contextName) {
+    try {
+      return ContentManagerFactory.getRefreshTimestamp(contextName);
+    } catch (ContentManagerException e) {
+      LOG.error(e.getMessage(), e);
+      return "Unknown";
+    }
   }
 
   protected SkinManager getSkinManager() {

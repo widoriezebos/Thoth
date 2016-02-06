@@ -60,11 +60,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.CacheManager;
-import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.IndexerException;
@@ -86,7 +85,6 @@ public class Indexer {
   private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
   private String indexPath;
-  private String context;
   private Path docDir;
   private boolean recreate = true;
   private ContentManager contentManager;
@@ -99,37 +97,37 @@ public class Indexer {
     System.out.println("Done");
   }
 
-  protected Indexer(ContentManager contentManager, String context) throws ContextNotFoundException, ContentManagerException {
+  protected Indexer(ContentManager contentManager) throws ContextNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
-    this.context = context;
-    this.indexPath = contentManager.getIndexFolder(context);
-    this.docDir = Paths.get(contentManager.getContextFolder(context));
-    this.setIndexExtensions(Configuration.getInstance().getIndexExtensions());
+    this.indexPath = contentManager.getIndexFolder();
+    this.docDir = Paths.get(contentManager.getContextFolder());
+    this.setIndexExtensions(ConfigurationFactory.getConfiguration().getIndexExtensions());
   }
 
   public void index() throws ContentManagerException {
 
+    String context = contentManager.getContext();
     synchronized (activeIndexers) {
-      if (activeIndexers.contains(this.context)) {
-        LOG.warn("Indexer for context " + this.context + " is already (still?) active. Not starting a new index operation");
+      if (activeIndexers.contains(context)) {
+        LOG.warn("Indexer for context " + context + " is already (still?) active. Not starting a new index operation");
         return;
       }
-      activeIndexers.add(this.context);
+      activeIndexers.add(context);
     }
 
     try {
       Date start = new Date();
-      LOG.info("Indexing " + this.context + " to directory '" + indexPath + "'...");
+      LOG.info("Indexing " + context + " to directory '" + indexPath + "'...");
 
       IndexWriter writer = getWriter(recreate);
-      IndexingContext context = new IndexingContext();
-      indexDocs(writer, docDir, context);
+      IndexingContext indexingContext = new IndexingContext();
+      indexDocs(writer, docDir, indexingContext);
 
-      sortIndexLists(context.getIndirectReverseIndex());
-      sortIndexLists(context.getDirectReverseIndex());
-      Collections.sort(context.getErrors());
+      sortIndexLists(indexingContext.getIndirectReverseIndex());
+      sortIndexLists(indexingContext.getDirectReverseIndex());
+      Collections.sort(indexingContext.getErrors());
 
-      cacheResults(context);
+      cacheResults(indexingContext);
 
       // NOTE: if you want to maximize search performance,
       // you can optionally call forceMerge here. This can be
@@ -141,15 +139,15 @@ public class Indexer {
 
       writer.close();
 
-      markUnusedDocuments(context.getDirectReverseIndex());
+      markUnusedDocuments(indexingContext.getDirectReverseIndex());
 
       Date end = new Date();
-      LOG.info("Indexing context " + this.context + " took " + (end.getTime() - start.getTime()) + " milliseconds");
+      LOG.info("Indexing context " + context + " took " + (end.getTime() - start.getTime()) + " milliseconds");
     } catch (IOException e) {
       throw new ContentManagerException(e);
     } finally {
       synchronized (activeIndexers) {
-        activeIndexers.remove(this.context);
+        activeIndexers.remove(context);
       }
     }
   }
@@ -171,11 +169,11 @@ public class Indexer {
 
   protected void markUnusedDocuments(Map<String, List<String>> directReverseIndex) throws IOException, ContentManagerException {
 
-    String indexFolder = contentManager.getIndexFolder(context);
+    String indexFolder = contentManager.getIndexFolder();
 
     try (IndexWriter writer = getWriter(false); IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)))) {
       IndexSearcher searcher = new IndexSearcher(reader);
-      for (ContentNode node : ContentManagerFactory.getContentManager().getUnusedFragments(context)) {
+      for (ContentNode node : contentManager.getUnusedFragments()) {
         TermQuery query = new TermQuery(new Term(Indexer.INDEX_PATH, node.getPath()));
 
         TopDocs results = searcher.search(query, 10, Sort.RELEVANCE);
@@ -191,9 +189,9 @@ public class Indexer {
   }
 
   protected void cacheResults(IndexingContext indexingContext) throws ContextNotFoundException, IOException, FileNotFoundException {
-    String reverseIndexFile = contentManager.getReverseIndexFileName(context);
-    String indirectReverseIndexFile = contentManager.getReverseIndexIndirectFileName(context);
-    String errorFile = contentManager.getErrorFileName(context);
+    String reverseIndexFile = contentManager.getReverseIndexFileName();
+    String indirectReverseIndexFile = contentManager.getReverseIndexIndirectFileName();
+    String errorFile = contentManager.getErrorFileName();
 
     synchronized (CacheManager.getFileLock()) {
       try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(reverseIndexFile)))) {
@@ -207,7 +205,7 @@ public class Indexer {
       }
     }
 
-    CacheManager cacheManager = CacheManager.getInstance(context);
+    CacheManager cacheManager = CacheManager.getInstance(contentManager.getContext());
     cacheManager.cacheReverseIndex(true, indexingContext.getIndirectReverseIndex());
     cacheManager.cacheReverseIndex(false, indexingContext.getDirectReverseIndex());
     cacheManager.cacheErrors(indexingContext.getErrors());
@@ -255,7 +253,7 @@ public class Indexer {
 
       try {
         String resourcePath = relativePath.toString();
-        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(context, resourcePath);
+        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(resourcePath);
         indexingContext.getErrors().addAll(markDownDocument.getErrors());
 
         // Also index non-documents if referenced and stored locally
@@ -301,13 +299,13 @@ public class Indexer {
 
     if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
       // New index, so we just add the document (no old document can be there):
-      LOG.debug("Indexer for context " + this.context + " added " + resourcePath);
+      LOG.debug("Indexer for context " + contentManager.getContext() + " added " + resourcePath);
       writer.addDocument(document);
     } else {
       // Existing index (an old copy of this document may have been indexed) so
       // we use updateDocument instead to replace the old one matching the exact
       // path, if present:
-      LOG.debug("Indexer for context " + this.context + " updated " + resourcePath);
+      LOG.debug("Indexer for context " + contentManager.getContext() + " updated " + resourcePath);
       writer.updateDocument(new Term(INDEX_PATH, resourcePath), document);
     }
   }
@@ -370,7 +368,7 @@ public class Indexer {
   }
 
   public List<ProcessorError> getValidationErrors() throws IndexerException {
-    return CacheManager.getInstance(context).getValidationErrors();
+    return CacheManager.getInstance(contentManager.getContext()).getValidationErrors();
   }
 
   class IndexingContext {

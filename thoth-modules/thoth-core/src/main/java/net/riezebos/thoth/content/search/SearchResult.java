@@ -17,7 +17,7 @@ package net.riezebos.thoth.content.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -68,7 +68,7 @@ public class SearchResult {
 
   public boolean isImage() {
     String extension = ThothUtil.getExtension(document);
-    return Configuration.getInstance().isImageExtension(extension);
+    return ConfigurationFactory.getConfiguration().isImageExtension(extension);
   }
 
   public void setIndexNumber(int indexNumber) {

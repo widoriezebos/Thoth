@@ -32,8 +32,8 @@ import org.apache.velocity.app.VelocityEngine;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -52,15 +52,15 @@ public abstract class RendererBase implements Renderer {
   }
 
   protected MarkDownDocument getMarkDownDocument(String context, String path) throws IOException, ContentManagerException {
-    return getContentManager().getMarkDownDocument(context, path);
+    return getContentManager(context).getMarkDownDocument(path);
   }
 
-  protected ContentManager getContentManager() throws ContentManagerException {
-    return ContentManagerFactory.getContentManager();
+  protected ContentManager getContentManager(String context) throws ContentManagerException {
+    return ContentManagerFactory.getContentManager(context);
   }
 
   protected String getFileSystemPath(String context, String path) throws ContextNotFoundException, IOException, ContentManagerException {
-    return getContentManager().getFileSystemPath(context, path);
+    return getContentManager(context).getFileSystemPath(path);
   }
 
   protected String getString(Map<String, Object> arguments, String key) {
@@ -85,7 +85,7 @@ public abstract class RendererBase implements Renderer {
 
   protected void executeJson(Map<String, Object> variables, OutputStream outputStream) throws ServletException {
     try {
-      boolean prettyPrintJson = Configuration.getInstance().isPrettyPrintJson();
+      boolean prettyPrintJson = ConfigurationFactory.getConfiguration().isPrettyPrintJson();
       ObjectMapper mapper = new ObjectMapper();
       ObjectWriter writer = prettyPrintJson ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
       writer.writeValue(outputStream, variables);

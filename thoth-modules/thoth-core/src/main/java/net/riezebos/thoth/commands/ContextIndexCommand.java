@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -38,12 +38,12 @@ public class ContextIndexCommand extends RendererBase implements Command {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      ContentManager contentManager = getContentManager();
+      ContentManager contentManager = getContentManager(context);
       Classifier classifier = new Classifier();
 
-      List<Book> books = contentManager.getBooks(context);
+      List<Book> books = contentManager.getBooks();
 
-      Set<String> classificationNames = Configuration.getInstance().getContextIndexClassifications();
+      Set<String> classificationNames = ConfigurationFactory.getConfiguration().getContextIndexClassifications();
       classificationNames.add("folder");
 
       // The order is important: to not allow a name clash to overwrite built in variables

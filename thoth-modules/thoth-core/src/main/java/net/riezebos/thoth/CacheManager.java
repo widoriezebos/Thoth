@@ -55,7 +55,7 @@ public class CacheManager {
   private String context;
 
   public CacheManager(String context) {
-    this.context = context;
+    this.setContext(context);
   }
 
   public static CacheManager getInstance(String context) {
@@ -107,8 +107,8 @@ public class CacheManager {
 
     try {
       if (map == null) {
-        String indexFileName = indirect ? getContentManager().getReverseIndexIndirectFileName(context)//
-            : getContentManager().getReverseIndexFileName(context);
+        String indexFileName = indirect ? getContentManager(getContext()).getReverseIndexIndirectFileName()//
+            : getContentManager(getContext()).getReverseIndexFileName();
 
         File reverseIndexFile = new File(indexFileName);
         if (reverseIndexFile.isFile()) {
@@ -121,7 +121,7 @@ public class CacheManager {
         }
       }
     } catch (IOException | ClassNotFoundException e) {
-      throw new IndexerException(context);
+      throw new IndexerException(getContext());
     }
     return map;
   }
@@ -130,12 +130,12 @@ public class CacheManager {
   public List<ProcessorError> getValidationErrors() throws IndexerException {
     List<ProcessorError> errors;
     synchronized (errorMap) {
-      errors = errorMap.get(context);
+      errors = errorMap.get(getContext());
     }
 
     try {
       if (errors == null) {
-        String errorFileName = getContentManager().getErrorFileName(context);
+        String errorFileName = getContentManager(getContext()).getErrorFileName();
 
         File errorFile = new File(errorFileName);
         if (errorFile.isFile()) {
@@ -154,21 +154,21 @@ public class CacheManager {
         }
       }
     } catch (IOException | ContextNotFoundException e) {
-      throw new IndexerException(context + ": " + e.getMessage(), e);
+      throw new IndexerException(getContext() + ": " + e.getMessage(), e);
     }
     return errors;
   }
 
-  public ContentManager getContentManager() throws IndexerException {
+  public ContentManager getContentManager(String context) throws IndexerException {
     try {
-      return ContentManagerFactory.getContentManager();
+      return ContentManagerFactory.getContentManager(context);
     } catch (ContentManagerException e) {
       throw new IndexerException(e);
     }
   }
 
   protected String getCacheKey(boolean indirect) {
-    String key = indirect + context;
+    String key = indirect + getContext();
     return key;
   }
 
@@ -181,7 +181,7 @@ public class CacheManager {
 
   public void cacheErrors(List<ProcessorError> errors) {
     synchronized (errorMap) {
-      errorMap.put(context, errors);
+      errorMap.put(getContext(), errors);
     }
   }
 
@@ -234,5 +234,13 @@ public class CacheManager {
       if (path.startsWith(entry.getKey()))
         return entry.getValue();
     return null;
+  }
+
+  private String getContext() {
+    return context;
+  }
+
+  private void setContext(String context) {
+    this.context = context;
   }
 }

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth;
+package net.riezebos.thoth.configuration;
 
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -28,66 +28,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
-import net.riezebos.thoth.util.ConfigurationBase;
 import net.riezebos.thoth.util.ThothUtil;
 
-public class Configuration extends ConfigurationBase {
+public class PropertyBasedConfiguration extends ConfigurationBase implements Configuration {
 
   private static final String DEFAULT_DATE_FMT = "dd-MM-yyyy HH:mm:ss";
-
-  private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PropertyBasedConfiguration.class);
   private static final String WORKSPACELOCATION_DEPRECATED = "libraryroot";
-  public static final String CONFIGKEY_DEPRECATED = "configuration";
 
-  public static final String BUILT_PROPERTIES = "net/riezebos/thoth/default.configuration.properties";
-  public static final String CONFIGKEY = "thoth_configuration";
-  public static final String WORKSPACELOCATION = "workspacelocation";
-  public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
-  public static final String CLASSPATH_PREFIX = "classpath:";
-  public static final String SKIN_PROPERTIES = "skin.properties";
-
-  private static Configuration _instance;
   private String workspaceLocation;
   private Integer markdownOptions;
   private Set<String> imageExtensions = new HashSet<>();
   private Set<String> _fragmentExtensions = null;
   private Set<String> _bookExtensions = null;
 
-  public static Configuration getInstance() {
-    if (_instance == null) {
-      String propertyPath = determinePropertyPath();
-      if (propertyPath == null) {
-        String msg = "There is no configuration defined. Please set either environment or system property '" + CONFIGKEY + "' and restart";
-        LOG.error(msg);
-        throw new IllegalArgumentException(msg);
-      } else {
-        LOG.info("Using " + propertyPath + " for configuration");
-        _instance = new Configuration(propertyPath);
-      }
-    }
-    return _instance;
-  }
-
-  public static String determinePropertyPath() {
-    String propertyPath = System.getProperty(CONFIGKEY);
-    if (propertyPath == null)
-      propertyPath = System.getenv(CONFIGKEY);
-    if (propertyPath == null)
-      propertyPath = System.getProperty(CONFIGKEY_DEPRECATED);
-    if (propertyPath == null)
-      propertyPath = System.getenv(CONFIGKEY_DEPRECATED);
-    return propertyPath;
-  }
-
-  private Configuration(String propertyPath) {
+  protected PropertyBasedConfiguration(String propertyPath) throws ConfigurationException {
     loadDefaults();
     load(propertyPath);
     String extensionSpec = getImageExtensions();
     for (String ext : extensionSpec.split(extensionSpec))
       imageExtensions.add(ext.trim().toLowerCase());
+    loadRepositoryDefinitions();
+    loadContextDefinitions();
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getImageExtensions()
+   */
+  @Override
   public String getImageExtensions() {
     return getValue("images.extensions", "png,jpeg,jpg,gif,tiff,bmp");
   }
@@ -101,6 +72,11 @@ public class Configuration extends ConfigurationBase {
       load(is);
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getWorkspaceLocation()
+   */
+  @Override
   public String getWorkspaceLocation() {
     if (this.workspaceLocation == null) {
       String deprecated = getValue(WORKSPACELOCATION_DEPRECATED, null);
@@ -115,28 +91,39 @@ public class Configuration extends ConfigurationBase {
     return this.workspaceLocation;
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getParseTimeOut()
+   */
+  @Override
   public long getParseTimeOut() {
     return Long.parseLong(getValue("parsetimeout", "4000"));
   }
 
-  public List<String> getContexts() {
-    List<String> result = new ArrayList<>();
-    for (String context : getValue("contexts", "").split("\\,"))
-      if (StringUtils.isNotBlank(context))
-        result.add(context.trim());
-    Collections.sort(result);
-    return result;
-  }
-
-  public void validate() {
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#validate()
+   */
+  @Override
+  public void validate() throws ConfigurationException {
     if (getWorkspaceLocation() == null)
       LOG.error("There is no library root defined in the configuration. " + this.getClass().getSimpleName() + "  will not be able to function");
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getBookExtensions()
+   */
+  @Override
   public List<String> getBookExtensions() {
     return getValueAsSet("books", "marked,book,index");
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getDocumentExtensions()
+   */
+  @Override
   public List<String> getDocumentExtensions() {
     return getValueAsSet("documents", "marked,book,index,md");
   }
@@ -150,6 +137,11 @@ public class Configuration extends ConfigurationBase {
     return result;
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getMarkdownOptions()
+   */
+  @Override
   public int getMarkdownOptions() {
     if (this.markdownOptions == null) {
       int result = 0;
@@ -199,6 +191,11 @@ public class Configuration extends ConfigurationBase {
     return value.equalsIgnoreCase("on") || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("1");
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getLocalHostUrl()
+   */
+  @Override
   public String getLocalHostUrl() {
     String url = getValue("localhost", null);
     if (!url.endsWith("/"))
@@ -206,59 +203,107 @@ public class Configuration extends ConfigurationBase {
     return url;
   }
 
-  public String getPdfCommand() {
-    return getValue("pdf.command", null);
-  }
-
-  public long getAutoRefreshIntervalMs() {
-    return Long.parseLong(getValue("versioncontrol.autorefresh", "30")) * 1000;
-  }
-
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#appendErrors()
+   */
+  @Override
   public boolean appendErrors() {
     return getValue("markdown.appenderrors", "true").equalsIgnoreCase("true");
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getFileMaxRevisions()
+   */
+  @Override
   public int getFileMaxRevisions() {
     return Integer.parseInt(getValue("versioncontrol.maxfilerevisions", "10"));
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getEmbeddedServerPort()
+   */
+  @Override
   public int getEmbeddedServerPort() {
     return Integer.parseInt(getValue("embedded.port", "8080"));
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getEmbeddedServerName()
+   */
+  @Override
   public String getEmbeddedServerName() {
     return getValue("embedded.servername", "localhost");
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getEmbeddedIdleTimeout()
+   */
+  @Override
   public int getEmbeddedIdleTimeout() {
     return Integer.parseInt(getValue("embedded.idletimeout", "30"));
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getContextMaxRevisions()
+   */
+  @Override
   public int getContextMaxRevisions() {
     return Integer.parseInt(getValue("versioncontrol.maxcontextrevisions", "10"));
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getVersionControlType()
+   */
+  @Override
   public String getVersionControlType() {
     return getValue("versioncontrol.type", "git").toLowerCase();
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getIndexExtensions()
+   */
+  @Override
   public String getIndexExtensions() {
     return getValue("index.extensions", "md,book,marked,txt").toLowerCase();
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getGlobalSkinContext()
+   */
+  @Override
   public String getGlobalSkinContext() {
     String context = getValue("skin.globalcontext", null);
     if (StringUtils.isBlank(context)) {
-      String[] contexts = getValue("contexts", "[contexts property not set]").split("\\,");
-      context = contexts[0].trim();
+      List<String> contexts = getContexts();
+      if (!contexts.isEmpty())
+        context = contexts.get(0);
     }
     return context;
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getDefaultSkin()
+   */
+  @Override
   public String getDefaultSkin() {
     return getValue("skin.default", Skin.SKIN_PARENT_OF_ALL);
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getContextIndexClassifications()
+   */
+  @Override
   public Set<String> getContextIndexClassifications() {
     String value = getValue("context.classifications", "category,audience,folder");
     Set<String> classifications = new HashSet<>();
@@ -268,10 +313,20 @@ public class Configuration extends ConfigurationBase {
     return classifications;
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#isPrettyPrintJson()
+   */
+  @Override
   public boolean isPrettyPrintJson() {
     return "true".equalsIgnoreCase(getValue("json.prettyprint", "true"));
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getCustomRenderers()
+   */
+  @Override
   public List<CustomRendererDefinition> getCustomRenderers() {
     List<CustomRendererDefinition> result = new ArrayList<>();
 
@@ -292,6 +347,11 @@ public class Configuration extends ConfigurationBase {
     return result;
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getDateFormat()
+   */
+  @Override
   public SimpleDateFormat getDateFormat() {
     try {
       return new SimpleDateFormat(getDateFormatMask());
@@ -305,6 +365,11 @@ public class Configuration extends ConfigurationBase {
     return getValue("formatmask", DEFAULT_DATE_FMT);
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getMaxSearchResults()
+   */
+  @Override
   public int getMaxSearchResults() {
     String value = getValue("search.maxresults", "25");
     try {
@@ -315,12 +380,22 @@ public class Configuration extends ConfigurationBase {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#isImageExtension(java.lang.String)
+   */
+  @Override
   public boolean isImageExtension(String extension) {
     if (extension == null)
       return false;
     return imageExtensions.contains(extension.toLowerCase());
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#isFragment(java.lang.String)
+   */
+  @Override
   public boolean isFragment(String path) {
     if (_fragmentExtensions == null) {
       Set<String> fragmentExtensions = new HashSet<>();
@@ -339,6 +414,11 @@ public class Configuration extends ConfigurationBase {
     return _fragmentExtensions.contains(extension);
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#isBook(java.lang.String)
+   */
+  @Override
   public boolean isBook(String path) {
     if (_bookExtensions == null) {
       Set<String> bookExtensions = new HashSet<>();
@@ -356,6 +436,11 @@ public class Configuration extends ConfigurationBase {
     return _bookExtensions.contains(extension);
   }
 
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#isResource(java.lang.String)
+   */
+  @Override
   public boolean isResource(String path) {
     return !isFragment(path) && !isBook(path);
   }

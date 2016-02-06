@@ -21,7 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -44,11 +45,11 @@ public class DiffCommand extends RendererBase implements Command {
       if (absolutePath == null) {
         result = RenderResult.FORBIDDEN;
       } else {
-        ContentManager contentManager = getContentManager();
-        Configuration configuration = Configuration.getInstance();
+        ContentManager contentManager = getContentManager(context);
+        Configuration configuration = ConfigurationFactory.getConfiguration();
         SimpleDateFormat dateFormat = configuration.getDateFormat();
         String commitId = getString(arguments, "commitId");
-        SourceDiff diff = contentManager.getDiff(context, commitId);
+        SourceDiff diff = contentManager.getDiff(commitId);
         String body = "Diff not found";
         String timestamp = "00-00-0000 00:00:00";
         String commitMessage = "Commit not found";

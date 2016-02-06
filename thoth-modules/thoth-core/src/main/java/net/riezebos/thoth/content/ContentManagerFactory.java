@@ -14,26 +14,84 @@
  */
 package net.riezebos.thoth.content;
 
-import net.riezebos.thoth.Configuration;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
+import net.riezebos.thoth.configuration.ContextDefinition;
+import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.impl.GitContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 
 public class ContentManagerFactory {
 
-  private static ContentManager contentManager = null;
+  private static Map<String, ContentManager> managers = new HashMap<>();
 
-  public static ContentManager getContentManager() throws ContentManagerException {
-    synchronized (ContentManagerFactory.class) {
-      if (contentManager == null) {
-        String type = Configuration.getInstance().getVersionControlType();
-        if ("git".equalsIgnoreCase(type))
-          contentManager = new GitContentManager();
+  public static ContentManager getContentManager(String context) throws ContentManagerException {
+
+    Configuration configuration = ConfigurationFactory.getConfiguration();
+    ContextDefinition contextDefinition = configuration.getContextDefinition(context);
+
+    ContentManager contentManager;
+    synchronized (managers) {
+      contentManager = managers.get(contextDefinition.getName());
+    }
+
+    if (contentManager == null) {
+      synchronized (managers) {
+        RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
+        String type = ConfigurationFactory.getConfiguration().getVersionControlType();
+        if ("git".equalsIgnoreCase(repositoryDefinition.getType()))
+          contentManager = new GitContentManager(contextDefinition);
         else
           throw new ContentManagerException("Unsupported version control type: " + type);
         contentManager.refresh();
         contentManager.enableAutoRefresh();
+        managers.put(contextDefinition.getName(), contentManager);
       }
-      return contentManager;
     }
+
+    return contentManager;
+  }
+
+  /**
+   * Returns a list of Contexts as defined by the Configuration
+   * 
+   * @return
+   */
+  public static List<String> getContexts() {
+    Configuration configuration = ConfigurationFactory.getConfiguration();
+    return configuration.getContexts();
+  }
+
+  // Touches all the contexts. Can be used to warm up a server
+  public static void touch() throws ContentManagerException {
+    Configuration configuration = ConfigurationFactory.getConfiguration();
+    for (String context : configuration.getContexts())
+      getContentManager(context);
+  }
+
+  public static String getRefreshTimestamp(String contextName) throws ContentManagerException {
+    Configuration configuration = ConfigurationFactory.getConfiguration();
+    SimpleDateFormat dateFormat = configuration.getDateFormat();
+    Date latestRefresh = new Date(0L);
+    for (String context : configuration.getContexts()) {
+      ContentManager contentManager = getContentManager(context);
+      Date refresh = contentManager.getLatestRefresh();
+      if (refresh != null && latestRefresh.compareTo(refresh) < 0)
+        latestRefresh = refresh;
+    }
+    String refresh = latestRefresh == null ? "Never" : dateFormat.format(latestRefresh);
+    return refresh;
+  }
+
+  public static void shutDown() throws ContentManagerException {
+    Configuration configuration = ConfigurationFactory.getConfiguration();
+    for (String context : configuration.getContexts())
+      getContentManager(context).disableAutoRefresh();
   }
 }

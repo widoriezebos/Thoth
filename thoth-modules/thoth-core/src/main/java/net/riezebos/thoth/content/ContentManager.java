@@ -24,8 +24,8 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.util.PagedList;
 
 public interface ContentManager {
@@ -38,38 +38,38 @@ public interface ContentManager {
 
   boolean accessAllowed(File file) throws IOException;
 
-  MarkDownDocument getMarkDownDocument(String context, String documentPath) throws IOException, ContextNotFoundException;
+  MarkDownDocument getMarkDownDocument(String documentPath) throws IOException, ContextNotFoundException;
 
-  List<Book> getBooks(String context) throws ContextNotFoundException, IOException;
+  List<Book> getBooks() throws ContextNotFoundException, IOException;
 
-  PagedList<Commit> getCommits(String context, String path, int pageNumber, int pageSize) throws ContentManagerException;
+  PagedList<Commit> getCommits(String path, int pageNumber, int pageSize) throws ContentManagerException;
 
-  public SourceDiff getDiff(String context, String id) throws ContentManagerException;
+  public SourceDiff getDiff(String id) throws ContentManagerException;
 
-  List<ContentNode> list(String context, String path) throws ContextNotFoundException, IOException;
+  List<ContentNode> list(String path) throws ContextNotFoundException, IOException;
 
-  public List<ContentNode> find(String context, String fileSpec, boolean recursive) throws ContextNotFoundException, IOException;
+  public List<ContentNode> find(String fileSpec, boolean recursive) throws ContextNotFoundException, IOException;
 
-  List<ContentNode> getUnusedFragments(String context) throws IOException, ContentManagerException;
+  List<ContentNode> getUnusedFragments() throws IOException, ContentManagerException;
 
-  Date getLatestRefresh(String context);
+  Date getLatestRefresh();
 
   void enableAutoRefresh();
 
   void disableAutoRefresh();
 
-  List<String> getContexts();
+  String getContext();
 
-  String getContextFolder(String context) throws ContextNotFoundException;
+  String getContextFolder() throws ContextNotFoundException;
 
-  String getIndexFolder(String context) throws ContextNotFoundException;
+  String getIndexFolder() throws ContextNotFoundException;
 
-  String getReverseIndexFileName(String context) throws ContextNotFoundException;
+  String getReverseIndexFileName() throws ContextNotFoundException;
 
-  public String getReverseIndexIndirectFileName(String context) throws ContextNotFoundException;
+  public String getReverseIndexIndirectFileName() throws ContextNotFoundException;
 
-  String getErrorFileName(String context) throws ContextNotFoundException;
+  String getErrorFileName() throws ContextNotFoundException;
 
-  String getFileSystemPath(String context, String path) throws ContextNotFoundException, IOException;
+  String getFileSystemPath(String path) throws ContextNotFoundException, IOException;
 
 }

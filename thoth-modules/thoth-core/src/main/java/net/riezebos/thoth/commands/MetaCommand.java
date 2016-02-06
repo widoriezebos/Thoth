@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
@@ -48,18 +48,18 @@ public class MetaCommand extends RendererBase implements Command {
       if (absolutePath == null) {
         result = RenderResult.FORBIDDEN;
       } else {
-        ContentManager contentManager = getContentManager();
+        ContentManager contentManager = getContentManager(context);
 
         MarkDownDocument markDownDocument = getMarkDownDocument(context, path);
 
         DocumentNode root = markDownDocument.getDocumentStructure();
         List<DocumentNode> documentNodes = root.flatten(true);
-        int pageSize = Configuration.getInstance().getFileMaxRevisions();
+        int pageSize = ConfigurationFactory.getConfiguration().getFileMaxRevisions();
 
         Map<String, List<Commit>> commitMap = new HashMap<>();
         List<Commit> commitList = new ArrayList<>();
         for (DocumentNode node : documentNodes) {
-          List<Commit> latestCommits = contentManager.getCommits(context, node.getPath(), 1, pageSize).getList();
+          List<Commit> latestCommits = contentManager.getCommits(node.getPath(), 1, pageSize).getList();
           commitMap.put(node.getPath(), latestCommits);
           commitList.addAll(latestCommits);
         }

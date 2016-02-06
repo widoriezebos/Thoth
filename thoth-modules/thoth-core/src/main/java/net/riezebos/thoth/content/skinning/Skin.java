@@ -22,10 +22,10 @@ import org.apache.commons.lang3.StringUtils;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.util.ConfigurationBase;
+import net.riezebos.thoth.util.PropertyLoader;
 import net.riezebos.thoth.util.ThothUtil;
 
-public class Skin extends ConfigurationBase {
+public class Skin extends PropertyLoader {
   public static final String SKIN_PARENT_OF_ALL = "SimpleSkin";
   private static final String CLASSPATH_PREFIX = "classpath:";
   private String skinPropertyFile;
@@ -46,7 +46,7 @@ public class Skin extends ConfigurationBase {
    * @throws ContextNotFoundException
    */
   public Skin(String context, String skinPropertyFile) throws ContextNotFoundException, ContentManagerException {
-    contextFolder = ContentManagerFactory.getContentManager().getContextFolder(context);
+    contextFolder = ContentManagerFactory.getContentManager(context).getContextFolder();
     if (skinPropertyFile.startsWith(CLASSPATH_PREFIX)) {
       fromClassPath = true;
       String resourceName = skinPropertyFile.substring(CLASSPATH_PREFIX.length());

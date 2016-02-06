@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 
 /**
  * @author wido
@@ -48,7 +49,7 @@ public class Commit {
   }
 
   public String getFormattedTimestamp() {
-    Configuration configuration = Configuration.getInstance();
+    Configuration configuration = ConfigurationFactory.getConfiguration();
     SimpleDateFormat dateFormat = configuration.getDateFormat();
     return dateFormat.format(timestamp);
   }

@@ -14,12 +14,11 @@
  */
 package net.riezebos.thoth.util;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 
 public class ThothCoreUtil extends ThothUtil {
 
@@ -37,7 +36,6 @@ public class ThothCoreUtil extends ThothUtil {
   public static String formatDate(Date date) {
     if (date == null)
       return null;
-    SimpleDateFormat sdf = new SimpleDateFormat(Configuration.getInstance().getDateFormatMask());
-    return sdf.format(date);
+    return ConfigurationFactory.getConfiguration().getDateFormat().format(date);
   }
 }

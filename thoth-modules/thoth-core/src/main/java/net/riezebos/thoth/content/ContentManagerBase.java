@@ -22,7 +22,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -32,14 +31,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.CacheManager;
-import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
+import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.FileProcessor;
 import net.riezebos.thoth.markdown.IncludeProcessor;
 import net.riezebos.thoth.markdown.util.ProcessorError;
@@ -51,7 +52,24 @@ public abstract class ContentManagerBase implements ContentManager {
   private String rootCanon = null;
   private boolean refreshing = false;
   private AutoRefresher autoRefresher = null;
-  private Map<String, Date> latestRefresh = new HashMap<>();
+  private Date latestRefresh = new Date();
+  private ContextDefinition contextDefinition;
+
+  public ContentManagerBase(ContextDefinition contextDefinition) {
+    this.contextDefinition = contextDefinition;
+  }
+
+  public String getContext() {
+    return getContextDefinition().getName();
+  }
+
+  public String getBranch() {
+    return getContextDefinition().getBranch();
+  }
+
+  public ContextDefinition getContextDefinition() {
+    return contextDefinition;
+  }
 
   protected abstract String cloneOrPull() throws ContentManagerException;
 
@@ -71,19 +89,17 @@ public abstract class ContentManagerBase implements ContentManager {
 
   @Override
   public void reindex() {
-    for (String context : getContexts()) {
-      notifyContextContentsChanged(context);
-    }
+    notifyContextContentsChanged();
   }
 
-  protected void notifyContextContentsChanged(final String context) {
-    CacheManager.expire(context);
+  protected void notifyContextContentsChanged() {
+    CacheManager.expire(getContext());
 
     Thread indexerThread = new Thread() {
       public void run() {
         try {
-          Indexer indexer = SearchFactory.getInstance().getIndexer(context);
-          indexer.setIndexExtensions(Configuration.getInstance().getIndexExtensions());
+          Indexer indexer = SearchFactory.getInstance().getIndexer(getContext());
+          indexer.setIndexExtensions(ConfigurationFactory.getConfiguration().getIndexExtensions());
           indexer.index();
         } catch (ContentManagerException e) {
           LOG.error(e.getMessage(), e);
@@ -92,23 +108,23 @@ public abstract class ContentManagerBase implements ContentManager {
     };
 
     indexerThread.start();
-    LOG.info("Contents updated. Launched indexer thread for context " + context);
+    LOG.info("Contents updated. Launched indexer thread for context " + getContext());
   }
 
   @Override
-  public MarkDownDocument getMarkDownDocument(String context, String path) throws IOException, ContextNotFoundException {
+  public MarkDownDocument getMarkDownDocument(String path) throws IOException, ContextNotFoundException {
     String documentPath = ThothUtil.normalSlashes(path);
     if (documentPath.startsWith("/"))
       documentPath = documentPath.substring(1);
-    String physicalFilePath = getContextFolder(context) + documentPath;
+    String physicalFilePath = getContextFolder() + documentPath;
     File file = new File(physicalFilePath);
     IncludeProcessor processor = new IncludeProcessor();
-    processor.setLibrary(getContextFolder(context));
+    processor.setLibrary(getContextFolder());
     processor.setRootFolder(ThothUtil.getFolder(physicalFilePath));
 
     try (FileInputStream in = new FileInputStream(file)) {
       String markdown = processor.execute(documentPath, in);
-      if (processor.hasErrors() && Configuration.getInstance().appendErrors()) {
+      if (processor.hasErrors() && ConfigurationFactory.getConfiguration().appendErrors()) {
         markdown = appendErrors(processor, markdown);
       }
       MarkDownDocument markDownDocument = new MarkDownDocument(markdown, processor.getMetaTags(), processor.getErrors(), processor.getDocumentStructure());
@@ -124,30 +140,11 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   public Date getLatestRefresh() {
-    Date result = null;
-    synchronized (latestRefresh) {
-      for (Date date : latestRefresh.values()) {
-        if (result == null || date.compareTo(result) < 0)
-          result = date;
-      }
-    }
-    return result;
+    return latestRefresh;
   }
 
-  @Override
-  public Date getLatestRefresh(String context) {
-    if (context == null)
-      return getLatestRefresh();
-
-    synchronized (latestRefresh) {
-      return latestRefresh.get(context);
-    }
-  }
-
-  protected void setLatestRefresh(String context, Date date) {
-    synchronized (latestRefresh) {
-      latestRefresh.put(context, date);
-    }
+  protected void setLatestRefresh(Date date) {
+    latestRefresh = date;
   }
 
   @Override
@@ -155,7 +152,7 @@ public abstract class ContentManagerBase implements ContentManager {
     synchronized (this) {
       if (autoRefresher != null)
         autoRefresher.cancel();
-      long autoRefreshIntervalMs = Configuration.getInstance().getAutoRefreshIntervalMs();
+      long autoRefreshIntervalMs = getContextDefinition().getRefreshIntervalMS();
       autoRefresher = autoRefreshIntervalMs <= 0 ? null : new AutoRefresher(autoRefreshIntervalMs, this);
     }
   }
@@ -182,18 +179,12 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<String> getContexts() {
-    Configuration config = Configuration.getInstance();
-    return config.getContexts();
-  }
-
-  @Override
-  public List<Book> getBooks(String context) throws ContextNotFoundException, IOException {
-    String contextFolder = getContextFolder(context);
+  public List<Book> getBooks() throws ContextNotFoundException, IOException {
+    String contextFolder = getContextFolder();
     File folder = new File(contextFolder);
     List<Book> result = new ArrayList<>();
 
-    collectBooks(getConical(folder), folder, result, Configuration.getInstance().getBookExtensions());
+    collectBooks(getConical(folder), folder, result, ConfigurationFactory.getConfiguration().getBookExtensions());
     Collections.sort(result);
     return result;
   }
@@ -233,43 +224,33 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public String getContextFolder(String context) throws ContextNotFoundException {
-    validateContext(context);
-    Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + context + "/";
+  public String getContextFolder() throws ContextNotFoundException {
+    Configuration config = ConfigurationFactory.getConfiguration();
+    return config.getWorkspaceLocation() + getContext() + "/";
   }
 
   @Override
-  public String getIndexFolder(String context) throws ContextNotFoundException {
-    validateContext(context);
-    Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + context + "-index/lucene/";
+  public String getIndexFolder() throws ContextNotFoundException {
+    Configuration config = ConfigurationFactory.getConfiguration();
+    return config.getWorkspaceLocation() + getContext() + "-index/lucene/";
   }
 
   @Override
-  public String getReverseIndexFileName(String context) throws ContextNotFoundException {
-    validateContext(context);
-    Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + context + "-index/reverseindex.bin";
+  public String getReverseIndexFileName() throws ContextNotFoundException {
+    Configuration config = ConfigurationFactory.getConfiguration();
+    return config.getWorkspaceLocation() + getContext() + "-index/reverseindex.bin";
   }
 
   @Override
-  public String getReverseIndexIndirectFileName(String context) throws ContextNotFoundException {
-    validateContext(context);
-    Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + context + "-index/indirectreverseindex.bin";
+  public String getReverseIndexIndirectFileName() throws ContextNotFoundException {
+    Configuration config = ConfigurationFactory.getConfiguration();
+    return config.getWorkspaceLocation() + getContext() + "-index/indirectreverseindex.bin";
   }
 
   @Override
-  public String getErrorFileName(String context) throws ContextNotFoundException {
-    validateContext(context);
-    Configuration config = Configuration.getInstance();
-    return config.getWorkspaceLocation() + context + "-index/errors.bin";
-  }
-
-  protected void validateContext(String context) throws ContextNotFoundException {
-    if (!getContexts().contains(context))
-      throw new ContextNotFoundException(context);
+  public String getErrorFileName() throws ContextNotFoundException {
+    Configuration config = ConfigurationFactory.getConfiguration();
+    return config.getWorkspaceLocation() + getContext() + "-index/errors.bin";
   }
 
   @Override
@@ -281,7 +262,7 @@ public abstract class ContentManagerBase implements ContentManager {
 
   protected String getRootCanonical() throws IOException {
     if (this.rootCanon == null) {
-      File root = new File(Configuration.getInstance().getWorkspaceLocation());
+      File root = new File(ConfigurationFactory.getConfiguration().getWorkspaceLocation());
       String rootCanon = root.getCanonicalPath();
       this.rootCanon = rootCanon;
     }
@@ -289,10 +270,10 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public String getFileSystemPath(String context, String path) throws ContextNotFoundException, IOException {
+  public String getFileSystemPath(String path) throws ContextNotFoundException, IOException {
     if (path.startsWith("/"))
       path = path.substring(1);
-    String absolutePath = getContextFolder(context) + path;
+    String absolutePath = getContextFolder() + path;
     if (!accessAllowed(new File(absolutePath)))
       return null;
     else
@@ -300,12 +281,12 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<ContentNode> list(String context, String path) throws ContextNotFoundException, IOException {
+  public List<ContentNode> list(String path) throws ContextNotFoundException, IOException {
 
     List<ContentNode> result = new ArrayList<>();
 
-    String fileSystemPath = getFileSystemPath(context, path);
-    String contextFolder = getContextFolder(context);
+    String fileSystemPath = getFileSystemPath(path);
+    String contextFolder = getContextFolder();
 
     Path contextPath = Paths.get(contextFolder);
 
@@ -323,7 +304,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<ContentNode> find(String context, String fileSpec, boolean recursive) throws ContextNotFoundException, IOException {
+  public List<ContentNode> find(String fileSpec, boolean recursive) throws ContextNotFoundException, IOException {
     List<ContentNode> result = new ArrayList<>();
 
     String folderPart = ThothUtil.getFolder(fileSpec);
@@ -331,8 +312,8 @@ public abstract class ContentManagerBase implements ContentManager {
     if (fileSpec.indexOf('/') == -1)
       folderPart = "/";
 
-    String folder = getFileSystemPath(context, folderPart);
-    Path root = Paths.get(getContextFolder(context));
+    String folder = getFileSystemPath(folderPart);
+    Path root = Paths.get(getContextFolder());
 
     Pattern pattern = Pattern.compile(ThothUtil.fileSpec2regExp(spec));
     traverseFolders(result, value -> pattern.matcher(ThothUtil.getFileName(value)).matches(), root, new File(folder), recursive);
@@ -354,19 +335,19 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<ContentNode> getUnusedFragments(String context) throws IOException, ContentManagerException {
+  public List<ContentNode> getUnusedFragments() throws IOException, ContentManagerException {
     List<ContentNode> result = new ArrayList<>();
 
-    Path root = Paths.get(getContextFolder(context));
-    CacheManager cacheManager = CacheManager.getInstance(context);
+    Path root = Paths.get(getContextFolder());
+    CacheManager cacheManager = CacheManager.getInstance(getContext());
     Map<String, List<String>> reverseIndex = cacheManager.getReverseIndex(false);
-    traverseFolders(result, value -> isFragment(context, value) && !reverseIndex.containsKey(value), root, root.toFile(), true);
+    traverseFolders(result, value -> isFragment(value) && !reverseIndex.containsKey(value), root, root.toFile(), true);
     Collections.sort(result);
     return result;
   }
 
-  public boolean isFragment(String context, String path) {
-    return Configuration.getInstance().isFragment(path);
+  public boolean isFragment(String path) {
+    return ConfigurationFactory.getConfiguration().isFragment(path);
   }
 
   protected ContentNode createContentNode(String fileSystemPath, Path contextPath) {

@@ -39,7 +39,7 @@ public class ReindexCommand extends RendererBase implements Command {
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
 
-      ContentManager contentManager = getContentManager();
+      ContentManager contentManager = getContentManager(context);
       contentManager.reindex();
       Map<String, Object> variables = new HashMap<>(arguments);
       String log = "Reindex reuested. Running in the background";

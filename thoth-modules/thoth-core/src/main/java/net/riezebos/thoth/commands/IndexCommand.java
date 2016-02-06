@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
@@ -32,7 +33,7 @@ public class IndexCommand extends RendererBase implements Command {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      List<String> contexts = getContentManager().getContexts();
+      List<String> contexts = ContentManagerFactory.getContexts();
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("contexts", contexts);
 

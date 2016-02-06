@@ -23,8 +23,8 @@ import net.riezebos.thoth.exceptions.RenderException;
 public interface Renderer {
 
   String CONTEXTPATH_PARAMETER = "contextpath";
-  String BRANCHURL_PARAMETER = "contexturl";
-  String BRANCH_PARAMETER = "context";
+  String CONTEXTURL_PARAMETER = "contexturl";
+  String CONTEXT_PARAMETER = "context";
   String PATH_PARAMETER = "path";
   String TITLE_PARAMETER = "title";
   String BODY_PARAMETER = "body";

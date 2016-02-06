@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.content.search.SearchResult;
 import net.riezebos.thoth.content.search.Searcher;
@@ -53,7 +53,7 @@ public class SearchCommand extends RendererBase implements Command {
         if (StringUtils.isBlank(query))
           errorMessage = "Do you feel lucky?";
         else {
-          int pageSize = Configuration.getInstance().getMaxSearchResults();
+          int pageSize = ConfigurationFactory.getConfiguration().getMaxSearchResults();
           PagedList<SearchResult> pagedList = searcher.search(query, pageNumber, pageSize);
           searchResults.addAll(pagedList.getList());
           hasMore = pagedList.hasMore();

@@ -37,7 +37,7 @@ public class BrowseCommand extends RendererBase implements Command {
 
     try {
       RenderResult result = RenderResult.OK;
-      List<ContentNode> contentNodes = getContentManager().list(context, path);
+      List<ContentNode> contentNodes = getContentManager(context).list(path);
       boolean asJson = asJson(arguments);
 
       Map<String, Object> variables = new HashMap<>(arguments);

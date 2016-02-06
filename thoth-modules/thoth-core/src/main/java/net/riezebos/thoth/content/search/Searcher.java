@@ -38,8 +38,8 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TextFragment;
 import org.apache.lucene.store.FSDirectory;
 
-import net.riezebos.thoth.Configuration;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -53,13 +53,13 @@ public class Searcher {
   private String context;
 
   protected Searcher(String context) {
-    this.context = context;
+    this.setContext(context);
   }
 
   public PagedList<SearchResult> search(String queryExpression, int pageNumber, int pageSize) throws SearchException {
     try {
-      ContentManager contentManager = ContentManagerFactory.getContentManager();
-      String indexFolder = contentManager.getIndexFolder(context);
+      ContentManager contentManager = ContentManagerFactory.getContentManager(getContext());
+      String indexFolder = contentManager.getIndexFolder();
       IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)));
       IndexSearcher searcher = new IndexSearcher(reader);
       Analyzer analyzer = new StandardAnalyzer();
@@ -90,7 +90,7 @@ public class Searcher {
 
           if (Indexer.TYPE_DOCUMENT.equals(document.get(Indexer.INDEX_TYPE))) {
             searchResult.setResource(false);
-            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(context, documentPath);
+            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(documentPath);
             String contents = markDownDocument.getMarkdown();
 
             SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
@@ -125,10 +125,10 @@ public class Searcher {
   protected void linkBooks(List<SearchResult> searchResults) throws ContentManagerException {
 
     SearchFactory searchFactory = SearchFactory.getInstance();
-    Indexer indexer = searchFactory.getIndexer(context);
-    Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(context, true);
+    Indexer indexer = searchFactory.getIndexer(getContext());
+    Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(getContext(), true);
 
-    List<String> bookExtensions = Configuration.getInstance().getBookExtensions();
+    List<String> bookExtensions = ConfigurationFactory.getConfiguration().getBookExtensions();
     for (SearchResult searchResult : searchResults) {
       String document = searchResult.getDocument();
       List<String> list = reverseIndexIndirect.get("/" + document);
@@ -144,6 +144,14 @@ public class Searcher {
         }
       }
     }
+  }
+
+  public String getContext() {
+    return context;
+  }
+
+  private void setContext(String context) {
+    this.context = context;
   }
 
 }

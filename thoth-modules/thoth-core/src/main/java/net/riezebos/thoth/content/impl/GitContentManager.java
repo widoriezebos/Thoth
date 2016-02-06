@@ -47,14 +47,17 @@ import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
+import net.riezebos.thoth.configuration.ContextDefinition;
+import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.Revision;
 import net.riezebos.thoth.content.versioncontrol.Revision.Action;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.util.PagedList;
 
 public class GitContentManager extends ContentManagerBase {
@@ -62,15 +65,17 @@ public class GitContentManager extends ContentManagerBase {
   private static final Logger LOG = LoggerFactory.getLogger(GitContentManager.class);
   private static final String HEAD_TREE = "HEAD^{tree}";
 
-  public GitContentManager() throws ContentManagerException {
+  public GitContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
+    super(contextDefinition);
   }
 
   protected synchronized String cloneOrPull() throws ContentManagerException {
     StringBuilder log = new StringBuilder();
     try {
       info(log, "Pulling git repositories for changes");
-      Configuration config = Configuration.getInstance();
-      String repositoryUrl = config.getValue("git.repository");
+      Configuration config = ConfigurationFactory.getConfiguration();
+      RepositoryDefinition repositoryDefinition = getContextDefinition().getRepositoryDefinition();
+      String repositoryUrl = repositoryDefinition.getUrl();
       String workspaceLocation = config.getWorkspaceLocation();
       if (StringUtils.isBlank(workspaceLocation))
         throw new IllegalArgumentException("No environment variable or system variable named " + Configuration.WORKSPACELOCATION + " was set");
@@ -78,49 +83,47 @@ public class GitContentManager extends ContentManagerBase {
       if (!file.isDirectory()) {
         severe(log, "The library path " + workspaceLocation + " does not exist. Cannot initialize content manager");
       } else {
-        for (String context : config.getContexts()) {
-          try {
-            String contextFolder = getContextFolder(context);
-            File target = new File(contextFolder);
-            CredentialsProvider credentialsProvider = getCredentialsProvider();
+        try {
+          String contextFolder = getContextFolder();
+          File target = new File(contextFolder);
+          CredentialsProvider credentialsProvider = getCredentialsProvider();
 
-            if (target.isDirectory()) {
-              info(log, "\nRepository for context " + context + " found at " + contextFolder);
-              try (Git repos = getRepository(context)) {
+          if (target.isDirectory()) {
+            info(log, "\nRepository for context " + getContext() + " found at " + contextFolder);
+            try (Git repos = getRepository()) {
 
-                Repository repository = repos.getRepository();
-                ObjectId oldHead = repository.resolve(HEAD_TREE);
+              Repository repository = repos.getRepository();
+              ObjectId oldHead = repository.resolve(HEAD_TREE);
 
-                PullResult pullResult = repos.pull().setCredentialsProvider(credentialsProvider).call();
-                info(log, pullResult.isSuccessful() ? "Pull was successful" : "Pull failed");
-                ObjectId newHead = repository.resolve(HEAD_TREE);
+              PullResult pullResult = repos.pull().setCredentialsProvider(credentialsProvider).call();
+              info(log, pullResult.isSuccessful() ? "Pull was successful" : "Pull failed");
+              ObjectId newHead = repository.resolve(HEAD_TREE);
 
-                if ((oldHead == null && newHead != null)//
-                    || (oldHead != null && !oldHead.equals(newHead)))
-                  notifyContextContentsChanged(context);
+              if ((oldHead == null && newHead != null)//
+                  || (oldHead != null && !oldHead.equals(newHead)))
+                notifyContextContentsChanged();
 
-                setLatestRefresh(context, new Date());
-              } catch (Exception e) {
-                severe(log, e);
-              }
-            } else {
-              info(log, "Cloning from " + repositoryUrl + " to " + contextFolder);
-              target.mkdirs();
-              try (Git result = Git.cloneRepository()//
-                  .setURI(repositoryUrl)//
-                  .setBranch(context)//
-                  .setCredentialsProvider(credentialsProvider)//
-                  .setDirectory(target).call()) {
-                info(log, "Cloned repository: " + result.getRepository().getDirectory());
-                setLatestRefresh(context, new Date());
-                notifyContextContentsChanged(context);
-              } catch (Exception e) {
-                severe(log, e);
-              }
+              setLatestRefresh(new Date());
+            } catch (Exception e) {
+              severe(log, e);
             }
-          } catch (Exception e) {
-            severe(log, e);
+          } else {
+            info(log, "Cloning from " + repositoryUrl + " to " + contextFolder);
+            target.mkdirs();
+            try (Git result = Git.cloneRepository()//
+                .setURI(repositoryUrl)//
+                .setBranch(getBranch())//
+                .setCredentialsProvider(credentialsProvider)//
+                .setDirectory(target).call()) {
+              info(log, "Cloned repository: " + result.getRepository().getDirectory());
+              setLatestRefresh(new Date());
+              notifyContextContentsChanged();
+            } catch (Exception e) {
+              severe(log, e);
+            }
           }
+        } catch (Exception e) {
+          severe(log, e);
         }
       }
       info(log, "Git refresh completed");
@@ -132,15 +135,16 @@ public class GitContentManager extends ContentManagerBase {
     return log.toString();
   }
 
-  protected Git getRepository(String context) throws ContextNotFoundException, IOException {
-    String contextFolder = getContextFolder(context);
+  protected Git getRepository() throws ContextNotFoundException, IOException {
+    String contextFolder = getContextFolder();
     File target = new File(contextFolder);
     return Git.open(target);
   }
 
-  public PagedList<Commit> getCommits(String context, String path, int pageNumber, int pageSize) throws ContentManagerException {
+  @Override
+  public PagedList<Commit> getCommits(String path, int pageNumber, int pageSize) throws ContentManagerException {
     path = ensureRelative(path);
-    try (Git repos = getRepository(context)) {
+    try (Git repos = getRepository()) {
       Repository repository = repos.getRepository();
       List<Commit> commits = new ArrayList<>();
       LogCommand log = repos.log();
@@ -218,7 +222,7 @@ public class GitContentManager extends ContentManagerBase {
     return commit;
   }
 
-  public SourceDiff getDiff(String context, String diffSpec) throws ContentManagerException {
+  public SourceDiff getDiff(String diffSpec) throws ContentManagerException {
 
     int idx = diffSpec.indexOf('/');
     if (idx == -1)
@@ -232,7 +236,7 @@ public class GitContentManager extends ContentManagerBase {
 
     SourceDiff result = null;
 
-    try (Git git = getRepository(context); RevWalk revWalk = new RevWalk(git.getRepository()); SimpleDiffFormatter df = new SimpleDiffFormatter()) {
+    try (Git git = getRepository(); RevWalk revWalk = new RevWalk(git.getRepository()); SimpleDiffFormatter df = new SimpleDiffFormatter()) {
       Repository repository = git.getRepository();
 
       RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(id));
@@ -344,9 +348,9 @@ public class GitContentManager extends ContentManagerBase {
   }
 
   protected CredentialsProvider getCredentialsProvider() {
-    Configuration config = Configuration.getInstance();
-    String username = config.getValue("git.username");
-    String password = config.getValue("git.password");
+    RepositoryDefinition repositoryDefinition = getContextDefinition().getRepositoryDefinition();
+    String username = repositoryDefinition.getUsername();
+    String password = repositoryDefinition.getPassword();
     return new UsernamePasswordCredentialsProvider(username, password);
   }
 

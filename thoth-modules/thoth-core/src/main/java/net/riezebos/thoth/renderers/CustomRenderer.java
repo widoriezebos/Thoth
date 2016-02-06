@@ -26,7 +26,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
@@ -81,7 +82,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
       if (absolutePath == null) {
         result = RenderResult.FORBIDDEN;
       } else {
-        Configuration configuration = Configuration.getInstance();
+        Configuration configuration = ConfigurationFactory.getConfiguration();
         String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
 
         File tempFile = File.createTempFile("thothtemp", "." + typeCode);

@@ -38,7 +38,7 @@ public class PullCommand extends RendererBase implements Command {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      ContentManager contentManager = getContentManager();
+      ContentManager contentManager = getContentManager(context);
       String log = contentManager.refresh();
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("log", log);

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.riezebos.thoth.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
@@ -38,14 +38,14 @@ public class RevisionsCommand extends RendererBase implements Command {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      ContentManager contentManager = getContentManager();
+      ContentManager contentManager = getContentManager(context);
 
       Integer pageNumber = getInteger(arguments, "page");
       if (pageNumber == null)
         pageNumber = 1;
 
-      int pageSize = Configuration.getInstance().getContextMaxRevisions();
-      PagedList<Commit> pagedList = contentManager.getCommits(context, null, pageNumber, pageSize);
+      int pageSize = ConfigurationFactory.getConfiguration().getContextMaxRevisions();
+      PagedList<Commit> pagedList = contentManager.getCommits(null, pageNumber, pageSize);
       List<Commit> commitList = pagedList.getList();
       boolean hasMore = pagedList.hasMore();
       Collections.sort(commitList, new CommitComparator());

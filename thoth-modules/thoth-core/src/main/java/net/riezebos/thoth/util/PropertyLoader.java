@@ -1,17 +1,3 @@
-/* Copyright (c) 2016 W.T.J. Riezebos
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package net.riezebos.thoth.util;
 
 import java.io.FileInputStream;
@@ -22,18 +8,15 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ConfigurationBase {
-  private static final Logger LOG = LoggerFactory.getLogger(ConfigurationBase.class);
+public class PropertyLoader {
+  private static final Logger LOG = LoggerFactory.getLogger(PropertyLoader.class);
 
   private Properties properties = new Properties();
   private String propertyFileName;
 
-  public ConfigurationBase() {
-  }
-
   public void load(String propertyFileName) {
     try {
-      this.propertyFileName = propertyFileName;
+      setPropertyFileName(propertyFileName);
       FileInputStream inStream = new FileInputStream(propertyFileName);
       load(inStream);
     } catch (IOException e) {
@@ -54,7 +37,7 @@ public class ConfigurationBase {
   public String getPropertyFileName() {
     return propertyFileName;
   }
-  
+
   public void setPropertyFileName(String propertyFileName) {
     this.propertyFileName = propertyFileName;
   }
