@@ -37,8 +37,9 @@ public class Configuration extends ConfigurationBase {
 
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
   private static final String WORKSPACELOCATION_DEPRECATED = "libraryroot";
+  public static final String CONFIGKEY_DEPRECATED = "configuration";
 
-  public static final String CONFIGKEY = "configuration";
+  public static final String CONFIGKEY = "thoth_configuration";
   public static final String WORKSPACELOCATION = "workspacelocation";
   public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
   public static final String CLASSPATH_PREFIX = "classpath:";
@@ -70,6 +71,10 @@ public class Configuration extends ConfigurationBase {
     String propertyPath = System.getProperty(CONFIGKEY);
     if (propertyPath == null)
       propertyPath = System.getenv(CONFIGKEY);
+    if (propertyPath == null)
+      propertyPath = System.getProperty(CONFIGKEY_DEPRECATED);
+    if (propertyPath == null)
+      propertyPath = System.getenv(CONFIGKEY_DEPRECATED);
     return propertyPath;
   }
 

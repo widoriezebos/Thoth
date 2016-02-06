@@ -16,7 +16,7 @@ Simple yet powerful Markdown based Documentation System for professional documen
 ## Getting started, while still in a hurry
 Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Thoth inside Tomcat (either standalone or in Eclipse) just follow these simple steps:
 
-1. Copy the sample.configuration.properties file from the conf folder to anywhere on your machine. In this example we copy/rename it here: `/Users/wido/Documents/Settings/wido.configuration.properties`
+1. Copy the sample.configuration.properties file from the conf folder to anywhere on your machine. In this example we copy/rename it here: `/Users/wido/Settings/wido.configuration.properties`
 2. Open your property file and start setting the required properties:
 3. Determine where to store the working information (local Git repositories managed by Thoth, one per branch). The property to set is workspacelocation. For instance:  
 	`workspacelocation=/Users/wido/Documents/ThothWorkspace`
@@ -24,10 +24,16 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 	`git.repository=https://github.com/widoriezebos/Thoth.git`  
 	`git.username=mygituser`  
 	`git.password=mysecret`
-5. Add a system variable or a system property to your launch configuration so that Thoth can find your configuration file. So launch the Java VM with an additional parameter:  
-	`-Dconfiguration=/Users/wido/Documents/Settings/wido.configuration.properties`
-6. Launch Tomcat. Your branches pulled to to local Git repositories in your  
-	workspace and they will be indexed automatically. When this is done you can connect  
+5. Decide how you want to run Thoth.   
+	If you want to use the **simplest approach** (i.e. running just on your desktop) then just place the configuration.properties in your working folder and from there launch Thoth standalone (or pass the path to your property file as an argument) i.e.  
+	`java -jar <path-to-tooth-standalone.jar>` and off you go.
+
+	Thoth can also be installed into a **web container** like Tomcat by simply dropping in the WAR. If you want to use the WAR (say with Tomcat):
+	- Place the Thoth WAR inside the `webapps` folder of Tomcat
+	- Add a system variable or a system property to your launch configuration so that Thoth can find your configuration file. So launch the Java VM with an additional parameter:  
+		`-Dthoth_configuration=/Users/wido/Settings/wido.configuration.properties`
+	- Launch Tomcat.
+6. Your branches pulled to to local Git repositories in your workspace and they will be indexed automatically. When this is done you can connect  
 	with your browser and get going!
 
 ## Copyright
