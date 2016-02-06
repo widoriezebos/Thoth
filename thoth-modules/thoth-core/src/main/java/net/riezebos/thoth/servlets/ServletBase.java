@@ -40,8 +40,8 @@ import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.content.skinning.SkinMapping;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.util.ThothUtil;
 

@@ -32,8 +32,8 @@ import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinInheritance;
 import net.riezebos.thoth.content.skinning.SkinMapping;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.IndexerException;
 import net.riezebos.thoth.markdown.util.LineInfo;
 import net.riezebos.thoth.markdown.util.ProcessorError;
@@ -194,8 +194,13 @@ public class CacheManager {
       String key = skin.getName().toLowerCase();
       Skin existing = skinsByName.get(key);
       if (existing != null) {
-        LOG.warn("There are multiple skins with the name '" + skin.getName() //
-            + "'. Found at " + skin.getPropertyFileName() + " and " + existing.getPropertyFileName());
+        // Do not warn in case of (startup) race conditions i.e. a servlet instantiating twice simultaneously
+        // This typically happens when a request if already in the queue but the web container is in the process
+        // of getting ready. Since that is not a problem we will not warn in that situation
+        if (!existing.getPropertyFileName().equals(skin.getPropertyFileName())) {
+          LOG.warn("There are multiple skins with the name '" + skin.getName() //
+              + "'. Found at " + skin.getPropertyFileName() + " and " + existing.getPropertyFileName());
+        }
       } else {
         skinsByName.put(key, skin);
         skins.add(skin);

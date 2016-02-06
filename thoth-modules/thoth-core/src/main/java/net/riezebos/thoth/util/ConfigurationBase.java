@@ -54,6 +54,10 @@ public class ConfigurationBase {
   public String getPropertyFileName() {
     return propertyFileName;
   }
+  
+  public void setPropertyFileName(String propertyFileName) {
+    this.propertyFileName = propertyFileName;
+  }
 
   public String getValue(String key) {
     String value = getValue(key, null);

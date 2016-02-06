@@ -20,8 +20,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.content.ContentManagerFactory;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.util.ConfigurationBase;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -54,6 +54,7 @@ public class Skin extends ConfigurationBase {
       if (is == null)
         throw new ContentManagerException("Could not find " + resourceName + " on the classpath");
       load(is);
+      setPropertyFileName(skinPropertyFile);
       this.skinBaseUrl = ThothUtil.getFolder(resourceName);
     } else {
       String absFileName = contextFolder + ThothUtil.stripPrefix(skinPropertyFile, "/");

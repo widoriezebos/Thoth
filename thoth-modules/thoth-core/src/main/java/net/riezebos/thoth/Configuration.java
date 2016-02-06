@@ -14,6 +14,7 @@
  */
 package net.riezebos.thoth;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +40,7 @@ public class Configuration extends ConfigurationBase {
   private static final String WORKSPACELOCATION_DEPRECATED = "libraryroot";
   public static final String CONFIGKEY_DEPRECATED = "configuration";
 
+  public static final String BUILT_PROPERTIES = "net/riezebos/thoth/default.configuration.properties";
   public static final String CONFIGKEY = "thoth_configuration";
   public static final String WORKSPACELOCATION = "workspacelocation";
   public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
@@ -79,13 +81,24 @@ public class Configuration extends ConfigurationBase {
   }
 
   private Configuration(String propertyPath) {
+    loadDefaults();
     load(propertyPath);
-    imageExtensions.add("png");
-    imageExtensions.add("jpeg");
-    imageExtensions.add("jpg");
-    imageExtensions.add("gif");
-    imageExtensions.add("tiff");
-    imageExtensions.add("bmp");
+    String extensionSpec = getImageExtensions();
+    for (String ext : extensionSpec.split(extensionSpec))
+      imageExtensions.add(ext.trim().toLowerCase());
+  }
+
+  public String getImageExtensions() {
+    return getValue("images.extensions", "png,jpeg,jpg,gif,tiff,bmp");
+  }
+
+  protected void loadDefaults() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    InputStream is = contextClassLoader.getResourceAsStream(BUILT_PROPERTIES);
+    if (is == null)
+      LOG.error("Somebody misplaced " + BUILT_PROPERTIES + " so there will be no defaults for the Configuration!");
+    else
+      load(is);
   }
 
   public String getWorkspaceLocation() {
