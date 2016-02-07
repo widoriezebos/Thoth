@@ -8,6 +8,21 @@
 </head>
 <body>
 <h1>Latest changes</h1>
+Showing page ${page}<br/>
+#set($prevpage=${page}+-1)
+#if($prevpage > 0)
+<a href="${contexturl}?cmd=revisions&amp;page=${prevpage}">Previous page</a>
+#else
+(First page)
+#end
+#if($hasmore)
+#set($nextpage=${page}+1)
+<a href="${contexturl}?cmd=revisions&amp;page=${nextpage}">Next page</a>
+#else
+ (last page)
+#end
+&nbsp;
+
 <table>
   <tr><th>Timestamp</th><th>Author</th><th>Diff</th><th>Comment</th></tr>
 #foreach($commit in $commitList)
