@@ -14,7 +14,6 @@
  */
 package net.riezebos.thoth.servlets;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -31,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.CacheManager;
-import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
@@ -67,39 +65,12 @@ public abstract class ServletBase extends HttpServlet {
     }
   }
 
-  protected void handleError(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
-    LOG.error(e.getMessage(), e);
-  }
-
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     doGet(request, response);
   }
 
-  protected MarkDownDocument getMarkdown(HttpServletRequest request)
-      throws ContextNotFoundException, FileNotFoundException, ContentManagerException, IOException, ServletException {
-    return getMarkdown(request, null);
-  }
-
-  protected MarkDownDocument getMarkdown(HttpServletRequest request, String suffix)
-      throws ContextNotFoundException, ContentManagerException, FileNotFoundException, IOException, ServletException {
-    String relativePath = ThothUtil.stripSuffix(getPath(request), suffix);
-    String context = getContext(request);
-
-    return getContentManager(context).getMarkDownDocument(relativePath);
-  }
-
-  /**
-   * Just a convenience wrapper
-   *
-   * @return
-   * @throws ServletException
-   */
-  protected ContentManager getContentManager(String context) throws ServletException {
-    try {
-      return ContentManagerFactory.getContentManager(context);
-    } catch (ContentManagerException e) {
-      throw new ServletException(e);
-    }
+  protected void handleError(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
+    LOG.error(e.getMessage(), e);
   }
 
   protected String getTitle(HttpServletRequest request) {
@@ -139,12 +110,6 @@ public abstract class ServletBase extends HttpServlet {
     String path = getRequestPath(request);
     path = ThothUtil.stripPrefix(path, "/");
     path = ThothUtil.getPartBeforeFirst(path, "/");
-    return path;
-  }
-
-  protected String prefixWithSlash(String path) {
-    if (!StringUtils.isBlank(path) && !path.startsWith("/"))
-      path = "/" + path;
     return path;
   }
 
@@ -209,11 +174,10 @@ public abstract class ServletBase extends HttpServlet {
     if (skin.isFromClassPath()) {
       skinBase = ContentManager.NATIVERESOURCES + baseUrl;
     } else {
-      skinBase = prefixWithSlash(request.getContextPath() + baseUrl);
+      skinBase = ThothUtil.prefix(request.getContextPath() + baseUrl, "/");
     }
 
-    String path = getPath(request);
-    path = prefixWithSlash(path);
+    String path = ThothUtil.prefix(getPath(request), "/");
     result.put(Renderer.CONTEXT_PARAMETER, contextName);
     result.put(Renderer.SKINBASE_PARAMETER, skinBase);
     result.put(Renderer.CONTEXTURL_PARAMETER, getContextUrl(request));

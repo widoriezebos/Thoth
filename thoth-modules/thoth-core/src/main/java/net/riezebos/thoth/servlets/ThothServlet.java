@@ -51,6 +51,7 @@ import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -252,7 +253,7 @@ public class ThothServlet extends ServletBase {
 
     String path = getPath(request);
     String context = getContext(request);
-    ContentManager contentManager = getContentManager(context);
+    ContentManager contentManager = ContentManagerFactory.getContentManager(context);
     String absolutePath = contentManager.getFileSystemPath(path);
 
     if (absolutePath == null) {

@@ -260,4 +260,10 @@ public class ThothUtil {
     return null;
   }
 
+  public static String prefix(String value, String prefix) {
+    if (value != null && !value.startsWith(prefix))
+      value = prefix + value;
+    return value;
+  }
+
 }
