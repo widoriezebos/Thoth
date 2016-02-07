@@ -183,6 +183,7 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.CONTEXTPATH_PARAMETER, request.getContextPath());
     result.put(Renderer.PATH_PARAMETER, path);
     result.put(Renderer.TITLE_PARAMETER, getTitle(request));
+    result.put(Renderer.SKIN, skin.getName());
     result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(contextName));
     return result;
   }

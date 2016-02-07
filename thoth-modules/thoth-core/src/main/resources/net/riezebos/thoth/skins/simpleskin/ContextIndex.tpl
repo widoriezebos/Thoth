@@ -50,7 +50,7 @@ Click <a href="${contexturl}/?cmd=browse">here</a> to browse the library
 #end	
 </table>
 
-<br/><br/>Latest successfull Pull request was at ${refresh} 
-
+<br/><br/>Latest successfull Pull request was at ${refresh}<br/> 
+Currently using skin: ${skin}<br>
 </body>
 </html>

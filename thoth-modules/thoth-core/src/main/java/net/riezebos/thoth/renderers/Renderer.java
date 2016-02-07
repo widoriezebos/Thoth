@@ -30,6 +30,7 @@ public interface Renderer {
   String BODY_PARAMETER = "body";
   String SKINBASE_PARAMETER = "skinbase";
   String REFRESH_PARAMETER = "refresh";
+  String SKIN = "skin";
 
   public enum RenderResult {
     OK, NOT_FOUND, FORBIDDEN
