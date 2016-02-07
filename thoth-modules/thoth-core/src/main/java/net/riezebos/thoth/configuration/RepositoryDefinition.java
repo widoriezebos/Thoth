@@ -16,7 +16,7 @@ package net.riezebos.thoth.configuration;
 
 public class RepositoryDefinition {
   private String name;
-  private String url;
+  private String location;
   private String username;
   private String password;
   private String type;
@@ -29,12 +29,12 @@ public class RepositoryDefinition {
     this.name = name;
   }
 
-  public String getUrl() {
-    return url;
+  public String getLocation() {
+    return location;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
+  public void setLocation(String location) {
+    this.location = location;
   }
 
   public String getUsername() {

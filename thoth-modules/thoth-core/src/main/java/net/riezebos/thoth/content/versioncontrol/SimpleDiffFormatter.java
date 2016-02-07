@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.content.impl;
+package net.riezebos.thoth.content.versioncontrol;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

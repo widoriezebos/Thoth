@@ -364,11 +364,17 @@ public class Indexer {
   }
 
   public Map<String, List<String>> getReverseIndex(String context, boolean indirect) throws ContextNotFoundException, ContentManagerException {
-    return CacheManager.getInstance(context).getReverseIndex(indirect);
+    Map<String, List<String>> reverseIndex = CacheManager.getInstance(context).getReverseIndex(indirect);
+    if (reverseIndex == null)
+      reverseIndex = new HashMap<>();
+    return reverseIndex;
   }
 
   public List<ProcessorError> getValidationErrors() throws IndexerException {
-    return CacheManager.getInstance(contentManager.getContext()).getValidationErrors();
+    List<ProcessorError> validationErrors = CacheManager.getInstance(contentManager.getContext()).getValidationErrors();
+    if (validationErrors == null)
+      validationErrors = new ArrayList<>();
+    return validationErrors;
   }
 
   class IndexingContext {

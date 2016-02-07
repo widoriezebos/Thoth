@@ -259,15 +259,6 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
 
   /*
    * (non-Javadoc)
-   * @see net.riezebos.thoth.configuration.ConfigurationT#getVersionControlType()
-   */
-  @Override
-  public String getVersionControlType() {
-    return getValue("versioncontrol.type", "git").toLowerCase();
-  }
-
-  /*
-   * (non-Javadoc)
    * @see net.riezebos.thoth.configuration.ConfigurationT#getIndexExtensions()
    */
   @Override

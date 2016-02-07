@@ -44,6 +44,7 @@ import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.FileProcessor;
 import net.riezebos.thoth.markdown.IncludeProcessor;
 import net.riezebos.thoth.markdown.util.ProcessorError;
+import net.riezebos.thoth.util.DiscardingList;
 import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class ContentManagerBase implements ContentManager {
@@ -321,17 +322,24 @@ public abstract class ContentManagerBase implements ContentManager {
     return result;
   }
 
-  protected void traverseFolders(List<ContentNode> result, Predicate<String> matcher, Path root, File currentFolder, boolean recursive) throws IOException {
-    for (File file : currentFolder.listFiles()) {
-      if (file.isDirectory()) {
-        if (recursive)
-          traverseFolders(result, matcher, root, file, recursive);
-      } else {
-        ContentNode node = createContentNode(file.getCanonicalPath(), root);
-        if (matcher.test(node.getPath()))
-          result.add(node);
+  protected long traverseFolders(List<ContentNode> result, Predicate<String> matcher, Path root, File currentFolder, boolean recursive) throws IOException {
+    File[] folderContents = currentFolder.listFiles();
+    long hash = 0;
+    if (folderContents != null) {
+      for (File file : folderContents) {
+        if (file.isDirectory()) {
+          if (recursive)
+            hash += traverseFolders(result, matcher, root, file, recursive);
+        } else {
+          ContentNode node = createContentNode(file.getCanonicalPath(), root);
+          if (matcher.test(node.getPath())) {
+            result.add(node);
+            hash += (file.getCanonicalPath().hashCode()) + file.lastModified();
+          }
+        }
       }
     }
+    return hash;
   }
 
   @Override
@@ -357,4 +365,10 @@ public abstract class ContentManagerBase implements ContentManager {
     return new ContentNode("/" + relativePath.toString(), file);
   }
 
+  @Override
+  public long getContextChecksum() throws IOException, ContextNotFoundException {
+    Path root = Paths.get(getContextFolder());
+    Pattern pattern = Pattern.compile(ThothUtil.fileSpec2regExp("*.*"));
+    return traverseFolders(new DiscardingList<ContentNode>(), value -> pattern.matcher(ThothUtil.getFileName(value)).matches(), root, root.toFile(), true);
+  }
 }

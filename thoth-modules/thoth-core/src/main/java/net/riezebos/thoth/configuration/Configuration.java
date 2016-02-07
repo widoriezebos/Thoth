@@ -85,8 +85,6 @@ public interface Configuration {
 
   int getContextMaxRevisions();
 
-  String getVersionControlType();
-
   String getIndexExtensions();
 
   String getGlobalSkinContext();

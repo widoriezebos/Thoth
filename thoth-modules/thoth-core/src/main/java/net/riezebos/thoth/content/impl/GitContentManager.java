@@ -54,12 +54,18 @@ import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.Revision;
+import net.riezebos.thoth.content.versioncontrol.SimpleDiffFormatter;
 import net.riezebos.thoth.content.versioncontrol.Revision.Action;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.util.PagedList;
 
+/**
+ * Support GIT based version control as the manager for the content
+ * @author wido
+ *
+ */
 public class GitContentManager extends ContentManagerBase {
 
   private static final Logger LOG = LoggerFactory.getLogger(GitContentManager.class);
@@ -74,7 +80,7 @@ public class GitContentManager extends ContentManagerBase {
     try {
       Configuration config = ConfigurationFactory.getConfiguration();
       RepositoryDefinition repositoryDefinition = getContextDefinition().getRepositoryDefinition();
-      String repositoryUrl = repositoryDefinition.getUrl();
+      String repositoryUrl = repositoryDefinition.getLocation();
       String workspaceLocation = config.getWorkspaceLocation();
       if (StringUtils.isBlank(workspaceLocation))
         throw new IllegalArgumentException("No environment variable or system variable named " + Configuration.WORKSPACELOCATION + " was set");

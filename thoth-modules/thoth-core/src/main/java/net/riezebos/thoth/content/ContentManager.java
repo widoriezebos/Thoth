@@ -72,4 +72,6 @@ public interface ContentManager {
 
   String getFileSystemPath(String path) throws ContextNotFoundException, IOException;
 
+  long getContextChecksum() throws IOException, ContextNotFoundException;
+
 }
