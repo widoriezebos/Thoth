@@ -97,7 +97,7 @@ public class DiffCommand extends RendererBase implements Command {
     StringBuilder html = new StringBuilder();
     int changeCounter = 1;
     for (Diff aDiff : diffs) {
-      String text = aDiff.text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\n", "&para;<br>");
+      String text = aDiff.text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
       switch (aDiff.operation) {
       case INSERT:
         html.append(getBookmark(changeCounter++)).append("<ins>").append(text).append("</ins>").append("</a>");
@@ -110,13 +110,29 @@ public class DiffCommand extends RendererBase implements Command {
         break;
       }
     }
+    if (!html.toString().endsWith("\n"))
+      html.append("\n");
+    StringBuilder withLineNumbers = new StringBuilder();
+    int idx = html.indexOf("\n");
+    int start = 0;
+    int line = 1;
+    while (idx != -1) {
+      withLineNumbers.append(html.substring(start, idx));
+      withLineNumbers.append("&para;<span class=\"difflinenumber\">");
+      withLineNumbers.append(line++);
+      withLineNumbers.append("</span><br/>");
+      start = idx;
+      idx = html.indexOf("\n", start + 1);
+    }
+    if (start != html.length())
+      withLineNumbers.append(html.substring(start, html.length()));
 
     StringBuilder result = new StringBuilder();
     for (int i = 1; i < changeCounter; i++)
       result.append("<a href=\"#edit" + i + "\">" + i + "</a>&nbsp;");
     if (changeCounter != 1)
       result.append("<br/><br/>");
-    result.append(html);
+    result.append(withLineNumbers);
     return result.toString();
   }
 

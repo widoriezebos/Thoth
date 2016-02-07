@@ -52,4 +52,5 @@ diffsection { font-family: monospace; }
 ins { background:#20ff20; }
 del { background:#e01010; color: #ffffff; }
 
+.difflinenumber { float: right; background: #ffe0e0; }
 
