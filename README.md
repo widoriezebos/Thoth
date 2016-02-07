@@ -20,11 +20,17 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 2. Open your property file and start setting the required properties:
 3. Determine where to store the working information (local Git repositories managed by Thoth, one per branch). The property to set is workspacelocation. For instance:  
 	`workspacelocation=/Users/wido/Documents/ThothWorkspace`
-4. Set the git.username, git.password and git.repository properties to their correct values. For instance:  
-	`git.repository=https://github.com/widoriezebos/Thoth.git`  
-	`git.username=mygituser`  
-	`git.password=mysecret`
-5. Decide how you want to run Thoth.   
+4. Set the properties below to their correct values. For instance:  
+	`repository.1.name=MyRepository`  
+	`repository.1.type=git`  
+	`repository.1.location=https://github.com/widoriezebos/Thoth.git`  
+	`repository.1.username=mygituser`  
+	`repository.1.password=mysecret`  
+	  
+	`context.1.name=HelloThoth`  
+	`context.1.repository=MyRepository`  
+	`context.1.branch=master`
+5. Decide how you want to run Thoth.  
 	If you want to use the **simplest approach** (i.e. running just on your desktop) then just place the configuration.properties in your working folder and from there launch Thoth standalone (or pass the path to your property file as an argument) i.e.  
 	`java -jar <path-to-tooth-standalone.jar>` and off you go.
 
