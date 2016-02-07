@@ -38,7 +38,7 @@ public interface ContentManager {
 
   boolean accessAllowed(File file) throws IOException;
 
-  MarkDownDocument getMarkDownDocument(String documentPath) throws IOException, ContextNotFoundException;
+  MarkDownDocument getMarkDownDocument(String documentPath, boolean suppressErrors) throws IOException, ContextNotFoundException;
 
   List<Book> getBooks() throws ContextNotFoundException, IOException;
 

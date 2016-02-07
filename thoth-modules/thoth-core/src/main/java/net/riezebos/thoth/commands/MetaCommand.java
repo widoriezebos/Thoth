@@ -50,7 +50,7 @@ public class MetaCommand extends RendererBase implements Command {
       } else {
         ContentManager contentManager = getContentManager(context);
 
-        MarkDownDocument markDownDocument = getMarkDownDocument(context, path);
+        MarkDownDocument markDownDocument = getMarkDownDocument(context, path, true);
 
         DocumentNode root = markDownDocument.getDocumentStructure();
         List<DocumentNode> documentNodes = root.flatten(true);

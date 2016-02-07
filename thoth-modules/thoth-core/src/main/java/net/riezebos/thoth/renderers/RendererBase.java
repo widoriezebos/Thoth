@@ -43,6 +43,7 @@ import net.riezebos.thoth.util.ThothCoreUtil;
 
 public abstract class RendererBase implements Renderer {
 
+  public static final String SUPPRESS_ERRORS = "suppresserrors";
   private static final String VELOCITY_HELPER = "thothutil";
   private static final String VELOCITY_PROPERTIES = "net/riezebos/thoth/velocity.properties";
 
@@ -51,8 +52,8 @@ public abstract class RendererBase implements Renderer {
     return asJson(arguments) ? "application/json;charset=UTF-8" : "text/html;charset=UTF-8";
   }
 
-  protected MarkDownDocument getMarkDownDocument(String context, String path) throws IOException, ContentManagerException {
-    return getContentManager(context).getMarkDownDocument(path);
+  protected MarkDownDocument getMarkDownDocument(String context, String path, boolean suppressError) throws IOException, ContentManagerException {
+    return getContentManager(context).getMarkDownDocument(path, suppressError);
   }
 
   protected ContentManager getContentManager(String context) throws ContentManagerException {
@@ -108,6 +109,12 @@ public abstract class RendererBase implements Renderer {
     } catch (Exception e) {
       throw new RenderException(e);
     }
+  }
+
+  protected boolean suppressErrors(Map<String, Object> arguments) {
+    Object suppress = arguments.get(SUPPRESS_ERRORS);
+    boolean suppressErrors = "true".equalsIgnoreCase(String.valueOf(suppress));
+    return suppressErrors;
   }
 
 }

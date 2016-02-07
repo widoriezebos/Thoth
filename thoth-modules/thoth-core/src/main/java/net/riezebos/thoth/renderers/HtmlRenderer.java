@@ -56,7 +56,7 @@ public class HtmlRenderer extends RendererBase implements Renderer {
         if (file.isFile()) {
 
           Configuration configuration = ConfigurationFactory.getConfiguration();
-          MarkDownDocument markdown = getMarkDownDocument(context, path);
+          MarkDownDocument markdown = getMarkDownDocument(context, path, suppressErrors(arguments));
           String markdownSource = markdown.getMarkdown();
 
           int extensions = configuration.getMarkdownOptions();

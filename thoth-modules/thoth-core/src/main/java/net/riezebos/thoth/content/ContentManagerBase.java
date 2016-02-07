@@ -113,7 +113,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public MarkDownDocument getMarkDownDocument(String path) throws IOException, ContextNotFoundException {
+  public MarkDownDocument getMarkDownDocument(String path, boolean suppressErrors) throws IOException, ContextNotFoundException {
     String documentPath = ThothUtil.normalSlashes(path);
     if (documentPath.startsWith("/"))
       documentPath = documentPath.substring(1);
@@ -125,7 +125,7 @@ public abstract class ContentManagerBase implements ContentManager {
 
     try (FileInputStream in = new FileInputStream(file)) {
       String markdown = processor.execute(documentPath, in);
-      if (processor.hasErrors() && ConfigurationFactory.getConfiguration().appendErrors()) {
+      if (processor.hasErrors() && (ConfigurationFactory.getConfiguration().appendErrors() && !suppressErrors)) {
         markdown = appendErrors(processor, markdown);
       }
       MarkDownDocument markDownDocument = new MarkDownDocument(markdown, processor.getMetaTags(), processor.getErrors(), processor.getDocumentStructure());

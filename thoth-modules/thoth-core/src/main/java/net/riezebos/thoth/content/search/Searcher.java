@@ -90,7 +90,7 @@ public class Searcher {
 
           if (Indexer.TYPE_DOCUMENT.equals(document.get(Indexer.INDEX_TYPE))) {
             searchResult.setResource(false);
-            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(documentPath);
+            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(documentPath, true);
             String contents = markDownDocument.getMarkdown();
 
             SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();

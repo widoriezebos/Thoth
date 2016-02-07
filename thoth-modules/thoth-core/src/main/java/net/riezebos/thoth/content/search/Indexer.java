@@ -253,7 +253,7 @@ public class Indexer {
 
       try {
         String resourcePath = relativePath.toString();
-        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(resourcePath);
+        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(resourcePath, true);
         indexingContext.getErrors().addAll(markDownDocument.getErrors());
 
         // Also index non-documents if referenced and stored locally

@@ -44,7 +44,8 @@ public class RawRenderer extends RendererBase implements Renderer {
       if (absolutePath == null) {
         result = RenderResult.FORBIDDEN;
       } else {
-        MarkDownDocument markDownDocument = getMarkDownDocument(context, path);
+
+        MarkDownDocument markDownDocument = getMarkDownDocument(context, path, suppressErrors(arguments));
         String markdown = markDownDocument.getMarkdown();
         InputStream is = new ByteArrayInputStream(markdown.getBytes("UTF-8"));
         IOUtils.copy(is, outputStream);
@@ -54,5 +55,4 @@ public class RawRenderer extends RendererBase implements Renderer {
       throw new RenderException(e);
     }
   }
-
 }
