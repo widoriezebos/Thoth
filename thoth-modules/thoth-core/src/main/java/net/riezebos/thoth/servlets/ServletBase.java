@@ -120,10 +120,9 @@ public abstract class ServletBase extends HttpServlet {
 
       String context = getContext(request);
       if (StringUtils.isBlank(context)) {
-        context = configuration.getGlobalSkinContext();
+        context = configuration.getMainIndexSkinContext();
       }
-      if (context == null)
-        throw new ServletException("No contexts defined. Please setup Thoth.");
+
       CacheManager cacheManager = CacheManager.getInstance(context);
       List<SkinMapping> skinMappings = cacheManager.getSkinMappings();
       if (skinMappings == null) {

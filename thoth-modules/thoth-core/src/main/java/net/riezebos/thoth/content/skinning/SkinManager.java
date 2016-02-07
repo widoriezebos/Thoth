@@ -49,23 +49,27 @@ public class SkinManager {
 
   public List<SkinMapping> setupSkins(Configuration configuration, String context, CacheManager cacheManager)
       throws ContextNotFoundException, IOException, ContentManagerException, FileNotFoundException, UnsupportedEncodingException {
-    List<SkinMapping> skinMappings;
+    List<SkinMapping> skinMappings = new ArrayList<>();
     defaultSkin = registerBuiltinSkins(context);
-    registerLocalSkins(context);
-    skinMappings = new ArrayList<>();
-
-    String contextFolder = ContentManagerFactory.getContentManager(context).getContextFolder();
-    String skinMappingFileName = contextFolder + SKINS_PROPERTIES;
-    File skinMappingFile = new File(skinMappingFileName);
-    if (!skinMappingFile.isFile()) {
-      LOG.warn("No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFileName + " so falling back to default which is "
-          + configuration.getDefaultSkin());
+    if (StringUtils.isBlank(context)) {
       skinMappings.add(new SkinMapping(Pattern.compile(".*"), defaultSkin));
     } else {
-      skinMappings.addAll(createSkinMappingsFromFile(context, skinMappingFileName));
-    }
-    cacheManager.registerSkinMappings(skinMappings);
+      registerLocalSkins(context);
 
+      if (!StringUtils.isBlank(context)) {
+        String contextFolder = ContentManagerFactory.getContentManager(context).getContextFolder();
+        String skinMappingFileName = contextFolder + SKINS_PROPERTIES;
+        File skinMappingFile = new File(skinMappingFileName);
+        if (!skinMappingFile.isFile()) {
+          LOG.warn("No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFileName + " so falling back to default which is "
+              + configuration.getDefaultSkin());
+          skinMappings.add(new SkinMapping(Pattern.compile(".*"), defaultSkin));
+        } else {
+          skinMappings.addAll(createSkinMappingsFromFile(context, skinMappingFileName));
+        }
+      }
+      cacheManager.registerSkinMappings(skinMappings);
+    }
     setupInheritance(cacheManager);
     return skinMappings;
   }

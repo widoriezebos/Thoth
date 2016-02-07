@@ -243,4 +243,9 @@ public class CacheManager {
   private void setContext(String context) {
     this.context = context;
   }
+
+  @Override
+  public String toString() {
+    return "Cache for " + getContext();
+  }
 }

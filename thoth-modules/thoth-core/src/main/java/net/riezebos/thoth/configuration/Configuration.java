@@ -87,7 +87,7 @@ public interface Configuration {
 
   String getIndexExtensions();
 
-  String getGlobalSkinContext();
+  String getMainIndexSkinContext();
 
   String getDefaultSkin();
 

@@ -46,7 +46,8 @@ public class Skin extends PropertyLoader {
    * @throws ContextNotFoundException
    */
   public Skin(String context, String skinPropertyFile) throws ContextNotFoundException, ContentManagerException {
-    contextFolder = ContentManagerFactory.getContentManager(context).getContextFolder();
+    if(StringUtils.isBlank(context)) contextFolder = "";
+    else contextFolder = ContentManagerFactory.getContentManager(context).getContextFolder();
     if (skinPropertyFile.startsWith(CLASSPATH_PREFIX)) {
       fromClassPath = true;
       String resourceName = skinPropertyFile.substring(CLASSPATH_PREFIX.length());

@@ -271,14 +271,8 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    * @see net.riezebos.thoth.configuration.ConfigurationT#getGlobalSkinContext()
    */
   @Override
-  public String getGlobalSkinContext() {
-    String context = getValue("skin.globalcontext", null);
-    if (StringUtils.isBlank(context)) {
-      List<String> contexts = getContexts();
-      if (!contexts.isEmpty())
-        context = contexts.get(0);
-    }
-    return context;
+  public String getMainIndexSkinContext() {
+    return getValue("skin.mainindexcontext", null);
   }
 
   /*
