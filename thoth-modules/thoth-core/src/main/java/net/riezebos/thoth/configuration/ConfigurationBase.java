@@ -110,8 +110,8 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
         String url = getValue("repository." + idx + ".url", null);
         String location = getValue("repository." + idx + ".location", null);
         repodef.setLocation(location == null ? url : location);
-        repodef.setUsername(getValue("repository." + idx + ".username"));
-        repodef.setPassword(getValue("repository." + idx + ".password"));
+        repodef.setUsername(getValue("repository." + idx + ".username", null));
+        repodef.setPassword(getValue("repository." + idx + ".password", null));
         repodef.setType(getValue("repository." + idx + ".type"));
         String key = repodef.getName().toLowerCase();
         if (repositoryDefinitions.containsKey(key)) {
