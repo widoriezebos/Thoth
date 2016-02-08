@@ -54,8 +54,8 @@ import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.Revision;
-import net.riezebos.thoth.content.versioncontrol.SimpleDiffFormatter;
 import net.riezebos.thoth.content.versioncontrol.Revision.Action;
+import net.riezebos.thoth.content.versioncontrol.SimpleDiffFormatter;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -63,8 +63,8 @@ import net.riezebos.thoth.util.PagedList;
 
 /**
  * Support GIT based version control as the manager for the content
+ * 
  * @author wido
- *
  */
 public class GitContentManager extends ContentManagerBase {
 
@@ -100,26 +100,29 @@ public class GitContentManager extends ContentManagerBase {
               ObjectId oldHead = repository.resolve(HEAD_TREE);
 
               PullResult pullResult = repos.pull().setCredentialsProvider(credentialsProvider).call();
-              info(log, pullResult.isSuccessful() ? "Pulling " + getContext() + " was successful" : "Pull of " + getContext() + " failed");
               ObjectId newHead = repository.resolve(HEAD_TREE);
-
-              if ((oldHead == null && newHead != null)//
-                  || (oldHead != null && !oldHead.equals(newHead)))
+              boolean changes = (oldHead == null && newHead != null)//
+                  || (oldHead != null && !oldHead.equals(newHead));
+              if (changes)
                 notifyContextContentsChanged();
+
+              String message = pullResult.isSuccessful() ? ": Pull successful, " : ": Pull of failed, ";
+              message += changes ? CHANGES_DETECTED_MSG : NO_CHANGES_DETECTED_MSG;
+              info(log, getContext() + message);
 
               setLatestRefresh(new Date());
             } catch (Exception e) {
               severe(log, e);
             }
           } else {
-            info(log, "Cloning from " + repositoryUrl + " to " + contextFolder);
+            info(log, getContext() + ": Cloning from " + repositoryUrl + " to " + contextFolder);
             target.mkdirs();
             try (Git result = Git.cloneRepository()//
                 .setURI(repositoryUrl)//
                 .setBranch(getBranch())//
                 .setCredentialsProvider(credentialsProvider)//
                 .setDirectory(target).call()) {
-              info(log, "Cloned repository: " + result.getRepository().getDirectory());
+              info(log, getContext() + ": Cloned repository: " + result.getRepository().getDirectory());
               setLatestRefresh(new Date());
               notifyContextContentsChanged();
             } catch (Exception e) {

@@ -63,16 +63,18 @@ public class FSContentManager extends ContentManagerBase {
   @Override
   protected synchronized String cloneOrPull() throws ContentManagerException {
 
+    boolean changes = false;
     try {
       long contextChecksum = getContextChecksum();
-      if (contextChecksum != previousChecksum)
+      changes = contextChecksum != previousChecksum;
+      if (changes)
         notifyContextContentsChanged();
       previousChecksum = contextChecksum;
     } catch (IOException e) {
       throw new ContentManagerException(e);
     }
 
-    return "No need to pull " + getContext() + " because this content manager is file system based";
+    return getContext() + ": " + (changes ? CHANGES_DETECTED_MSG : NO_CHANGES_DETECTED_MSG);
   }
 
   @Override

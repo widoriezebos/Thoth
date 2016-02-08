@@ -49,6 +49,8 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class ContentManagerBase implements ContentManager {
   private static final Logger LOG = LoggerFactory.getLogger(ContentManagerBase.class);
+  protected static final String NO_CHANGES_DETECTED_MSG = "No changes detected";
+  protected static final String CHANGES_DETECTED_MSG = "Changes detected, reindex requested";
 
   private String rootCanon = null;
   private boolean refreshing = false;

@@ -61,7 +61,7 @@ public class SkinManager {
         String skinMappingFileName = contextFolder + SKINS_PROPERTIES;
         File skinMappingFile = new File(skinMappingFileName);
         if (!skinMappingFile.isFile()) {
-          LOG.warn("No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFileName + " so falling back to default which is "
+          LOG.info("No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFileName + " so falling back to default which is "
               + configuration.getDefaultSkin());
           skinMappings.add(new SkinMapping(Pattern.compile(".*"), defaultSkin));
         } else {
