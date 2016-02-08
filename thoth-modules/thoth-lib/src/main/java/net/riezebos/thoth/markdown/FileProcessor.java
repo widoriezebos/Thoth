@@ -50,7 +50,6 @@ public class FileProcessor {
 
   private List<Bookmark> bookmarks = new ArrayList<Bookmark>();
   private int maxNumberingLevel = DEFAULT_NUMBERING_LEVEL;
-  private Pattern metainfo = Pattern.compile("\\<\\!\\-\\-\\s*meta\\s*(\\w+)\\s*\\=\\s*([^\\-]*)\\s*\\-\\-\\>");
   private String library;
   private String rootFolder;
   private List<ProcessorError> errors = new ArrayList<ProcessorError>();
@@ -77,8 +76,9 @@ public class FileProcessor {
     reset();
     BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
     String line = readLine(br);
-    while (line != null) {
-      extractMetaInfo(line);
+    boolean inMetaDataSection = true;
+    while (line != null && inMetaDataSection) {
+      inMetaDataSection = extractMetaInfo(line);
       line = readLine(br);
     }
     br.close();
@@ -113,16 +113,21 @@ public class FileProcessor {
     return line;
   }
 
-  protected void extractMetaInfo(String line) {
-    if (line.indexOf("<!--") != -1) {
-      Matcher matcher = metainfo.matcher(line);
-      if (matcher.find()) {
-        String key = matcher.group(1);
-        String value = matcher.group(2).trim();
-        if (!this.metaTags.containsKey(key))
+  protected boolean extractMetaInfo(String line) {
+    int idx = line.indexOf(":");
+    if (idx != -1) {
+      boolean consider = Character.isLetter(line.trim().charAt(0));
+      consider &= !line.trim().startsWith("http://");
+      consider &= !line.trim().startsWith("ftp://");
+      if (consider) {
+        String key = line.substring(0, idx).trim();
+        String value = line.substring(idx + 1).trim();
+        if (!this.metaTags.containsKey(key) && value.length() > 0)
           this.metaTags.put(key, value);
+        return true;
       }
     }
+    return false;
   }
 
   protected void updateTocFlag(String line) {

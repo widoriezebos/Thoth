@@ -83,6 +83,7 @@ public class IncludeProcessor extends FileProcessor {
     } else {
       BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
       int lineNumber = 1;
+      boolean inMetaDataSection = true;
       String line = readLine(br);
       while (line != null) {
         setLineNumber(lineNumber++);
@@ -126,8 +127,12 @@ public class IncludeProcessor extends FileProcessor {
             out.print(suffix);
           } else {
             line = handleLinks(currentFolder, line, includeStack);
-            extractMetaInfo(line);
-            out.println(line);
+            if (inMetaDataSection)
+              inMetaDataSection = extractMetaInfo(line);
+
+            // Write the output
+            if (!inMetaDataSection)
+              out.println(line);
           }
         }
         line = readLine(br);
