@@ -29,6 +29,8 @@ import net.riezebos.thoth.beans.BookClassification;
  * @author wido
  */
 public class Classifier {
+  private static final String FOLDER_META_TAG = "folder";
+
   public List<BookClassification> getClassifications(List<Book> books, String metaTagName, String defaultValue) {
     Map<String, BookClassification> classificationMap = new HashMap<>();
 
@@ -38,7 +40,7 @@ public class Classifier {
 
       if (classificationSpec == null) {
         // Special case for meta tag 'folder'
-        if ("folder".equalsIgnoreCase(metaTagName)) {
+        if (FOLDER_META_TAG.equalsIgnoreCase(metaTagName)) {
           classificationSpec = book.getFolder();
           if (StringUtils.isBlank(classificationSpec))
             classificationSpec = "/";
