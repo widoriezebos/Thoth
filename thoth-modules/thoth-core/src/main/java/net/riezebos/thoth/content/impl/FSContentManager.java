@@ -18,7 +18,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.riezebos.thoth.configuration.ContextDefinition;
+import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -39,6 +42,7 @@ public class FSContentManager extends ContentManagerBase {
 
   public FSContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
     super(contextDefinition);
+    validateContextDefinition(contextDefinition);
     fsroot = ThothUtil.normalSlashes(contextDefinition.getRepositoryDefinition().getLocation());
     if (!fsroot.endsWith("/"))
       fsroot += "/";
@@ -86,5 +90,11 @@ public class FSContentManager extends ContentManagerBase {
   public SourceDiff getDiff(String diffSpec) throws ContentManagerException {
 
     return new SourceDiff("nobody", "", "", new Date(0L));
+  }
+
+  protected void validateContextDefinition(ContextDefinition contextDefinition) throws ContentManagerException {
+    RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
+    if (StringUtils.isBlank(repositoryDefinition.getLocation()))
+      throw new ContentManagerException("Location not set for repositiory " + repositoryDefinition.getName());
   }
 }

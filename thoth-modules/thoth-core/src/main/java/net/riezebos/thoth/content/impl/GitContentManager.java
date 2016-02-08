@@ -73,6 +73,7 @@ public class GitContentManager extends ContentManagerBase {
 
   public GitContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
     super(contextDefinition);
+    validateContextDefinition(contextDefinition);
   }
 
   protected synchronized String cloneOrPull() throws ContentManagerException {
@@ -372,6 +373,18 @@ public class GitContentManager extends ContentManagerBase {
     if (changeType == ChangeType.RENAME)
       return Action.RENAME;
     return Action.MODIFY;
+  }
+
+  protected void validateContextDefinition(ContextDefinition contextDefinition) throws ContentManagerException {
+    RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
+    if (StringUtils.isBlank(repositoryDefinition.getUsername()))
+      throw new ContentManagerException("Username not set for repositiory " + repositoryDefinition.getName());
+    if (StringUtils.isBlank(repositoryDefinition.getPassword()))
+      throw new ContentManagerException("Password not set for repositiory " + repositoryDefinition.getName());
+    if (StringUtils.isBlank(repositoryDefinition.getLocation()))
+      throw new ContentManagerException("Location not set for repositiory " + repositoryDefinition.getName());
+    if (StringUtils.isBlank(contextDefinition.getBranch()))
+      throw new ContentManagerException("Branch not set for context " + contextDefinition.getName());
   }
 
   protected void info(StringBuilder log, String message) {

@@ -75,7 +75,7 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
       if (StringUtils.isNotBlank(contextName)) {
 
         String repository = getValue("context." + idx + ".repository");
-        String branch = getValue("context." + idx + ".branch");
+        String branch = getValue("context." + idx + ".branch", null);
         String refreshSeconds = getValue("context." + idx + ".refreshseconds", "60");
         long refreshMs = Long.parseLong(refreshSeconds) * 1000;
 
