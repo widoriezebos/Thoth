@@ -106,4 +106,10 @@ public class ContentManagerFactory {
       report.append(getContentManager(context).refresh());
     return report.toString();
   }
+
+  public static void reindexAll() throws ContentManagerException {
+    Configuration configuration = ConfigurationFactory.getConfiguration();
+    for (String context : configuration.getContexts())
+      getContentManager(context).reindex();
+  }
 }
