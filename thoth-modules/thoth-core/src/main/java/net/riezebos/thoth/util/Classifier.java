@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
 
@@ -35,9 +37,12 @@ public class Classifier {
       String classificationSpec = book.getMetaTag(metaTagName);
 
       if (classificationSpec == null) {
-        if ("folder".equalsIgnoreCase(metaTagName))
+        // Special case for meta tag 'folder'
+        if ("folder".equalsIgnoreCase(metaTagName)) {
           classificationSpec = book.getFolder();
-        else
+          if (StringUtils.isBlank(classificationSpec))
+            classificationSpec = "/";
+        } else
           classificationSpec = defaultValue;
       }
 
