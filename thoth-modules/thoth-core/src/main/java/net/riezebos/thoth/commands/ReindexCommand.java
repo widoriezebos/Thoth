@@ -19,7 +19,10 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
@@ -39,8 +42,12 @@ public class ReindexCommand extends RendererBase implements Command {
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
 
-      ContentManager contentManager = getContentManager(context);
-      contentManager.reindex();
+      if (StringUtils.isBlank(context))
+        ContentManagerFactory.reindexAll();
+      else {
+        ContentManager contentManager = getContentManager(context);
+        contentManager.reindex();
+      }
       Map<String, Object> variables = new HashMap<>(arguments);
       String log = "Reindex reuested. Running in the background";
       variables.put("log", log);
