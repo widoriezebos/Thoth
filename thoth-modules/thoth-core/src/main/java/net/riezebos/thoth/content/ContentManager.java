@@ -75,4 +75,5 @@ public interface ContentManager {
 
   long getContextChecksum() throws IOException, ContextNotFoundException;
 
+  boolean supportsVersionControl();
 }

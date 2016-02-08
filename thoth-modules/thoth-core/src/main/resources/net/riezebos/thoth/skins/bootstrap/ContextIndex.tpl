@@ -13,7 +13,9 @@
 <form action="${contexturl}?cmd=search" method="get">
   Search all of ${context}: <input type="text" name="query"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
 </form>
+#if($versioncontrolled)
 Click <a href="${contexturl}/?cmd=revisions">here</a> for the latest changes, or click on a meta link below to zoom in on a document.<br/>
+#end
 Click <a href="${contexturl}/?cmd=validationreport">here</a> for the validation report of this entire context<br/>
 Click <a href="${contexturl}/?cmd=browse">here</a> to browse the library
 

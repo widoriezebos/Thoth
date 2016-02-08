@@ -97,4 +97,9 @@ public class FSContentManager extends ContentManagerBase {
     if (StringUtils.isBlank(repositoryDefinition.getLocation()))
       throw new ContentManagerException("Location not set for repositiory " + repositoryDefinition.getName());
   }
+
+  @Override
+  public boolean supportsVersionControl() {
+    return false;
+  }
 }

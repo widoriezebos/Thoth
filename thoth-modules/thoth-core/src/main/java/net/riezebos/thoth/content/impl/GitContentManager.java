@@ -76,6 +76,12 @@ public class GitContentManager extends ContentManagerBase {
     validateContextDefinition(contextDefinition);
   }
 
+  @Override
+  public boolean supportsVersionControl() {
+    return true;
+  }
+
+  @Override
   protected synchronized String cloneOrPull() throws ContentManagerException {
     StringBuilder log = new StringBuilder();
     try {
@@ -229,6 +235,7 @@ public class GitContentManager extends ContentManagerBase {
     return commit;
   }
 
+  @Override
   public SourceDiff getDiff(String diffSpec) throws ContentManagerException {
 
     int idx = diffSpec.indexOf('/');

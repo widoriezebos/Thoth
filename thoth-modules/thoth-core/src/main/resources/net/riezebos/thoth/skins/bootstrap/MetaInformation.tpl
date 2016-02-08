@@ -58,6 +58,7 @@ This document is not uncluded by any other document.
 #end
 #end
 
+#if($versioncontrolled)
 <h3>Version history (summary)</h3>
 	
 <table>
@@ -104,5 +105,6 @@ ${revision.action}:
   <tr><td colspan="3"></td></tr>
 #end
 </table>
+#end
 </body>
 </html>

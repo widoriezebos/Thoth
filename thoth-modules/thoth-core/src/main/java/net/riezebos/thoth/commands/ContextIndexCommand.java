@@ -54,6 +54,7 @@ public class ContextIndexCommand extends RendererBase implements Command {
       }
       variables.putAll(arguments);
       variables.put("books", books);
+      variables.put("versioncontrolled", contentManager.supportsVersionControl());
 
       if (asJson(arguments))
         executeJson(variables, outputStream);

@@ -57,7 +57,7 @@ This document is not uncluded by any other document.
 <a href="$contexturl/${documentPath}">${documentPath}</a> (<a href="$contexturl/${documentPath}?cmd=meta">meta</a>)<br/>
 #end
 #end
-
+#if($versioncontrolled)
 <h3>Version history (summary)</h3>
 	
 <table>
@@ -96,5 +96,6 @@ This document is not uncluded by any other document.
   <tr><td colspan="3"></td></tr>
 #end
 </table>
+#end
 </body>
 </html>

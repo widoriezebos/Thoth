@@ -86,6 +86,7 @@ public class MetaCommand extends RendererBase implements Command {
         variables.put("metatagKeys", metaTagKeys);
         variables.put("metatags", metatags);
         variables.put("errors", markDownDocument.getErrors());
+        variables.put("versioncontrolled", contentManager.supportsVersionControl());
 
         if (asJson(arguments))
           executeJson(variables, outputStream);
