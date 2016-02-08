@@ -67,6 +67,7 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.IndexerException;
+import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
@@ -253,7 +254,7 @@ public class Indexer {
 
       try {
         String resourcePath = relativePath.toString();
-        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(resourcePath, true);
+        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(resourcePath, true, CriticProcessingMode.DO_NOTHING);
         indexingContext.getErrors().addAll(markDownDocument.getErrors());
 
         // Also index non-documents if referenced and stored locally

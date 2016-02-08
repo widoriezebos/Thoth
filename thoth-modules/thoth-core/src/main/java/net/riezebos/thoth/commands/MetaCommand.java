@@ -30,6 +30,7 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.renderers.RendererBase;
 
@@ -50,7 +51,7 @@ public class MetaCommand extends RendererBase implements Command {
       } else {
         ContentManager contentManager = getContentManager(context);
 
-        MarkDownDocument markDownDocument = getMarkDownDocument(context, path, true);
+        MarkDownDocument markDownDocument = getMarkDownDocument(context, path, true, CriticProcessingMode.DO_NOTHING);
 
         DocumentNode root = markDownDocument.getDocumentStructure();
         List<DocumentNode> documentNodes = root.flatten(true);

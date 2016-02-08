@@ -26,6 +26,7 @@ import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.util.PagedList;
 
 public interface ContentManager {
@@ -38,7 +39,7 @@ public interface ContentManager {
 
   boolean accessAllowed(File file) throws IOException;
 
-  MarkDownDocument getMarkDownDocument(String documentPath, boolean suppressErrors) throws IOException, ContextNotFoundException;
+  MarkDownDocument getMarkDownDocument(String documentPath, boolean suppressErrors, CriticProcessingMode criticProcessingMode) throws IOException, ContextNotFoundException;
 
   List<Book> getBooks() throws ContextNotFoundException, IOException;
 

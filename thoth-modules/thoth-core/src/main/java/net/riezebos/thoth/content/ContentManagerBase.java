@@ -43,6 +43,7 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.FileProcessor;
 import net.riezebos.thoth.markdown.IncludeProcessor;
+import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.DiscardingList;
 import net.riezebos.thoth.util.ThothUtil;
@@ -115,7 +116,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public MarkDownDocument getMarkDownDocument(String path, boolean suppressErrors) throws IOException, ContextNotFoundException {
+  public MarkDownDocument getMarkDownDocument(String path, boolean suppressErrors, CriticProcessingMode criticProcessingMode) throws IOException, ContextNotFoundException {
     String documentPath = ThothUtil.normalSlashes(path);
     if (documentPath.startsWith("/"))
       documentPath = documentPath.substring(1);
@@ -124,6 +125,7 @@ public abstract class ContentManagerBase implements ContentManager {
     IncludeProcessor processor = new IncludeProcessor();
     processor.setLibrary(getContextFolder());
     processor.setRootFolder(ThothUtil.getFolder(physicalFilePath));
+    processor.setCriticProcessingMode(criticProcessingMode);
 
     try (FileInputStream in = new FileInputStream(file)) {
       String markdown = processor.execute(documentPath, in);

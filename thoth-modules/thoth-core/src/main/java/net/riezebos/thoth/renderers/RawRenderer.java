@@ -45,7 +45,7 @@ public class RawRenderer extends RendererBase implements Renderer {
         result = RenderResult.FORBIDDEN;
       } else {
 
-        MarkDownDocument markDownDocument = getMarkDownDocument(context, path, suppressErrors(arguments));
+        MarkDownDocument markDownDocument = getMarkDownDocument(context, path, suppressErrors(arguments), getCriticProcessingMode(arguments));
         String markdown = markDownDocument.getMarkdown();
         InputStream is = new ByteArrayInputStream(markdown.getBytes("UTF-8"));
         IOUtils.copy(is, outputStream);

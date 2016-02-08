@@ -39,11 +39,13 @@ import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.util.ThothCoreUtil;
 
 public abstract class RendererBase implements Renderer {
 
   public static final String SUPPRESS_ERRORS = "suppresserrors";
+  public static final String CRITICS = "critics";
   private static final String VELOCITY_HELPER = "thothutil";
   private static final String VELOCITY_PROPERTIES = "net/riezebos/thoth/velocity.properties";
 
@@ -52,8 +54,8 @@ public abstract class RendererBase implements Renderer {
     return asJson(arguments) ? "application/json;charset=UTF-8" : "text/html;charset=UTF-8";
   }
 
-  protected MarkDownDocument getMarkDownDocument(String context, String path, boolean suppressError) throws IOException, ContentManagerException {
-    return getContentManager(context).getMarkDownDocument(path, suppressError);
+  protected MarkDownDocument getMarkDownDocument(String context, String path, boolean suppressError, CriticProcessingMode criticProcessingMode) throws IOException, ContentManagerException {
+    return getContentManager(context).getMarkDownDocument(path, suppressError, criticProcessingMode);
   }
 
   protected ContentManager getContentManager(String context) throws ContentManagerException {
@@ -117,4 +119,12 @@ public abstract class RendererBase implements Renderer {
     return suppressErrors;
   }
 
+  protected CriticProcessingMode getCriticProcessingMode(Map<String, Object> arguments) {
+    Object critics = arguments.get(CRITICS);
+    if ("show".equalsIgnoreCase(String.valueOf(critics)))
+      return CriticProcessingMode.TRANSLATE_ONLY;
+    if ("raw".equalsIgnoreCase(String.valueOf(critics)))
+      return CriticProcessingMode.DO_NOTHING;
+    return CriticProcessingMode.PROCESS;
+  }
 }

@@ -44,6 +44,7 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.SearchException;
+import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.util.PagedList;
 import net.riezebos.thoth.util.ThothCoreUtil;
@@ -90,7 +91,7 @@ public class Searcher {
 
           if (Indexer.TYPE_DOCUMENT.equals(document.get(Indexer.INDEX_TYPE))) {
             searchResult.setResource(false);
-            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(documentPath, true);
+            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(documentPath, true, CriticProcessingMode.DO_NOTHING);
             String contents = markDownDocument.getMarkdown();
 
             SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();

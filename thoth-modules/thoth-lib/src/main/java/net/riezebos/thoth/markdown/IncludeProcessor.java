@@ -33,6 +33,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.riezebos.thoth.beans.BookmarkUsage;
+import net.riezebos.thoth.markdown.critics.CriticMarkupProcessor;
+import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
@@ -50,6 +52,7 @@ public class IncludeProcessor extends FileProcessor {
   private Pattern includeImages = Pattern.compile("\\\\includeimages\\{(.*?)\\}"); // Handle image icludes based on a filespec
   private Pattern hyperlink = Pattern.compile("\\[(.*?)\\]\\(([^\")]*)(.*?)\\)");
   private DocumentNode documentStructure;
+  private CriticProcessingMode criticProcessingMode = CriticProcessingMode.PROCESS;
 
   public String execute(String fileName, InputStream in) throws IOException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream(50000);
@@ -65,11 +68,18 @@ public class IncludeProcessor extends FileProcessor {
 
     validate();
 
+    String markdown;
+
     if (containsToc()) {
       String document = new String(bos.toByteArray(), "UTF-8");
-      return createToc(document);
-    } else
-      return bos.toString("UTF-8");
+      markdown = createToc(document);
+    } else {
+      markdown = bos.toString("UTF-8");
+    }
+
+    CriticMarkupProcessor criticMarkupProcessor = new CriticMarkupProcessor();
+    markdown = criticMarkupProcessor.processCritics(markdown, criticProcessingMode);
+    return markdown;
   }
 
   protected void processFile(String currentFolder, InputStream fis, PrintStream out, Stack<DocumentNode> includeStack, int headerIndent) throws IOException {
@@ -435,6 +445,10 @@ public class IncludeProcessor extends FileProcessor {
 
   private void setDocumentStructure(DocumentNode documentStructure) {
     this.documentStructure = documentStructure;
+  }
+
+  public void setCriticProcessingMode(CriticProcessingMode criticProcessingMode) {
+    this.criticProcessingMode = criticProcessingMode;
   }
 
 }
