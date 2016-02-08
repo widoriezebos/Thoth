@@ -18,13 +18,15 @@ You can apply any number of skins to Thoth itself and the documents it can rende
 Thoth has an embedded search engine that automatically updates it’s index when changes are submitted (pushed) you the central documentation repository. The search engine supports complex expressions to help you narrow down when a simple query does not cut it.
 
 ## Meta data
-You can add meta data to your documents that can help you organize your library. Documents can be categorized based on folder structure or meta tags and meta tags can be used in templates used for rendering your output
+You can add meta data to your documents that can help you organize (and search) your library. Documents can be categorized based on folder structure or meta tags and meta tags can be used in templates used for rendering your output. The syntax adheres to [MultiMarkdown](https://github.com/fletcher/MultiMarkdown/wiki/MultiMarkdown-Syntax-Guide) although currently metadata cannot span multiple lines.
+
+## Supports Critic Markup
+You can propose additions, deletions, changes and add comments like you would do in MS Word right in your markdown. You can then choose to have these to be part of the rendered output, or show them for review until either accepted in the final document version. The syntax is based on [Critic Markup](http://criticmarkup.com)
 
 ## Configurable and extendable rendering pipeline
 Out of the box Thoth can render your Markdown documents to CSS styled HTML pages. By configuring additional outputs like PDF or EPUB you can easily render the same content to any format you want as long as you have a rendering tool that does that for you. Very good options here are [Prince](http://www.princexml.com), [Wk\<html\>to*pdf*](http://wkhtmltopdf.org) and [Pandoc](http://pandoc.org). As long as you have a command line tool that can render Markdown, CSS rich or plain HTML then you can plug it into Thoth.
 
 ## Open source, Apache license
 Thoth is open source, free and available under the [Apache license](http://www.apache.org/licenses/LICENSE-2.0). This basically means you can do whatever you like with Thoth, including use in commercial environments as long as you adhere to the terms of the license.
-
 
 
