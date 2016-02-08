@@ -386,7 +386,10 @@ public class FileProcessor {
     }
     if (!bookmarks.isEmpty())
       toc.append("</" + TABLEOFCONTENTS_TAG + ">");
-    document = document.replaceAll("\\\\tableofcontents", toc.toString().trim() + "\n");
+
+    Pattern pattern = Pattern.compile("^\\\\tableofcontents", Pattern.MULTILINE);
+    Matcher matcher = pattern.matcher(document);
+    document = matcher.replaceAll(toc.toString().trim()) + "\n";
     return document;
   }
 
