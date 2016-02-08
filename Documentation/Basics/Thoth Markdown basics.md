@@ -4,16 +4,25 @@ Currently Thoth uses the Markdown syntax as [defined originally by John Gruber](
 Note that a lot of Markdown constructs require an empty line before it. If you see unexpected results with a header, a list or a table then usually this is resolved by placing an empty line directly about your construct.
 Whitespace is generally not rendered. If you want an empty line between your paragraphs however you can simply enter two consecutive new-line characters.
 
+## Table of Contents
+You can add a generated TOC section to your document by adding \tableofcontents tag to your document. All headers present in the document will be used to create the TOC, using the level of the header to indent appropriately. Note that the \tableofcontents construct must appear (without any prefixes) at the beginning of a line.
+
+	\tableofcontents
+
 ## Headers
-SetExt style (either use a ‘-‘ or a ‘=‘)
+Note: headers will be automatically numbered by Thoth (unless turned off in the configuration by setting markdown.maxheadernumberlevel = 0, default is 3). The following two methods of header specification are supported:
+
+**SetExt style (either use a ‘-‘ or a ‘=‘)**
 
 	My header
 	=========
 
-Atx style (1 - 6 hashes to denote the level)
+**Atx style (1 - 6 hashes to denote the level)**
 
 	#My Level 1 header
 	##My level 2 header
+	...
+	######My level 6 header
 
 ## Block quotes
 You can use a \> character to start a block quote.
@@ -115,4 +124,3 @@ You can render a table using a ‘|’ character as a separator between columns 
 Although not encouraged, you can place HTML fragments directly in your markdown. Since this goes directly against the spirit of Markdown altogether this obviously should be used as the exception of the rule (i.e. title pages etc).
 
 	<b>Any html</b>
-
