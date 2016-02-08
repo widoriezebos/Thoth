@@ -116,20 +116,23 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public MarkDownDocument getMarkDownDocument(String path, boolean suppressErrors, CriticProcessingMode criticProcessingMode) throws IOException, ContextNotFoundException {
+  public MarkDownDocument getMarkDownDocument(String path, boolean suppressErrors, CriticProcessingMode criticProcessingMode)
+      throws IOException, ContextNotFoundException {
     String documentPath = ThothUtil.normalSlashes(path);
     if (documentPath.startsWith("/"))
       documentPath = documentPath.substring(1);
     String physicalFilePath = getContextFolder() + documentPath;
     File file = new File(physicalFilePath);
+    Configuration configuration = ConfigurationFactory.getConfiguration();
     IncludeProcessor processor = new IncludeProcessor();
     processor.setLibrary(getContextFolder());
     processor.setRootFolder(ThothUtil.getFolder(physicalFilePath));
     processor.setCriticProcessingMode(criticProcessingMode);
+    processor.setMaxNumberingLevel(configuration.getMaxHeaderNumberingLevel());
 
     try (FileInputStream in = new FileInputStream(file)) {
       String markdown = processor.execute(documentPath, in);
-      if (processor.hasErrors() && (ConfigurationFactory.getConfiguration().appendErrors() && !suppressErrors)) {
+      if (processor.hasErrors() && (configuration.appendErrors() && !suppressErrors)) {
         markdown = appendErrors(processor, markdown);
       }
       MarkDownDocument markDownDocument = new MarkDownDocument(markdown, processor.getMetaTags(), processor.getErrors(), processor.getDocumentStructure());

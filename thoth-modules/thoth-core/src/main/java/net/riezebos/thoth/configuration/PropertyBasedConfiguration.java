@@ -429,4 +429,9 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   public boolean isResource(String path) {
     return !isFragment(path) && !isBook(path);
   }
+  
+  @Override
+  public int getMaxHeaderNumberingLevel() {
+    return Integer.parseInt(getValue("markdown.maxheadernumberlevel", "3"));
+  }
 }
