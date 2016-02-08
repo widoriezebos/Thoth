@@ -105,7 +105,7 @@ public class IncludeProcessor extends FileProcessor {
           matcher = includeLatex.matcher(line);
           found = matcher.find();
         }
-        if (found) {
+        if (found && !inCodeBlock(line)) {
           String prefix = line.substring(0, matcher.start());
           String suffix = line.substring(matcher.end());
           out.print(prefix);
@@ -151,18 +151,9 @@ public class IncludeProcessor extends FileProcessor {
     }
   }
 
-  protected int asInt(String indentStr) {
-    try {
-      return Integer.parseInt(indentStr);
-    } catch (Exception x) {
-      error("Invalid value for integer specified " + indentStr);
-    }
-    return 0;
-  }
-
   protected String handleLinks(String currentFolder, String line, Stack<DocumentNode> includeStack) throws IOException {
     // Small optimization to avoid RegExp stuff for lines that do not need processing anyways
-    if (line.indexOf("[") != -1) {
+    if (line.indexOf("[") != -1 && !inCodeBlock(line)) {
       // Check whether we need to fix relative paths for images
       Matcher matcher = hyperlink.matcher(line);
       int idx = 0;

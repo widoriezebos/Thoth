@@ -43,6 +43,8 @@ import net.riezebos.thoth.util.ThothUtil;
  */
 public class FileProcessor {
 
+  private static final String SOFTLINKS_PROPERTIES_DFLT = "softlinks.properties";
+
   public static final String TABLEOFCONTENTS_TAG = "tableofcontents";
 
   protected static int DEFAULT_NUMBERING_LEVEL = 3;
@@ -59,7 +61,7 @@ public class FileProcessor {
   private int[] headerCounters = new int[20];
   private boolean addComments = true;
   private boolean stripTrailingWhitespace = true;
-  private String softLinkFileName = "softlinks.properties";
+  private String softLinkFileName = null;
   private Map<String, String> softLinkMappings = new HashMap<String, String>();
   private List<SoftLinkTranslation> softLinkTranslations = new ArrayList<SoftLinkTranslation>();
   protected List<BookmarkUsage> bookmarkUsages = new ArrayList<BookmarkUsage>();
@@ -519,6 +521,14 @@ public class FileProcessor {
     softLinkMappings = new HashMap<String, String>();
     softLinkTranslations = new ArrayList<SoftLinkTranslation>();
     String softLinkFileName = getSoftLinkFileName();
+
+    // If not set then try the default; but do not warn if that file is not found
+    boolean showErrorNoNotFound = true;
+    if (softLinkFileName == null) {
+      softLinkFileName = SOFTLINKS_PROPERTIES_DFLT;
+      showErrorNoNotFound = false;
+    }
+
     if (softLinkFileName.startsWith("/"))
       softLinkFileName = softLinkFileName.substring(1);
     String fileName = getLibrary() + softLinkFileName;
@@ -548,7 +558,7 @@ public class FileProcessor {
       }
       br.close();
 
-    } else
+    } else if (showErrorNoNotFound)
       error("Soft link file " + softLinkFileName + " not found at " + file.getAbsolutePath());
   }
 
@@ -641,6 +651,19 @@ public class FileProcessor {
         result = result.substring(1);
     }
     return result;
+  }
+
+  protected boolean inCodeBlock(String line) {
+    return line.startsWith("\t") || line.startsWith("    ");
+  }
+
+  protected int asInt(String intSpec) {
+    try {
+      return Integer.parseInt(intSpec);
+    } catch (Exception x) {
+      error("Invalid value for integer specified " + intSpec);
+    }
+    return 0;
   }
 
   /**
