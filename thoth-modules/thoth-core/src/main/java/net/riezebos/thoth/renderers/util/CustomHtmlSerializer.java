@@ -71,9 +71,23 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
   }
 
   // Add a few extra bookmarks to the header (aliases)
+  // Also: embed them inside the header to avoid mis-alignment when navigating
+  // (Should be on not before or after the H-tag
   @Override
   public void visit(HeaderNode node) {
-    printBreakBeforeTag(node, "h" + node.getLevel());
+    String tag = "h" + node.getLevel();
+    
+    boolean startWasNewLine = printer.endsWithNewLine();
+    printer.println();
+    printer.print('<').print(tag).print('>');
+    printer.println();
+    writeBookmarks(node);
+    visitChildren(node);
+    printer.print('<').print('/').print(tag).print('>');
+    if (startWasNewLine) printer.println();
+  }
+
+  protected void writeBookmarks(HeaderNode node) {
     // Headers might be tokenized; so we need to append them together.
     String combinedName = "";
     for (Node child : node.getChildren()) {
