@@ -73,6 +73,7 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
   // Add a few extra bookmarks to the header (aliases)
   @Override
   public void visit(HeaderNode node) {
+    printBreakBeforeTag(node, "h" + node.getLevel());
     // Headers might be tokenized; so we need to append them together.
     String combinedName = "";
     for (Node child : node.getChildren()) {
@@ -99,7 +100,6 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
         writeBookmark(alternate);
       }
     }
-    printBreakBeforeTag(node, "h" + node.getLevel());
   }
 
   protected void writeBookmark(String alias) {
