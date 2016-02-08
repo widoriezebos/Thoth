@@ -1,0 +1,16 @@
+# Installing Thoth
+There are two ways you can run Thoth. For server environments there is a WAR that you can deploy in a Web Container like tomcat. 
+
+## Configuration
+Create a configuration.properties file as described in the [Configuration](Configuration.md) section.
+
+## WAR installation
+Just drop the Thoth WAR inside the web apps folder of your Web Container. And then the only requirement is that the configuration can be found through an environment variable (or -D provided JVM argument) called `thoth_configuration`. On servers with an init script for Tomcat (/etc/init.d/tomcat) you could add a script line stating 
+
+	export thoth_configuration=/opt/conf/configuration.properties
+
+## Running standalone
+For desktop environments you can run Thoth without a Web Container using the Thoth-standalone version which has an embedded web server. You can start ‘standalone Thoth’ if you either have an environment or JVM variable set (as describe above) or simply provide the location of the configuration.properties file as an argument. Not even any of this is required if you have the configuration.properties file in the working folder when starting the Thoth standalone
+
+	java -jar thoth-standalone.jar
+
