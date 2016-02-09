@@ -426,7 +426,40 @@ public class FileProcessor {
    * @param library
    */
   public String getLibrary() {
+    if (library == null)
+      library = determineLibraryFallBack();
     return library;
+  }
+
+  /**
+   * This tries to find the library root based on the fact that the library root contains a file called 'softlinks.properties' If that file cannot be found then
+   * the folder of the root document is taken as a last resort.
+   * 
+   * @return
+   */
+  protected String determineLibraryFallBack() {
+    String currentFolder = ThothUtil.normalSlashes(getRootFolder());
+    File file = new File(currentFolder);
+    String lookFor = getSoftLinkFileName();
+    if (lookFor == null)
+      lookFor = SOFTLINKS_PROPERTIES_DFLT;
+
+    boolean found = false;
+    if (lookFor != null) {
+      while (!found && file != null && file.isDirectory()) {
+        for (String name : file.list()) {
+          if (lookFor.equals(name)) {
+            found = true;
+            break;
+          }
+        }
+        if (!found)
+          file = file.getParentFile();
+      }
+    }
+    if (found)
+      return file.getAbsolutePath();
+    return getRootFolder();
   }
 
   /**

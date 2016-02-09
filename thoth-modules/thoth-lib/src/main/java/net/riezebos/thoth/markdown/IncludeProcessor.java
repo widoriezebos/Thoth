@@ -63,7 +63,7 @@ public class IncludeProcessor extends FileProcessor {
     String path = fileName == null ? STDIN : fileName;
     startNewFile(path);
     Stack<DocumentNode> includeStack = new Stack<DocumentNode>();
-    setDocumentStructure(new DocumentNode(path, ThothUtil.getNameOnly(fileName), 0, 0));
+    setDocumentStructure(new DocumentNode(path, ThothUtil.getNameOnly(path), 0, 0));
     includeStack.push(getDocumentStructure());
     processFile(getRootFolder(), in, result, includeStack, 0);
     result.flush();
