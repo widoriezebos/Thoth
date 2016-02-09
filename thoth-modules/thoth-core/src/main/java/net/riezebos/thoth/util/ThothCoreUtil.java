@@ -33,9 +33,15 @@ public class ThothCoreUtil extends ThothUtil {
     return result;
   }
 
-  public static String formatDate(Date date) {
+  public static String formatTimestamp(Date date) {
     if (date == null)
       return null;
     return ConfigurationFactory.getConfiguration().getTimestampFormat().format(date);
+  }
+
+  public static String formatDate(Date date) {
+    if (date == null)
+      return null;
+    return ConfigurationFactory.getConfiguration().getDateFormat().format(date);
   }
 }

@@ -136,6 +136,8 @@ public abstract class ContentManagerBase implements ContentManager {
         markdown = appendErrors(processor, markdown);
       }
       MarkDownDocument markDownDocument = new MarkDownDocument(markdown, processor.getMetaTags(), processor.getErrors(), processor.getDocumentStructure());
+      long latestMod =  Math.max(file.lastModified(), processor.getLatestIncludeModificationDate());
+      markDownDocument.setLastModified(new Date(latestMod));
       return markDownDocument;
     }
   }

@@ -15,6 +15,7 @@
 package net.riezebos.thoth.beans;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class MarkDownDocument {
   private List<ProcessorError> errors = new ArrayList<ProcessorError>();
   private DocumentNode documentStructure;
   private String markdown;
+  private Date lastModified;
 
   public MarkDownDocument(String markdown, Map<String, String> metatags, List<ProcessorError> errors, DocumentNode documentStructure) {
     super();
@@ -85,5 +87,13 @@ public class MarkDownDocument {
       return getName();
     else
       return title;
+  }
+
+  public void setLastModified(Date date) {
+    this.lastModified = date;
+  }
+
+  public Date getLastModified() {
+    return lastModified;
   }
 }

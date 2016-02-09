@@ -27,7 +27,7 @@ Showing page ${page}<br/>
   <tr><th>Timestamp</th><th>Author</th><th>Diff</th><th>Comment</th></tr>
 #foreach($commit in $commitList)
   <tr>
-      <td>${commit.formattedTimestamp}</td>
+      <td>${thothutil.formatTimestamp($commit.timestamp)}</td>
       <td>${commit.author}</td>
       <td>     
 #foreach($revision in $commit.revisions)

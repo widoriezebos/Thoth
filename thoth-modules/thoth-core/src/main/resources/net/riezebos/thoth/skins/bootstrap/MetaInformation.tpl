@@ -8,7 +8,8 @@
 <head>
 <body>
 <h1>${document.name}</h1>
-Full path: $path
+Full path: $path<br/>
+Latest modification: ${thothutil.formatTimestamp($document.lastModified)}
 <h3>Meta tags</h3>
 <metatags>
 #foreach($key in $metatagKeys)
@@ -65,7 +66,7 @@ This document is not uncluded by any other document.
   <tr><th>Timestamp</th><th>Author</th><th>Document</th><th>Comment</th></tr>
 #foreach($commit in $commitList)
   <tr>
-      <td>${commit.formattedTimestamp}</td>
+      <td>${thothutil.formatTimestamp($commit.timestamp)}</td>
       <td>${commit.author}</td>
       <td>     
 #foreach($revision in $commit.revisions)
@@ -91,7 +92,7 @@ This document is not uncluded by any other document.
   <tr>
       <td>     
 #foreach($revision in $commit.revisions)
-      <a href="$contexturl/${documentNode.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">${commit.formattedTimestamp}</a>
+      <a href="$contexturl/${documentNode.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">${thothutil.formatTimestamp($commit.timestamp)}</a>
 #end  
       </td>
       <td>${commit.author}</td>

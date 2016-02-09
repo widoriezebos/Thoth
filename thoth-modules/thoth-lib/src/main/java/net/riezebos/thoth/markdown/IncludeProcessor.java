@@ -52,6 +52,7 @@ public class IncludeProcessor extends FileProcessor {
   private Pattern includeImages = Pattern.compile("\\\\includeimages\\{(.*?)\\}"); // Handle image icludes based on a filespec
   private Pattern hyperlink = Pattern.compile("\\[(.*?)\\]\\(([^\")]*)(.*?)\\)");
   private DocumentNode documentStructure;
+  private long latestIncludeModificationDate = 0;
   private CriticProcessingMode criticProcessingMode = CriticProcessingMode.PROCESS;
 
   public String execute(String fileName, InputStream in) throws IOException {
@@ -303,6 +304,7 @@ public class IncludeProcessor extends FileProcessor {
         errorMessage += " (translated by softlink to '" + softTranslated + "')";
       error(errorMessage.trim());
     } else {
+      latestIncludeModificationDate = Math.max(file.lastModified(), latestIncludeModificationDate);
       String newFolder = pathname;
       int lastIdx = newFolder.lastIndexOf("/");
       if (lastIdx != -1)
@@ -322,6 +324,10 @@ public class IncludeProcessor extends FileProcessor {
 
   public DocumentNode getDocumentStructure() {
     return documentStructure;
+  }
+
+  public long getLatestIncludeModificationDate() {
+    return latestIncludeModificationDate;
   }
 
   protected static void printUsage() {

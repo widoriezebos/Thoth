@@ -89,10 +89,6 @@ public class Revision {
     return commit.getTimestamp();
   }
 
-  public String getFormattedTimestamp() {
-    return commit.getFormattedTimestamp();
-  }
-
   public String getMessage() {
     return commit.getMessage();
   }

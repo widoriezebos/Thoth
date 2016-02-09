@@ -14,13 +14,9 @@
  */
 package net.riezebos.thoth.content.versioncontrol;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
 
 /**
  * @author wido
@@ -46,12 +42,6 @@ public class Commit {
 
   public Date getTimestamp() {
     return timestamp;
-  }
-
-  public String getFormattedTimestamp() {
-    Configuration configuration = ConfigurationFactory.getConfiguration();
-    SimpleDateFormat dateFormat = configuration.getTimestampFormat();
-    return dateFormat.format(timestamp);
   }
 
   public void setTimestamp(Date timestamp) {
@@ -85,7 +75,7 @@ public class Commit {
 
   @Override
   public String toString() {
-    String revMessage = (getFormattedTimestamp() + " " + getAuthor() + ": " + getShortMessage()).trim() + "\n";
+    String revMessage = (getTimestamp() + " " + getAuthor() + ": " + getShortMessage()).trim() + "\n";
     for (Revision rev : getRevisions()) {
       revMessage += "  " + rev.toString() + "\n";
     }
