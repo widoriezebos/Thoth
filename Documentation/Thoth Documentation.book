@@ -11,10 +11,10 @@ Thoth Documentation
 \include{/Overview/Introduction.md}
 \include{/Overview/Name.md}
 \include{/Overview/Features.md}
+\include{/Basics/Thoth Markdown basics.md}
 \include{/Basics/The Thoth Toolset.md}
 \include{/Basics/Git concepts.md, 1}
 \include{/Basics/Editing with Thoth.md, 1}
-\include{/Basics/Thoth Markdown basics.md}
-\include{/Setup/Configuration.md}
 \include{/Setup/Installation.md}
+\include{/Setup/Configuration.md}
 
