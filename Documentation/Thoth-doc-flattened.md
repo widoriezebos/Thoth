@@ -1,6 +1,6 @@
 
 <p style="text-align:center;font-size:xx-large">
-Thoth Documentation
+Thoth Overview
 </p>
 
 <h1>Table of contents</h1>
