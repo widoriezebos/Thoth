@@ -49,7 +49,8 @@ public class IncludeProcessor extends FileProcessor {
   private int MAX_INCLUDE_DEPTH = 10;
   private Pattern includeMarked = Pattern.compile("\\<\\<\\[(.*?)\\]"); // Handle Marked style includes i.e. '<<[MyDocument.md]>>'
   private Pattern includeLatex = Pattern.compile("\\\\include\\{(.*?)\\}"); // Handle Latex style includes i.e. '\include{MyDocument.md}'
-  private Pattern includeImages = Pattern.compile("\\\\includeimages\\{(.*?)\\}"); // Handle image icludes based on a filespec
+  private Pattern includeImages = Pattern.compile("\\\\includeimages\\{(.*?)\\}"); // Handle image includes based on a filespec
+  private Pattern includeCode = Pattern.compile("\\\\includecode\\{(.*?)\\}"); // Handle code includes based on a filespec
   private Pattern hyperlink = Pattern.compile("\\[(.*?)\\]\\(([^\")]*)(.*?)\\)");
   private DocumentNode documentStructure;
   private long latestIncludeModificationDate = 0;
@@ -98,6 +99,7 @@ public class IncludeProcessor extends FileProcessor {
       String line = readLine(br);
       while (line != null) {
         setLineNumber(lineNumber++);
+        boolean inCodeBlock = inCodeBlock(line);
         updateTocFlag(line);
         // Handle include Marked style
         Matcher matcher = includeMarked.matcher(line);
@@ -106,7 +108,7 @@ public class IncludeProcessor extends FileProcessor {
           matcher = includeLatex.matcher(line);
           found = matcher.find();
         }
-        if (found && !inCodeBlock(line)) {
+        if (found && !inCodeBlock) {
           String prefix = line.substring(0, matcher.start());
           String suffix = line.substring(matcher.end());
           out.print(prefix);
@@ -128,22 +130,28 @@ public class IncludeProcessor extends FileProcessor {
           if (line.startsWith("#"))
             line = createBookmark(line, headerIndent);
 
-          Matcher imageMatcher = includeImages.matcher(line);
-          if (imageMatcher.find()) {
-            String prefix = line.substring(0, imageMatcher.start());
-            String suffix = line.substring(imageMatcher.end());
-            out.print(prefix);
-            String fileName = imageMatcher.group(1);
-            includeImages(currentFolder, fileName, out, includeStack, headerIndent);
-            out.print(suffix);
+          Matcher includeCodeMatcher = includeCode.matcher(line);
+          if (includeCodeMatcher.find() && !inCodeBlock) {
+            String fileName = includeCodeMatcher.group(1);
+            includeCode(currentFolder, fileName, out);
           } else {
-            line = handleLinks(currentFolder, line, includeStack);
-            if (inMetaDataSection)
-              inMetaDataSection = extractMetaInfo(line);
+            Matcher imageMatcher = includeImages.matcher(line);
+            if (imageMatcher.find() && !inCodeBlock) {
+              String prefix = line.substring(0, imageMatcher.start());
+              String suffix = line.substring(imageMatcher.end());
+              out.print(prefix);
+              String fileName = imageMatcher.group(1);
+              includeImages(currentFolder, fileName, out, includeStack, headerIndent);
+              out.print(suffix);
+            } else {
+              line = handleLinks(currentFolder, line, includeStack);
+              if (inMetaDataSection)
+                inMetaDataSection = extractMetaInfo(line);
 
-            // Write the output
-            if (!inMetaDataSection)
-              out.println(line);
+              // Write the output
+              if (!inMetaDataSection)
+                out.println(line);
+            }
           }
         }
         line = readLine(br);
@@ -279,6 +287,34 @@ public class IncludeProcessor extends FileProcessor {
         out.println(line + "\n");
       }
       out.println("![](" + imagePath.replaceAll(" ", "%20") + ")");
+    }
+  }
+
+  protected void includeCode(String currentFolder, String fileToInclude, PrintStream out) throws IOException {
+
+    String softTranslated = translateSoftLink(fileToInclude);
+    String fileName = softTranslated;
+    String pathname;
+
+    if (fileName.startsWith("/")) {
+      fileName = resolveLibraryPath(fileName);
+      pathname = getRootFolder() + fileName;
+    } else
+      pathname = currentFolder + fileName;
+
+    if (fileName.startsWith("/"))
+      pathname = fileName;
+    File file = new File(pathname.replaceAll("%20", " "));
+    if (!file.isFile())
+      error("File " + fileToInclude + " not found");
+    else {
+      BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+      String line = br.readLine();
+      while (line != null) {
+        out.println("\t" + line);
+        line = br.readLine();
+      }
+      br.close();
     }
   }
 

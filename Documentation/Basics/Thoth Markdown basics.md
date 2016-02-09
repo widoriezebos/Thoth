@@ -91,10 +91,24 @@ You can escape any character below that might be interpreted by Markdown otherwi
 	!   exclamation mark
 
 ## Include processing
-You can include any other markdown file (or any text file for that matter) by using a special include directive. The file specification can be either relative or absolute. Absolute paths will be taken as absolute from the context folder. 
+There are three different ways of including content in your document; tailored to the type of included content: MarkDown, images or raw source code.
+
+### Include Markdown
+You can include any other markdown file (or any text file for that matter) by using a special include directive. The file specification can be either relative or absolute. Absolute paths will be taken as absolute from the context folder. You can provide an optional second argument that specifies the level adjustment for headers (negative or positive). When given a value of 1 the headers of the included file will be bumped up 1 level when including them in the result.
 
 	\include{somesubfolder/somedocument.md}
+	\include{somesubfolder/somedocument.md, 1}
 	\include{/absolute/path/to/somedocument.md}
+
+### Include Images
+There is also include functionality for images using a wildcard. This enables you to add images from a folder without having to completely specifying their name. The header level for automatically determined headers can be specified as a separate argument. Specify 0 for no headers. 
+
+	\includeimages{images/component/*.png, 1}
+
+### Include Source (code block)
+You can include any text file as a Code Block, Thoth will prefix every line with a tab character making it a Code Block
+
+	\includecode{sources/SomeFile.java}
 
 ## Critic markup
 You can mark text with the syntax outlined below. Since this kind of markup is meant to work anywhere note that there is a space between the ‘{‘ and the directive to keep it from processing in this example. In your own markdown there should be *no space* after the opening ‘{‘ character. The Critic markup can be displayed during rendering by adding the request parameter `critics=show`, or displayed as-is with `critics=raw`. By default the critics are processed and the result will then be rendered.
