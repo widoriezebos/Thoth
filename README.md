@@ -42,7 +42,7 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 	with your browser and get going!
 
 ##Not in a hurry?
-Then head on to [the full documentation](Documentation/Thoth-doc-flattened.md)
+Then why don't you head on to [the full documentation of Thoth](Documentation/Thoth Documentation.md)!
 ## Copyright
 Copyright (c) 2016 W.T.J. Riezebos
 
