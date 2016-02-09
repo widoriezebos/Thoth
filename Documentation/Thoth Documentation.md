@@ -1,4 +1,4 @@
-
+<!-- THIS FILE IS A RAW OUTPUT OF THE BOOK. SOLE PURPOSE IS TO HAVE GITHUB BE ABLE TO DISPLAY IT PROPERLY -->
 <p style="text-align:center;font-size:xx-large">
 Thoth Documentation
 </p>
@@ -226,7 +226,7 @@ In the examples below we will use SourceTree as a Git client; but there is no pr
 
 When you start SourceTree for the first time you are asked to add an account. If you are familiar with Github then this is where you your Github account details. If you are still wandering what Git actually is all about then you might need some help to either set up a central repository (Github would be good) or skip Git altogether and continue with a file based repository. If you go for File Based then you can read the text below just for reference, but you will be missing out on a lot of goodies.
 
-![](../Basics/images/01%20Add%20Account.png)
+![](Basics/images/01%20Add%20Account.png)
 
 Enter your account type and details and click ‘continue’.
 
@@ -235,18 +235,18 @@ Enter your account type and details and click ‘continue’.
 
 The next step is about creating a local repository by cloning the central (remote) repository. Determine where you want to place your local repository (I usually create a folder Repositories in my home folder and put all repositories in there)
 
-![](../Basics/images/02%20Clone.png)
+![](Basics/images/02%20Clone.png)
 
 
 ###5.1.4  SourceTree main screen
 
 After cloning the repository you should the main screen of SourceTree. A few things to note here:
 
-![](../Basics/images/03%20Branches.png)
+![](Basics/images/03%20Branches.png)
 
 Under branches you see only one branch called ‘master’, and if you open up ‘remote’ you see more branches that are not yet available locally. You can have one branch at a time in your local repository, it is like a snapshot of a particular version of your files. The master branch is not the one you want to work on. Usually you work on develop or a branch based on develop. To switch to develop, just double click on the remove develop branch.
 
-![](../Basics/images/04%20Checkout%20Branch.png)
+![](Basics/images/04%20Checkout%20Branch.png)
 
 After doing that you have switched to the develop branch. Now you should think about the branches that you want to have.
 
@@ -254,42 +254,42 @@ Typically you would have one repository for a set of documents that logically be
 
 In any case, you should create a new branch based on develop and give it the name of a particular version of your (product) documentation. When you start working on the next version of the product documentation, you will create a new branch based on this initial version branch that you are about to create.
 
-![](../Basics/images/05%20Create%20New%20Branch.png)
+![](Basics/images/05%20Create%20New%20Branch.png)
 
 
 ###5.1.5  Ready to start writing!
 
 You have now your new branch active in your local repository and you can start creating and editing files (all located inside the repository folder, you remember where you put it right?). After creating files they will show up in SourceTree in the ‘Working copy’ section. Anything in the working copy is a local change that has not yet been committed to the local repository, so it is just a change in a file and nothing else. To add them to the (local) version control you will have to commit the changes. To do this check all the files listed in the Working Copy section, add a comment for your commit (good practice) and click ‘Commit’.
 
-![](../Basics/images/07%20Commit%20Changes.png)
+![](Basics/images/07%20Commit%20Changes.png)
 
 After you have committed your changes they are stored in the local repository and their state is therefore set to unchanged (as compared to what is stored in the local repository). The changes have not left your local machine however, this will only happen when you Push. Your mantra here is ‘Commit-Pull-Push’. You should always Pull before you Push. Git needs you to do this to make sure that any changes a colleague has pushed to the repository does not conflict with anything you are about to push.
 
-![](../Basics/images/08%20Changes%20to%20Push.png)
+![](Basics/images/08%20Changes%20to%20Push.png)
 
 Sidestep: If you forget to Pull before you commit, you might get an ugly error message (if you read carefully you will find ‘Please, commit your changes or stash them before you can merge’. To recover from this just close the dialog, commit your changes and then Pull again.
 
-![](../Basics/images/11%20Pull%20before%20Commit.png)
+![](Basics/images/11%20Pull%20before%20Commit.png)
 
 Now click Pull and then Push to push your changes to the central repository. (Note the read badge with the number ‘1’ which shows you the number of local commits that are ready to get pushed)
 
-![](../Basics/images/09%20Push.png)
+![](Basics/images/09%20Push.png)
 
 After ‘pull/pushing’ your Working Copy will show empty again, all your changes are now available to any colleagues sharing the central repository with you (by Pulling in your changes).
 
-![](../Basics/images/10%20No%20changes.png)
+![](Basics/images/10%20No%20changes.png)
 
 Now there might be a complication when a colleague did indeed push a change since the latest Pull you did, and that this change conflicts with a change of you. A conflict means that there is a change on the same line in the same file, and Git cannot automatically merge both changes. This so called ‘Merge Conflict’ will have to be resolved by you then.
 
-![](../Basics/images/13%20Merge%20Conflicts.png)
+![](Basics/images/13%20Merge%20Conflicts.png)
 
 If you have conflicts you head over to the Working Copy and find out what files have a conflict. There are several ways to resolve a conflict; the easiest one is overwriting either your own or your colleagues’ changes. That might be easy but is usually not the way forward because you might overwrite other changes in the file as well. You will either resolve the conflicts with your ‘External Merge Tool’ (on OSX that would be FileMerge), handpick the segments in SourceTree or you will simply head to your editor and find the conflicts in the source. After making sure everything is in order save the file and switch back to SourceTree. Now right click on the conflicted file and select ‘Mark Resolved’.
 
-![](../Basics/images/15%20Mark%20Resolved.png)
+![](Basics/images/15%20Mark%20Resolved.png)
 
 Once every conflict has been resolved you can finally commit all your changes. You will notice that SourceTree enters a comment automatically about the merge and the conflicts
 
-![](../Basics/images/16%20Commit%20Resolved.png)
+![](Basics/images/16%20Commit%20Resolved.png)
 
 Now Pull again to make sure nobody Pushed in the mean time and then Push yourself.
 
@@ -309,7 +309,7 @@ Although writing in Markdown is all about *not* focussing on how your document i
 
 For OSX there is the excellent tool called Marked2 that supports a custom pre processor. By making use of this feature you can actually run any Thoth specific functionality (includes, link processing etc) right before it is transformed into HTML. To give you a sense of what a pre processor’s role here could be just have a look at the screenshot below. Any editor that supports a pre processor can be set up this way.
 
-![](../Basics/images/MarkedPreprocessor.png)
+![](Basics/images/MarkedPreprocessor.png)
 
 The command line that is obscured in the screenshot should be similar to
 
@@ -936,7 +936,7 @@ There are two ways you can run Thoth. For server environments there is a WAR tha
 
 ##8.1  Configuration
 
-Create a configuration.properties file as described in the [Configuration](../Setup/Configuration.md) section.
+Create a configuration.properties file as described in the [Configuration](Setup/Configuration.md) section.
 
 
 ##8.2  Running standalone
