@@ -1,6 +1,6 @@
 
 <p style="text-align:center;font-size:xx-large">
-Thoth Overview
+Thoth Documentation
 </p>
 
 <h1>Table of contents</h1>
@@ -27,55 +27,61 @@ Thoth Overview
   - [4.9  Configurable and extendable rendering pipeline](#49configurableandextendablerenderingpipeline)
   - [4.10  Open source, Apache license](#410opensourceapachelicense)
 
-###[5  Technicalities](#5technicalities)
+###[5  The Thoth Toolset](#5thethothtoolset)
 
-  - [5.1  Minimum requirements](#51minimumrequirements)
-  - [5.2  Acknowledgements](#52acknowledgements)
+  - [5.1  Git concepts](#51gitconcepts)
+    - [5.1.1  Setting up your local Git repository](#511settingupyourlocalgitrepository)
+    - [5.1.2  Starting SourceTree for the first time](#512startingsourcetreeforthefirsttime)
+    - [5.1.3  Cloning the central repository](#513cloningthecentralrepository)
+    - [5.1.4  SourceTree main screen](#514sourcetreemainscreen)
+    - [5.1.5  Ready to start writing!](#515readytostartwriting)
+  - [5.2  WYSIWYG](#52wysiwyg)
+    - [5.2.1  Use the Thoth IncludeProcessor as a pre processor](#521usethethothincludeprocessorasapreprocessor)
+    - [5.2.2  Use Thoth standalone with your browser](#522usethothstandalonewithyourbrowser)
+    - [5.2.3  Use an editor that does WYSIWYG](#523useaneditorthatdoeswysiwyg)
 
-###[6  Typical setup](#6typicalsetup)
+###[6  Thoth Markdown basics](#6thothmarkdownbasics)
 
-  - [6.1  Tools in the mix](#61toolsinthemix)
-  - [6.2  Workflow](#62workflow)
+  - [6.1  Table of Contents](#61tableofcontents)
+  - [6.2  Headers](#62headers)
+  - [6.3  Block quotes](#63blockquotes)
+  - [6.4  Lists](#64lists)
+  - [6.5  Code blocks](#65codeblocks)
+  - [6.6  Horizontal Rules](#66horizontalrules)
+  - [6.7  Links](#67links)
+  - [6.8  Embedded images](#68embeddedimages)
+  - [6.9  Emphasis](#69emphasis)
+  - [6.10  Code](#610code)
+  - [6.11  Backslash escapes](#611backslashescapes)
+  - [6.12  Include processing](#612includeprocessing)
+    - [6.12.1  Include Markdown](#6121includemarkdown)
+    - [6.12.2  Include Images](#6122includeimages)
+    - [6.12.3  Include Source (code block)](#6123includesourcecodeblock)
+  - [6.13  Critic markup](#613criticmarkup)
+  - [6.14  Meta data](#614metadata)
+  - [6.15  Tables](#615tables)
+  - [6.16  Inline HTML](#616inlinehtml)
 
-###[7  Thoth Markdown basics](#7thothmarkdownbasics)
+###[7  The configuration file](#7theconfigurationfile)
 
-  - [7.1  Table of Contents](#71tableofcontents)
-  - [7.2  Headers](#72headers)
-  - [7.3  Block quotes](#73blockquotes)
-  - [7.4  Lists](#74lists)
-  - [7.5  Code blocks](#75codeblocks)
-  - [7.6  Horizontal Rules](#76horizontalrules)
-  - [7.7  Links](#77links)
-  - [7.8  Embedded images](#78embeddedimages)
-  - [7.9  Emphasis](#79emphasis)
-  - [7.10  Code](#710code)
-  - [7.11  Backslash escapes](#711backslashescapes)
-  - [7.12  Include processing](#712includeprocessing)
-  - [7.13  Critic markup](#713criticmarkup)
-  - [7.14  Meta data](#714metadata)
-  - [7.15  Tables](#715tables)
-  - [7.16  Inline HTML](#716inlinehtml)
+  - [7.1  Required settings](#71requiredsettings)
+    - [7.1.1  Repository settings](#711repositorysettings)
+    - [7.1.2  Context settings](#712contextsettings)
+  - [7.2  Optional settings](#72optionalsettings)
+    - [7.2.1  Custom renderers](#721customrenderers)
+    - [7.2.2  File recognition](#722filerecognition)
+    - [7.2.3  Markdown processing options](#723markdownprocessingoptions)
+  - [7.3  Sample configuration file](#73sampleconfigurationfile)
 
-###[8  The configuration file](#8theconfigurationfile)
+###[8  Installing Thoth](#8installingthoth)
 
-  - [8.1  Required settings](#81requiredsettings)
-    - [8.1.1  Repository settings](#811repositorysettings)
-    - [8.1.2  Context settings](#812contextsettings)
-  - [8.2  Optional settings](#82optionalsettings)
-    - [8.2.1  Custom renderers](#821customrenderers)
-    - [8.2.2  File recognition](#822filerecognition)
-    - [8.2.3  Markdown processing options](#823markdownprocessingoptions)
-  - [8.3  Sample configuration file](#83sampleconfigurationfile)
-
-###[9  Installing Thoth](#9installingthoth)
-
-  - [9.1  Configuration](#91configuration)
-  - [9.2  WAR installation](#92warinstallation)
-  - [9.3  Running standalone](#93runningstandalone)
+  - [8.1  Configuration](#81configuration)
+  - [8.2  Running standalone](#82runningstandalone)
+  - [8.3  WAR installation](#83warinstallation)
 </tableofcontents>
 
 
-[//]: # "Include Copyright.md"
+[//]: # "Include /Copyright.md"
 
 #1  Copyright
 
@@ -93,7 +99,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[//]: # "Include Overview/Introduction.md"
+[//]: # "Include /Overview/Introduction.md"
 
 #2  Introduction to Thoth
 
@@ -127,7 +133,7 @@ But not for you, because you are reading this. A system described by Ian is not 
 
 
 
-[//]: # "Include Overview/Name.md"
+[//]: # "Include /Overview/Name.md"
 
 #3  What kind of a name is that?!
 
@@ -136,7 +142,7 @@ Yes, Thoth is not the easiest word to pronounce. (Unless copious amounts of beer
 
 
 
-[//]: # "Include Overview/Features.md"
+[//]: # "Include /Overview/Features.md"
 
 #4  Features
 
@@ -192,75 +198,160 @@ Thoth is open source, free and available under the [Apache license](http://www.a
 
 
 
-[//]: # "Include Overview/Technicalities.md"
+[//]: # "Include /Basics/The Thoth Toolset.md"
 
-#5  Technicalities
+#5  The Thoth Toolset
 
-Thoth is built on the Java platform and is OS independent. Thoth runs on Linux, OSX and Windows with minimal hardware requirements.
-
-
-##5.1  Minimum requirements
-
-The following are considered minimum requirements
-
-- Supported OS: Linux, OSX and Windows
-- 4 GB of available RAM
-- Disk space depending on the size of your library, say 10 GB
-- Java 8 platform
-- Apache Tomcat 7
+Let’s get familiar with the toolset. An important aspect of working with Thoth is version control, currently based on Git. Version control can be a bit daunting if you are new to the concept, but if you stick to the basics and use [a good Git client](https://www.sourcetreeapp.com) you will quickly get the hang of it. (Note: For very simple setups you can skip the use of Git altogether and use the File System based content manager)
 
 
-##5.2  Acknowledgements
+[//]: # "Include /Basics/Git concepts.md"
 
-Thoth would not have been possible without the great help of the following projects (in arbitrary order):
+##5.1  Git concepts
 
-- Markdown, [https://daringfireball.net/projects/markdown/](https://daringfireball.net/projects/markdown/)
-- Pegdown Markdown parser, [https://github.com/sirthias/pegdown](https://github.com/sirthias/pegdown)
-- JGit, [http://www.eclipse.org/jgit/](http://www.eclipse.org/jgit/)
-- Diff-match-patch, [https://code.google.com/archive/p/google-diff-match-patch/](https://code.google.com/archive/p/google-diff-match-patch/)
-- Apache Lucene, [https://lucene.apache.org/core/](https://lucene.apache.org/core/)
-- And of course many many other open source projects. Check the pom.xml for a complete list.
+It is important to note that Git uses a local version control repository to store all it’s information. The local repository is usually created by ‘Cloning’ the central repository. After cloning the trick is that this local repository can be synchronized with the central repository. This synchronization is done by you using ‘Pull’ and ‘Push’. ‘Pull’ fetches information from the central repository and ‘Push’ writes your local changes to the central repository. Before you can ‘Push’ your changes however there are a few steps you need to do first:
 
-[//]: # "Include Overview/Setup.md"
-
-#6  Typical setup
-
-A typical setup consists of a Thoth server, a Git repository, a Git client and a Markdown editor (or just a plain text editor if you prefer).
-To help you understand how this is all connected consider the following diagram:
-
-![](Overview/images/Setup.png)
-
-Note that in this example Thoth standalone can be used on your desktop for WYSIWYG purposes. In this case you would edit your markdown, and after saving it you could simply refresh the corresponding document in your browser (connected to a locally running Thoth). Obviously the use of Thoth on your desktop is optional; if you have a tool like Marked2 in place (with Thoth running as a preprocessor) you might want nor need this.
+1. You must commit your local changes to your local repository
+2. You must then Pull any changes that happened since your last Pull from the central repository
+3. If there are conflicting changes (i.e. both you and somebody else changed something on the same line in the same file) you have to resolve them. You do this by editing the file containing the conflict until you are satisfied, and then mark the file ‘resolved’ in Git. All your changes have to be committed before you continue.
+4. You can now Push your local changes to the central repository. In rare cases (on a very busy central repository) somebody might have pushed changes while you were resolving conflicts; in that case you have to retry from step 2.
 
 
-##6.1  Tools in the mix
+###5.1.1  Setting up your local Git repository
 
-Depending on your type of desktop there is a good choice of Markdown editors. For OSX there is a great app called [Ulysses](http://www.ulyssesapp.com) that you can use (enable ‘external folders’, enable ‘inline links’) and for Windows there are also good Markdown editors available (have a look at [Haroopad](http://pad.haroopress.com)). If you have other suggestions please let me know so I can add them to the list of suggested apps. You might also want to have a look at a WYSIWYG solution; for OSX you could consider [Marked2](http://marked2app.com). As a Git client I suggest you use the excellent [SourceTree from Atlassian](https://www.sourcetreeapp.com), unless you are a command line tiger of course because then a regular Git client would do as well (and then you would use VI as an editor right :-) ).
-Note that it is also possible to run Thoth on your desktop, WYSIWYG can then be done by just refreshing your browser. Benefit of this is that it is true WYSIWYG obviously.
-
-
-##6.2  Workflow
-
-Using the above setup you will edit documents with your Markdown editor, commit changes with SourceTree, Pull any changes from the central repository and then Push all your local changes (to the central repository). Thoth will synchronize automatically with the central repository, depending on the configuration your changes will end up on the Thoth server within 60 seconds. Once available on the Thoth server anybody will be able to access them in the various formats and skins that are configured (HTML, PDF etc).
+In the examples below we will use SourceTree as a Git client; but there is no pressing reason why you could not use any other Git client. The point is that you create a local Git repository where you will work on your documentation, and that you do this by cloning the central repository.
 
 
-[//]: # "Include Basics/Thoth Markdown basics.md"
+###5.1.2  Starting SourceTree for the first time
 
-#7  Thoth Markdown basics
+When you start SourceTree for the first time you are asked to add an account. If you are familiar with Github then this is where you your Github account details. If you are still wandering what Git actually is all about then you might need some help to either set up a central repository (Github would be good) or skip Git altogether and continue with a file based repository. If you go for File Based then you can read the text below just for reference, but you will be missing out on a lot of goodies.
+
+![](../Basics/images/01%20Add%20Account.png)
+
+Enter your account type and details and click ‘continue’.
+
+
+###5.1.3  Cloning the central repository
+
+The next step is about creating a local repository by cloning the central (remote) repository. Determine where you want to place your local repository (I usually create a folder Repositories in my home folder and put all repositories in there)
+
+![](../Basics/images/02%20Clone.png)
+
+
+###5.1.4  SourceTree main screen
+
+After cloning the repository you should the main screen of SourceTree. A few things to note here:
+
+![](../Basics/images/03%20Branches.png)
+
+Under branches you see only one branch called ‘master’, and if you open up ‘remote’ you see more branches that are not yet available locally. You can have one branch at a time in your local repository, it is like a snapshot of a particular version of your files. The master branch is not the one you want to work on. Usually you work on develop or a branch based on develop. To switch to develop, just double click on the remove develop branch.
+
+![](../Basics/images/04%20Checkout%20Branch.png)
+
+After doing that you have switched to the develop branch. Now you should think about the branches that you want to have.
+
+Typically you would have one repository for a set of documents that logically belong to each other (part of the same product for instance). In this repository you would then have one branch per version of the product. This makes it very easy to promote changes to an older version of the documentation to a new (even after the new branch was created) or back port documentation of a new version to an older version. Git makes it really easy to do by merging one branch into another and selecting the changes you want to have merged. This might sound a bit easier than it is in some cases but you should be able to find enough material on the web to become a Git expert in no time.
+
+In any case, you should create a new branch based on develop and give it the name of a particular version of your (product) documentation. When you start working on the next version of the product documentation, you will create a new branch based on this initial version branch that you are about to create.
+
+![](../Basics/images/05%20Create%20New%20Branch.png)
+
+
+###5.1.5  Ready to start writing!
+
+You have now your new branch active in your local repository and you can start creating and editing files (all located inside the repository folder, you remember where you put it right?). After creating files they will show up in SourceTree in the ‘Working copy’ section. Anything in the working copy is a local change that has not yet been committed to the local repository, so it is just a change in a file and nothing else. To add them to the (local) version control you will have to commit the changes. To do this check all the files listed in the Working Copy section, add a comment for your commit (good practice) and click ‘Commit’.
+
+![](../Basics/images/07%20Commit%20Changes.png)
+
+After you have committed your changes they are stored in the local repository and their state is therefore set to unchanged (as compared to what is stored in the local repository). The changes have not left your local machine however, this will only happen when you Push. Your mantra here is ‘Commit-Pull-Push’. You should always Pull before you Push. Git needs you to do this to make sure that any changes a colleague has pushed to the repository does not conflict with anything you are about to push.
+
+![](../Basics/images/08%20Changes%20to%20Push.png)
+
+Sidestep: If you forget to Pull before you commit, you might get an ugly error message (if you read carefully you will find ‘Please, commit your changes or stash them before you can merge’. To recover from this just close the dialog, commit your changes and then Pull again.
+
+![](../Basics/images/11%20Pull%20before%20Commit.png)
+
+Now click Pull and then Push to push your changes to the central repository. (Note the read badge with the number ‘1’ which shows you the number of local commits that are ready to get pushed)
+
+![](../Basics/images/09%20Push.png)
+
+After ‘pull/pushing’ your Working Copy will show empty again, all your changes are now available to any colleagues sharing the central repository with you (by Pulling in your changes).
+
+![](../Basics/images/10%20No%20changes.png)
+
+Now there might be a complication when a colleague did indeed push a change since the latest Pull you did, and that this change conflicts with a change of you. A conflict means that there is a change on the same line in the same file, and Git cannot automatically merge both changes. This so called ‘Merge Conflict’ will have to be resolved by you then.
+
+![](../Basics/images/13%20Merge%20Conflicts.png)
+
+If you have conflicts you head over to the Working Copy and find out what files have a conflict. There are several ways to resolve a conflict; the easiest one is overwriting either your own or your colleagues’ changes. That might be easy but is usually not the way forward because you might overwrite other changes in the file as well. You will either resolve the conflicts with your ‘External Merge Tool’ (on OSX that would be FileMerge), handpick the segments in SourceTree or you will simply head to your editor and find the conflicts in the source. After making sure everything is in order save the file and switch back to SourceTree. Now right click on the conflicted file and select ‘Mark Resolved’.
+
+![](../Basics/images/15%20Mark%20Resolved.png)
+
+Once every conflict has been resolved you can finally commit all your changes. You will notice that SourceTree enters a comment automatically about the merge and the conflicts
+
+![](../Basics/images/16%20Commit%20Resolved.png)
+
+Now Pull again to make sure nobody Pushed in the mean time and then Push yourself.
+
+
+
+
+
+
+[//]: # "Include /Basics/Editing with Thoth.md"
+
+##5.2  WYSIWYG
+
+Although writing in Markdown is all about *not* focussing on how your document is rendered it is sometimes good to have a preview. Depending on the editor you would have some WYSIWYG functionality in place, but it will most certainly not do all that Thoth can do for you. To get around this there are a couple of options.
+
+
+###5.2.1  Use the Thoth IncludeProcessor as a pre processor
+
+For OSX there is the excellent tool called Marked2 that supports a custom pre processor. By making use of this feature you can actually run any Thoth specific functionality (includes, link processing etc) right before it is transformed into HTML. To give you a sense of what a pre processor’s role here could be just have a look at the screenshot below. Any editor that supports a pre processor can be set up this way.
+
+![](../Basics/images/MarkedPreprocessor.png)
+
+The command line that is obscured in the screenshot should be similar to
+
+	-cp /Users/wido/Libs/thoth-lib.jar net.riezebos.thoth.markdown.IncludeProcessor
+
+
+###5.2.2  Use Thoth standalone with your browser
+
+You can easily run Thoth as a standalone server on your laptop, using a File System based repository that points straight into your Git documentation repository. Read the section about configuring and installing Thoth on how to do this. Basically you just connect your browser to the locally running Thoth that will show you exactly what your rendered document looks like. Just save your document, switch to your browser and press the refresh-key. To do this; open a terminal and enter:
+
+**`java -jar thoth-standalone.jar /path/to/my/config.properties`**
+
+	Thoth is firing up. Please hang on...
+	Setting up content managers...
+	Thoth server started.
+	You can now access Thoth at http://localhost:8080
+	Just enter 'stop' to stop the server
+	
+
+
+###5.2.3  Use an editor that does WYSIWYG
+
+If you use an editor that supports WYSIWYG and supports a pre processor as described above then you are set to go. If the editor does not support a pre processor however there will be certain features (include processing being the obvious one) that will not show up in the WYSIWYG (therefore breaking the WYG part). The WYSIWYG will then maybe helpful but it will not show you the whole story.
+
+
+[//]: # "Include /Basics/Thoth Markdown basics.md"
+
+#6  Thoth Markdown basics
 
 Currently Thoth uses the Markdown syntax as [defined originally by John Gruber](http://daringfireball.net/projects/markdown/syntax). On top of that Thoth supports some extra’s as defined by [PegDown](https://github.com/sirthias/pegdown) (depending how you have configured Thoth), [Critic Markup](http://criticmarkup.com) and the [Metadata definition](https://github.com/fletcher/MultiMarkdown/wiki/MultiMarkdown-Syntax-Guide) as defined by MultiMarkdown. The include processing is kept close to how you would specify in Latex.
 Note that a lot of Markdown constructs require an empty line before it. If you see unexpected results with a header, a list or a table then usually this is resolved by placing an empty line directly about your construct.
 Whitespace is generally not rendered. If you want an empty line between your paragraphs however you can simply enter two consecutive new-line characters.
 
 
-##7.1  Table of Contents
+##6.1  Table of Contents
 
 You can add a generated TOC section to your document by adding \tableofcontents tag to your document. All headers present in the document will be used to create the TOC, using the level of the header to indent appropriately. Note that the \tableofcontents construct must appear (without any prefixes) at the beginning of a line.
 
 	\tableofcontents
 
 
-##7.2  Headers
+##6.2  Headers
 
 Note: headers will be automatically numbered by Thoth (unless turned off in the configuration by setting markdown.maxheadernumberlevel = 0, default is 3). The following two methods of header specification are supported:
 
@@ -277,14 +368,14 @@ Note: headers will be automatically numbered by Thoth (unless turned off in the 
 	######My level 6 header
 
 
-##7.3  Block quotes
+##6.3  Block quotes
 
 You can use a \> character to start a block quote.
 
 	> This is a block quote
 
 
-##7.4  Lists
+##6.4  Lists
 
 Lists can be unordered or ordered, and can be nested. Use asterisks, pluses, and hyphens — interchangably — as list markers, indent with a tab. Numbered lists should have a number suffixed with a ‘.’
 
@@ -295,7 +386,7 @@ Lists can be unordered or ordered, and can be nested. Use asterisks, pluses, and
 	2. Ordered 2
 
 
-##7.5  Code blocks
+##6.5  Code blocks
 
 Pre-formatted code blocks can be used to include source code and will not be interpreted as Markdown. To create a code block simply indent the text with a Tab or with 4 spaces.
 
@@ -303,14 +394,14 @@ Pre-formatted code blocks can be used to include source code and will not be int
 	   Taken literally
 
 
-##7.6  Horizontal Rules
+##6.6  Horizontal Rules
 
 You can include a horizontal rule in your output by placing three or more hyphens, underscores or asterisks in your text.
 
 	---
 
 
-##7.7  Links
+##6.7  Links
 
 Note that Thoth currently only supports inline links because of complications that arise when files are included (currently this is a restriction). When referencing documents in the library, you can either use an absolute path or a relative path. The absolute path will take the location of your context as the root during resolving.
 Note that Thoth supports ‘Soft links’ which means that you can define an alias or substitution pattern as a short-cut in a file called softlinks.properties in the root of your context. You reference a soft link by prefixing it’s name (or substitution pattern) with a ‘:’. You might prefer soft links over hard links if you want to avoid having hard links all over the place or want to use them simply as a shorthand. Reorganizing your library without breaking links all over the place can be avoided using soft-links.
@@ -320,7 +411,7 @@ Note that Thoth supports ‘Soft links’ which means that you can define an ali
 	[A local document](:mysoftlink)
 
 
-##7.8  Embedded images
+##6.8  Embedded images
 
 If you prefix a link with a ‘!’ then it will embed the contents of that link as an image. The link can point to a local or remote resource. Description and title are optional when specifying an image.
 
@@ -328,7 +419,7 @@ If you prefix a link with a ‘!’ then it will embed the contents of that link
 	![](images/Setup.png)
 
 
-##7.9  Emphasis
+##6.9  Emphasis
 
 You can emphasize pieces of your text by wrapping them inside either two ‘\*’ or ‘\_\’ characters
 
@@ -336,14 +427,14 @@ You can emphasize pieces of your text by wrapping them inside either two ‘\*�
 	Although you could also _do that this way_
 
 
-##7.10  Code
+##6.10  Code
 
 You can mark text as code inside a single like enclosing it with a ‘\`’
 
 	Use the `printf()` function.
 
 
-##7.11  Backslash escapes
+##6.11  Backslash escapes
 
 You can escape any character below that might be interpreted by Markdown otherwise:
 
@@ -361,15 +452,35 @@ You can escape any character below that might be interpreted by Markdown otherwi
 	!   exclamation mark
 
 
-##7.12  Include processing
+##6.12  Include processing
 
-You can include any other markdown file (or any text file for that matter) by using a special include directive. The file specification can be either relative or absolute. Absolute paths will be taken as absolute from the context folder.
+There are three different ways of including content in your document; tailored to the type of included content: MarkDown, images or raw source code.
+
+
+###6.12.1  Include Markdown
+
+You can include any other markdown file (or any text file for that matter) by using a special include directive. The file specification can be either relative or absolute. Absolute paths will be taken as absolute from the context folder. You can provide an optional second argument that specifies the level adjustment for headers (negative or positive). When given a value of 1 the headers of the included file will be bumped up 1 level when including them in the result.
 
 	\include{somesubfolder/somedocument.md}
+	\include{somesubfolder/somedocument.md, 1}
 	\include{/absolute/path/to/somedocument.md}
 
 
-##7.13  Critic markup
+###6.12.2  Include Images
+
+There is also include functionality for images using a wildcard. This enables you to add images from a folder without having to completely specifying their name. The header level for automatically determined headers can be specified as a separate argument. Specify 0 for no headers.
+
+	\includeimages{images/component/*.png, 1}
+
+
+###6.12.3  Include Source (code block)
+
+You can include any text file as a Code Block, Thoth will prefix every line with a tab character making it a Code Block
+
+	\includecode{sources/SomeFile.java}
+
+
+##6.13  Critic markup
 
 You can mark text with the syntax outlined below. Since this kind of markup is meant to work anywhere note that there is a space between the ‘{‘ and the directive to keep it from processing in this example. In your own markdown there should be *no space* after the opening ‘{‘ character. The Critic markup can be displayed during rendering by adding the request parameter `critics=show`, or displayed as-is with `critics=raw`. By default the critics are processed and the result will then be rendered.
 
@@ -380,16 +491,16 @@ You can mark text with the syntax outlined below. Since this kind of markup is m
 	Highlight { ==And this a highlighted piece of text, probably followed by a comment==}
 
 
-##7.14  Meta data
+##6.14  Meta data
 
-You can add any number of meta data tags to your document. You do this by adding them at the very top of your document, separating the key from the value with a ‘:’ character. The first line that does not follow this rule will start normal Markdown processing. When including files, any meta tag in the included files is added if it is not encountered before. This means that meta tag with a specific key that is first encountered ‘wins’ and will not be overwritten by subsequent definitions. Meta data is searchable with the search engine and the key/values are also available to any template that wants to use them during rendering.
+You can add any number of meta data tags to your document. You do this by adding them **at the very top** of your document, separating the key from the value with a ‘:’ character. The first line that does not follow this rule will start normal Markdown processing. When including files, any meta tag in the included files is added if it is not encountered before. This means that meta tag with a specific key that is first encountered ‘wins’ and will not be overwritten by subsequent definitions. Meta data is searchable with the search engine and the key/values are also available to any template that wants to use them during rendering.
 
 	audience: writers, developers
 	title: Title of the document
 	author: Wido Riezebos
 
 
-##7.15  Tables
+##6.15  Tables
 
 You can render a table using a ‘|’ character as a separator between columns (make sure the number of ‘|’ characters per row is always the same). You are required to define as header separator as the second line of your table definition, with at least one ‘-‘ as the contents. If you want alignment for a column use a ‘:’ in the separator row to specify where to align (:- for left, -: for right and :-: for center)
 
@@ -399,27 +510,26 @@ You can render a table using a ‘|’ character as a separator between columns 
 	|2   | Two       |
 
 
-##7.16  Inline HTML
+##6.16  Inline HTML
 
 Although not encouraged, you can place HTML fragments directly in your markdown. Since this goes directly against the spirit of Markdown altogether this obviously should be used as the exception of the rule (i.e. title pages etc).
 
 	<b>Any html</b>
 
+[//]: # "Include /Setup/Configuration.md"
 
-[//]: # "Include Setup/Configuration.md"
-
-#8  The configuration file
+#7  The configuration file
 
 In this section you will find the settings Thoth supports. The configuration of Thoth is placed in a property file which is read during startup. Without the minimal configuration (which is about where to store working files and where to find content) Thoth will not be able to start
 
 
-##8.1  Required settings
+##7.1  Required settings
 
 workspacelocation
 : States where the working files of Thoth will be created. This is where Thoth will checkout branches and create search indexes. In principle it is completely safe to delete the entire contents of the workspace (after shutting down Thoth). When Thoth is launched it will automatically recreate the contents of the workspace.
 
 
-###8.1.1  Repository settings
+###7.1.1  Repository settings
 
 Repositories are the source for content. In the case of a Git repository Thoth will pull a branch as the source of the content. In the case of a FileSystem repository nothing will be pulled; the specified location for the repository is then used as-is.
 
@@ -439,7 +549,7 @@ repository.1.password
 : The password for logging in to the repository. In the case of FS repository this can be left blank.
 
 
-###8.1.2  Context settings
+###7.1.2  Context settings
 
 A context if the root of a library, and corresponds to a branch in Git. For FileSystem  repositories there is not branch, but the name of the context is used in Thoth to refer to the contents. Note the numeric index in the name (1) which enumerates the context definition. You can define as many contexts as long as you number them sequentially leaving no gaps. Thoth will stop at the first context.*n*.name that does not have it’s value set.
 
@@ -456,7 +566,7 @@ context.1.refreshseconds
 : The number of seconds between automatic repository refreshes. When a change is detected an indexer updating the search index is automatically launched. Default = 60
 
 
-##8.2  Optional settings
+##7.2  Optional settings
 
 skin.default
 : The name of the default skin. When no skin is defined for a specific context this is the skin that will be used. Also used when no skin is defined for the main index page. Default value is ‘SimpleSkin’
@@ -468,7 +578,7 @@ localhost
 : Custom rendering uses a forked process to render the contents. When this process needs to fetch the contents; this URL is used as the base for the path of the document. Default value is ‘http://localhost:8080/'
 
 
-###8.2.1  Custom renderers
+###7.2.1  Custom renderers
 
 You can define any number of custom renderers. The most basic one would be a PDF renderer.
 
@@ -497,8 +607,11 @@ context.classifications
 search.maxresults
 : The number of search results to show per page of results
 
-formatmask
+formatmask.timestamp
 : The format mask to use for timestamps. Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html) for more information about this mask). Default value = dd-MM-yyyy HH:mm:ss
+
+formatmask.date
+: The format mask to use for dates (without the time part). Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html) for more information about this mask). Default value = dd-MM-yyyy
 
 versioncontrol.maxfilerevisions
 : The maximum number of revisions to retrieve for the metadata page. Default = 10
@@ -513,7 +626,7 @@ parsetimeout
 : The maximum time in ms that a Markdown parse by the PegDown parser can last. Default = 4000
 
 
-###8.2.2  File recognition
+###7.2.2  File recognition
 
 documents
 : The extensions of the files that will be recognized as a 'Document' and therefore can be rendered to html, pdf etc. Default = marked,book,index,md
@@ -528,7 +641,7 @@ images.extensions
 : Image recognition. Set (comma separated) the extensions (without the '.') below to determine whether a matching resource will be treated as an image. Default = png,jpeg,jpg,gif,tiff,bmp
 
 
-###8.2.3  Markdown processing options
+###7.2.3  Markdown processing options
 
 markdown.appenderrors
 : Append any link / include error messages at the bottom of the document. Default = true
@@ -549,7 +662,7 @@ markdown.option.AUTOLINKS
 : Enables plain autolinks the way github flavoured markdown implements them. With this extension enabled pegdown will intelligently recognize URLs and email addresses without any further delimiters and mark them as the respective link type. See [http://github.github.com/github-flavored-markdown](http://github.github.com/github-flavored-markdown). Default = off
 
 markdown.option.TABLES
-: Table support similar to what Multimarkdown offers. See [http://fletcherpenney.net/multimarkdown/users_guide/](http://fletcherpenney.net/multimarkdown/users_guide/). Default = on
+: Table support similar to what Multimarkdown offers. See [http://fletcherpenney.net/multimarkdown/users\_guide/](http://fletcherpenney.net/multimarkdown/users_guide/). Default = on
 
 markdown.option.DEFINITIONS
 : PHP Markdown Extra style definition lists. Additionally supports the small extension proposed in the article referenced below. See [http://michelf.com/projects/php-markdown/extra/#def-list](http://michelf.com/projects/php-markdown/extra/#def-list) and [http://www.justatheory.com/computers/markup/modest-markdown-proposal.html](http://www.justatheory.com/computers/markup/modest-markdown-proposal.html) Default = on
@@ -588,7 +701,7 @@ markdown.option.EXTANCHORLINKS
 : Generate anchor links for headers using complete contents of the header. Note that Thoth has it’s own method of creating actor links that might interfere with this setting. Default is off.
 
 
-##8.3  Sample configuration file
+##7.3  Sample configuration file
 
 	#######
 	# Primary options below; these you will have to set to get things going
@@ -635,7 +748,7 @@ markdown.option.EXTANCHORLINKS
 	# Skinning related properties
 	#######
 	
-	# The name of the default skin to use. If not set; it will use the builtin skin named 'Builtin'
+	# The name of the default skin to use. If not set; it will use the builtin skin named 'Builtin' 
 	# Note that any skin can come from the classpath as long as the package remains within net/riezebos/thoth/skins/
 	skin.default=SimpleSkin
 	
@@ -655,13 +768,13 @@ markdown.option.EXTANCHORLINKS
 	# Note that you can also override the default html and raw renderers. Their extensions are 'raw' and 'html'
 	#######
 	
-	renderer.1.extension=pdf
-	renderer.1.contenttype=application/pdf
-	renderer.1.command=/usr/local/bin/prince ${url}?suppresserrors=true -o ${output} --javascript --media=print --page-size=A4 --page-margin=20mm
+	renderer.1.extension=pdf 
+	renderer.1.contenttype=application/pdf 
+	renderer.1.command=/usr/local/bin/prince ${url}?suppresserrors=true -o ${output} --javascript --media=print --page-size=A4 --page-margin=20mm 
 	
-	renderer.2.extension=
-	renderer.2.contenttype=
-	renderer.2.command=
+	renderer.2.extension= 
+	renderer.2.contenttype= 
+	renderer.2.command= 
 	
 	
 	#######
@@ -682,7 +795,7 @@ markdown.option.EXTANCHORLINKS
 	# Context index (page) options
 	#######
 	
-	# The following comma separated classifications will be available to the context index template
+	# The following comma separated classifications will be available to the context index template 
 	# (grouping of documents by classification) The folder classification is built in; and is just listed below for clarity
 	# In the template (or json) the classification names are available under "classification_" + <the name specified below>
 	context.classifications=category,audience,folder
@@ -700,8 +813,11 @@ markdown.option.EXTANCHORLINKS
 	# More options below; but you might not necessarily have to change them
 	#######
 	
-	# Default date format mask. Note that the month is MM and the minutes are mm. HH is 24hr and hh 12hr
-	formatmask=dd-MM-yyyy HH:mm:ss
+	# Default timestamp format mask. Note that the month is MM and the minutes are mm. HH is 24hr and hh 12hr
+	formatmask.timestamp=dd-MM-yyyy HH:mm:ss
+	
+	# Default date format mask. Note that the month is MM and the minutes are mm.
+	formatmask.date=dd-MM-yyyy
 	
 	# Pretty prent JSON responses. You might want to set this to false in a production environment; small performance benefit
 	json.prettyprint=true
@@ -730,7 +846,7 @@ markdown.option.EXTANCHORLINKS
 	# Append any link / include error messages at the bottom of the document
 	markdown.appenderrors=true
 	
-	# Auto number headings up to the specified level. Default is 3, set to 0 to disable
+	# Auto number headings up to the specified level. Default is 3, set to 0 to disable 
 	markdown.maxheadernumberlevel=3
 	
 	#######
@@ -802,7 +918,6 @@ markdown.option.EXTANCHORLINKS
 	
 	#Generate anchor links for headers using complete contents of the header
 	markdown.option.EXTANCHORLINKS=off
-	
 
 
 
@@ -812,30 +927,29 @@ markdown.option.EXTANCHORLINKS
 
 
 
+[//]: # "Include /Setup/Installation.md"
+
+#8  Installing Thoth
+
+There are two ways you can run Thoth. For server environments there is a WAR that you can deploy in a Web Container like tomcat and for desktop environments there is a standalone version that requires almost no setup.
 
 
-[//]: # "Include Setup/Installation.md"
+##8.1  Configuration
 
-#9  Installing Thoth
-
-There are two ways you can run Thoth. For server environments there is a WAR that you can deploy in a Web Container like tomcat.
+Create a configuration.properties file as described in the [Configuration](../Setup/Configuration.md) section.
 
 
-##9.1  Configuration
+##8.2  Running standalone
 
-Create a configuration.properties file as described in the [Configuration](Setup/Configuration.md) section.
+For desktop environments you can run Thoth without a Web Container using the Thoth-standalone version which has an embedded web server. First make sure you have Java8 installed, so [grab a JRE or JDK version 8](https://www.java.com/en/download/) and install it. Then you can start ‘standalone Thoth’ if you either have an environment or JVM variable set (as describe above) or simply provide the location of the configuration.properties file as an argument. Not even any of this is required if you have the configuration.properties file in the working folder when starting the Thoth standalone
+
+	java -jar thoth-standalone.jar
 
 
-##9.2  WAR installation
+##8.3  WAR installation
 
-Just drop the Thoth WAR inside the web apps folder of your Web Container. And then the only requirement is that the configuration can be found through an environment variable (or -D provided JVM argument) called `thoth_configuration`. On servers with an init script for Tomcat (/etc/init.d/tomcat) you could add a script line stating
+Have your Web Container and JDK8 ready and then just drop the Thoth WAR inside the web apps folder of your Web Container. And then the only requirement is that the configuration can be found through an environment variable (or -D provided JVM argument) called `thoth_configuration`. On servers with an init script for Tomcat (/etc/init.d/tomcat) you could add a script line stating
 
 	export thoth_configuration=/opt/conf/configuration.properties
 
-
-##9.3  Running standalone
-
-For desktop environments you can run Thoth without a Web Container using the Thoth-standalone version which has an embedded web server. You can start ‘standalone Thoth’ if you either have an environment or JVM variable set (as describe above) or simply provide the location of the configuration.properties file as an argument. Not even any of this is required if you have the configuration.properties file in the working folder when starting the Thoth standalone
-
-	java -jar thoth-standalone.jar
 

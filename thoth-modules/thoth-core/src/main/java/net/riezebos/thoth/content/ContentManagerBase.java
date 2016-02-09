@@ -41,7 +41,6 @@ import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.markdown.FileProcessor;
 import net.riezebos.thoth.markdown.IncludeProcessor;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.ProcessorError;
@@ -124,11 +123,8 @@ public abstract class ContentManagerBase implements ContentManager {
     String physicalFilePath = getContextFolder() + documentPath;
     File file = new File(physicalFilePath);
     Configuration configuration = ConfigurationFactory.getConfiguration();
-    IncludeProcessor processor = new IncludeProcessor();
-    processor.setLibrary(getContextFolder());
-    processor.setRootFolder(ThothUtil.getFolder(physicalFilePath));
-    processor.setCriticProcessingMode(criticProcessingMode);
-    processor.setMaxNumberingLevel(configuration.getMaxHeaderNumberingLevel());
+
+    IncludeProcessor processor = getIncludeProcessor(criticProcessingMode, physicalFilePath);
 
     try (FileInputStream in = new FileInputStream(file)) {
       String markdown = processor.execute(documentPath, in);
@@ -136,10 +132,20 @@ public abstract class ContentManagerBase implements ContentManager {
         markdown = appendErrors(processor, markdown);
       }
       MarkDownDocument markDownDocument = new MarkDownDocument(markdown, processor.getMetaTags(), processor.getErrors(), processor.getDocumentStructure());
-      long latestMod =  Math.max(file.lastModified(), processor.getLatestIncludeModificationDate());
+      long latestMod = Math.max(file.lastModified(), processor.getLatestIncludeModificationDate());
       markDownDocument.setLastModified(new Date(latestMod));
       return markDownDocument;
     }
+  }
+
+  protected IncludeProcessor getIncludeProcessor(CriticProcessingMode criticProcessingMode, String physicalFilePath) throws ContextNotFoundException {
+    Configuration configuration = ConfigurationFactory.getConfiguration();
+    IncludeProcessor processor = new IncludeProcessor();
+    processor.setLibrary(getContextFolder());
+    processor.setRootFolder(ThothUtil.getFolder(physicalFilePath));
+    processor.setCriticProcessingMode(criticProcessingMode);
+    processor.setMaxNumberingLevel(configuration.getMaxHeaderNumberingLevel());
+    return processor;
   }
 
   protected String appendErrors(IncludeProcessor processor, String markdown) {
@@ -199,14 +205,14 @@ public abstract class ContentManagerBase implements ContentManager {
     return result;
   }
 
-  protected void collectBooks(String contextFolder, File folder, List<Book> result, List<String> bookExtensions) throws IOException {
-    FileProcessor includeProcessor = new IncludeProcessor();
+  protected void collectBooks(String contextFolder, File folder, List<Book> result, List<String> bookExtensions) throws IOException, ContextNotFoundException {
     if (folder.isDirectory()) {
       for (File file : folder.listFiles()) {
         if (file.isFile()) {
           for (String ext : bookExtensions)
             if (file.getName().endsWith("." + ext)) {
               String absolutePath = file.getAbsolutePath();
+              IncludeProcessor includeProcessor = getIncludeProcessor(CriticProcessingMode.DO_NOTHING, absolutePath);
               File bookFile = new File(absolutePath);
               String canonicalPath = getConical(bookFile);
               if (canonicalPath.startsWith(contextFolder))
