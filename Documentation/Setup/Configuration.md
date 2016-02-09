@@ -76,8 +76,11 @@ context.classifications
 search.maxresults
 : The number of search results to show per page of results
 
-formatmask
+formatmask.timestamp
 : The format mask to use for timestamps. Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html) for more information about this mask). Default value = dd-MM-yyyy HH:mm:ss
+
+formatmask.date
+: The format mask to use for dates (without the time part). Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html) for more information about this mask). Default value = dd-MM-yyyy
 
 versioncontrol.maxfilerevisions
 : The maximum number of revisions to retrieve for the metadata page. Default = 10
@@ -124,7 +127,7 @@ markdown.option.AUTOLINKS
 : Enables plain autolinks the way github flavoured markdown implements them. With this extension enabled pegdown will intelligently recognize URLs and email addresses without any further delimiters and mark them as the respective link type. See [http://github.github.com/github-flavored-markdown](http://github.github.com/github-flavored-markdown). Default = off
 
 markdown.option.TABLES
-: Table support similar to what Multimarkdown offers. See [http://fletcherpenney.net/multimarkdown/users_guide/](http://fletcherpenney.net/multimarkdown/users_guide/). Default = on
+: Table support similar to what Multimarkdown offers. See [http://fletcherpenney.net/multimarkdown/users\_guide/](http://fletcherpenney.net/multimarkdown/users_guide/). Default = on
 
 markdown.option.DEFINITIONS
 : PHP Markdown Extra style definition lists. Additionally supports the small extension proposed in the article referenced below. See [http://michelf.com/projects/php-markdown/extra/#def-list](http://michelf.com/projects/php-markdown/extra/#def-list) and [http://www.justatheory.com/computers/markup/modest-markdown-proposal.html](http://www.justatheory.com/computers/markup/modest-markdown-proposal.html) Default = on
@@ -273,8 +276,11 @@ markdown.option.EXTANCHORLINKS
 	# More options below; but you might not necessarily have to change them
 	#######
 	
-	# Default date format mask. Note that the month is MM and the minutes are mm. HH is 24hr and hh 12hr
-	formatmask=dd-MM-yyyy HH:mm:ss
+	# Default timestamp format mask. Note that the month is MM and the minutes are mm. HH is 24hr and hh 12hr
+	formatmask.timestamp=dd-MM-yyyy HH:mm:ss
+	
+	# Default date format mask. Note that the month is MM and the minutes are mm.
+	formatmask.date=dd-MM-yyyy
 	
 	# Pretty prent JSON responses. You might want to set this to false in a production environment; small performance benefit
 	json.prettyprint=true
@@ -375,8 +381,7 @@ markdown.option.EXTANCHORLINKS
 	
 	#Generate anchor links for headers using complete contents of the header
 	markdown.option.EXTANCHORLINKS=off
-	
-
+ 
 
 
 

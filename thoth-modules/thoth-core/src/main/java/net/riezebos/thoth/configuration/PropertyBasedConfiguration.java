@@ -34,7 +34,9 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class PropertyBasedConfiguration extends ConfigurationBase implements Configuration {
 
-  private static final String DEFAULT_DATE_FMT = "dd-MM-yyyy HH:mm:ss";
+  private static final String DEFAULT_TIMESTAMP_FMT = "dd-MM-yyyy HH:mm:ss";
+  private static final String DEFAULT_DATE_FMT = "dd-MM-yyyy";
+  
   private static final Logger LOG = LoggerFactory.getLogger(PropertyBasedConfiguration.class);
   private static final String WORKSPACELOCATION_DEPRECATED = "libraryroot";
 
@@ -337,17 +339,31 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    * @see net.riezebos.thoth.configuration.ConfigurationT#getDateFormat()
    */
   @Override
+  public SimpleDateFormat getTimestampFormat() {
+    try {
+      return new SimpleDateFormat(getTimestampFormatMask());
+    } catch (Exception x) {
+      LOG.warn("Invalid format mask: " + getTimestampFormatMask());
+      return new SimpleDateFormat(DEFAULT_TIMESTAMP_FMT);
+    }
+  }
+
+  @Override
   public SimpleDateFormat getDateFormat() {
     try {
       return new SimpleDateFormat(getDateFormatMask());
     } catch (Exception x) {
-      LOG.warn("Invalid format mask: " + getDateFormatMask());
+      LOG.warn("Invalid format mask: " + getTimestampFormatMask());
       return new SimpleDateFormat(DEFAULT_DATE_FMT);
     }
   }
 
+  public String getTimestampFormatMask() {
+    return getValue("formatmask.timestamp", DEFAULT_TIMESTAMP_FMT);
+  }
+
   public String getDateFormatMask() {
-    return getValue("formatmask", DEFAULT_DATE_FMT);
+    return getValue("formatmask.date", DEFAULT_DATE_FMT);
   }
 
   /*
@@ -429,7 +445,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   public boolean isResource(String path) {
     return !isFragment(path) && !isBook(path);
   }
-  
+
   @Override
   public int getMaxHeaderNumberingLevel() {
     return Integer.parseInt(getValue("markdown.maxheadernumberlevel", "3"));

@@ -47,7 +47,7 @@ public class DiffCommand extends RendererBase implements Command {
       } else {
         ContentManager contentManager = getContentManager(context);
         Configuration configuration = ConfigurationFactory.getConfiguration();
-        SimpleDateFormat dateFormat = configuration.getDateFormat();
+        SimpleDateFormat dateFormat = configuration.getTimestampFormat();
         String commitId = getString(arguments, "commitId");
         SourceDiff diff = contentManager.getDiff(commitId);
         String body = "Diff not found";

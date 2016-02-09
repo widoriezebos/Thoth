@@ -80,7 +80,7 @@ public class ContentManagerFactory {
 
   public static String getRefreshTimestamp(String contextName) throws ContentManagerException {
     Configuration configuration = ConfigurationFactory.getConfiguration();
-    SimpleDateFormat dateFormat = configuration.getDateFormat();
+    SimpleDateFormat dateFormat = configuration.getTimestampFormat();
     Date latestRefresh = new Date(0L);
     for (String context : configuration.getContexts()) {
       ContentManager contentManager = getContentManager(context);

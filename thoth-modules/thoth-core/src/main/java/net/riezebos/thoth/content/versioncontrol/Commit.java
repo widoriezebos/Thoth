@@ -50,7 +50,7 @@ public class Commit {
 
   public String getFormattedTimestamp() {
     Configuration configuration = ConfigurationFactory.getConfiguration();
-    SimpleDateFormat dateFormat = configuration.getDateFormat();
+    SimpleDateFormat dateFormat = configuration.getTimestampFormat();
     return dateFormat.format(timestamp);
   }
 

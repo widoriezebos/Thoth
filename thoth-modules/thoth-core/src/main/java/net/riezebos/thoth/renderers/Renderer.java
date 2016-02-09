@@ -31,6 +31,8 @@ public interface Renderer {
   String SKINBASE_PARAMETER = "skinbase";
   String REFRESH_PARAMETER = "refresh";
   String SKIN = "skin";
+  String TODAY = "today";
+  String NOW = "now";
 
   public enum RenderResult {
     OK, NOT_FOUND, FORBIDDEN

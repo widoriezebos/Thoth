@@ -172,7 +172,14 @@ public interface Configuration {
   List<CustomRendererDefinition> getCustomRenderers();
 
   /**
-   * The date format mask to use for Thoth pages
+   * The date format including the time part mask to use for Thoth pages
+   * 
+   * @return
+   */
+  SimpleDateFormat getTimestampFormat();
+
+  /**
+   * The date format excluding the time part mask to use for Thoth pages
    * 
    * @return
    */
@@ -255,4 +262,5 @@ public interface Configuration {
    * @throws ContextNotFoundException
    */
   ContextDefinition getContextDefinition(String name) throws ContextNotFoundException;
+
 }
