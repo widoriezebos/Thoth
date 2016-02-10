@@ -24,7 +24,7 @@ public class SoftLinkTranslation {
   private String replacePattern;
 
   public SoftLinkTranslation(String patternSpec, String replacePattern) {
-    this.pattern = Pattern.compile("^"+ThothUtil.fileSpec2regExp(patternSpec)+"$");
+    this.pattern = Pattern.compile("^" + ThothUtil.fileSpec2regExp(patternSpec) + "$");
     this.replacePattern = replacePattern;
   }
 

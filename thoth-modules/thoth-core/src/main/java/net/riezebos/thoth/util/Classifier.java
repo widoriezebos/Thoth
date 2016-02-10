@@ -48,7 +48,7 @@ public class Classifier {
           classificationSpec = defaultValue;
       }
 
-      for (String classificationName : ThothUtil.tokenize(classificationSpec)) {
+      for (String classificationName : ThothUtil.sort(ThothUtil.tokenize(classificationSpec))) {
         BookClassification classification = classificationMap.get(classificationName);
         if (classification == null) {
           classification = new BookClassification(classificationName);

@@ -28,8 +28,8 @@ public class ContentNode implements Comparable<ContentNode> {
 
   public ContentNode(String path, File file) {
     super();
-    this.path = path;
-    this.isFolder = file.isDirectory();
+    setPath(path);
+    setFolder(file.isDirectory());
     this.dateModified = new Date(file.lastModified());
     this.size = isFolder ? 0 : file.length();
   }

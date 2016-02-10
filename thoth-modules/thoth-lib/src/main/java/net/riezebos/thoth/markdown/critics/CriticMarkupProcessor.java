@@ -24,11 +24,17 @@ import java.util.regex.Pattern;
  */
 public class CriticMarkupProcessor {
 
-  private Pattern addition = Pattern.compile("\\{\\+\\+(.*?)\\+\\+\\}", Pattern.DOTALL);
-  private Pattern deletion = Pattern.compile("\\{\\-\\-(.*?)\\-\\-\\}", Pattern.DOTALL);
-  private Pattern substitution = Pattern.compile("\\{\\~\\~(.*?)\\~\\>(.*?)\\~\\~\\}", Pattern.DOTALL);
-  private Pattern highlight = Pattern.compile("\\{\\=\\=(.*?)\\=\\=\\}", Pattern.DOTALL);
-  private Pattern comment = Pattern.compile("\\{\\>\\>(.*?)\\<\\<\\}", Pattern.DOTALL);
+  public static final String INSERTION_PATTERN = "\\{\\+\\+(.*?)\\+\\+\\}";
+  public static final String DELETION_PATTERN = "\\{\\-\\-(.*?)\\-\\-\\}";
+  public static final String SUBSTITUTION_PATTERN = "\\{\\~\\~(.*?)\\~\\>(.*?)\\~\\~\\}";
+  public static final String HIGHLIGHT_PATTERN = "\\{\\=\\=(.*?)\\=\\=\\}";
+  public static final String COMMENT_PATTERN = "\\{\\>\\>(.*?)\\<\\<\\}";
+
+  private Pattern addition = Pattern.compile(INSERTION_PATTERN, Pattern.DOTALL);
+  private Pattern deletion = Pattern.compile(DELETION_PATTERN, Pattern.DOTALL);
+  private Pattern substitution = Pattern.compile(SUBSTITUTION_PATTERN, Pattern.DOTALL);
+  private Pattern highlight = Pattern.compile(HIGHLIGHT_PATTERN, Pattern.DOTALL);
+  private Pattern comment = Pattern.compile(COMMENT_PATTERN, Pattern.DOTALL);
 
   public String processCritics(String source, CriticProcessingMode processingMode) {
 

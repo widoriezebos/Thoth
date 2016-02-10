@@ -23,7 +23,7 @@ public class HighlightTranslator implements TranslateAction {
     if (processingMode == CriticProcessingMode.TRANSLATE_ONLY) {
       return "<mark>" + value + "</mark>";
     } else {
-      replaceString = "";
+      replaceString = value;
     }
     return replaceString;
   }

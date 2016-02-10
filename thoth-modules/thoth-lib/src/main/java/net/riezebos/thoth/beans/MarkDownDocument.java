@@ -68,17 +68,11 @@ public class MarkDownDocument {
   }
 
   public String getPath() {
-    if (documentStructure != null)
       return documentStructure.getPath();
-    else
-      return null;
   }
 
   public String getName() {
-    if (documentStructure != null)
       return documentStructure.getFileName();
-    else
-      return null;
   }
 
   public String getTitle() {

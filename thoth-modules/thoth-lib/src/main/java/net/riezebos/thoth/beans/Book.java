@@ -29,8 +29,8 @@ public class Book implements Comparable<Book> {
 
   public Book(String name, String path) {
     super();
-    this.name = name;
-    this.path = path;
+    setName(name);
+    setPath(path);
     setFolder(path);
     setTitle(name);
   }

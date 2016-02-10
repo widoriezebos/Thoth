@@ -14,8 +14,6 @@
  */
 package net.riezebos.thoth.util;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,14 +33,6 @@ public class ThothUtil {
     return value;
   }
 
-  public static String encodeUrl(String url) {
-    try {
-      return URLEncoder.encode(url, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-    }
-    return url;
-  }
-
   public static String normalSlashes(String filespec) {
     if (filespec == null)
       return null;
@@ -56,6 +46,8 @@ public class ThothUtil {
    * @return
    */
   public static String getNameOnly(String imagePath) {
+    if (imagePath == null)
+      return null;
     String name = getFileName(imagePath);
     int idx = name.lastIndexOf(".");
     if (idx != -1)
@@ -70,6 +62,8 @@ public class ThothUtil {
    * @return
    */
   public static String getFileName(String filespec) {
+    if (filespec == null)
+      return null;
     String fileName = normalSlashes(filespec);
     int idx = fileName.lastIndexOf("/");
     if (idx != -1)
@@ -78,9 +72,11 @@ public class ThothUtil {
   }
 
   public static char[] wrapWithNewLines(char[] source) {
+    if (source == null)
+      return null;
     char[] src = new char[source.length + 2];
-    System.arraycopy(source, 0, src, 0, source.length);
-    src[source.length] = '\n';
+    System.arraycopy(source, 0, src, 1, source.length);
+    src[0] = '\n';
     src[source.length + 1] = '\n';
     return src;
   }
@@ -102,6 +98,8 @@ public class ThothUtil {
   }
 
   public static String encodeBookmark(String text, boolean toLowercase) {
+    if (text == null)
+      return null;
     String bookmark = text.replaceAll("[^\\w\\_]", "");
     if (toLowercase)
       bookmark = bookmark.toLowerCase();
@@ -109,6 +107,8 @@ public class ThothUtil {
   }
 
   public static String replaceKeywords(String messageTemplate, Map<String, Object> args) {
+    if (messageTemplate == null)
+      return null;
     for (String expression : extractKeyswords(messageTemplate))
       messageTemplate = replaceKeyword(messageTemplate, args, expression);
     return messageTemplate;
@@ -169,8 +169,7 @@ public class ThothUtil {
 
   public static Pattern specAsRegExp(String spec) {
     spec = fileSpec2regExp(spec);
-    int flags = Pattern.CASE_INSENSITIVE;
-    return Pattern.compile(spec, flags);
+    return Pattern.compile(spec, Pattern.CASE_INSENSITIVE);
   }
 
   public static String fileSpec2regExp(String spec) {
@@ -189,7 +188,7 @@ public class ThothUtil {
       }
     }
 
-    return sort(result);
+    return result;
   }
 
   public static <T extends Comparable<T>> List<T> sort(List<T> list) {
@@ -199,15 +198,28 @@ public class ThothUtil {
     return newList;
   }
 
+  /**
+   * Strips any prefixing number. Result will be trimmed from whitespace as well
+   * 
+   * @param title
+   * @return
+   */
   public static String stripNumericPrefix(String title) {
     if (title == null)
-      return title;
+      return null;
 
     while (title.length() > 0 && Character.isDigit(title.charAt(0)))
       title = title.substring(1);
     return title.trim();
   }
 
+  /**
+   * When prefix not found; will return the entire path
+   * 
+   * @param path
+   * @param prefix
+   * @return
+   */
   public static String getPartBeforeFirst(String path, String prefix) {
     if (path != null) {
       int idx = path.indexOf(prefix);
@@ -217,11 +229,20 @@ public class ThothUtil {
     return path;
   }
 
+  /**
+   * When prefix not found; will return empty string
+   * 
+   * @param path
+   * @param prefix
+   * @return
+   */
   public static String getPartAfterFirst(String path, String prefix) {
     if (path != null) {
       int idx = path.indexOf(prefix);
       if (idx != -1)
         path = path.substring(idx + prefix.length());
+      else
+        path = "";
     }
     return path;
   }
@@ -253,6 +274,8 @@ public class ThothUtil {
   }
 
   public static String getExtension(String path) {
+    if (path == null)
+      return null;
     int idx = path.lastIndexOf('.');
     if (idx != -1) {
       return path.substring(idx + 1);
@@ -261,7 +284,9 @@ public class ThothUtil {
   }
 
   public static String prefix(String value, String prefix) {
-    if (value != null && !value.startsWith(prefix))
+    if (value == null)
+      return prefix;
+    if (!value.startsWith(prefix))
       value = prefix + value;
     return value;
   }

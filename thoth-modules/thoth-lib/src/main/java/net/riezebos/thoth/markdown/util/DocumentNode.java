@@ -40,9 +40,9 @@ public class DocumentNode {
     if (idx != -1)
       path = path.substring(0, idx);
 
-    this.path = path;
+    setPath(path);
     this.description = (description == null || description.isEmpty()) ? ThothUtil.getFileName(path) : description;
-    this.includePosition = includePosition;
+    setIncludePosition(includePosition);
     this.fileName = ThothUtil.getFileName(path);
     this.folder = ThothUtil.getFolder(path);
     this.level = level;
