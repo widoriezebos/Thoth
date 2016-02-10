@@ -10,7 +10,7 @@ It is important to note that Git uses a local version control repository to stor
 In the examples below we will use SourceTree as a Git client; but there is no pressing reason why you could not use any other Git client. The point is that you create a local Git repository where you will work on your documentation, and that you do this by cloning the central repository.
 
 ## Starting SourceTree for the first time
-When you start SourceTree for the first time you are asked to add an account. If you are familiar with Github then this is where you your Github account details. If you are still wandering what Git actually is all about then you might need some help to either set up a central repository (Github would be good) or skip Git altogether and continue with a file based repository. If you go for File Based then you can read the text below just for reference, but you will be missing out on a lot of goodies.
+When you start SourceTree for the first time you are asked to add an account. If you are familiar with Github then this is where you enter your Github account details. If you are still wandering what Git actually is all about then you might need some help to either set up a central repository (Github would be good) or skip Git altogether and continue with a file based repository. If you go for File Based then you can read the text below just for reference, but you will be missing out on a lot of goodies.
 
 ![](images/01%20Add%20Account.png)
 
@@ -22,11 +22,11 @@ The next step is about creating a local repository by cloning the central (remot
 ![](images/02%20Clone.png)
 
 ## SourceTree main screen
-After cloning the repository you should the main screen of SourceTree. A few things to note here: 
+After cloning the repository you should see the main screen of SourceTree. A few things to note here: 
 
 ![](images/03%20Branches.png)
 
-Under branches you see only one branch called ‘master’, and if you open up ‘remote’ you see more branches that are not yet available locally. You can have one branch at a time in your local repository, it is like a snapshot of a particular version of your files. The master branch is not the one you want to work on. Usually you work on develop or a branch based on develop. To switch to develop, just double click on the remove develop branch. 
+Under branches you see only one branch called ‘master’, and if you open up ‘REMOTES’ you see more branches that are not yet available locally. You can have one branch at a time in your local repository, it is like a snapshot of a particular version of your files. The master branch is not the one you want to work on. Usually you work on develop or a branch based on develop. To switch to develop, just double click on the REMOTES\>Origin develop branch. 
 
 ![](images/04%20Checkout%20Branch.png)
 
@@ -72,7 +72,6 @@ Once every conflict has been resolved you can finally commit all your changes. Y
 ![](images/16%20Commit%20Resolved.png)
 
 Now Pull again to make sure nobody Pushed in the mean time and then Push yourself.
-
 
 
 

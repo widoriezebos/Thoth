@@ -1,11 +1,11 @@
 category: Intro
 # Thoth Markdown basics
 Currently Thoth uses the Markdown syntax as [defined originally by John Gruber](http://daringfireball.net/projects/markdown/syntax). On top of that Thoth supports some extra’s as defined by [PegDown](https://github.com/sirthias/pegdown) (depending how you have configured Thoth), [Critic Markup](http://criticmarkup.com) and the [Metadata definition](https://github.com/fletcher/MultiMarkdown/wiki/MultiMarkdown-Syntax-Guide) as defined by MultiMarkdown. The include processing is kept close to how you would specify in Latex.
-Note that a lot of Markdown constructs require an empty line before it. If you see unexpected results with a header, a list or a table then usually this is resolved by placing an empty line directly about your construct.
+Note that a lot of Markdown constructs require an empty line before it. If you see unexpected results with a header, a list or a table then usually this is resolved by placing an empty line directly above your construct.
 Whitespace is generally not rendered. If you want an empty line between your paragraphs however you can simply enter two consecutive new-line characters.
 
 ## Table of Contents
-You can add a generated TOC section to your document by adding \tableofcontents tag to your document. All headers present in the document will be used to create the TOC, using the level of the header to indent appropriately. Note that the \tableofcontents construct must appear (without any prefixes) at the beginning of a line.
+You can add a generated TOC section to your document by adding a \tableofcontents tag to your document. All headers present in the document will be used to create the TOC, using the level of the header to indent appropriately. Note that the \tableofcontents construct must appear (without any prefixes) at the beginning of a line.
 
 	\tableofcontents
 
@@ -54,7 +54,8 @@ Note that Thoth currently only supports inline links because of complications th
 Note that Thoth supports ‘Soft links’ which means that you can define an alias or substitution pattern as a short-cut in a file called softlinks.properties in the root of your context. You reference a soft link by prefixing it’s name (or substitution pattern) with a ‘:’. You might prefer soft links over hard links if you want to avoid having hard links all over the place or want to use them simply as a shorthand. Reorganizing your library without breaking links all over the place can be avoided using soft-links.
 
 	[Link text showing in the document](http://example.net/ "With a description")
-	[A local document](nestedfolder/otherdocument.md)
+	[A local document](/absolute/path/inlibrary/otherdocument.md)
+	[A local document](relativefolder/otherdocument.md)
 	[A local document](:mysoftlink)
 
 ## Embedded images
@@ -75,7 +76,7 @@ You can mark text as code inside a single like enclosing it with a ‘\`’
 	Use the `printf()` function.
 
 ## Backslash escapes
-You can escape any character below that might be interpreted by Markdown otherwise:
+With a ‘\\’ you can escape any character below that might be interpreted by Markdown otherwise:
 
 	\   backslash
 	`   backtick
@@ -127,7 +128,7 @@ You can add any number of meta data tags to your document. You do this by adding
 	author: Wido Riezebos
 
 ## Tables
-You can render a table using a ‘|’ character as a separator between columns (make sure the number of ‘|’ characters per row is always the same). You are required to define as header separator as the second line of your table definition, with at least one ‘-‘ as the contents. If you want alignment for a column use a ‘:’ in the separator row to specify where to align (:- for left, -: for right and :-: for center)
+You can render a table using a ‘|’ character as a separator between columns (make sure the number of ‘|’ characters per row is always the same). You are required to define a header separator as the second line of your table definition, with at least one ‘-‘ as the contents. If you want alignment for a column use a ‘:’ in the separator row to specify where to align (:- for left, -: for right and :-: for center)
 
 	|Code|Description|
 	|-:|-|
