@@ -138,7 +138,7 @@ public abstract class ContentManagerBase implements ContentManager {
     }
   }
 
-  protected IncludeProcessor getIncludeProcessor(CriticProcessingMode criticProcessingMode, String physicalFilePath) throws ContextNotFoundException {
+  protected IncludeProcessor getIncludeProcessor(CriticProcessingMode criticProcessingMode, String physicalFilePath) throws ContextNotFoundException, IOException {
     Configuration configuration = ConfigurationFactory.getConfiguration();
     IncludeProcessor processor = new IncludeProcessor();
     processor.setLibrary(getContextFolder());

@@ -21,6 +21,13 @@ public class BookmarkUsage {
   private LineInfo currentLineInfo;
   private String bookmark;
 
+  public BookmarkUsage() {
+  }
+
+  public BookmarkUsage(String bookmark) {
+    this.bookmark = bookmark;
+  }
+
   public void setCurrentLineInfo(LineInfo currentLineInfo) {
     this.currentLineInfo = currentLineInfo.clone();
   }

@@ -16,6 +16,9 @@ public class BookmarkUsageTest {
     assertEquals(1, usage.getCurrentLineInfo().getLine());
     assertEquals("/file", usage.getCurrentLineInfo().getFile());
     assertEquals("/file(1): #mark1", usage.toString());
+    
+    BookmarkUsage usage2 = new BookmarkUsage("mark2");
+    assertEquals("mark2", usage2.getBookmark());
   }
 
 }

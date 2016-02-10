@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -171,9 +172,6 @@ public class FileProcessor {
   protected String resolveLibraryPath(String pathSpec) throws IOException {
 
     String lib = getLibrary();
-    if (lib == null)
-      throw new IllegalArgumentException(
-          "Using absolute library path for '" + pathSpec + "' in " + getCurrentLineInfo() + " but no library specified with the -library parameter");
 
     // Every path must be made relative to the root (document). The pathSpec is however relative to the currentFolder
     // Since the currentFolder is an absolute path that is always in the library (this is a requirement) we can create a relative path from it
@@ -255,6 +253,10 @@ public class FileProcessor {
     return "\n" + line + "\n";
   }
 
+  public List<Bookmark> getBookmarks() {
+    return bookmarks;
+  }
+
   protected String adjustHeaderLevel(String line, int headerIndent) {
     if (headerIndent >= 0) {
       for (int i = 0; i < headerIndent; i++)
@@ -334,6 +336,8 @@ public class FileProcessor {
   protected String getFolderName(String filespec) {
     String folderName = ThothUtil.normalSlashes(filespec);
     int idx = folderName.lastIndexOf("/");
+    if (idx == -1)
+      return "";
     if (idx != -1)
       folderName = folderName.substring(0, idx);
     if (!folderName.endsWith("/"))
@@ -414,9 +418,10 @@ public class FileProcessor {
    * Sets the library path that serves as the root for the entire documentation structure
    *
    * @param library
+   * @throws IOException 
    */
-  public void setLibrary(String library) {
-    library = fixFolderSpec(library);
+  public void setLibrary(String library) throws IOException {
+    library = fixFolderSpec(new File(library).getCanonicalPath());
     this.library = library;
   }
 
@@ -571,31 +576,33 @@ public class FileProcessor {
 
     File file = new File(fileName);
     if (file.isFile()) {
-      FileInputStream fis = new FileInputStream(file);
-      BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-      String line = br.readLine();
-      while (line != null) {
-        // Skip comments
-        if (!line.trim().startsWith("#")) {
-          int idx = line.indexOf('=');
-          if (idx != -1) {
-            String key = line.substring(0, idx).trim();
-            String value = line.substring(idx + 1).trim();
-            if (key.indexOf('*') != -1) {
-              softLinkTranslations.add(new SoftLinkTranslation(key, value));
-            } else {
-              if (value.startsWith("/"))
-                value = value.replaceAll(" ", "%20");
-              softLinkMappings.put(key.toLowerCase(), value);
-            }
-          }
-        }
-        line = br.readLine();
-      }
-      br.close();
-
+      loadSoftLinks(new FileInputStream(file));
     } else if (showErrorNoNotFound)
       error("Soft link file " + softLinkFileName + " not found at " + file.getAbsolutePath());
+  }
+
+  protected void loadSoftLinks(InputStream is) throws UnsupportedEncodingException, IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+    String line = br.readLine();
+    while (line != null) {
+      // Skip comments
+      if (!line.trim().startsWith("#")) {
+        int idx = line.indexOf('=');
+        if (idx != -1) {
+          String key = line.substring(0, idx).trim();
+          String value = line.substring(idx + 1).trim();
+          if (key.indexOf('*') != -1) {
+            softLinkTranslations.add(new SoftLinkTranslation(key, value));
+          } else {
+            if (value.startsWith("/"))
+              value = value.replaceAll(" ", "%20");
+            softLinkMappings.put(key.toLowerCase(), value);
+          }
+        }
+      }
+      line = br.readLine();
+    }
+    br.close();
   }
 
   public Map<String, String> getSoftLinkMappings() {
@@ -663,7 +670,7 @@ public class FileProcessor {
   }
 
   public String getRootFolder() {
-    return rootFolder;
+    return rootFolder == null ? "./" : rootFolder;
   }
 
   public void setAddComments(boolean addComments) {
@@ -683,8 +690,6 @@ public class FileProcessor {
       result = file.getAbsolutePath();
     } else {
       result = canonicalFile.substring(library.length());
-      if (result.startsWith("/"))
-        result = result.substring(1);
     }
     return result;
   }
