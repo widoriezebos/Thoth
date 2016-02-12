@@ -90,4 +90,9 @@ public class MarkDownDocument {
   public Date getLastModified() {
     return lastModified;
   }
+  
+  @Override
+  public String toString() {
+    return getPath();
+  }
 }

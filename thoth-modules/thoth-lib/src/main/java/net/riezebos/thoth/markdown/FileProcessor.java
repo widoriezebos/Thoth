@@ -462,12 +462,14 @@ public class FileProcessor {
     boolean found = false;
     if (lookFor != null) {
       while (!found && file != null && file.isDirectory()) {
-        for (String name : file.list()) {
-          if (lookFor.equals(name)) {
-            found = true;
-            break;
+        String[] list = file.list();
+        if (list != null)
+          for (String name : list) {
+            if (lookFor.equals(name)) {
+              found = true;
+              break;
+            }
           }
-        }
         if (!found)
           file = file.getParentFile();
       }
@@ -716,11 +718,11 @@ public class FileProcessor {
     }
     return 0;
   }
-  
+
   public void setOut(PrintStream out) {
     this.out = out;
   }
-  
+
   public PrintStream getOut() {
     return out;
   }

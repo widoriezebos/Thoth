@@ -46,20 +46,24 @@ public class ClasspathFileHandleFactory implements FileHandleFactory {
 
   @Override
   public FileHandle createFileHandle(String filename) {
-    return new ClasspathFileHandle(this, ThothUtil.stripSuffix(ThothUtil.prefix(filename, "/"), "/"));
+    String path = ThothUtil.stripSuffix(ThothUtil.prefix(filename, "/"), "/");
+    return new ClasspathFileHandle(this, path, isFile(path));
   }
 
   public boolean exists(String filename) {
     return isDirectory(filename) || isFile(filename);
   }
 
+  // There is no reliable way of figuring out whether a resource on the classpath is a folder
+  // or a file. Opening the folder as a resource might return an inputstream which is
+  // the list of that folder.
+  // So for now we return false if there is a folder with the same name, and then true
+  // if the inputstream is not null
   public boolean isFile(String filename) {
-    filename = ThothUtil.getCanonicalPath(filename);
-    String folder = ThothUtil.getFolder(filename);
-    if (folder == null)
+    if (filename == null || filename.length() == 0)
       return false;
-    List<String> list = folderContents.get(folder);
-    if (list == null)
+    filename = ThothUtil.getCanonicalPath(filename);
+    if (folders.contains(filename))
       return false;
     // First check 'real' existence
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -86,7 +90,7 @@ public class ClasspathFileHandleFactory implements FileHandleFactory {
     if (isDirectory(folderName)) {
       List<FileHandle> result = new ArrayList<FileHandle>();
       for (String name : folderContents.get(folderName)) {
-        result.add(new ClasspathFileHandle(this, folderName + "/" + name));
+        result.add(new ClasspathFileHandle(this, folderName + "/" + name, true));
       }
       return result;
     }

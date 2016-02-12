@@ -78,4 +78,6 @@ public interface ContentManager {
 
   boolean supportsVersionControl();
 
+  FileHandle getFileHandle(String contextFolder);
+
 }

@@ -59,7 +59,7 @@ public abstract class ContentManagerBase implements ContentManager {
   private Date latestRefresh = new Date();
   private ContextDefinition contextDefinition;
 
-  abstract protected FileHandle getFileHandle(String physicalFilePath);
+  abstract public FileHandle getFileHandle(String physicalFilePath);
 
   public ContentManagerBase(ContextDefinition contextDefinition) {
     this.contextDefinition = contextDefinition;

@@ -11,10 +11,12 @@ public class ClasspathFileHandle implements FileHandle {
   private static final long serialVersionUID = 1L;
   ClasspathFileHandleFactory fileHandleFactory;
   private String fullPath;
+  private boolean isFile;
 
-  public ClasspathFileHandle(ClasspathFileHandleFactory fileHandleFactory, String fullPath) {
+  public ClasspathFileHandle(ClasspathFileHandleFactory fileHandleFactory, String fullPath, boolean isFile) {
     this.fileHandleFactory = fileHandleFactory;
     this.fullPath = fullPath;
+    this.isFile = isFile;
   }
 
   @Override
@@ -29,12 +31,12 @@ public class ClasspathFileHandle implements FileHandle {
 
   @Override
   public boolean isFile() {
-    return fileHandleFactory.isFile(fullPath);
+    return isFile;
   }
 
   @Override
   public boolean isDirectory() {
-    return fileHandleFactory.isDirectory(fullPath);
+    return !isFile;
   }
 
   @Override
@@ -65,15 +67,14 @@ public class ClasspathFileHandle implements FileHandle {
 
   @Override
   public FileHandle[] listFiles() {
-    String[] strings = list();
-    FileHandle[] result = new FileHandle[strings.length];
-    for (int i = 0; i < strings.length; i++)
-      result[i] = new ClasspathFileHandle(fileHandleFactory, fullPath + "/" + strings[i]);
-    return result;
+    List<FileHandle> list = fileHandleFactory.list(getCanonicalPath());
+    return list.toArray(new FileHandle[list.size()]);
   }
 
   @Override
   public FileHandle getParentFile() {
+    if (fullPath == null || fullPath.length() == 0)
+      return null;
     String parentName = ThothUtil.getPartBeforeLast(fullPath, "/");
     return fileHandleFactory.createFileHandle(parentName);
   }

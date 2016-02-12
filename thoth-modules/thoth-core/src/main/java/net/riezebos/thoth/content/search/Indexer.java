@@ -19,12 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -68,6 +64,7 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.IndexerException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
@@ -85,8 +82,8 @@ public class Indexer {
 
   private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
-  private String indexPath;
-  private Path docDir;
+  private String indexFolder;
+  private FileHandle contextFolder;
   private boolean recreate = true;
   private ContentManager contentManager;
   private Set<String> extensions = new HashSet<>();
@@ -100,8 +97,8 @@ public class Indexer {
 
   protected Indexer(ContentManager contentManager) throws ContextNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
-    this.indexPath = contentManager.getIndexFolder();
-    this.docDir = Paths.get(contentManager.getContextFolder());
+    this.indexFolder = contentManager.getIndexFolder();
+    this.contextFolder = contentManager.getFileHandle(contentManager.getContextFolder());
     this.setIndexExtensions(ConfigurationFactory.getConfiguration().getIndexExtensions());
   }
 
@@ -118,11 +115,11 @@ public class Indexer {
 
     try {
       Date start = new Date();
-      LOG.info("Indexing " + context + " to directory '" + indexPath + "'...");
+      LOG.info("Indexing " + context + " to directory '" + indexFolder + "'...");
 
       IndexWriter writer = getWriter(recreate);
       IndexingContext indexingContext = new IndexingContext();
-      indexDocs(writer, docDir, indexingContext);
+      indexDirectory(writer, contextFolder, indexingContext);
 
       sortIndexLists(indexingContext.getIndirectReverseIndex());
       sortIndexLists(indexingContext.getDirectReverseIndex());
@@ -154,7 +151,7 @@ public class Indexer {
   }
 
   protected IndexWriter getWriter(boolean wipeIndex) throws IOException {
-    Directory dir = FSDirectory.open(Paths.get(indexPath));
+    Directory dir = FSDirectory.open(Paths.get(indexFolder));
     Analyzer analyzer = new StandardAnalyzer();
     IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
@@ -217,38 +214,26 @@ public class Indexer {
       Collections.sort(entry.getValue());
   }
 
-  void indexDocs(final IndexWriter writer, Path path, final IndexingContext context) throws IOException, ContextNotFoundException {
+  protected void indexDirectory(IndexWriter writer, FileHandle path, IndexingContext context) throws IOException, ContextNotFoundException {
 
-    if (Files.isDirectory(path)) {
-      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          try {
-            indexDoc(writer, file, attrs.lastModifiedTime().toMillis(), context);
-          } catch (Exception ignore) {
-            // don't index files that can't be read.
-            LOG.warn("Not indexing " + file.toString() + " because of " + ignore.getMessage());
-          }
-          return FileVisitResult.CONTINUE;
-        }
-      });
+    if (path.isDirectory()) {
+      for (FileHandle fileHandle : path.listFiles()) {
+        if (fileHandle.isFile())
+          indexFile(writer, fileHandle, context);
+        else
+          indexDirectory(writer, fileHandle, context);
+      }
     } else {
-      indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis(), context);
+      indexFile(writer, path, context);
     }
   }
 
-  /**
-   * Indexes a single document
-   * 
-   * @param indirectReverseIndex
-   * @param directReverseIndex
-   * @param referencedLocalResources
-   * @param errors
-   * @throws ContextNotFoundException
-   */
-  void indexDoc(IndexWriter writer, Path file, long lastModified, IndexingContext indexingContext) throws IOException, ContextNotFoundException {
+  protected void indexFile(IndexWriter writer, FileHandle fileHandle, IndexingContext indexingContext) throws IOException, ContextNotFoundException {
 
-    Path relativePath = docDir.relativize(file);
+    Path docDirPath = Paths.get(contextFolder.getAbsolutePath());
+    Path filePath = Paths.get(fileHandle.getAbsolutePath());
+    Path relativePath = docDirPath.relativize(filePath);
+
     if (!ignore(relativePath.toString())) {
       // make a new, empty document
 

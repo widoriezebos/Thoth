@@ -106,7 +106,7 @@ public class FSContentManager extends ContentManagerBase {
   }
 
   @Override
-  protected FileHandle getFileHandle(String filePath) {
+  public FileHandle getFileHandle(String filePath) {
     return new BasicFileHandle(filePath);
   }
 }
