@@ -36,7 +36,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
 
   private static final String DEFAULT_TIMESTAMP_FMT = "dd-MM-yyyy HH:mm:ss";
   private static final String DEFAULT_DATE_FMT = "dd-MM-yyyy";
-  
+
   private static final Logger LOG = LoggerFactory.getLogger(PropertyBasedConfiguration.class);
   private static final String WORKSPACELOCATION_DEPRECATED = "libraryroot";
 
@@ -47,10 +47,18 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   private Set<String> _bookExtensions = null;
 
   protected PropertyBasedConfiguration(String propertyPath) throws ConfigurationException {
-    loadDefaults();
     load(propertyPath);
+  }
+
+  protected PropertyBasedConfiguration(InputStream is) throws ConfigurationException {
+    load(is);
+  }
+
+  @Override
+  protected void load(InputStream inStream) throws ConfigurationException {
+    super.load(inStream);
     String extensionSpec = getImageExtensions();
-    for (String ext : extensionSpec.split(extensionSpec))
+    for (String ext : extensionSpec.split("\\,"))
       imageExtensions.add(ext.trim().toLowerCase());
     loadRepositoryDefinitions();
     loadContextDefinitions();
@@ -71,7 +79,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
     if (is == null)
       LOG.error("Somebody misplaced " + BUILT_PROPERTIES + " so there will be no defaults for the Configuration!");
     else
-      load(is);
+      readInputStream(is);
   }
 
   /*
@@ -422,9 +430,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   @Override
   public boolean isBook(String path) {
     if (_bookExtensions == null) {
-      Set<String> bookExtensions = new HashSet<>();
-      bookExtensions.removeAll(getBookExtensions());
-      _bookExtensions = bookExtensions;
+      _bookExtensions = new HashSet<>(getBookExtensions());
     }
     if (ThothUtil.getFileName(path).startsWith("."))
       return false;

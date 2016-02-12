@@ -8,13 +8,15 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.exceptions.ConfigurationException;
+
 public class PropertyLoader {
   private static final Logger LOG = LoggerFactory.getLogger(PropertyLoader.class);
 
   private Properties properties = new Properties();
   private String propertyFileName;
 
-  public void load(String propertyFileName) {
+  public void load(String propertyFileName) throws ConfigurationException {
     try {
       setPropertyFileName(propertyFileName);
       FileInputStream inStream = new FileInputStream(propertyFileName);
@@ -22,11 +24,23 @@ public class PropertyLoader {
     } catch (IOException e) {
       String msg = "Could not load configuration from '" + propertyFileName + "' because of: " + e.getMessage();
       LOG.error(msg, e);
-      throw new IllegalArgumentException(msg);
+      throw new ConfigurationException(msg);
     }
   }
 
-  protected void load(InputStream inStream) {
+  protected void load(InputStream inStream) throws ConfigurationException {
+    loadDefaults();
+    readInputStream(inStream);
+  }
+
+  /**
+   * Override this method to set default before actually loading any properties
+   */
+  protected void loadDefaults() {
+
+  }
+
+  protected void readInputStream(InputStream inStream) {
     try {
       properties.load(inStream);
     } catch (IOException e) {

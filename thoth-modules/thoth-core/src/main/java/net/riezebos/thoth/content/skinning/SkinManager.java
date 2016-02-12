@@ -35,6 +35,7 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManagerFactory;
+import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.util.ThothUtil;
@@ -180,7 +181,7 @@ public class SkinManager {
     return skinMappings;
   }
 
-  protected Skin createAndRegisterSkin(String context, String skinFileName) throws ContextNotFoundException, ContentManagerException {
+  protected Skin createAndRegisterSkin(String context, String skinFileName) throws ContextNotFoundException, ContentManagerException, ConfigurationException {
     Skin skin = new Skin(context, skinFileName);
     CacheManager instance = CacheManager.getInstance(context);
     instance.registerSkin(skin);

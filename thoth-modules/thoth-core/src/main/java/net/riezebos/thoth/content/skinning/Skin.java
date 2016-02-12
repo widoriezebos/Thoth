@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.content.ContentManagerFactory;
+import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.util.PropertyLoader;
@@ -44,8 +45,9 @@ public class Skin extends PropertyLoader {
    * @param skinPropertyFile relative path to the skin.properties file in the context
    * @throws ContentManagerException
    * @throws ContextNotFoundException
+   * @throws ConfigurationException 
    */
-  public Skin(String context, String skinPropertyFile) throws ContextNotFoundException, ContentManagerException {
+  public Skin(String context, String skinPropertyFile) throws ContextNotFoundException, ContentManagerException, ConfigurationException {
     if(StringUtils.isBlank(context)) contextFolder = "";
     else contextFolder = ContentManagerFactory.getContentManager(context).getContextFolder();
     if (skinPropertyFile.startsWith(CLASSPATH_PREFIX)) {
