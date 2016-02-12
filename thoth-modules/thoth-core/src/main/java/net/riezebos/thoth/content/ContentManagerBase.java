@@ -138,7 +138,8 @@ public abstract class ContentManagerBase implements ContentManager {
     }
   }
 
-  protected IncludeProcessor getIncludeProcessor(CriticProcessingMode criticProcessingMode, String physicalFilePath) throws ContextNotFoundException, IOException {
+  protected IncludeProcessor getIncludeProcessor(CriticProcessingMode criticProcessingMode, String physicalFilePath)
+      throws ContextNotFoundException, IOException {
     Configuration configuration = ConfigurationFactory.getConfiguration();
     IncludeProcessor processor = new IncludeProcessor();
     processor.setLibrary(getContextFolder());
@@ -232,7 +233,7 @@ public abstract class ContentManagerBase implements ContentManager {
 
   protected String getConical(File bookFile) {
     try {
-      return ThothUtil.normalSlashes(bookFile.getCanonicalPath());
+      return ThothUtil.normalSlashes(ThothUtil.getCanonicalPath(bookFile));
     } catch (Exception e) {
       LOG.error(e.getMessage() + " for " + bookFile.getAbsolutePath());
       return bookFile.getAbsolutePath();
@@ -272,14 +273,14 @@ public abstract class ContentManagerBase implements ContentManager {
   @Override
   public boolean accessAllowed(File file) throws IOException {
     String rootCanon = getRootCanonical();
-    String canonicalPath = file.getCanonicalPath();
+    String canonicalPath = ThothUtil.getCanonicalPath(file);
     return canonicalPath.startsWith(rootCanon);
   }
 
   protected String getRootCanonical() throws IOException {
     if (this.rootCanon == null) {
       File root = new File(ConfigurationFactory.getConfiguration().getWorkspaceLocation());
-      String rootCanon = root.getCanonicalPath();
+      String rootCanon = ThothUtil.getCanonicalPath(root);
       this.rootCanon = rootCanon;
     }
     return this.rootCanon;
@@ -346,10 +347,10 @@ public abstract class ContentManagerBase implements ContentManager {
           if (recursive)
             hash += traverseFolders(result, matcher, root, file, recursive);
         } else {
-          ContentNode node = createContentNode(file.getCanonicalPath(), root);
+          ContentNode node = createContentNode(ThothUtil.getCanonicalPath(file), root);
           if (matcher.test(node.getPath())) {
             result.add(node);
-            hash += (file.getCanonicalPath().hashCode()) + file.lastModified();
+            hash += (ThothUtil.getCanonicalPath(file).hashCode()) + file.lastModified();
           }
         }
       }

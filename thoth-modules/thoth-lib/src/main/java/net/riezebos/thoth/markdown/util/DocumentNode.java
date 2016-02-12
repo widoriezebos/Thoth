@@ -97,7 +97,7 @@ public class DocumentNode {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < level; i++)
       sb.append("  ");
-    sb.append(getPath());
+    sb.append(getPath() + " " + ((includePosition != 0) ? " line " + includePosition : ""));
     sb.append("\n");
     for (DocumentNode child : getChildren()) {
       sb.append(child.toString(level + 1));

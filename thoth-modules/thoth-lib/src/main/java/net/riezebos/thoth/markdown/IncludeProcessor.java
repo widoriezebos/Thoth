@@ -16,14 +16,13 @@ package net.riezebos.thoth.markdown;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +34,7 @@ import java.util.regex.Pattern;
 import net.riezebos.thoth.beans.BookmarkUsage;
 import net.riezebos.thoth.markdown.critics.CriticMarkupProcessor;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
@@ -55,6 +55,11 @@ public class IncludeProcessor extends FileProcessor {
   private DocumentNode documentStructure;
   private long latestIncludeModificationDate = 0;
   private CriticProcessingMode criticProcessingMode = CriticProcessingMode.PROCESS;
+
+  public String execute(FileHandle fileHandle) throws IOException {
+    setRootFolder(fileHandle.getParentFile().getCanonicalPath());
+    return execute(fileHandle.getCanonicalPath(), fileHandle.getInputStream());
+  }
 
   public String execute(String fileName, InputStream in) throws IOException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream(50000);
@@ -86,12 +91,10 @@ public class IncludeProcessor extends FileProcessor {
 
   protected void processFile(String currentFolder, InputStream fis, PrintStream out, Stack<DocumentNode> includeStack, int headerIndent) throws IOException {
     if (includeStack.size() > MAX_INCLUDE_DEPTH) {
-      String errorMessage = "\n\nMaximum include depth of " + MAX_INCLUDE_DEPTH + " reached. Stopping here.\nStack:\n";
-      for (DocumentNode documentNode : includeStack) {
-        errorMessage += "\t" + documentNode.getPath() + "\n";
-        out.println(errorMessage);
-        error(errorMessage.trim());
-      }
+      String errorMessage = "Maximum include depth of " + MAX_INCLUDE_DEPTH + " reached. Stopping here. Stack: ";
+      errorMessage += includeStack.firstElement();
+      out.println(errorMessage);
+      error(errorMessage.trim());
     } else {
       BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
       int lineNumber = 1;
@@ -200,9 +203,7 @@ public class IncludeProcessor extends FileProcessor {
           // fix relative links
           {
             // First determine the relative path from the root to where we are now; which actually is the currentFolder without the library prefix
-            String relativePart = currentFolder.substring(getRootFolder().length());
-            if (relativePart.startsWith("/"))
-              relativePart = relativePart.substring(1);
+            String relativePart = ThothUtil.stripPrefix(currentFolder.substring(getRootFolder().length()), "/");
             String actualLocation = relativePart + pathSpec;
             actualLocation = actualLocation.replace(" ", "%20"); // Encode spaces because that will also break an image link
 
@@ -216,14 +217,14 @@ public class IncludeProcessor extends FileProcessor {
             } else {
               // Do not check http:// or mailto: kind of links
               if (pathname.indexOf(':') == -1) {
-                File check = new File(pathname.replaceAll("%20", " "));
+                FileHandle check = createFileHandle(pathname.replaceAll("%20", " "));
                 if (!check.exists())
                   error(getCurrentLineInfo() + ": Link invalid: " + pathSpec);
               }
             }
 
             if (embed)
-              createDocumentNode(makeRelativeToLibrary(new File(pathname)), description, includeStack);
+              createDocumentNode(makeRelativeToLibrary(createFileHandle(pathname)), description, includeStack);
 
             String newLink = "[" + description + "](" + actualLocation + (afterPath != null ? " " + afterPath : "") + ")";
             line = line.substring(0, start) + newLink + line.substring(end);
@@ -258,18 +259,18 @@ public class IncludeProcessor extends FileProcessor {
     String spec = ThothUtil.getFileName(args[0]);
 
     String absoluteFolder = currentFolder + folderName;
-    File folder = new File(absoluteFolder);
+    FileHandle folder = createFileHandle(absoluteFolder);
     Pattern pattern = ThothUtil.specAsRegExp(spec);
 
     List<String> result = new ArrayList<String>();
-    File[] listFiles = folder.listFiles();
-    if (listFiles == null) {
+    String[] fileNames = folder.list();
+    if (fileNames == null) {
       error("Image include spec invalid: " + includeSpec);
     } else {
-      for (File file : listFiles) {
-        Matcher matcher = pattern.matcher(file.getName());
+      for (String file : fileNames) {
+        Matcher matcher = pattern.matcher(file);
         if (matcher.matches())
-          result.add(folderName + file.getName());
+          result.add(folderName + file);
       }
     }
     Collections.sort(result);
@@ -302,13 +303,11 @@ public class IncludeProcessor extends FileProcessor {
     } else
       pathname = currentFolder + fileName;
 
-    if (fileName.startsWith("/"))
-      pathname = fileName;
-    File file = new File(pathname.replaceAll("%20", " "));
+    FileHandle file = createFileHandle(pathname.replaceAll("%20", " "));
     if (!file.isFile())
       error("File " + fileToInclude + " not found");
     else {
-      BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+      BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream(), "UTF-8"));
       String line = br.readLine();
       while (line != null) {
         out.println("\t" + line);
@@ -331,9 +330,7 @@ public class IncludeProcessor extends FileProcessor {
     } else
       pathname = currentFolder + fileName;
 
-    if (fileName.startsWith("/"))
-      pathname = fileName;
-    File file = new File(pathname.replaceAll("%20", " "));
+    FileHandle file = createFileHandle(pathname.replaceAll("%20", " "));
     if (!file.exists()) {
       String errorMessage = "Include not found: " + fileToInclude;
       if (!fileToInclude.equals(softTranslated))
@@ -352,7 +349,7 @@ public class IncludeProcessor extends FileProcessor {
       includeStack.push(includeUsage);
       startNewFile(pathname);
       comment(out, "Include " + fileToInclude);
-      processFile(newFolder, new FileInputStream(file), out, includeStack, headerIndent);
+      processFile(newFolder, file.getInputStream(), out, includeStack, headerIndent);
       endFile();
       includeStack.pop();
     }
@@ -366,7 +363,15 @@ public class IncludeProcessor extends FileProcessor {
     return latestIncludeModificationDate;
   }
 
-  protected static void printUsage() {
+  private void setDocumentStructure(DocumentNode documentStructure) {
+    this.documentStructure = documentStructure;
+  }
+
+  public void setCriticProcessingMode(CriticProcessingMode criticProcessingMode) {
+    this.criticProcessingMode = criticProcessingMode;
+  }
+
+  protected void printUsage() {
     pl("Usage: java " + IncludeProcessor.class.getName() + " <arguments>");
     pl();
     pl("Description:");
@@ -409,8 +414,7 @@ public class IncludeProcessor extends FileProcessor {
     pl("       the (fully) generated input");
   }
 
-  public static void main(String[] args) throws IOException {
-
+  protected void execute(String[] args) throws FileNotFoundException, IOException, UnsupportedEncodingException {
     Map<String, String> arguments = getArgumentsMap(args);
     boolean help = arguments.containsKey("help");
     boolean nocomments = arguments.containsKey("nocomments");
@@ -420,68 +424,63 @@ public class IncludeProcessor extends FileProcessor {
     help |= arguments.containsKey("h");
     if (help) {
       printUsage();
-      System.exit(0);
+    } else {
+      int numberingLevel = DEFAULT_NUMBERING_LEVEL;
+
+      String numberLevelStr = arguments.get("numbering");
+      if (numberLevelStr != null)
+        numberingLevel = Integer.parseInt(numberLevelStr);
+
+      Map<String, String> env = System.getenv();
+      String rootFolder = env.get("MARKED_ORIGIN");
+      InputStream in = System.in;
+
+      String fileName = arguments.get("file");
+      if (fileName != null) {
+        in = createFileHandle(fileName).getInputStream();
+        int idx = fileName.lastIndexOf("/");
+        if (idx != -1)
+          rootFolder = fileName.substring(0, idx);
+      }
+
+      if (rootFolder == null)
+        rootFolder = arguments.get("origin");
+      if (rootFolder == null)
+        throw new IllegalArgumentException("No origin set. Either use the -origin parameter or the MARKED_ORIGIN environment variable");
+
+      String library = arguments.get("library");
+      String softlinkFile = arguments.get("softlinkfile");
+
+      rootFolder = fixFolderSpec(rootFolder);
+      setLibrary(library);
+      setRootFolder(rootFolder);
+      setMaxNumberingLevel(numberingLevel);
+      setAddComments(!nocomments);
+      setStripTrailingWhitespace(!nostrip);
+      if (softlinkFile != null)
+        setSoftlinkFile(softlinkFile);
+      String result = execute(fileName, in);
+      List<ProcessorError> errors = getErrors();
+      if (!errors.isEmpty() && !noErrors) {
+        result += "\n\tThe following problems occurred during generation of this document:\n";
+        for (ProcessorError error : errors)
+          result += "\t" + (error.getErrorMessage().replaceAll("\n", "\n\t").trim()) + "\n";
+      }
+
+      String target = arguments.get("target");
+      if (target != null) {
+        FileOutputStream fos = new FileOutputStream(target);
+        fos.write(result.getBytes("UTF-8"));
+        fos.close();
+        getOut().println("Written to " + target);
+      } else
+        getOut().println(result);
     }
-
-    int numberingLevel = DEFAULT_NUMBERING_LEVEL;
-
-    String numberLevelStr = arguments.get("numbering");
-    if (numberLevelStr != null)
-      numberingLevel = Integer.parseInt(numberLevelStr);
-
-    Map<String, String> env = System.getenv();
-    String rootFolder = env.get("MARKED_ORIGIN");
-    InputStream in = System.in;
-
-    String fileName = arguments.get("file");
-    if (fileName != null) {
-      in = new FileInputStream(fileName);
-      int idx = fileName.lastIndexOf("/");
-      if (idx != -1)
-        rootFolder = fileName.substring(0, idx);
-    }
-
-    if (rootFolder == null)
-      rootFolder = arguments.get("origin");
-    if (rootFolder == null)
-      throw new IllegalArgumentException("No origin set. Either use the -origin parameter or the MARKED_ORIGIN environment variable");
-
-    String library = arguments.get("library");
-    String softlinkFile = arguments.get("softlinkfile");
-
-    IncludeProcessor processor = new IncludeProcessor();
-    rootFolder = processor.fixFolderSpec(rootFolder);
-    processor.setLibrary(library);
-    processor.setRootFolder(rootFolder);
-    processor.setMaxNumberingLevel(numberingLevel);
-    processor.setAddComments(!nocomments);
-    processor.setStripTrailingWhitespace(!nostrip);
-    if (softlinkFile != null)
-      processor.setSoftlinkFile(softlinkFile);
-    String result = processor.execute(fileName, in);
-    List<ProcessorError> errors = processor.getErrors();
-    if (!errors.isEmpty() && !noErrors) {
-      result += "\n\tThe following problems occurred during generation of this document:\n";
-      for (ProcessorError error : errors)
-        result += "\t" + (error.getErrorMessage().replaceAll("\n", "\n\t").trim()) + "\n";
-    }
-
-    String target = arguments.get("target");
-    if (target != null) {
-      FileOutputStream fos = new FileOutputStream(target);
-      fos.write(result.getBytes("UTF-8"));
-      fos.close();
-      System.out.println("Written to " + target);
-    } else
-      System.out.println(result);
   }
 
-  private void setDocumentStructure(DocumentNode documentStructure) {
-    this.documentStructure = documentStructure;
-  }
-
-  public void setCriticProcessingMode(CriticProcessingMode criticProcessingMode) {
-    this.criticProcessingMode = criticProcessingMode;
+  public static void main(String[] args) throws IOException {
+    IncludeProcessor includeProcessor = new IncludeProcessor();
+    includeProcessor.execute(args);
   }
 
 }

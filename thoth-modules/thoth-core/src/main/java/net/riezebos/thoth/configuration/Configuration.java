@@ -263,4 +263,6 @@ public interface Configuration {
    */
   ContextDefinition getContextDefinition(String name) throws ContextNotFoundException;
 
+  boolean isValidContext(String name);
+
 }

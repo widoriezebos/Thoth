@@ -14,6 +14,9 @@
  */
 package net.riezebos.thoth.util;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +26,34 @@ import java.util.regex.Pattern;
 
 public class ThothUtil {
   private static final int DEFAULT_ADDITIONAL_BUFFERSIZE = 10;
+
+  public static String getCanonicalPath(String path) {
+    if (path == null)
+      return null;
+    try {
+
+      // public URI(String scheme,
+      // String userInfo,
+      // String host,
+      // int port,
+      // String path,
+      // String query,
+      // String fragment)
+      // throws URISyntaxException
+
+      URI uri = new URI(null, null, null, 0, path, null, null);
+
+      return uri.normalize().getPath();
+    } catch (URISyntaxException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  public static String getCanonicalPath(File file) {
+    if (file == null)
+      return null;
+    return getCanonicalPath(file.getAbsolutePath());
+  }
 
   public static String tidyRelativePath(String value) {
     if (value != null) {

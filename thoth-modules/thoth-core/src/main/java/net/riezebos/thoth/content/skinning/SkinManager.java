@@ -147,6 +147,8 @@ public class SkinManager {
         Skin skin = new Skin(context, (fromClasspath ? Configuration.CLASSPATH_PREFIX : "") + skinDescriptor);
         fallbackSkin = skin;
         cacheManager.registerSkin(skin);
+      } catch (ContextNotFoundException e) {
+        LOG.warn("Cannot create skins for unknown context: " + context);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }

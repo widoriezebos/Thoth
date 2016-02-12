@@ -1,0 +1,6 @@
+Some piece
+of code
+That will have
+to be indented
+with tabs
+when included

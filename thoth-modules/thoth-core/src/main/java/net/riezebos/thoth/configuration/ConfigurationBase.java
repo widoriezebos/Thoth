@@ -52,6 +52,10 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
     return contextDefinition;
   }
 
+  @Override
+  public boolean isValidContext(String name) {
+    return contextDefinitions.containsKey(name.toLowerCase());
+  }
   /*
    * (non-Javadoc)
    * @see net.riezebos.thoth.configuration.ConfigurationT#getContexts()

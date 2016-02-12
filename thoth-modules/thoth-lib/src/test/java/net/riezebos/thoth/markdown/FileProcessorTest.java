@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import net.riezebos.thoth.beans.Bookmark;
 import net.riezebos.thoth.beans.BookmarkUsage;
+import net.riezebos.thoth.markdown.filehandle.BasicFileHandle;
 
 public class FileProcessorTest {
 
@@ -320,10 +321,10 @@ public class FileProcessorTest {
     String someFile = libraryPath + "/some/other/path/file.md";
 
     processor.setLibrary(libFolder.getAbsolutePath());
-    String relative = processor.makeRelativeToLibrary(new File(someFile));
+    String relative = processor.makeRelativeToLibrary(new BasicFileHandle(someFile));
     assertEquals("some/other/path/file.md", relative);
     assertFalse(processor.hasErrors());
-    processor.makeRelativeToLibrary(new File("/outside/the/library"));
+    processor.makeRelativeToLibrary(new BasicFileHandle("/outside/the/library"));
     assertTrue(processor.hasErrors());
   }
   

@@ -23,10 +23,10 @@ public class DocumentNodeTest {
     assertEquals(4, node.flatten(false).size());
 
     String string = node.toString();
-    assertEquals("/absolutefilePath\n" + //
-        "  /absolutefilePath2\n" + //
-        "    /absolutefilePath3\n" + //
-        "    /absolutefilePath3", string);
+    assertEquals("/absolutefilePath \n" + //
+        "  /absolutefilePath2  line 2\n" + //
+        "    /absolutefilePath3  line 3\n" + //
+        "    /absolutefilePath3  line 3", string);
 
     assertEquals("/path/to", node4.getFolder());
     assertEquals("absolutefilePath4.md", node4.getFileName());

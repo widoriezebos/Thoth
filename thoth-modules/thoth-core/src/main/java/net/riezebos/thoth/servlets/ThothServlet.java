@@ -238,14 +238,18 @@ public class ThothServlet extends ServletBase {
 
   protected void executeCommand(Command command, HttpServletRequest request, HttpServletResponse response)
       throws RenderException, ServletException, IOException {
-    Map<String, Object> parameters = getParameters(request);
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    command.execute(getContext(request), getPath(request), parameters, getSkin(request), bos);
-    // Only now will we touch the response; this to avoid sending stuff out already and then
-    // encountering an error. This might complicate error handling (rendering an error page)
-    // otherwise
-    response.setContentType(command.getContentType(parameters));
-    IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
+    String context = getContext(request);
+    if (StringUtils.isBlank(context) || ConfigurationFactory.getConfiguration().isValidContext(context)) {
+      Map<String, Object> parameters = getParameters(request);
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      command.execute(context, getPath(request), parameters, getSkin(request), bos);
+      // Only now will we touch the response; this to avoid sending stuff out already and then
+      // encountering an error. This might complicate error handling (rendering an error page)
+      // otherwise
+      response.setContentType(command.getContentType(parameters));
+      IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
+    } else
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
 
   protected void streamResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException {

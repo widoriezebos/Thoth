@@ -15,8 +15,6 @@
 package net.riezebos.thoth.markdown;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,6 +32,9 @@ import java.util.regex.Pattern;
 
 import net.riezebos.thoth.beans.Bookmark;
 import net.riezebos.thoth.beans.BookmarkUsage;
+import net.riezebos.thoth.markdown.filehandle.BasicFileHandleFactory;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
+import net.riezebos.thoth.markdown.filehandle.FileHandleFactory;
 import net.riezebos.thoth.markdown.util.LineInfo;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.markdown.util.SoftLinkTranslation;
@@ -65,7 +66,16 @@ public class FileProcessor {
   private String softLinkFileName = null;
   private Map<String, String> softLinkMappings = new HashMap<String, String>();
   private List<SoftLinkTranslation> softLinkTranslations = new ArrayList<SoftLinkTranslation>();
-  protected List<BookmarkUsage> bookmarkUsages = new ArrayList<BookmarkUsage>();
+  private List<BookmarkUsage> bookmarkUsages = new ArrayList<BookmarkUsage>();
+  private FileHandleFactory fileHandlerFactory = new BasicFileHandleFactory();
+  private PrintStream out = System.out;
+
+  public FileProcessor() {
+  }
+
+  public void setFileHandlerFactory(FileHandleFactory factory) {
+    fileHandlerFactory = factory;
+  }
 
   /**
    * Scans the input stream for meta tags. Includes are NOT processed. if you want that to happen you should use and IncludeProcessor. Meta tags in the input
@@ -418,10 +428,10 @@ public class FileProcessor {
    * Sets the library path that serves as the root for the entire documentation structure
    *
    * @param library
-   * @throws IOException 
+   * @throws IOException
    */
   public void setLibrary(String library) throws IOException {
-    library = fixFolderSpec(new File(library).getCanonicalPath());
+    library = fixFolderSpec(createFileHandle(library).getCanonicalPath());
     this.library = library;
   }
 
@@ -444,7 +454,7 @@ public class FileProcessor {
    */
   protected String determineLibraryFallBack() {
     String currentFolder = ThothUtil.normalSlashes(getRootFolder());
-    File file = new File(currentFolder);
+    FileHandle file = createFileHandle(currentFolder);
     String lookFor = getSoftLinkFileName();
     if (lookFor == null)
       lookFor = SOFTLINKS_PROPERTIES_DFLT;
@@ -544,8 +554,8 @@ public class FileProcessor {
       return STDIN;
 
     try {
-      File file = new File(fileName);
-      String canonicalPath = fixFolderSpec(file.getCanonicalPath());
+      FileHandle fileHandle = createFileHandle(fileName);
+      String canonicalPath = fixFolderSpec(fileHandle.getCanonicalPath());
       return canonicalPath;
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
@@ -574,9 +584,9 @@ public class FileProcessor {
       softLinkFileName = softLinkFileName.substring(1);
     String fileName = getLibrary() + softLinkFileName;
 
-    File file = new File(fileName);
+    FileHandle file = createFileHandle(fileName);
     if (file.isFile()) {
-      loadSoftLinks(new FileInputStream(file));
+      loadSoftLinks(file.getInputStream());
     } else if (showErrorNoNotFound)
       error("Soft link file " + softLinkFileName + " not found at " + file.getAbsolutePath());
   }
@@ -681,13 +691,13 @@ public class FileProcessor {
     this.stripTrailingWhitespace = stripTrailingWhitespace;
   }
 
-  protected String makeRelativeToLibrary(File file) throws IOException {
-    String canonicalFile = ThothUtil.normalSlashes(file.getCanonicalFile().getAbsolutePath());
+  protected String makeRelativeToLibrary(FileHandle fileHandle) throws IOException {
+    String canonicalFile = ThothUtil.normalSlashes(fileHandle.getCanonicalPath());
     String library = getLibrary();
     String result;
     if (!canonicalFile.startsWith(library)) {
       error("Path " + canonicalFile + " is not located in library " + library);
-      result = file.getAbsolutePath();
+      result = fileHandle.getAbsolutePath();
     } else {
       result = canonicalFile.substring(library.length());
     }
@@ -706,18 +716,30 @@ public class FileProcessor {
     }
     return 0;
   }
+  
+  public void setOut(PrintStream out) {
+    this.out = out;
+  }
+  
+  public PrintStream getOut() {
+    return out;
+  }
 
   /**
    * Abbreviation for System.out.println()
    */
-  protected static void pl() {
-    System.out.println();
+  protected void pl() {
+    out.println();
   }
 
   /**
    * Abbreviation for System.out.println(String string)
    */
-  protected static void pl(String string) {
-    System.out.println(string);
+  protected void pl(String string) {
+    out.println(string);
+  }
+
+  public FileHandle createFileHandle(String filename) {
+    return fileHandlerFactory.createFileHandle(filename);
   }
 }

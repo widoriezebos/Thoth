@@ -120,6 +120,9 @@ public abstract class ServletBase extends HttpServlet {
       Configuration configuration = ConfigurationFactory.getConfiguration();
 
       String context = getContext(request);
+      if (!StringUtils.isBlank(context) && !ConfigurationFactory.getConfiguration().isValidContext(context))
+        return null;
+
       if (StringUtils.isBlank(context)) {
         context = configuration.getMainIndexSkinContext();
       }
@@ -169,14 +172,15 @@ public abstract class ServletBase extends HttpServlet {
 
     String contextName = getContext(request);
     Skin skin = getSkin(request);
-    String skinBase;
-    String baseUrl = skin.getBaseUrl();
-    if (skin.isFromClassPath()) {
-      skinBase = ContentManager.NATIVERESOURCES + baseUrl;
-    } else {
-      skinBase = ThothUtil.prefix(request.getContextPath() + baseUrl, "/");
+    String skinBase = null;
+    if (skin != null) {
+      String baseUrl = skin.getBaseUrl();
+      if (skin.isFromClassPath()) {
+        skinBase = ContentManager.NATIVERESOURCES + baseUrl;
+      } else {
+        skinBase = ThothUtil.prefix(request.getContextPath() + baseUrl, "/");
+      }
     }
-
     Configuration configuration = ConfigurationFactory.getConfiguration();
     Date now = new Date();
     String path = ThothUtil.prefix(getPath(request), "/");
@@ -186,7 +190,7 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.CONTEXTPATH_PARAMETER, request.getContextPath());
     result.put(Renderer.PATH_PARAMETER, path);
     result.put(Renderer.TITLE_PARAMETER, getTitle(request));
-    result.put(Renderer.SKIN, skin.getName());
+    result.put(Renderer.SKIN, skin == null ? null : skin.getName());
     result.put(Renderer.TODAY, configuration.getDateFormat().format(now));
     result.put(Renderer.NOW, configuration.getTimestampFormat().format(now));
     result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(contextName));
