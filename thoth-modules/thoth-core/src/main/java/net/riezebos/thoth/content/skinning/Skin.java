@@ -90,7 +90,7 @@ public class Skin extends PropertyLoader {
   }
 
   public String getMarkDownTemplate() {
-    return getPathProperty("template.markdown");
+    return getPathProperty("template.html");
   }
 
   public String getDiffTemplate() {
@@ -98,7 +98,7 @@ public class Skin extends PropertyLoader {
   }
 
   public String getIndexTemplate() {
-    return getPathProperty("template.mainindex");
+    return getPathProperty("template.index");
   }
 
   public String getContextIndexTemplate() {
@@ -106,7 +106,7 @@ public class Skin extends PropertyLoader {
   }
 
   public String getMetaInformationTemplate() {
-    return getPathProperty("template.metainformation");
+    return getPathProperty("template.meta");
   }
 
   public String getRevisionTemplate() {
@@ -114,7 +114,7 @@ public class Skin extends PropertyLoader {
   }
 
   public String getValidationTemplate() {
-    return getPathProperty("template.validation");
+    return getPathProperty("template.validationreport");
   }
 
   public String getSearchTemplate() {

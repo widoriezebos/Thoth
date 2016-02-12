@@ -24,7 +24,7 @@ import net.riezebos.thoth.renderers.RendererBase;
 
 public class ErrorPageCommand extends RendererBase implements Command {
 
-  public static final String COMMAND = "showerror";
+  public static final String COMMAND = "error";
 
   @Override
   public String getTypeCode() {
