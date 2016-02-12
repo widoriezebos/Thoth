@@ -14,7 +14,6 @@
  */
 package net.riezebos.thoth.content;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +26,7 @@ import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.util.PagedList;
 
 public interface ContentManager {
@@ -37,9 +37,10 @@ public interface ContentManager {
 
   void reindex();
 
-  boolean accessAllowed(File file) throws IOException;
+  boolean accessAllowed(FileHandle file) throws IOException;
 
-  MarkDownDocument getMarkDownDocument(String documentPath, boolean suppressErrors, CriticProcessingMode criticProcessingMode) throws IOException, ContextNotFoundException;
+  MarkDownDocument getMarkDownDocument(String documentPath, boolean suppressErrors, CriticProcessingMode criticProcessingMode)
+      throws IOException, ContextNotFoundException;
 
   List<Book> getBooks() throws ContextNotFoundException, IOException;
 
@@ -76,4 +77,5 @@ public interface ContentManager {
   long getContextChecksum() throws IOException, ContextNotFoundException;
 
   boolean supportsVersionControl();
+
 }

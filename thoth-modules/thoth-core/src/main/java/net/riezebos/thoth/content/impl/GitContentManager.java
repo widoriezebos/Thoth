@@ -59,6 +59,8 @@ import net.riezebos.thoth.content.versioncontrol.SimpleDiffFormatter;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.markdown.filehandle.BasicFileHandle;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.util.PagedList;
 
 /**
@@ -407,6 +409,11 @@ public class GitContentManager extends ContentManagerBase {
   protected void severe(StringBuilder log, Exception e) {
     LOG.error(e.getMessage(), e);
     log.append("ERROR: " + e.getMessage() + "\n");
+  }
+
+  @Override
+  protected FileHandle getFileHandle(String filePath) {
+    return new BasicFileHandle(filePath);
   }
 
 }

@@ -22,6 +22,7 @@ public class BasicFileHandleTest {
     assertEquals("/some/file/name/../other", basicFileHandle.getAbsolutePath());
     assertEquals("/some/file/other", basicFileHandle.getCanonicalPath());
     assertNull(basicFileHandle.list());
+    assertNull(basicFileHandle.listFiles());
     FileHandle parentFile = basicFileHandle.getParentFile();
     assertEquals("/some/file/name/..", parentFile.getAbsolutePath());
     assertEquals("other", basicFileHandle.getName());

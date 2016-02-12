@@ -7,6 +7,7 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class ClasspathFileHandle implements FileHandle {
 
+  private static final long serialVersionUID = 1L;
   ClasspathFileHandleFactory fileHandleFactory;
   private String fullPath;
 
@@ -56,6 +57,15 @@ public class ClasspathFileHandle implements FileHandle {
   }
 
   @Override
+  public FileHandle[] listFiles() {
+    String[] strings = list();
+    FileHandle[] result = new FileHandle[strings.length];
+    for (int i = 0; i < strings.length; i++)
+      result[i] = new ClasspathFileHandle(fileHandleFactory, strings[i]);
+    return result;
+  }
+
+  @Override
   public FileHandle getParentFile() {
     String parentName = ThothUtil.getPartBeforeLast(fullPath, "/");
     return fileHandleFactory.createFileHandle(parentName);
@@ -74,4 +84,38 @@ public class ClasspathFileHandle implements FileHandle {
   public String toString() {
     return getAbsolutePath();
   }
+
+  @Override
+  public int compareTo(FileHandle other) {
+    if (other instanceof ClasspathFileHandle)
+      return fullPath.compareTo(((ClasspathFileHandle) other).fullPath);
+    else
+      return -1;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fullPath == null) ? 0 : fullPath.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    ClasspathFileHandle other = (ClasspathFileHandle) obj;
+    if (fullPath == null) {
+      if (other.fullPath != null)
+        return false;
+    } else if (!fullPath.equals(other.fullPath))
+      return false;
+    return true;
+  }
+
 }

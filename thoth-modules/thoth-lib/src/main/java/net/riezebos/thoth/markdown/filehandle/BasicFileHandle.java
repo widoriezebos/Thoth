@@ -28,7 +28,7 @@ import net.riezebos.thoth.util.ThothUtil;
  * @author wido
  */
 public class BasicFileHandle implements FileHandle {
-
+  private static final long serialVersionUID = 1L;
   private File file;
 
   public BasicFileHandle(String fileName) {
@@ -80,6 +80,15 @@ public class BasicFileHandle implements FileHandle {
   }
 
   @Override
+  public FileHandle[] listFiles() {
+    String[] strings = list();
+    FileHandle[] result = new FileHandle[strings.length];
+    for (int i = 0; i < strings.length; i++)
+      result[i] = new BasicFileHandle(strings[i]);
+    return result;
+  }
+
+  @Override
   public FileHandle getParentFile() {
     String parent = file.getParent();
     if (parent == null)
@@ -91,9 +100,42 @@ public class BasicFileHandle implements FileHandle {
   public String getName() {
     return file.getName();
   }
-  
+
   @Override
   public String toString() {
     return getAbsolutePath();
+  }
+
+  @Override
+  public int compareTo(FileHandle other) {
+    if (other instanceof BasicFileHandle)
+      return file.compareTo(((BasicFileHandle) other).file);
+    else
+      return -1;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((file == null) ? 0 : file.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    BasicFileHandle other = (BasicFileHandle) obj;
+    if (file == null) {
+      if (other.file != null)
+        return false;
+    } else if (!file.equals(other.file))
+      return false;
+    return true;
   }
 }

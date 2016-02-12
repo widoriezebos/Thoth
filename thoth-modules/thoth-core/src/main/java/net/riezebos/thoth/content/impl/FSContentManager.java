@@ -27,6 +27,8 @@ import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.markdown.filehandle.BasicFileHandle;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.util.PagedList;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -101,5 +103,10 @@ public class FSContentManager extends ContentManagerBase {
   @Override
   public boolean supportsVersionControl() {
     return false;
+  }
+
+  @Override
+  protected FileHandle getFileHandle(String filePath) {
+    return new BasicFileHandle(filePath);
   }
 }

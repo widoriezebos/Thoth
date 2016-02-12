@@ -31,18 +31,7 @@ public class ThothUtil {
     if (path == null)
       return null;
     try {
-
-      // public URI(String scheme,
-      // String userInfo,
-      // String host,
-      // int port,
-      // String path,
-      // String query,
-      // String fragment)
-      // throws URISyntaxException
-
-      URI uri = new URI(null, null, null, 0, path, null, null);
-
+      URI uri = new URI(null, null, null, 0, normalSlashes(path), null, null);
       return uri.normalize().getPath();
     } catch (URISyntaxException e) {
       throw new IllegalArgumentException(e);

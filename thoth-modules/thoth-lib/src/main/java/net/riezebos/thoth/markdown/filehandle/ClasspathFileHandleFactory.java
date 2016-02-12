@@ -82,9 +82,14 @@ public class ClasspathFileHandleFactory implements FileHandleFactory {
     return lng == null ? 0 : lng;
   }
 
-  public String[] list(String filename) {
-    if (isDirectory(filename))
-      return folderContents.get(filename).toArray(new String[0]);
+  public String[] list(String folderName) {
+    if (isDirectory(folderName)) {
+      List<String> result = new ArrayList<String>();
+      for (String name : folderContents.get(folderName)) {
+        result.add(folderName + "/" + name);
+      }
+      return result.toArray(new String[0]);
+    }
     return null;
   }
 

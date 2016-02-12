@@ -56,6 +56,9 @@ public class ClasspathFileHandleFactoryTest {
     assertTrue(lst.contains("IncludeProcessorNoToc.md"));
     assertNull(factory.createFileHandle("net/riezebos/thoth/nofolder/").list());
 
+    List<FileHandle> lst2 = Arrays.asList(folder.listFiles());
+    assertTrue(lst2.contains(fileHandler));
+
     FileHandle walk = factory.createFileHandle("/net/riezebos/thoth/one/two/../../markdown/NotThere.md");
 
     assertEquals("/net/riezebos/thoth/markdown/NotThere.md", walk.getCanonicalPath());

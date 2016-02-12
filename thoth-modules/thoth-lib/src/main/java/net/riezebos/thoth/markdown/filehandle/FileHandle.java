@@ -17,8 +17,9 @@ package net.riezebos.thoth.markdown.filehandle;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 
-public interface FileHandle {
+public interface FileHandle extends Serializable, Comparable<FileHandle> {
 
   String getName();
 
@@ -35,6 +36,8 @@ public interface FileHandle {
   String getAbsolutePath();
 
   String[] list();
+
+  FileHandle[] listFiles();
 
   FileHandle getParentFile();
 
