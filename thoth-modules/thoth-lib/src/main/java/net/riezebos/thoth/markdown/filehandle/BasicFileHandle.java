@@ -19,6 +19,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -81,11 +83,15 @@ public class BasicFileHandle implements FileHandle {
 
   @Override
   public FileHandle[] listFiles() {
-    String[] strings = list();
-    FileHandle[] result = new FileHandle[strings.length];
-    for (int i = 0; i < strings.length; i++)
-      result[i] = new BasicFileHandle(strings[i]);
-    return result;
+    File[] files = file.listFiles();
+    if (files == null)
+      return null;
+
+    List<FileHandle> result = new ArrayList<FileHandle>();
+    for (File file : files)
+      result.add(new BasicFileHandle(file));
+
+    return result.toArray(new FileHandle[result.size()]);
   }
 
   @Override

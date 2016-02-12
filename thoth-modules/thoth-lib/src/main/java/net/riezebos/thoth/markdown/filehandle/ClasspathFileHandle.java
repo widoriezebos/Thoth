@@ -2,6 +2,7 @@ package net.riezebos.thoth.markdown.filehandle;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -53,7 +54,13 @@ public class ClasspathFileHandle implements FileHandle {
 
   @Override
   public String[] list() {
-    return fileHandleFactory.list(getCanonicalPath());
+    List<FileHandle> list = fileHandleFactory.list(getCanonicalPath());
+    if (list == null)
+      return null;
+    String[] result = new String[list.size()];
+    for (int i = 0; i < list.size(); i++)
+      result[i] = list.get(i).getName();
+    return result;
   }
 
   @Override
@@ -61,7 +68,7 @@ public class ClasspathFileHandle implements FileHandle {
     String[] strings = list();
     FileHandle[] result = new FileHandle[strings.length];
     for (int i = 0; i < strings.length; i++)
-      result[i] = new ClasspathFileHandle(fileHandleFactory, strings[i]);
+      result[i] = new ClasspathFileHandle(fileHandleFactory, fullPath + "/" + strings[i]);
     return result;
   }
 
@@ -117,5 +124,4 @@ public class ClasspathFileHandle implements FileHandle {
       return false;
     return true;
   }
-
 }
