@@ -12,9 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.markdown.filehandle;
+package net.riezebos.thoth.exceptions;
 
-public interface FileHandleFactory {
+public class SkinManagerException extends ContentManagerException {
+  private static final long serialVersionUID = 1L;
 
-  FileHandle createFileHandle(String filename);
+  public SkinManagerException(Exception e) {
+    super(e);
+  }
+
+  public SkinManagerException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public SkinManagerException(String message) {
+    super(message);
+  }
+
 }

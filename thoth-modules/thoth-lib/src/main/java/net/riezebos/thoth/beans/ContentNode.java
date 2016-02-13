@@ -14,10 +14,12 @@
  */
 package net.riezebos.thoth.beans;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class ContentNode implements Comparable<ContentNode> {
   private String path;
@@ -26,7 +28,7 @@ public class ContentNode implements Comparable<ContentNode> {
   private long size;
   private List<ContentNode> children = new ArrayList<ContentNode>();
 
-  public ContentNode(String path, File file) {
+  public ContentNode(String path, FileHandle file) {
     super();
     setPath(path);
     setFolder(file.isDirectory());
@@ -39,7 +41,7 @@ public class ContentNode implements Comparable<ContentNode> {
   }
 
   public void setPath(String path) {
-    this.path = path;
+    this.path = ThothUtil.prefix(path, "/");
   }
 
   public boolean isFolder() {

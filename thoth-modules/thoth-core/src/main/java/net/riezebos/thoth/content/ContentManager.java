@@ -21,10 +21,12 @@ import java.util.List;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.exceptions.SkinManagerException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.util.PagedList;
@@ -72,12 +74,13 @@ public interface ContentManager {
 
   String getErrorFileName() throws ContextNotFoundException;
 
-  String getFileSystemPath(String path) throws ContextNotFoundException, IOException;
-
   long getContextChecksum() throws IOException, ContextNotFoundException;
 
   boolean supportsVersionControl();
 
-  FileHandle getFileHandle(String contextFolder);
+  FileHandle getFileHandle(String contextFile);
+
+  SkinManager getSkinManager() throws SkinManagerException;
+
 
 }

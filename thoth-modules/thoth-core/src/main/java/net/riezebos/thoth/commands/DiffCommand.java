@@ -41,50 +41,45 @@ public class DiffCommand extends RendererBase implements Command {
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
       RenderResult result = RenderResult.OK;
-      String absolutePath = getFileSystemPath(context, path);
-      if (absolutePath == null) {
-        result = RenderResult.FORBIDDEN;
-      } else {
-        ContentManager contentManager = getContentManager(context);
-        Configuration configuration = ConfigurationFactory.getConfiguration();
-        SimpleDateFormat dateFormat = configuration.getTimestampFormat();
-        String commitId = getString(arguments, "commitId");
-        SourceDiff diff = contentManager.getDiff(commitId);
-        String body = "Diff not found";
-        String timestamp = "00-00-0000 00:00:00";
-        String commitMessage = "Commit not found";
-        String author = "Diff not found";
-        LinkedList<Diff> diffs = new LinkedList<>();
-        if (diff != null) {
-          timestamp = dateFormat.format(diff.getTimeModified());
+      ContentManager contentManager = getContentManager(context);
+      Configuration configuration = ConfigurationFactory.getConfiguration();
+      SimpleDateFormat dateFormat = configuration.getTimestampFormat();
+      String commitId = getString(arguments, "commitId");
+      SourceDiff diff = contentManager.getDiff(commitId);
+      String body = "Diff not found";
+      String timestamp = "00-00-0000 00:00:00";
+      String commitMessage = "Commit not found";
+      String author = "Diff not found";
+      LinkedList<Diff> diffs = new LinkedList<>();
+      if (diff != null) {
+        timestamp = dateFormat.format(diff.getTimeModified());
 
-          String newSource = diff.getNewSource();
-          String oldSource = diff.getOldSource();
-          commitMessage = diff.getCommitMessage();
-          author = diff.getAuthor();
-          if (commitMessage != null)
-            commitMessage = commitMessage.trim();
+        String newSource = diff.getNewSource();
+        String oldSource = diff.getOldSource();
+        commitMessage = diff.getCommitMessage();
+        author = diff.getAuthor();
+        if (commitMessage != null)
+          commitMessage = commitMessage.trim();
 
-          diff_match_patch dmp = new diff_match_patch();
-          diffs = dmp.diff_main(oldSource, newSource);
-          dmp.diff_cleanupSemantic(diffs);
-          body = prettyPrintHtml(diffs);
-        }
-        boolean asJson = asJson(arguments);
+        diff_match_patch dmp = new diff_match_patch();
+        diffs = dmp.diff_main(oldSource, newSource);
+        dmp.diff_cleanupSemantic(diffs);
+        body = prettyPrintHtml(diffs);
+      }
+      boolean asJson = asJson(arguments);
 
-        Map<String, Object> variables = new HashMap<>(arguments);
-        if (!asJson)
-          variables.put("body", body);
-        variables.put("author", author);
-        variables.put("timestamp", timestamp);
-        variables.put("commitMessage", commitMessage);
-        variables.put("diffs", diffs);
+      Map<String, Object> variables = new HashMap<>(arguments);
+      if (!asJson)
+        variables.put("body", body);
+      variables.put("author", author);
+      variables.put("timestamp", timestamp);
+      variables.put("commitMessage", commitMessage);
+      variables.put("diffs", diffs);
 
-        if (asJson)
-          executeJson(variables, outputStream);
-        else {
-          renderTemplate(skin.getDiffTemplate(), context, variables, outputStream);
-        }
+      if (asJson)
+        executeJson(variables, outputStream);
+      else {
+        renderTemplate(skin.getDiffTemplate(), context, variables, outputStream);
       }
       return result;
     } catch (Exception e) {

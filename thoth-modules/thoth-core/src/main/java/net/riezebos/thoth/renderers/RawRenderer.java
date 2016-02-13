@@ -22,8 +22,10 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 
 public class RawRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "raw";
@@ -40,15 +42,16 @@ public class RawRenderer extends RendererBase implements Renderer {
     try {
       RenderResult result = RenderResult.OK;
 
-      String absolutePath = getFileSystemPath(context, path);
-      if (absolutePath == null) {
-        result = RenderResult.FORBIDDEN;
-      } else {
-
-        MarkDownDocument markDownDocument = getMarkDownDocument(context, path, suppressErrors(arguments), getCriticProcessingMode(arguments));
-        String markdown = markDownDocument.getMarkdown();
-        InputStream is = new ByteArrayInputStream(markdown.getBytes("UTF-8"));
+      ContentManager contentManager = getContentManager(context);
+      FileHandle fileHandle = contentManager.getFileHandle(path);
+      if (fileHandle.isFile()) {
+        MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));
+        String markdownSource = markDownDocument.getMarkdown();
+        InputStream is = new ByteArrayInputStream(markdownSource.getBytes(("UTF-8")));
         IOUtils.copy(is, outputStream);
+        return result;
+      } else {
+        result = RenderResult.NOT_FOUND;
       }
       return result;
     } catch (Exception e) {

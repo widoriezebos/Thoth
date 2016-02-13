@@ -4,14 +4,14 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import net.riezebos.thoth.markdown.filehandle.BasicFileHandleFactory;
+import net.riezebos.thoth.markdown.filehandle.BasicFileSystem;
 
 public class BasicFileHandleFactoryTest {
 
   @Test
   public void test() {
-    BasicFileHandleFactory basicFileHandlerFactory = new BasicFileHandleFactory();
-    FileHandle fileHandler = basicFileHandlerFactory.createFileHandle("test");
+    BasicFileSystem basicFileHandlerFactory = new BasicFileSystem();
+    FileHandle fileHandler = basicFileHandlerFactory.getFileHandle("test");
     assertEquals("test", fileHandler.getName());
   }
 

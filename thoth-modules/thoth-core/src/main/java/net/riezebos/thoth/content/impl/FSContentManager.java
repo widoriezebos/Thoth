@@ -26,9 +26,7 @@ import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.markdown.filehandle.BasicFileHandle;
-import net.riezebos.thoth.markdown.filehandle.FileHandle;
+import net.riezebos.thoth.markdown.filehandle.BasicFileSystem;
 import net.riezebos.thoth.util.PagedList;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -39,26 +37,13 @@ import net.riezebos.thoth.util.ThothUtil;
  */
 public class FSContentManager extends ContentManagerBase {
 
-  private String fsroot;
   private long previousChecksum = 0;
 
   public FSContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
     super(contextDefinition);
     validateContextDefinition(contextDefinition);
-    fsroot = ThothUtil.normalSlashes(contextDefinition.getRepositoryDefinition().getLocation());
-    if (!fsroot.endsWith("/"))
-      fsroot += "/";
-  }
-
-  @Override
-  public String getFileSystemPath(String path) throws ContextNotFoundException, IOException {
-    path = ThothUtil.stripPrefix(path, "/");
-    return fsroot + path;
-  }
-
-  @Override
-  public String getContextFolder() throws ContextNotFoundException {
-    return fsroot;
+    String fsroot = ThothUtil.normalSlashes(contextDefinition.getRepositoryDefinition().getLocation());
+    setFileSystem(new BasicFileSystem(fsroot));
   }
 
   /**
@@ -103,10 +88,5 @@ public class FSContentManager extends ContentManagerBase {
   @Override
   public boolean supportsVersionControl() {
     return false;
-  }
-
-  @Override
-  public FileHandle getFileHandle(String filePath) {
-    return new BasicFileHandle(filePath);
   }
 }

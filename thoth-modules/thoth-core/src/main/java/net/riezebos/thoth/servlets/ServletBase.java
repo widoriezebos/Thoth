@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
@@ -46,9 +45,6 @@ import net.riezebos.thoth.util.ThothUtil;
 public abstract class ServletBase extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(ServletBase.class);
-
-  private Skin defaultSkin = null;
-  private SkinManager skinManager = null;
 
   protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
 
@@ -120,27 +116,22 @@ public abstract class ServletBase extends HttpServlet {
       Configuration configuration = ConfigurationFactory.getConfiguration();
 
       String context = getContext(request);
-      if (!StringUtils.isBlank(context) && !ConfigurationFactory.getConfiguration().isValidContext(context))
+      if (!StringUtils.isBlank(context) && !configuration.isValidContext(context))
         return null;
 
       if (StringUtils.isBlank(context)) {
         context = configuration.getMainIndexSkinContext();
       }
 
-      CacheManager cacheManager = CacheManager.getInstance(context);
-      List<SkinMapping> skinMappings = cacheManager.getSkinMappings();
-      if (skinMappings == null) {
-        SkinManager skinManager = new SkinManager();
-        skinMappings = skinManager.setupSkins(configuration, context, cacheManager);
-        defaultSkin = skinManager.getDefaultSkin();
-      }
-
+      ContentManager contentManager = ContentManagerFactory.getContentManager(context);
+      SkinManager skinManager = contentManager.getSkinManager();
+      List<SkinMapping> skinMappings = skinManager.getSkinMappings();
       String path = getPath(request);
 
       // First check for a skin override; i.e. a request with ?skin=name in it
       String skinOverride = request.getParameter("skin");
       if (StringUtils.isNotBlank(skinOverride)) {
-        skin = cacheManager.getSkinByName(skinOverride);
+        skin = skinManager.getSkinByName(skinOverride);
         if (skin == null)
           LOG.warn("Skin with name = " + skinOverride + " not found. Ignoring override.");
       }
@@ -153,7 +144,7 @@ public abstract class ServletBase extends HttpServlet {
             break;
           }
         if (skin == null)
-          skin = defaultSkin;
+          skin = skinManager.getDefaultSkin();
       }
       return skin;
     } catch (Exception e) {
@@ -206,18 +197,12 @@ public abstract class ServletBase extends HttpServlet {
     }
   }
 
-  protected SkinManager getSkinManager() {
-    if (this.skinManager == null)
-      this.skinManager = new SkinManager();
-    return this.skinManager;
-  }
-
   protected Skin getSkinNoFail(HttpServletRequest request) {
     Skin result;
     try {
       result = getSkin(request);
     } catch (Exception e2) {
-      result = getSkinManager().getDefaultSkin();
+      result = new Skin();
     }
     return result;
   }

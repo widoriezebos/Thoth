@@ -32,9 +32,9 @@ import java.util.regex.Pattern;
 
 import net.riezebos.thoth.beans.Bookmark;
 import net.riezebos.thoth.beans.BookmarkUsage;
-import net.riezebos.thoth.markdown.filehandle.BasicFileHandleFactory;
+import net.riezebos.thoth.markdown.filehandle.BasicFileSystem;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
-import net.riezebos.thoth.markdown.filehandle.FileHandleFactory;
+import net.riezebos.thoth.markdown.filehandle.FileSystem;
 import net.riezebos.thoth.markdown.util.LineInfo;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.markdown.util.SoftLinkTranslation;
@@ -67,14 +67,14 @@ public class FileProcessor {
   private Map<String, String> softLinkMappings = new HashMap<String, String>();
   private List<SoftLinkTranslation> softLinkTranslations = new ArrayList<SoftLinkTranslation>();
   private List<BookmarkUsage> bookmarkUsages = new ArrayList<BookmarkUsage>();
-  private FileHandleFactory fileHandlerFactory = new BasicFileHandleFactory();
+  private FileSystem fileSystem = new BasicFileSystem();
   private PrintStream out = System.out;
 
   public FileProcessor() {
   }
 
-  public void setFileHandlerFactory(FileHandleFactory factory) {
-    fileHandlerFactory = factory;
+  public void setFileSystem(FileSystem fileSystem) {
+    this.fileSystem = fileSystem;
   }
 
   /**
@@ -134,6 +134,8 @@ public class FileProcessor {
       consider &= !line.trim().startsWith("ftp://");
       if (consider) {
         String key = line.substring(0, idx).trim();
+        if (key.indexOf(' ') != -1)
+          return false;
         String value = line.substring(idx + 1).trim();
         if (!this.metaTags.containsKey(key) && value.length() > 0)
           this.metaTags.put(key, value);
@@ -418,8 +420,8 @@ public class FileProcessor {
     if (path != null) {
       path = path.replaceAll("\\\\", "/");
       path = path.replaceAll("//", "/");
-      if (!path.endsWith("/"))
-        path += "/";
+      if (path.length() != 0)
+        path = ThothUtil.suffix(path, "/");
     }
     return path;
   }
@@ -531,11 +533,9 @@ public class FileProcessor {
    * @throws IOException
    */
   protected void startNewFile(String fileName) throws IOException {
-    if (fileName.startsWith(getLibrary()))
+    if (getLibrary().length() != 0 && fileName.startsWith(getLibrary()))
       fileName = fileName.substring(getLibrary().length() - 1);
-    if (fileName.startsWith("/"))
-      fileName = fileName.substring(1);
-    currentInfo.push(new LineInfo(fileName, 0));
+    currentInfo.push(new LineInfo(ThothUtil.stripPrefix(fileName, "/"), 0));
   }
 
   /**
@@ -555,13 +555,8 @@ public class FileProcessor {
     if (STDIN.equalsIgnoreCase(fileName))
       return STDIN;
 
-    try {
-      FileHandle fileHandle = createFileHandle(fileName);
-      String canonicalPath = fixFolderSpec(fileHandle.getCanonicalPath());
-      return canonicalPath;
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e);
-    }
+    FileHandle fileHandle = createFileHandle(fileName);
+    return fixFolderSpec(fileHandle.getCanonicalPath());
   }
 
   /**
@@ -742,6 +737,6 @@ public class FileProcessor {
   }
 
   public FileHandle createFileHandle(String filename) {
-    return fileHandlerFactory.createFileHandle(filename);
+    return fileSystem.getFileHandle(filename);
   }
 }

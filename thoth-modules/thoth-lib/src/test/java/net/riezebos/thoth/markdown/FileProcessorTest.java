@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import net.riezebos.thoth.beans.Bookmark;
 import net.riezebos.thoth.beans.BookmarkUsage;
-import net.riezebos.thoth.markdown.filehandle.BasicFileHandle;
+import net.riezebos.thoth.markdown.filehandle.BasicFileSystem;
 
 public class FileProcessorTest {
 
@@ -293,7 +293,7 @@ public class FileProcessorTest {
     FileProcessor processor = new FileProcessor();
     assertEquals(FileProcessor.STDIN, processor.canonicalize(FileProcessor.STDIN));
     String canonicalized = processor.canonicalize("one/sub1/../two");
-    assertTrue(canonicalized.endsWith("/one/two/"));
+    assertTrue(canonicalized.endsWith("one/two/"));
   }
 
   @Test
@@ -313,6 +313,7 @@ public class FileProcessorTest {
 
   @Test
   public void testMakeRelativeToLibrary() throws IOException {
+
     FileProcessor processor = new FileProcessor();
     File libPath = File.createTempFile("lib", "");
     libPath.deleteOnExit();
@@ -320,27 +321,27 @@ public class FileProcessorTest {
     File libFolder = new File(libraryPath);
     String someFile = libraryPath + "/some/other/path/file.md";
 
+    BasicFileSystem fs = new BasicFileSystem();
     processor.setLibrary(libFolder.getAbsolutePath());
-    String relative = processor.makeRelativeToLibrary(new BasicFileHandle(someFile));
+    String relative = processor.makeRelativeToLibrary(fs.getFileHandle(someFile));
     assertEquals("some/other/path/file.md", relative);
     assertFalse(processor.hasErrors());
-    processor.makeRelativeToLibrary(new BasicFileHandle("/outside/the/library"));
+    processor.makeRelativeToLibrary(fs.getFileHandle("/outside/the/library"));
     assertTrue(processor.hasErrors());
   }
-  
+
   @Test
-  public void testInCodeBlock()
-  {
+  public void testInCodeBlock() {
     FileProcessor processor = new FileProcessor();
     assertTrue(processor.inCodeBlock("\tsomecode"));
     assertTrue(processor.inCodeBlock("    somecode"));
     assertFalse(processor.inCodeBlock("  somecode"));
     assertFalse(processor.inCodeBlock("somecode"));
-    
+
   }
+
   @Test
-  public void testAsInt()
-  {
+  public void testAsInt() {
     FileProcessor processor = new FileProcessor();
     assertEquals(1, processor.asInt("1"));
     assertFalse(processor.hasErrors());

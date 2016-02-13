@@ -19,8 +19,8 @@ import net.riezebos.thoth.markdown.critics.HighlightTranslatorTest;
 import net.riezebos.thoth.markdown.critics.InsertTranslatorTest;
 import net.riezebos.thoth.markdown.critics.SubstitutionTranslatorTest;
 import net.riezebos.thoth.markdown.filehandle.BasicFileHandleFactoryTest;
-import net.riezebos.thoth.markdown.filehandle.BasicFileHandleTest;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileHandleFactoryTest;
+import net.riezebos.thoth.markdown.filehandle.FileHandleTest;
 import net.riezebos.thoth.markdown.util.DocumentNodeTest;
 import net.riezebos.thoth.markdown.util.LineInfoTest;
 import net.riezebos.thoth.markdown.util.ProcessorErrorTest;
@@ -31,7 +31,7 @@ import net.riezebos.thoth.util.ThothUtilTest;
 @SuiteClasses({BookClassificationTest.class, BookmarkTest.class, BookmarkUsageTest.class, BookTest.class, ContentNodeTest.class, CommentTranslatorTest.class,
     CriticMarkupProcessorTest.class, DeleteTranslatorTest.class, HighlightTranslatorTest.class, InsertTranslatorTest.class, SubstitutionTranslatorTest.class,
     DocumentNodeTest.class, LineInfoTest.class, ProcessorErrorTest.class, SoftLinkTranslationTest.class, MarkDownDocumentTest.class, FileProcessorTest.class,
-    ThothUtilTest.class, BasicFileHandleFactoryTest.class, BasicFileHandleTest.class, ClasspathFileHandleFactoryTest.class, IncludeProcessorTest.class})
+    ThothUtilTest.class, BasicFileHandleFactoryTest.class, FileHandleTest.class, ClasspathFileHandleFactoryTest.class, IncludeProcessorTest.class})
 public class AllTests {
 
 }

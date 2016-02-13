@@ -30,7 +30,6 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.renderers.RendererBase;
 
@@ -45,55 +44,49 @@ public class MetaCommand extends RendererBase implements Command {
 
     try {
       RenderResult result = RenderResult.OK;
-      String absolutePath = getFileSystemPath(context, path);
-      if (absolutePath == null) {
-        result = RenderResult.FORBIDDEN;
-      } else {
-        ContentManager contentManager = getContentManager(context);
+      ContentManager contentManager = getContentManager(context);
+      MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));
 
-        MarkDownDocument markDownDocument = getMarkDownDocument(context, path, true, CriticProcessingMode.DO_NOTHING);
+      DocumentNode root = markDownDocument.getDocumentStructure();
+      List<DocumentNode> documentNodes = root.flatten(true);
+      int pageSize = ConfigurationFactory.getConfiguration().getFileMaxRevisions();
 
-        DocumentNode root = markDownDocument.getDocumentStructure();
-        List<DocumentNode> documentNodes = root.flatten(true);
-        int pageSize = ConfigurationFactory.getConfiguration().getFileMaxRevisions();
+      Map<String, List<Commit>> commitMap = new HashMap<>();
+      List<Commit> commitList = new ArrayList<>();
+      for (DocumentNode node : documentNodes) {
+        List<Commit> latestCommits = contentManager.getCommits(node.getPath(), 1, pageSize).getList();
+        commitMap.put(node.getPath(), latestCommits);
+        commitList.addAll(latestCommits);
+      }
+      Collections.sort(commitList, new CommitComparator());
 
-        Map<String, List<Commit>> commitMap = new HashMap<>();
-        List<Commit> commitList = new ArrayList<>();
-        for (DocumentNode node : documentNodes) {
-          List<Commit> latestCommits = contentManager.getCommits(node.getPath(), 1, pageSize).getList();
-          commitMap.put(node.getPath(), latestCommits);
-          commitList.addAll(latestCommits);
-        }
-        Collections.sort(commitList, new CommitComparator());
+      SearchFactory searchFactory = SearchFactory.getInstance();
+      Indexer indexer = searchFactory.getIndexer(context);
+      Map<String, List<String>> reverseIndex = indexer.getReverseIndex(context, false);
+      Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(context, true);
+      List<String> usedBy = reverseIndex.get("/" + path);
+      List<String> usedByIndirect = reverseIndexIndirect.get("/" + path);
+      Map<String, String> metatags = markDownDocument.getMetatags();
+      List<String> metaTagKeys = new ArrayList<>(metatags.keySet());
+      Collections.sort(metaTagKeys);
 
-        SearchFactory searchFactory = SearchFactory.getInstance();
-        Indexer indexer = searchFactory.getIndexer(context);
-        Map<String, List<String>> reverseIndex = indexer.getReverseIndex(context, false);
-        Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(context, true);
-        List<String> usedBy = reverseIndex.get("/" + path);
-        List<String> usedByIndirect = reverseIndexIndirect.get("/" + path);
-        Map<String, String> metatags = markDownDocument.getMetatags();
-        List<String> metaTagKeys = new ArrayList<>(metatags.keySet());
-        Collections.sort(metaTagKeys);
+      Map<String, Object> variables = new HashMap<>(arguments);
+      variables.put("document", markDownDocument);
+      variables.put("usedBy", usedBy);
+      variables.put("usedByIndirect", usedByIndirect);
+      variables.put("documentNodes", documentNodes);
+      variables.put("commitMap", commitMap);
+      variables.put("commitList", commitList);
+      variables.put("metatagKeys", metaTagKeys);
+      variables.put("metatags", metatags);
+      variables.put("errors", markDownDocument.getErrors());
+      variables.put("versioncontrolled", contentManager.supportsVersionControl());
 
-        Map<String, Object> variables = new HashMap<>(arguments);
-        variables.put("document", markDownDocument);
-        variables.put("usedBy", usedBy);
-        variables.put("usedByIndirect", usedByIndirect);
-        variables.put("documentNodes", documentNodes);
-        variables.put("commitMap", commitMap);
-        variables.put("commitList", commitList);
-        variables.put("metatagKeys", metaTagKeys);
-        variables.put("metatags", metatags);
-        variables.put("errors", markDownDocument.getErrors());
-        variables.put("versioncontrolled", contentManager.supportsVersionControl());
-
-        if (asJson(arguments))
-          executeJson(variables, outputStream);
-        else {
-          String metaInformationTemplate = skin.getMetaInformationTemplate();
-          renderTemplate(metaInformationTemplate, context, variables, outputStream);
-        }
+      if (asJson(arguments))
+        executeJson(variables, outputStream);
+      else {
+        String metaInformationTemplate = skin.getMetaInformationTemplate();
+        renderTemplate(metaInformationTemplate, context, variables, outputStream);
       }
       return result;
     } catch (Exception e) {

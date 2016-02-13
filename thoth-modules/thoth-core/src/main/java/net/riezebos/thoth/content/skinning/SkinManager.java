@@ -15,109 +15,125 @@
 package net.riezebos.thoth.content.skinning;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
-import net.riezebos.thoth.content.ContentManagerFactory;
-import net.riezebos.thoth.exceptions.ConfigurationException;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.exceptions.SkinManagerException;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class SkinManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(SkinManager.class);
+  public static final String SKIN_PARENT_OF_ALL = "SimpleSkin";
   private static final String BUILTIN_SKIN_LIST = "net/riezebos/thoth/skins/builtinskins.txt";
   private static final String SKINS_PROPERTIES = "skins.properties";
 
+  private List<SkinMapping> skinMappings = new ArrayList<>();
+  private Map<String, Skin> skinsByName = new HashMap<>();
+  private List<Skin> skins = new ArrayList<>();
+  private Map<String, SkinInheritance> skinInheritances = new HashMap<>();
   private Skin defaultSkin;
+  private String defaultSkinName;
+  private ContentManager contentManager;
 
-  public List<SkinMapping> setupSkins(Configuration configuration, String context, CacheManager cacheManager)
-      throws ContextNotFoundException, IOException, ContentManagerException, FileNotFoundException, UnsupportedEncodingException {
-    List<SkinMapping> skinMappings = new ArrayList<>();
-    defaultSkin = registerBuiltinSkins(context);
-    if (StringUtils.isBlank(context)) {
-      skinMappings.add(new SkinMapping(Pattern.compile(".*"), defaultSkin));
-    } else {
-      registerLocalSkins(context);
+  public SkinManager(ContentManager contentManager, String defaultSkinName) throws SkinManagerException {
+    if (defaultSkinName == null)
+      defaultSkinName = SKIN_PARENT_OF_ALL;
+    this.setContentManager(contentManager);
+    this.defaultSkinName = defaultSkinName;
+    try {
+      String context = contentManager.getContext();
 
-      if (!StringUtils.isBlank(context)) {
-        String contextFolder = ContentManagerFactory.getContentManager(context).getContextFolder();
-        String skinMappingFileName = contextFolder + SKINS_PROPERTIES;
-        File skinMappingFile = new File(skinMappingFileName);
-        if (!skinMappingFile.isFile()) {
-          LOG.info("No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFileName + " so falling back to default which is "
-              + configuration.getDefaultSkin());
-          skinMappings.add(new SkinMapping(Pattern.compile(".*"), defaultSkin));
-        } else {
-          skinMappings.addAll(createSkinMappingsFromFile(context, skinMappingFileName));
-        }
+      List<Skin> allSkins = getBuiltinSkins(contentManager);
+      allSkins.addAll(getLocalSkins(contentManager));
+      Skin defaultSkin = determineDefaultSkin(allSkins);
+      FileHandle skinMappingFile = contentManager.getFileHandle(SKINS_PROPERTIES);
+      if (!skinMappingFile.isFile()) {
+        LOG.info(
+            "No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFile.getName() + " so falling back to default which is " + defaultSkinName);
+        skinMappings.add(new SkinMapping("*", defaultSkin));
+      } else {
+        skinMappings.addAll(createSkinMappingsFromFile(context, skinMappingFile));
       }
-      cacheManager.registerSkinMappings(skinMappings);
+      setupInheritance(allSkins);
+    } catch (IOException | ContentManagerException e) {
+      throw new SkinManagerException(e);
     }
-    setupInheritance(cacheManager);
-    return skinMappings;
   }
 
-  protected void setupInheritance(CacheManager cacheManager) {
-
-    for (Skin skin : cacheManager.getSkins()) {
+  protected void setupInheritance(List<Skin> allSkins) {
+    for (Skin skin : allSkins) {
       String inheritsFrom = skin.getInheritsFrom();
       if (StringUtils.isNotBlank(inheritsFrom)) {
-        Skin superSkin = cacheManager.getSkinByName(inheritsFrom);
-        if (superSkin == null)
+        Skin superSkin = getSkinByName(inheritsFrom);
+        if (superSkin == null) {
           LOG.error("Skin with name " + inheritsFrom //
               + " not defined. Check skin.properties of Skin defined by " //
               + skin.getPropertyFileName());
-        else {
-          skin.setSuper(superSkin);
-          cacheManager.registerSkinInheritance(new SkinInheritance(skin, superSkin));
+          superSkin = getSkinByName(SKIN_PARENT_OF_ALL);
+          if (superSkin == null)
+            LOG.error("In trouble now: skin " + SKIN_PARENT_OF_ALL + " is not defined");
         }
+        skin.setSuper(superSkin);
+        registerSkinInheritance(new SkinInheritance(skin, superSkin));
       }
     }
   }
 
-  /**
-   * Returns the default (fallback) skin. Only valid after calling setupSkins.
-   *
-   * @return
-   */
-  public Skin getDefaultSkin() {
-    return defaultSkin;
-  }
-
-  protected void registerLocalSkins(String context) throws ContextNotFoundException, IOException, ContentManagerException {
+  protected List<Skin> getLocalSkins(ContentManager contentManager) throws ContextNotFoundException, IOException, ContentManagerException {
     List<String> skinDescriptors = new ArrayList<>();
-    for (ContentNode node : ContentManagerFactory.getContentManager(context).find("skin.properties", true))
+    for (ContentNode node : contentManager.find("skin.properties", true))
       skinDescriptors.add(node.getPath());
 
-    CacheManager cacheManager = CacheManager.getInstance(context);
-    createSkins(cacheManager, context, skinDescriptors, false);
+    return createSkins(contentManager, skinDescriptors, false);
   }
 
   /**
    * Returns the Builtin skin
    */
-  protected Skin registerBuiltinSkins(String context) {
+  protected List<Skin> getBuiltinSkins(ContentManager contentManager) {
     InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(BUILTIN_SKIN_LIST);
     if (is == null)
       throw new IllegalArgumentException("Builtin skin definition file " + BUILTIN_SKIN_LIST + " not found!");
+    List<String> skinDescriptors = getSkinDescriptors(is);
+    return createSkins(contentManager, skinDescriptors, true);
+  }
+
+  protected List<Skin> createSkins(ContentManager contentManager, List<String> skinDescriptors, boolean fromClasspath) {
+    List<Skin> result = new ArrayList<>();
+    for (String skinDescriptor : skinDescriptors) {
+      try {
+        Skin skin = new Skin(contentManager, (fromClasspath ? Configuration.CLASSPATH_PREFIX : "") + skinDescriptor);
+        registerSkin(skin);
+        result.add(skin);
+      } catch (ContextNotFoundException e) {
+        LOG.warn("Cannot create skin " + skinDescriptor + " for unknown context: " + contentManager.getContext());
+      } catch (Exception e) {
+        LOG.error(e.getMessage(), e);
+      }
+    }
+    return result;
+  }
+
+  protected List<String> getSkinDescriptors(InputStream is) {
     List<String> skinDescriptors = new ArrayList<>();
     try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
       String line = br.readLine();
@@ -130,38 +146,13 @@ public class SkinManager {
     } catch (IOException e) {
       LOG.error(e.getMessage(), e);
     }
-    CacheManager cacheManager = CacheManager.getInstance(context);
-    Skin fallbackSkin = createSkins(cacheManager, context, skinDescriptors, true);
-    String defaultSkinName = ConfigurationFactory.getConfiguration().getDefaultSkin();
-    Skin defaultSkin = cacheManager.getSkinByName(defaultSkinName);
-    if (defaultSkin == null) {
-      LOG.error("Default skin named '" + defaultSkinName + "' not found. Falling back on first available which is " + fallbackSkin);
-      defaultSkin = fallbackSkin;
-    }
-    return defaultSkin;
+    return skinDescriptors;
   }
 
-  protected Skin createSkins(CacheManager cacheManager, String context, List<String> skinDescriptors, boolean fromClasspath) {
-    Skin fallbackSkin = null;
-    for (String skinDescriptor : skinDescriptors) {
-      try {
-        Skin skin = new Skin(context, (fromClasspath ? Configuration.CLASSPATH_PREFIX : "") + skinDescriptor);
-        fallbackSkin = skin;
-        cacheManager.registerSkin(skin);
-      } catch (ContextNotFoundException e) {
-        LOG.warn("Cannot create skins for unknown context: " + context);
-      } catch (Exception e) {
-        LOG.error(e.getMessage(), e);
-      }
-    }
-    return fallbackSkin;
-  }
-
-  protected List<SkinMapping> createSkinMappingsFromFile(String context, String skinMappingFileName)
+  protected List<SkinMapping> createSkinMappingsFromFile(String context, FileHandle skinMappingFile)
       throws FileNotFoundException, IOException, ContextNotFoundException, ContentManagerException, UnsupportedEncodingException {
     List<SkinMapping> skinMappings = new ArrayList<>();
-    CacheManager cacheManager = CacheManager.getInstance(context);
-    InputStream is = new FileInputStream(skinMappingFileName);
+    InputStream is = skinMappingFile.getInputStream();
     try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
       String line = br.readLine();
       while (line != null) {
@@ -169,11 +160,11 @@ public class SkinManager {
         if (!line.startsWith("#") && idx != -1) {
           String patternSpec = line.substring(0, idx).trim();
           String skinName = line.substring(idx + 1).trim();
-          Pattern pattern = Pattern.compile(ThothUtil.fileSpec2regExp(patternSpec));
-          Skin skin = cacheManager.getSkinByName(skinName);
+          Skin skin = getSkinByName(skinName);
           if (skin == null)
             LOG.error("Skin with name " + skinName + " not found. Mapping " + line + " ignored");
-          skinMappings.add(new SkinMapping(pattern, skin));
+          else
+            skinMappings.add(new SkinMapping(patternSpec, skin));
         }
         line = br.readLine();
       }
@@ -181,29 +172,10 @@ public class SkinManager {
     return skinMappings;
   }
 
-  protected Skin createAndRegisterSkin(String context, String skinFileName) throws ContextNotFoundException, ContentManagerException, ConfigurationException {
-    Skin skin = new Skin(context, skinFileName);
-    CacheManager instance = CacheManager.getInstance(context);
-    instance.registerSkin(skin);
-    return skin;
-  }
-
-  public String getInheritedPath(String path, String context) throws IOException, ContentManagerException {
-    String result = null;
-    String inheritedPath = handleContextBasedInheritance(context, path);
-    if (inheritedPath != null)
-      if (inheritedPath.startsWith(Configuration.CLASSPATH_PREFIX))
-        result = inheritedPath;
-      else
-        result = ContentManagerFactory.getContentManager(context).getFileSystemPath(inheritedPath);
-    return result;
-  }
-
-  protected String handleContextBasedInheritance(String context, String path) {
+  public String getInheritedPath(String path) throws IOException, ContentManagerException {
     String result = null;
 
-    CacheManager cacheManager = CacheManager.getInstance(context);
-    SkinInheritance skinInheritance = cacheManager.getSkinInheritance(path);
+    SkinInheritance skinInheritance = getSkinInheritance(path);
     if (skinInheritance != null) {
       String baseFolder = ThothUtil.stripPrefix(skinInheritance.getChild().getSkinBaseFolder(), "/");
       String remainder = path.substring(baseFolder.length());
@@ -213,4 +185,74 @@ public class SkinManager {
     return result;
   }
 
+  public void registerSkinInheritance(SkinInheritance skinInheritance) {
+    String key = ThothUtil.stripPrefix(skinInheritance.getChild().getSkinBaseFolder(), "/");
+    skinInheritances.put(key, skinInheritance);
+  }
+
+  public SkinInheritance getSkinInheritance(String path) {
+    for (Entry<String, SkinInheritance> entry : skinInheritances.entrySet())
+      if (path.startsWith(entry.getKey()))
+        return entry.getValue();
+    return null;
+  }
+
+  protected Skin determineDefaultSkin(List<Skin> allSkins) {
+    Skin result = null;
+    for (Skin skin : allSkins)
+      if (skin.getName().equalsIgnoreCase(defaultSkinName))
+        result = skin;
+    if (result == null) {
+      LOG.warn("Default skin setting " + defaultSkinName + " is not a known in skin. Must be one of ");
+      result = allSkins.get(0);
+    }
+
+    setDefaultSkin(result);
+    return result;
+  }
+
+  public Skin getSkinByName(String name) {
+    return skinsByName == null ? null : skinsByName.get(name.toLowerCase());
+  }
+
+  public List<SkinMapping> getSkinMappings() {
+    return skinMappings;
+  }
+
+  public List<Skin> getSkins() {
+    return skins;
+  }
+
+  protected void registerSkin(Skin skin) {
+    String key = skin.getName().toLowerCase();
+    Skin existing = skinsByName.get(key);
+    if (existing != null) {
+      LOG.warn("There are multiple skins with the name '" + skin.getName() //
+          + "'. Found at " + skin.getPropertyFileName() + " and " + existing.getPropertyFileName());
+    } else {
+      skinsByName.put(key, skin);
+      skins.add(skin);
+    }
+  }
+
+  /**
+   * Returns the default (fallback) skin.
+   *
+   * @return
+   */
+  public Skin getDefaultSkin() {
+    return this.defaultSkin;
+  }
+
+  protected void setDefaultSkin(Skin defaultSkin) {
+    this.defaultSkin = defaultSkin;
+  }
+
+  protected ContentManager getContentManager() {
+    return contentManager;
+  }
+
+  private void setContentManager(ContentManager contentManager) {
+    this.contentManager = contentManager;
+  }
 }

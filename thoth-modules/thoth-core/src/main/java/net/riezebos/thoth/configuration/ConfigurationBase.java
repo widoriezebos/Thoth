@@ -30,8 +30,13 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
 
   private Map<String, RepositoryDefinition> repositoryDefinitions = new HashMap<>();
   private Map<String, ContextDefinition> contextDefinitions = new HashMap<>();
+  private ContextDefinition global;
 
   public ConfigurationBase() {
+    RepositoryDefinition repoDef = new RepositoryDefinition();
+    repoDef.setName("global-nop-repository");
+    repoDef.setType("nop");
+    global = new ContextDefinition(repoDef, "*global*", null, 0);
   }
 
   @Override
@@ -46,16 +51,21 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
 
   @Override
   public ContextDefinition getContextDefinition(String name) throws ContextNotFoundException {
-    ContextDefinition contextDefinition = contextDefinitions.get(name.toLowerCase());
-    if (contextDefinition == null)
-      throw new ContextNotFoundException(name);
-    return contextDefinition;
+    if (name != null) {
+      name = name.toLowerCase();
+      ContextDefinition contextDefinition = contextDefinitions.get(name);
+      if (contextDefinition == null)
+        throw new ContextNotFoundException(name);
+      return contextDefinition;
+    } else
+      return global;
   }
 
   @Override
   public boolean isValidContext(String name) {
     return contextDefinitions.containsKey(name.toLowerCase());
   }
+
   /*
    * (non-Javadoc)
    * @see net.riezebos.thoth.configuration.ConfigurationT#getContexts()

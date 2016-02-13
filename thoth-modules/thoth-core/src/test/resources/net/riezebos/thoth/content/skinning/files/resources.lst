@@ -1,0 +1,14 @@
+net/riezebos/thoth/content/skinning/files/skins.properties
+
+net/riezebos/thoth/content/skinning/files/testskin/browse.tpl
+net/riezebos/thoth/content/skinning/files/testskin/contextindex.tpl
+net/riezebos/thoth/content/skinning/files/testskin/diff.tpl
+net/riezebos/thoth/content/skinning/files/testskin/error.tpl
+net/riezebos/thoth/content/skinning/files/testskin/html.tpl
+net/riezebos/thoth/content/skinning/files/testskin/index.tpl
+net/riezebos/thoth/content/skinning/files/testskin/meta.tpl
+net/riezebos/thoth/content/skinning/files/testskin/revisions.tpl
+net/riezebos/thoth/content/skinning/files/testskin/search.tpl
+net/riezebos/thoth/content/skinning/files/testskin/skin.properties
+net/riezebos/thoth/content/skinning/files/testskin/validationreport.tpl
+

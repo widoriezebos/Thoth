@@ -16,14 +16,15 @@ package net.riezebos.thoth.content.skinning;
 
 import java.util.regex.Pattern;
 
+import net.riezebos.thoth.util.ThothUtil;
+
 public class SkinMapping {
   private Pattern pattern;
   private Skin skin;
 
-  public SkinMapping(Pattern pattern, Skin skin) {
-    super();
-    this.pattern = pattern;
-    this.skin = skin;
+  public SkinMapping(String patternSpec, Skin skin) {
+    setPattern(Pattern.compile(ThothUtil.fileSpec2regExp(patternSpec)));
+    setSkin(skin);
   }
 
   public Pattern getPattern() {

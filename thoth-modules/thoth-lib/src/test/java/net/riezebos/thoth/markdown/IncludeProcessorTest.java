@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import net.riezebos.thoth.markdown.filehandle.ClasspathFileHandleFactory;
+import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 
@@ -27,11 +27,11 @@ public class IncludeProcessorTest {
 
   @Test
   public void testIncludeImages() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
     includeProcessor.setLibrary("/net/riezebos/thoth/");
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/IncludeImagesTest.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeImagesTest.md");
     String result = includeProcessor.execute(handle);
     assertTrue(result.indexOf("![](images/img1.txt)") != -1);
     assertTrue(result.indexOf("![](images/img2.txt)") != -1);
@@ -45,11 +45,11 @@ public class IncludeProcessorTest {
 
   @Test
   public void testIncludeImagesFail() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
     includeProcessor.setLibrary("/net/riezebos/thoth/");
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/IncludeImagesFail.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeImagesFail.md");
     includeProcessor.execute(handle);
     List<ProcessorError> errors = includeProcessor.getErrors();
     assertTrue(errors.get(0).getErrorMessage().indexOf("spec invalid") != -1);
@@ -57,11 +57,11 @@ public class IncludeProcessorTest {
 
   @Test
   public void testIncludeImages2() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
     includeProcessor.setLibrary("/net/riezebos/thoth/");
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/IncludeImagesTest2.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeImagesTest2.md");
     String result = includeProcessor.execute(handle);
 
     // Absolute link must be relativized now; so:
@@ -70,10 +70,10 @@ public class IncludeProcessorTest {
 
   @Test
   public void testIncludeCode() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/CodeTest.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/CodeTest.md");
     String result = includeProcessor.execute(handle);
     assertTrue(result.indexOf("\tof code") != -1);
     assertTrue(result.indexOf("\twhen included") != -1);
@@ -81,10 +81,10 @@ public class IncludeProcessorTest {
 
   @Test
   public void testIncludeCodeFail() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/CodeFailTest.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/CodeFailTest.md");
     includeProcessor.execute(handle);
     List<ProcessorError> errors = includeProcessor.getErrors();
     assertTrue(errors.get(0).getErrorMessage().indexOf("not found") != -1);
@@ -92,11 +92,11 @@ public class IncludeProcessorTest {
 
   @Test
   public void testIncludeCodeAbsolute() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
     includeProcessor.setLibrary("/net/riezebos/thoth/");
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/CodeTest2.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/CodeTest2.md");
     String result = includeProcessor.execute(handle);
     assertTrue(result.indexOf("\tof code") != -1);
     assertTrue(result.indexOf("\twhen included") != -1);
@@ -104,10 +104,10 @@ public class IncludeProcessorTest {
 
   @Test
   public void testIncludeLevels() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/IncludeTest1.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeTest1.md");
     String result = includeProcessor.execute(handle);
     // Must have a level two header because of indent level 1 specified at include:
     assertTrue(result.indexOf("##1") != -1);
@@ -117,9 +117,9 @@ public class IncludeProcessorTest {
 
   @Test
   public void testToc() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
-    includeProcessor.setFileHandlerFactory(factory);
+    includeProcessor.setFileSystem(factory);
     includeProcessor.loadSoftLinks(getResource("softlinks.properties"));
     String source = includeProcessor.execute("IncludeProcessor.md", getResource("IncludeProcessor.md"));
     assertTrue(source.indexOf("<tableofcontents>") != -1);
@@ -132,17 +132,17 @@ public class IncludeProcessorTest {
     assertTrue(source.indexOf("###[1 Chapter one](#1chapterone)") != -1);
 
     includeProcessor.reset();
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/IncludeProcessor.md");
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeProcessor.md");
     source = includeProcessor.execute(handle);
     assertTrue(source.indexOf("###[1 Chapter one](#1chapterone)") != -1);
   }
 
   @Test
   public void testCyclic() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle cyclic = factory.createFileHandle("/net/riezebos/thoth/markdown/Cyclic.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle cyclic = factory.getFileHandle("/net/riezebos/thoth/markdown/Cyclic.md");
     includeProcessor.execute(cyclic);
     List<ProcessorError> errors = includeProcessor.getErrors();
     assertTrue(errors.get(0).getErrorMessage().indexOf("include depth") != -1);
@@ -150,11 +150,11 @@ public class IncludeProcessorTest {
 
   @Test
   public void testIncludeAbs() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
     includeProcessor.setLibrary("/net/riezebos/thoth/");
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/IncludeTestAbs.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeTestAbs.md");
     String result = includeProcessor.execute(handle);
 
     // Absolute link must be relativized now; so:
@@ -163,18 +163,18 @@ public class IncludeProcessorTest {
 
   @Test
   public void testIncludeFail() throws IOException {
-    ClasspathFileHandleFactory factory = getFileHandleFactory();
+    ClasspathFileSystem factory = getFileHandleFactory();
     IncludeProcessor includeProcessor = new IncludeProcessor();
     includeProcessor.setLibrary("/net/riezebos/thoth/markdown");
     includeProcessor.setSoftlinkFile("softlinks.properties");
-    includeProcessor.setFileHandlerFactory(factory);
-    FileHandle handle = factory.createFileHandle("/net/riezebos/thoth/markdown/IncludeTestFail.md");
+    includeProcessor.setFileSystem(factory);
+    FileHandle handle = factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeTestFail.md");
     includeProcessor.execute(handle);
     List<ProcessorError> errors = includeProcessor.getErrors();
     assertTrue(errors.get(0).getErrorMessage().indexOf("Include not found") != -1);
 
     includeProcessor.reset();
-    handle = factory.createFileHandle("/net/riezebos/thoth/markdown/InvalidSoftlink.md");
+    handle = factory.getFileHandle("/net/riezebos/thoth/markdown/InvalidSoftlink.md");
     includeProcessor.execute(handle);
     errors = includeProcessor.getErrors();
     assertTrue(errors.get(0).getErrorMessage().indexOf("Include not found") != -1);
@@ -182,8 +182,8 @@ public class IncludeProcessorTest {
 
   }
 
-  protected ClasspathFileHandleFactory getFileHandleFactory() throws IOException {
-    ClasspathFileHandleFactory factory = new ClasspathFileHandleFactory();
+  protected ClasspathFileSystem getFileHandleFactory() throws IOException {
+    ClasspathFileSystem factory = new ClasspathFileSystem();
     factory.registerFiles("/net/riezebos/thoth/resources.lst");
     return factory;
   }
@@ -199,7 +199,7 @@ public class IncludeProcessorTest {
     String outMessage = execMain(includeProcessor, new String[] {"-help"});
     assertTrue(outMessage.startsWith("Usage:"));
 
-    includeProcessor.setFileHandlerFactory(getFileHandleFactory());
+    includeProcessor.setFileSystem(getFileHandleFactory());
     includeProcessor.setLibrary("/net/riezebos/thoth/");
     outMessage = execMain(includeProcessor,
         new String[] {"-file", "/net/riezebos/thoth/markdown/IncludeProcessor.md"//
@@ -213,7 +213,7 @@ public class IncludeProcessorTest {
   @Test
   public void testTarget() throws IOException {
     IncludeProcessor includeProcessor = new IncludeProcessor();
-    includeProcessor.setFileHandlerFactory(getFileHandleFactory());
+    includeProcessor.setFileSystem(getFileHandleFactory());
     includeProcessor.setLibrary("/net/riezebos/thoth/");
     File tempFile = File.createTempFile("tmp", "tmp");
     tempFile.deleteOnExit();

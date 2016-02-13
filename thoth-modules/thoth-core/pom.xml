@@ -73,6 +73,7 @@
 			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -89,6 +90,15 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
 		</dependency>
+
+		<!-- Test scope -->
+		<dependency>
+			<scope>test</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>1.10.19</version>
+		</dependency>
+
 	</dependencies>
 
 </project>

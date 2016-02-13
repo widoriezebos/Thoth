@@ -14,11 +14,26 @@
  */
 package net.riezebos.thoth.markdown.filehandle;
 
-public class BasicFileHandleFactory implements FileHandleFactory {
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
-  @Override
-  public FileHandle createFileHandle(String fileName) {
-    return new BasicFileHandle(fileName);
-  }
+public interface FileSystem {
 
+  FileHandle getFileHandle(String filename);
+
+  boolean exists(FileHandle fileHandle);
+
+  boolean isFile(FileHandle fileHandle);
+
+  boolean isDirectory(FileHandle fileHandle);
+
+  long lastModified(FileHandle fileHandle);
+
+  long length(FileHandle fileHandle);
+
+  String[] list(FileHandle fileHandle);
+
+  FileHandle[] listFiles(FileHandle fileHandle);
+
+  InputStream getInputStream(FileHandle fileHandle) throws FileNotFoundException;
 }

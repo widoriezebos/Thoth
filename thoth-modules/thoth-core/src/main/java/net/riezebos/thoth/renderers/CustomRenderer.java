@@ -78,26 +78,21 @@ public class CustomRenderer extends RendererBase implements Renderer {
     try {
       RenderResult result = RenderResult.OK;
 
-      String absolutePath = getFileSystemPath(context, path);
-      if (absolutePath == null) {
-        result = RenderResult.FORBIDDEN;
-      } else {
-        Configuration configuration = ConfigurationFactory.getConfiguration();
-        String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
+      Configuration configuration = ConfigurationFactory.getConfiguration();
+      String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
 
-        File tempFile = File.createTempFile("thothtemp", "." + typeCode);
+      File tempFile = File.createTempFile("thothtemp", "." + typeCode);
 
-        arguments.put("url", url);
-        arguments.put("output", tempFile.getAbsolutePath());
-        String command = ThothUtil.replaceKeywords(getCommandLine(configuration), arguments);
+      arguments.put("url", url);
+      arguments.put("output", tempFile.getAbsolutePath());
+      String command = ThothUtil.replaceKeywords(getCommandLine(configuration), arguments);
 
-        execute(command);
+      execute(command);
 
-        try (FileInputStream fis = new FileInputStream(tempFile)) {
-          IOUtils.copy(fis, outputStream);
-        }
-        tempFile.delete();
+      try (FileInputStream fis = new FileInputStream(tempFile)) {
+        IOUtils.copy(fis, outputStream);
       }
+      tempFile.delete();
       return result;
     } catch (Exception e) {
       throw new RenderException(e);

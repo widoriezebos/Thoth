@@ -1,6 +1,5 @@
 package net.riezebos.thoth.util;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -15,18 +14,6 @@ public class PropertyLoader {
 
   private Properties properties = new Properties();
   private String propertyFileName;
-
-  public void load(String propertyFileName) throws ConfigurationException {
-    try {
-      setPropertyFileName(propertyFileName);
-      FileInputStream inStream = new FileInputStream(propertyFileName);
-      load(inStream);
-    } catch (IOException e) {
-      String msg = "Could not load configuration from '" + propertyFileName + "' because of: " + e.getMessage();
-      LOG.error(msg, e);
-      throw new ConfigurationException(msg);
-    }
-  }
 
   protected void load(InputStream inStream) throws ConfigurationException {
     loadDefaults();

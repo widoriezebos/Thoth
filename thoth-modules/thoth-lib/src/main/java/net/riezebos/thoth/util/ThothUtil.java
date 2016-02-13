@@ -15,8 +15,10 @@
 package net.riezebos.thoth.util;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +28,14 @@ import java.util.regex.Pattern;
 
 public class ThothUtil {
   private static final int DEFAULT_ADDITIONAL_BUFFERSIZE = 10;
+
+  public static String encodeUrl(String url) {
+    try {
+      return URLEncoder.encode(url, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+    }
+    return url;
+  }
 
   public static String getCanonicalPath(String path) {
     if (path == null)
@@ -311,4 +321,15 @@ public class ThothUtil {
     return value;
   }
 
+  public static String suffix(String value, String prefix) {
+    if (value == null)
+      return prefix;
+    if (!value.endsWith(prefix))
+      value += prefix;
+    return value;
+  }
+
+  public static String absoluteFolder(String folder) {
+    return suffix(prefix(normalSlashes(folder), "/"), "/");
+  }
 }

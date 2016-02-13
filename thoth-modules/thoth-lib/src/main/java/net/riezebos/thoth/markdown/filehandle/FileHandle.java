@@ -15,32 +15,116 @@
 package net.riezebos.thoth.markdown.filehandle;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
-public interface FileHandle extends Serializable, Comparable<FileHandle> {
+import net.riezebos.thoth.util.ThothUtil;
 
-  String getName();
+public class FileHandle implements Serializable, Comparable<FileHandle> {
 
-  boolean exists();
+  private static final long serialVersionUID = 1L;
+  FileSystem fileSystem;
+  private String fullPath;
 
-  boolean isFile();
+  public FileHandle(FileSystem fileSystem, String fullPath) {
+    this.fileSystem = fileSystem;
+    this.fullPath = fullPath;
+  }
 
-  boolean isDirectory();
+  public String getName() {
+    return ThothUtil.getFileName(fullPath);
+  }
 
-  long lastModified();
+  public String getCanonicalPath() {
+    return ThothUtil.getCanonicalPath(fullPath);
+  }
 
-  String getCanonicalPath() throws IOException;
+  public String getAbsolutePath() {
+    return fullPath;
+  }
 
-  String getAbsolutePath();
+  public boolean exists() {
+    return fileSystem.exists(this);
+  }
 
-  String[] list();
+  public boolean isFile() {
+    return fileSystem.isFile(this);
+  }
 
-  FileHandle[] listFiles();
+  public boolean isDirectory() {
+    return fileSystem.isDirectory(this);
+  }
 
-  FileHandle getParentFile();
+  public long lastModified() {
+    return fileSystem.lastModified(this);
+  }
 
-  InputStream getInputStream() throws FileNotFoundException;
+  public long length() {
+    return fileSystem.length(this);
+  }
+
+  public String[] list() {
+    return fileSystem.list(this);
+  }
+
+  public FileHandle[] listFiles() {
+    return fileSystem.listFiles(this);
+  }
+
+  public FileHandle getParentFile() {
+    if (fullPath == null || fullPath.length() == 0 || fullPath.indexOf("/") == -1)
+      return null;
+    String parentName = ThothUtil.getPartBeforeLast(fullPath, "/");
+    return fileSystem.getFileHandle(parentName);
+  }
+
+  public InputStream getInputStream() throws FileNotFoundException {
+    return fileSystem.getInputStream(this);
+
+  }
+
+  @Override
+  public String toString() {
+    return getAbsolutePath();
+  }
+
+  @Override
+  public int compareTo(FileHandle other) {
+    if (other instanceof FileHandle)
+      return fullPath.compareTo(((FileHandle) other).fullPath);
+    else
+      return -1;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fileSystem == null) ? 0 : fileSystem.hashCode());
+    result = prime * result + ((fullPath == null) ? 0 : fullPath.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    FileHandle other = (FileHandle) obj;
+    if (fileSystem == null) {
+      if (other.fileSystem != null)
+        return false;
+    } else if (fileSystem != other.fileSystem)
+      return false;
+    if (fullPath == null) {
+      if (other.fullPath != null)
+        return false;
+    } else if (!fullPath.equals(other.fullPath))
+      return false;
+    return true;
+  }
 
 }

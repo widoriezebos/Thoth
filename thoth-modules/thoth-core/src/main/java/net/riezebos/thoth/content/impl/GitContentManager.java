@@ -59,8 +59,7 @@ import net.riezebos.thoth.content.versioncontrol.SimpleDiffFormatter;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.markdown.filehandle.BasicFileHandle;
-import net.riezebos.thoth.markdown.filehandle.FileHandle;
+import net.riezebos.thoth.markdown.filehandle.BasicFileSystem;
 import net.riezebos.thoth.util.PagedList;
 
 /**
@@ -76,6 +75,7 @@ public class GitContentManager extends ContentManagerBase {
   public GitContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
     super(contextDefinition);
     validateContextDefinition(contextDefinition);
+    setFileSystem(new BasicFileSystem(getContextFolder()));
   }
 
   @Override
@@ -410,10 +410,4 @@ public class GitContentManager extends ContentManagerBase {
     LOG.error(e.getMessage(), e);
     log.append("ERROR: " + e.getMessage() + "\n");
   }
-
-  @Override
-  public FileHandle getFileHandle(String filePath) {
-    return new BasicFileHandle(filePath);
-  }
-
 }

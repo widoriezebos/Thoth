@@ -16,8 +16,6 @@ package net.riezebos.thoth.servlets;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -53,9 +51,11 @@ import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.renderers.CustomRenderer;
 import net.riezebos.thoth.renderers.HtmlRenderer;
 import net.riezebos.thoth.renderers.RawRenderer;
@@ -258,53 +258,49 @@ public class ThothServlet extends ServletBase {
     String path = getPath(request);
     String context = getContext(request);
     ContentManager contentManager = ContentManagerFactory.getContentManager(context);
-    String absolutePath = contentManager.getFileSystemPath(path);
 
-    if (absolutePath == null) {
-      LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
-      response.sendError(HttpServletResponse.SC_FORBIDDEN);
-    } else {
-      InputStream is = null;
+    InputStream is = null;
 
-      // First check whether the file exists; because then we are done.
-      File file = new File(absolutePath);
-      if (!file.isFile()) {
-        // Not found; then check for any inheritance of skin related paths.
-        // Complication is that we might move from the library into the classpath so we need
-        // to handle that as well here
-        String inheritedPath = getSkinManager().getInheritedPath(path, context);
-        while (inheritedPath != null && is == null && !file.isFile()) {
-          absolutePath = inheritedPath;
-          // Moving into classpath now?
-          if (absolutePath.startsWith(Configuration.CLASSPATH_PREFIX)) {
-            String resourceName = absolutePath.substring(Configuration.CLASSPATH_PREFIX.length());
-            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-          } else {
-            // Ok not moved into the classpath. We have to check for the inherited file now:
-            if (absolutePath != null)
-              file = new File(absolutePath);
-          }
-          // Do we need to move up the hierarchy still?
-          inheritedPath = getSkinManager().getInheritedPath(inheritedPath, context);
+    String resourcePath = path;
+    // First check whether the file exists; because then we are done.
+    FileHandle file = contentManager.getFileHandle(resourcePath);
+    if (!file.isFile()) {
+      // Not found; then check for any inheritance of skin related paths.
+      // Complication is that we might move from the library into the classpath so we need
+      // to handle that as well here
+      SkinManager skinManager = contentManager.getSkinManager();
+      String inheritedPath = skinManager.getInheritedPath(path);
+      while (inheritedPath != null && is == null && !file.isFile()) {
+        resourcePath = inheritedPath;
+        // Moving into classpath now?
+        if (resourcePath.startsWith(Configuration.CLASSPATH_PREFIX)) {
+          String resourceName = resourcePath.substring(Configuration.CLASSPATH_PREFIX.length());
+          is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+        } else {
+          // Ok not moved into the classpath. We have to check for the inherited file now:
+          if (resourcePath != null)
+            file = contentManager.getFileHandle(resourcePath);
         }
+        // Do we need to move up the hierarchy still?
+        inheritedPath = skinManager.getInheritedPath(inheritedPath);
       }
-
-      // If the inputstream is set now; it came from the classpath.
-      // If it is not set; then it will have to come from the file now; if it exists
-      if (is == null && file.isFile())
-        is = new FileInputStream(file);
-
-      // Now we should have found the original file; inherited from classpath or inherited from library
-      // If we still do not have anything then we should give a 404
-      if (is != null) {
-        guessMimeType(getRequestPath(request), response);
-        IOUtils.copy(is, response.getOutputStream());
-      } else {
-        LOG.warn("404 on request " + request.getRequestURI());
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
-      }
-      LOG.debug("Handled request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
     }
+
+    // If the inputstream is set now; it came from the classpath.
+    // If it is not set; then it will have to come from the file now; if it exists
+    if (is == null && file.isFile())
+      is = file.getInputStream();
+
+    // Now we should have found the original file; inherited from classpath or inherited from library
+    // If we still do not have anything then we should give a 404
+    if (is != null) {
+      guessMimeType(getRequestPath(request), response);
+      IOUtils.copy(is, response.getOutputStream());
+    } else {
+      LOG.warn("404 on request " + request.getRequestURI());
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+    LOG.debug("Handled request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
 
   }
 

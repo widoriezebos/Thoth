@@ -121,7 +121,7 @@ You can mark text with the syntax outlined below. Since this kind of markup is m
 	Highlight { ==And this a highlighted piece of text, probably followed by a comment==}
 
 ## Meta data
-You can add any number of meta data tags to your document. You do this by adding them **at the very top** of your document, separating the key from the value with a ‘:’ character. The first line that does not follow this rule will start normal Markdown processing. When including files, any meta tag in the included files is added if it is not encountered before. This means that meta tag with a specific key that is first encountered ‘wins’ and will not be overwritten by subsequent definitions. Meta data is searchable with the search engine and the key/values are also available to any template that wants to use them during rendering.
+You can add any number of meta data tags to your document. You do this by adding them **at the very top** of your document, separating the key (which must be one word with no spaces) from the value with a ‘:’ character. The first line that does not follow this rule will start normal Markdown processing. When including files, any meta tag in the included files is added if it is not encountered before. This means that meta tag with a specific key that is first encountered ‘wins’ and will not be overwritten by subsequent definitions. Meta data is searchable with the search engine and the key/values are also available to any template that wants to use them during rendering.
 
 	audience: writers, developers
 	title: Title of the document

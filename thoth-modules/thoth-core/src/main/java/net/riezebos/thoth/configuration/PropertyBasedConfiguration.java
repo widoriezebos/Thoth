@@ -27,7 +27,7 @@ import org.pegdown.Extensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 import net.riezebos.thoth.util.ThothUtil;
@@ -46,12 +46,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   private Set<String> _fragmentExtensions = null;
   private Set<String> _bookExtensions = null;
 
-  protected PropertyBasedConfiguration(String propertyPath) throws ConfigurationException {
-    load(propertyPath);
-  }
-
-  protected PropertyBasedConfiguration(InputStream is) throws ConfigurationException {
-    load(is);
+  protected PropertyBasedConfiguration() throws ConfigurationException {
   }
 
   @Override
@@ -291,7 +286,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public String getDefaultSkin() {
-    return getValue("skin.default", Skin.SKIN_PARENT_OF_ALL);
+    return getValue("skin.default", SkinManager.SKIN_PARENT_OF_ALL);
   }
 
   /*

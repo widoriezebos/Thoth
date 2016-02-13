@@ -32,12 +32,10 @@ import org.apache.velocity.app.VelocityEngine;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.util.ThothCoreUtil;
@@ -54,16 +52,8 @@ public abstract class RendererBase implements Renderer {
     return asJson(arguments) ? "application/json;charset=UTF-8" : "text/html;charset=UTF-8";
   }
 
-  protected MarkDownDocument getMarkDownDocument(String context, String path, boolean suppressError, CriticProcessingMode criticProcessingMode) throws IOException, ContentManagerException {
-    return getContentManager(context).getMarkDownDocument(path, suppressError, criticProcessingMode);
-  }
-
   protected ContentManager getContentManager(String context) throws ContentManagerException {
     return ContentManagerFactory.getContentManager(context);
-  }
-
-  protected String getFileSystemPath(String context, String path) throws ContextNotFoundException, IOException, ContentManagerException {
-    return getContentManager(context).getFileSystemPath(path);
   }
 
   protected String getString(Map<String, Object> arguments, String key) {

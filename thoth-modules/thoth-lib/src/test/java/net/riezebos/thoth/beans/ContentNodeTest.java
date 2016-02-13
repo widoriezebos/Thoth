@@ -5,11 +5,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
 import org.junit.Test;
+
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 
 public class ContentNodeTest {
 
@@ -19,12 +20,12 @@ public class ContentNodeTest {
     Date ts = new Date();
     long filesize = 100L;
 
-    File mockedFile = mock(File.class);
+    FileHandle mockedFile = mock(FileHandle.class);
     when(mockedFile.length()).thenReturn(filesize);
     when(mockedFile.lastModified()).thenReturn(ts.getTime());
     when(mockedFile.isDirectory()).thenReturn(false);
 
-    File mockedFolder = mock(File.class);
+    FileHandle mockedFolder = mock(FileHandle.class);
     when(mockedFolder.length()).thenReturn(filesize);
     when(mockedFolder.lastModified()).thenReturn(ts.getTime());
     when(mockedFolder.isDirectory()).thenReturn(true);

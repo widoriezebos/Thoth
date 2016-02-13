@@ -23,14 +23,12 @@
 
     <h3>Document Structure</h3>
     <documentstructure>
-      <pre>  
-        #foreach($documentNode in $documentNodes)
-          #foreach($idx in [0..$documentNode.level])
-            &nbsp;&nbsp;##
-          #end
-          <a href="$contexturl/${documentNode.path}">${documentNode.fileName}</a> (<a href="$contexturl/${documentNode.path}?cmd=meta">meta</a>)
-        #end
-      </pre>  
+    #foreach($documentNode in $documentNodes)
+      #foreach($idx in [0..$documentNode.level])
+        &nbsp;&nbsp;&nbsp;##
+      #end
+      <a href="$contexturl/${documentNode.path}">${documentNode.fileName}</a> (<a href="$contexturl/${documentNode.path}?cmd=meta">meta</a>)<br/>
+    #end
     </documentstructure>    
     
     #if(!${errors.isEmpty()})

@@ -18,15 +18,15 @@ public class ClasspathFileHandleFactoryTest {
 
   @Test
   public void test() throws IOException {
-    ClasspathFileHandleFactory factory = new ClasspathFileHandleFactory();
+    ClasspathFileSystem factory = new ClasspathFileSystem();
     factory.registerFiles("/net/riezebos/thoth/resources.lst");
-    FileHandle fileHandler = factory.createFileHandle("/net/riezebos/thoth/markdown/IncludeProcessor.md");
-    FileHandle fileHandler2 = factory.createFileHandle("net/riezebos/thoth/markdown/IncludeProcessor.md");
-    FileHandle fileHandler3 = factory.createFileHandle("net/riezebos/thoth/markdown/NotThere.md");
-    FileHandle folderHandler = factory.createFileHandle("net/riezebos/thoth");
-    FileHandle folderHandler2 = factory.createFileHandle("net/riezebos/thoth/");
-    FileHandle folderHandler3 = factory.createFileHandle("net/riezebos/Nuts/");
-    FileHandle folderHandler4 = factory.createFileHandle(null);
+    FileHandle fileHandler = factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeProcessor.md");
+    FileHandle fileHandler2 = factory.getFileHandle("net/riezebos/thoth/markdown/IncludeProcessor.md");
+    FileHandle fileHandler3 = factory.getFileHandle("net/riezebos/thoth/markdown/NotThere.md");
+    FileHandle folderHandler = factory.getFileHandle("net/riezebos/thoth");
+    FileHandle folderHandler2 = factory.getFileHandle("net/riezebos/thoth/");
+    FileHandle folderHandler3 = factory.getFileHandle("net/riezebos/Nuts/");
+    FileHandle folderHandler4 = factory.getFileHandle(null);
 
     assertEquals(20000L, fileHandler.lastModified());
     assertEquals(fileHandler.getName(), fileHandler2.getName());
@@ -45,27 +45,28 @@ public class ClasspathFileHandleFactoryTest {
     assertFalse(folderHandler3.isFile());
     assertFalse(folderHandler4.isFile());
 
-    assertFalse(factory.isFile("NotThere"));
+    assertFalse(factory.getFileHandle("NotThere").isFile());
     assertFalse(factory.isFile(null));
-    assertTrue(factory.isFile("/net/riezebos/thoth/markdown/IncludeProcessor.md"));
-    assertFalse(factory.isFile("/net/wrong/thoth/markdown/IncludeProcessor.md"));
+    assertFalse(factory.getFileHandle(null).isFile());
+    assertTrue(factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeProcessor.md").isFile());
+    assertFalse(factory.getFileHandle("/net/wrong/thoth/markdown/IncludeProcessor.md").isFile());
 
-    FileHandle folder = factory.createFileHandle("net/riezebos/thoth/markdown/");
+    FileHandle folder = factory.getFileHandle("net/riezebos/thoth/markdown/");
     List<String> lst = Arrays.asList(folder.list());
     assertTrue(lst.contains("IncludeProcessor.md"));
     assertTrue(lst.contains("IncludeProcessorNoToc.md"));
-    assertNull(factory.createFileHandle("net/riezebos/thoth/nofolder/").list());
+    assertNull(factory.getFileHandle("net/riezebos/thoth/nofolder/").list());
 
     List<FileHandle> lst2 = Arrays.asList(folder.listFiles());
     assertTrue(lst2.contains(fileHandler));
 
-    FileHandle walk = factory.createFileHandle("/net/riezebos/thoth/one/two/../../markdown/NotThere.md");
+    FileHandle walk = factory.getFileHandle("/net/riezebos/thoth/one/two/../../markdown/NotThere.md");
 
     assertEquals("/net/riezebos/thoth/markdown/NotThere.md", walk.getCanonicalPath());
     assertEquals("/net/riezebos/thoth/one/two/../../markdown/NotThere.md", walk.getAbsolutePath());
     assertEquals("/net/riezebos/thoth/one/two/../../markdown", walk.getParentFile().getAbsolutePath());
-    
-    FileHandle check = factory.createFileHandle("/net/riezebos/thoth/markdown/check.txt");
+
+    FileHandle check = factory.getFileHandle("/net/riezebos/thoth/markdown/check.txt");
     BufferedReader br = new BufferedReader(new InputStreamReader(check.getInputStream()));
     String line = br.readLine();
     assertEquals("check", line);
@@ -75,15 +76,15 @@ public class ClasspathFileHandleFactoryTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testFail() throws IOException {
-    ClasspathFileHandleFactory factory = new ClasspathFileHandleFactory();
+    ClasspathFileSystem factory = new ClasspathFileSystem();
     factory.registerFiles("/net/riezebos/thoth/wrong.lst");
 
   }
 
   @Test(expected = FileNotFoundException.class)
   public void testFailInput() throws IOException {
-    ClasspathFileHandleFactory factory = new ClasspathFileHandleFactory();
-    FileHandle check = factory.createFileHandle("/net/riezebos/thoth/markdown/notthere.txt");
+    ClasspathFileSystem factory = new ClasspathFileSystem();
+    FileHandle check = factory.getFileHandle("/net/riezebos/thoth/markdown/notthere.txt");
     check.getInputStream();
 
   }

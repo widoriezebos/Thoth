@@ -1,5 +1,8 @@
 package net.riezebos.thoth.configuration;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +25,15 @@ public class ConfigurationFactory {
           throw new IllegalArgumentException(msg);
         } else {
           LOG.info("Using " + propertyPath + " for configuration");
-          _instance = new PropertyBasedConfiguration(propertyPath);
+          PropertyBasedConfiguration propertyBasedConfiguration = new PropertyBasedConfiguration();
+          propertyBasedConfiguration.setPropertyFileName(propertyPath);
+          FileInputStream inStream = new FileInputStream(propertyPath);
+          propertyBasedConfiguration.load(inStream);
+          _instance = propertyBasedConfiguration;
         }
       }
       return _instance;
-    } catch (ConfigurationException e) {
+    } catch (ConfigurationException | FileNotFoundException e) {
       throw new IllegalArgumentException(e);
     }
   }

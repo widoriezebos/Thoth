@@ -31,7 +31,7 @@
             <td>
                 #foreach($book in $category.books)
                     <a href="${context}${book.path}">${book.title}</a>
-                   (<a href="${context}${book.path}?output=pdf">pdf</a>&nbsp;
+                   (<a href="${context}${book.path}?output=pdf">pdf</a>
                     <a href="${context}${book.path}?output=raw">md</a>
                     <a href="${context}${book.path}?cmd=meta">meta</a>)<br/>
                 #end
@@ -49,8 +49,9 @@
           <td>
             #foreach($book in $folder.books)
                <a href="${context}${book.path}">${book.title}</a> 
-              (<a href="${context}${book.path}?output=pdf">pdf</a>&nbsp;
-               <a href="${context}${book.path}?output=raw">md</a>)<br/>
+              (<a href="${context}${book.path}?output=pdf">pdf</a>
+               <a href="${context}${book.path}?output=raw">md</a>
+               <a href="${context}${book.path}?cmd=meta">meta</a>)<br/>
             #end
           </td>
         </tr>

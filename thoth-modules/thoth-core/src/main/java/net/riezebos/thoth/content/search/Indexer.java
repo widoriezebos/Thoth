@@ -19,7 +19,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,7 +97,7 @@ public class Indexer {
   protected Indexer(ContentManager contentManager) throws ContextNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
     this.indexFolder = contentManager.getIndexFolder();
-    this.contextFolder = contentManager.getFileHandle(contentManager.getContextFolder());
+    this.contextFolder = contentManager.getFileHandle("/");
     this.setIndexExtensions(ConfigurationFactory.getConfiguration().getIndexExtensions());
   }
 
@@ -214,31 +213,26 @@ public class Indexer {
       Collections.sort(entry.getValue());
   }
 
-  protected void indexDirectory(IndexWriter writer, FileHandle path, IndexingContext context) throws IOException, ContextNotFoundException {
+  protected void indexDirectory(IndexWriter writer, FileHandle fileHandle, IndexingContext context) throws IOException, ContextNotFoundException {
 
-    if (path.isDirectory()) {
-      for (FileHandle fileHandle : path.listFiles()) {
-        if (fileHandle.isFile())
-          indexFile(writer, fileHandle, context);
+    if (fileHandle.isDirectory()) {
+      for (FileHandle children : fileHandle.listFiles()) {
+        if (children.isFile())
+          indexFile(writer, children, context);
         else
-          indexDirectory(writer, fileHandle, context);
+          indexDirectory(writer, children, context);
       }
     } else {
-      indexFile(writer, path, context);
+      indexFile(writer, fileHandle, context);
     }
   }
 
   protected void indexFile(IndexWriter writer, FileHandle fileHandle, IndexingContext indexingContext) throws IOException, ContextNotFoundException {
 
-    Path docDirPath = Paths.get(contextFolder.getAbsolutePath());
-    Path filePath = Paths.get(fileHandle.getAbsolutePath());
-    Path relativePath = docDirPath.relativize(filePath);
-
-    if (!ignore(relativePath.toString())) {
-      // make a new, empty document
+    if (!ignore(fileHandle.getAbsolutePath())) {
 
       try {
-        String resourcePath = relativePath.toString();
+        String resourcePath = fileHandle.getAbsolutePath();
         MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(resourcePath, true, CriticProcessingMode.DO_NOTHING);
         indexingContext.getErrors().addAll(markDownDocument.getErrors());
 
@@ -258,7 +252,7 @@ public class Indexer {
         updateReverseIndex(indexingContext.getIndirectReverseIndex(), true, markDownDocument);
         updateReverseIndex(indexingContext.getDirectReverseIndex(), false, markDownDocument);
 
-        addToIndex(writer, "/" + resourcePath, TYPE_DOCUMENT, markDownDocument.getTitle(), markDownDocument.getMarkdown(), markDownDocument.getMetatags());
+        addToIndex(writer,  resourcePath, TYPE_DOCUMENT, markDownDocument.getTitle(), markDownDocument.getMarkdown(), markDownDocument.getMetatags());
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }

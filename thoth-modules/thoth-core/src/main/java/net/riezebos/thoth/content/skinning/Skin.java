@@ -14,24 +14,26 @@
  */
 package net.riezebos.thoth.content.skinning;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.content.ContentManagerFactory;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.util.PropertyLoader;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class Skin extends PropertyLoader {
-  public static final String SKIN_PARENT_OF_ALL = "SimpleSkin";
+  private static final Logger LOG = LoggerFactory.getLogger(PropertyLoader.class);
+  private static final String SIMPLESKIN = "net/riezebos/thoth/skins/simpleskin/skin.properties";
   private static final String CLASSPATH_PREFIX = "classpath:";
-  private String skinPropertyFile;
   private String context;
-  private String contextFolder;
   private String skinBaseFolder;
   private String skinBaseUrl;
   private boolean fromClassPath = false;
@@ -39,17 +41,36 @@ public class Skin extends PropertyLoader {
   private String inheritsFrom;
   private Skin superSkin = null;
 
+  public Skin() {
+    try {
+      InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(SIMPLESKIN);
+      load(is);
+      setPropertyFileName(SIMPLESKIN);
+      this.skinBaseUrl = "/";
+      this.skinBaseFolder = "/";
+      this.name = getValue("name", UUID.randomUUID().toString());
+      this.context = "/";
+    } catch (ConfigurationException e) {
+      LOG.error("Problem: unable to setup even the most basic Skin. About to panic now");
+      LOG.error(e.getMessage(), e);
+    }
+  }
+
   /**
    * Sets up a Skin configuration
    * 
    * @param skinPropertyFile relative path to the skin.properties file in the context
    * @throws ContentManagerException
    * @throws ContextNotFoundException
-   * @throws ConfigurationException 
+   * @throws ConfigurationException
+   * @throws FileNotFoundException
    */
-  public Skin(String context, String skinPropertyFile) throws ContextNotFoundException, ContentManagerException, ConfigurationException {
-    if(StringUtils.isBlank(context)) contextFolder = "";
-    else contextFolder = ContentManagerFactory.getContentManager(context).getContextFolder();
+  public Skin(ContentManager contentManager, String skinPropertyFile)
+      throws ContextNotFoundException, ContentManagerException, ConfigurationException, FileNotFoundException {
+
+    String context = contentManager.getContext();
+    setPropertyFileName(skinPropertyFile);
+
     if (skinPropertyFile.startsWith(CLASSPATH_PREFIX)) {
       fromClassPath = true;
       String resourceName = skinPropertyFile.substring(CLASSPATH_PREFIX.length());
@@ -57,39 +78,27 @@ public class Skin extends PropertyLoader {
       if (is == null)
         throw new ContentManagerException("Could not find " + resourceName + " on the classpath");
       load(is);
-      setPropertyFileName(skinPropertyFile);
       this.skinBaseUrl = ThothUtil.getFolder(resourceName);
     } else {
-      String absFileName = contextFolder + ThothUtil.stripPrefix(skinPropertyFile, "/");
-      load(absFileName);
+      FileHandle fileHandle = contentManager.getFileHandle(skinPropertyFile);
+      load(fileHandle.getInputStream());
       this.skinBaseUrl = context + ThothUtil.getFolder(skinPropertyFile);
     }
-    this.skinPropertyFile = skinPropertyFile;
-    this.context = context;
-    this.skinBaseFolder = ThothUtil.getFolder(skinPropertyFile) + "/";
+    this.skinBaseFolder = ThothUtil.absoluteFolder(ThothUtil.getFolder(skinPropertyFile));
     this.name = getValue("name", UUID.randomUUID().toString());
     this.inheritsFrom = getValue("inheritsfrom", null);
-
-    if (StringUtils.isBlank(this.inheritsFrom)) {
-      if (!SKIN_PARENT_OF_ALL.equalsIgnoreCase(name))
-        inheritsFrom = SKIN_PARENT_OF_ALL;
-    }
-
+    this.context = context;
   }
 
   public String getName() {
     return name;
   }
 
-  public String getSkinPropertyFile() {
-    return skinPropertyFile;
-  }
-
   public String getContext() {
     return context;
   }
 
-  public String getMarkDownTemplate() {
+  public String getHtmlTemplate() {
     return getPathProperty("template.html");
   }
 
@@ -137,15 +146,7 @@ public class Skin extends PropertyLoader {
     if (isFromClassPath()) {
       return CLASSPATH_PREFIX + skinBaseUrl + "/" + tidyRelativePath;
     }
-    String prefix = ThothUtil.stripPrefix(skinBaseFolder, "/");
-
-    String result;
-    // If we move into the classpath now; then do not ass the contextfolder
-    if (prefix.startsWith(CLASSPATH_PREFIX))
-      result = prefix + tidyRelativePath;
-    else
-      result = contextFolder + prefix + tidyRelativePath;
-    return result;
+    return skinBaseFolder + tidyRelativePath;
   }
 
   protected boolean shouldGetFromSuper(String key) {
@@ -153,7 +154,7 @@ public class Skin extends PropertyLoader {
   }
 
   /**
-   * Implement getting inherited values (i.e. when not set get value from super)
+   * Implement getting inherited values (i.e. when not set, then get value from super)
    */
   @Override
   public String getValue(String key, String dflt) {
@@ -165,7 +166,7 @@ public class Skin extends PropertyLoader {
 
   @Override
   public String toString() {
-    return "Skin " + getSkinPropertyFile();
+    return "Skin " + getPropertyFileName();
   }
 
   public String getBaseUrl() {
