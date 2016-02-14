@@ -51,17 +51,16 @@ import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
-import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.renderers.CustomRenderer;
 import net.riezebos.thoth.renderers.HtmlRenderer;
 import net.riezebos.thoth.renderers.RawRenderer;
 import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.renderers.Renderer.RenderResult;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
+import net.riezebos.thoth.util.MimeTypeUtil;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class ThothServlet extends ServletBase {
@@ -259,42 +258,9 @@ public class ThothServlet extends ServletBase {
     String context = getContext(request);
     ContentManager contentManager = ContentManagerFactory.getContentManager(context);
 
-    InputStream is = null;
-
-    String resourcePath = path;
-    // First check whether the file exists; because then we are done.
-    FileHandle file = contentManager.getFileHandle(resourcePath);
-    if (!file.isFile()) {
-      // Not found; then check for any inheritance of skin related paths.
-      // Complication is that we might move from the library into the classpath so we need
-      // to handle that as well here
-      SkinManager skinManager = contentManager.getSkinManager();
-      String inheritedPath = skinManager.getInheritedPath(path);
-      while (inheritedPath != null && is == null && !file.isFile()) {
-        resourcePath = inheritedPath;
-        // Moving into classpath now?
-        if (resourcePath.startsWith(Configuration.CLASSPATH_PREFIX)) {
-          String resourceName = resourcePath.substring(Configuration.CLASSPATH_PREFIX.length());
-          is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-        } else {
-          // Ok not moved into the classpath. We have to check for the inherited file now:
-          if (resourcePath != null)
-            file = contentManager.getFileHandle(resourcePath);
-        }
-        // Do we need to move up the hierarchy still?
-        inheritedPath = skinManager.getInheritedPath(inheritedPath);
-      }
-    }
-
-    // If the inputstream is set now; it came from the classpath.
-    // If it is not set; then it will have to come from the file now; if it exists
-    if (is == null && file.isFile())
-      is = file.getInputStream();
-
-    // Now we should have found the original file; inherited from classpath or inherited from library
-    // If we still do not have anything then we should give a 404
+    InputStream is = contentManager.getInputStream(path);
     if (is != null) {
-      guessMimeType(getRequestPath(request), response);
+      setMimeType(getRequestPath(request), response);
       IOUtils.copy(is, response.getOutputStream());
     } else {
       LOG.warn("404 on request " + request.getRequestURI());
@@ -309,28 +275,21 @@ public class ThothServlet extends ServletBase {
     if (!path.startsWith(Configuration.REQUIRED_PREFIX))
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
     else {
-      // First try the path as is
       InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-      // if (is == null) {
-      // // Not found; then check for any inheritance of skin related paths:
-      // String inheritedPath = handleInheritance(null, path);
-      // if (inheritedPath != null)
-      // is = Thread.currentThread().getContextClassLoader().getResourceAsStream(inheritedPath);
-      // }
       if (is == null) {
         LOG.warn("404 on request for native resource " + request.getRequestURI());
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
       } else {
-        guessMimeType(getRequestPath(request), response);
+        setMimeType(getRequestPath(request), response);
+
         IOUtils.copy(is, response.getOutputStream());
       }
     }
   }
 
-  protected void guessMimeType(String path, HttpServletResponse response) {
-    if (path.toLowerCase().endsWith(".properties"))
-      response.setContentType(PLAIN_TEXT);
-    if (path.toLowerCase().endsWith(".txt"))
-      response.setContentType(PLAIN_TEXT);
+  protected void setMimeType(String path, HttpServletResponse response) {
+    String mimeType = MimeTypeUtil.getMimeType(ThothUtil.getExtension(path));
+    if (mimeType != null)
+      response.setContentType(mimeType);
   }
 }

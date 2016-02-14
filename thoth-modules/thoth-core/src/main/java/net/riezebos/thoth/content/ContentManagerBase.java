@@ -68,6 +68,46 @@ public abstract class ContentManagerBase implements ContentManager {
     this.contextDefinition = contextDefinition;
   }
 
+  @Override
+  public InputStream getInputStream(String path) throws IOException {
+    try {
+      String resourcePath = path;
+      InputStream inputStream = null;
+      // First check whether the file exists; because then we are done.
+      FileHandle file = getFileHandle(resourcePath);
+      if (!file.isFile()) {
+        // Not found; then check for any inheritance of skin related paths.
+        // Complication is that we might move from the library into the classpath so we need
+        // to handle that as well here
+        SkinManager skinManager = getSkinManager();
+        String inheritedPath = skinManager.getInheritedPath(path);
+        
+        while (inheritedPath != null && inputStream == null && !file.isFile()) {
+          resourcePath = inheritedPath;
+          // Moving into classpath now?
+          if (resourcePath.startsWith(Configuration.CLASSPATH_PREFIX)) {
+            String resourceName = resourcePath.substring(Configuration.CLASSPATH_PREFIX.length());
+            inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+          } else {
+            // Ok not moved into the classpath. We have to check for the inherited file now:
+            if (resourcePath != null)
+              file = getFileHandle(resourcePath);
+          }
+          // Do we need to move up the hierarchy still?
+          inheritedPath = skinManager.getInheritedPath(inheritedPath);
+        }
+      }
+
+      // If the inputstream is set now; it came from the classpath.
+      // If it is not set; then it will have to come from the file now; if it exists
+      if (inputStream == null && file.isFile())
+        inputStream = file.getInputStream();
+      return inputStream;
+    } catch (ContentManagerException e) {
+      throw new IOException(e);
+    }
+  }
+
   public String getContext() {
     return getContextDefinition().getName();
   }

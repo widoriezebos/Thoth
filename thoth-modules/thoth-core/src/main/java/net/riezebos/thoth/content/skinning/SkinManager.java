@@ -255,4 +255,16 @@ public class SkinManager {
   private void setContentManager(ContentManager contentManager) {
     this.contentManager = contentManager;
   }
+
+  public Skin determineSkin(String path) {
+    Skin skin = null;
+    for (SkinMapping mapping : skinMappings)
+      if (mapping.getPattern().matcher(path).matches()) {
+        skin = mapping.getSkin();
+        break;
+      }
+    if (skin == null)
+      skin = getDefaultSkin();
+    return skin;
+  }
 }

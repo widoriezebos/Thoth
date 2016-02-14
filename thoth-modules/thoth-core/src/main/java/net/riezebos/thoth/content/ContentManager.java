@@ -15,6 +15,7 @@
 package net.riezebos.thoth.content;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -81,6 +82,8 @@ public interface ContentManager {
   FileHandle getFileHandle(String contextFile);
 
   SkinManager getSkinManager() throws SkinManagerException;
+
+  InputStream getInputStream(String path) throws IOException;
 
 
 }

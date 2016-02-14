@@ -4,7 +4,7 @@
     <title>${context} Documentation Index</title>
     <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
-    <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
+    <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css"/>
   </head>
   <body>
     

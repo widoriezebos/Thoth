@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -36,7 +35,6 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
-import net.riezebos.thoth.content.skinning.SkinMapping;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.Renderer;
@@ -125,7 +123,6 @@ public abstract class ServletBase extends HttpServlet {
 
       ContentManager contentManager = ContentManagerFactory.getContentManager(context);
       SkinManager skinManager = contentManager.getSkinManager();
-      List<SkinMapping> skinMappings = skinManager.getSkinMappings();
       String path = getPath(request);
 
       // First check for a skin override; i.e. a request with ?skin=name in it
@@ -137,15 +134,9 @@ public abstract class ServletBase extends HttpServlet {
       }
 
       // No override (or valid) so do normal processing
-      if (skin == null) {
-        for (SkinMapping mapping : skinMappings)
-          if (mapping.getPattern().matcher(path).matches()) {
-            skin = mapping.getSkin();
-            break;
-          }
-        if (skin == null)
-          skin = skinManager.getDefaultSkin();
-      }
+      if (skin == null)
+        skin = skinManager.determineSkin(path);
+
       return skin;
     } catch (Exception e) {
       throw new ServletException(e);

@@ -14,7 +14,11 @@
  */
 package net.riezebos.thoth.util;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -331,5 +335,19 @@ public class ThothUtil {
 
   public static String absoluteFolder(String folder) {
     return suffix(prefix(normalSlashes(folder), "/"), "/");
+  }
+
+  public static String readInputStream(InputStream is) throws IOException {
+    if (is == null)
+      return null;
+    StringBuilder sb = new StringBuilder();
+    BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+    String line = br.readLine();
+    while (line != null) {
+      sb.append(line);
+      sb.append("\n");
+      line = br.readLine();
+    }
+    return sb.toString();
   }
 }
