@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,7 +35,9 @@ public class PropertyBasedConfigurationTest {
     assertEquals(25, config.getContextMaxRevisions());
     assertEquals("pdf", config.getCustomRenderers().get(0).getExtension());
     assertEquals("dd-MM-yyyy", config.getDateFormatMask());
+    assertEquals("01-01-1970", config.getDateFormat().format(new Date(0L)));
     assertEquals("dd-MM-yyyy HH:mm:ss", config.getTimestampFormatMask());
+    assertEquals("01-01-1970 01:00:00", config.getTimestampFormat().format(new Date(0L)));
     assertEquals(4000, config.getParseTimeOut());
     assertEquals(2098159, config.getMarkdownOptions());
     assertEquals("http://localhost:8080/", config.getLocalHostUrl());
