@@ -65,8 +65,7 @@ public class Skin extends PropertyLoader {
    * @throws ConfigurationException
    * @throws FileNotFoundException
    */
-  public Skin(ContentManager contentManager, String skinPropertyFile)
-      throws ContextNotFoundException, ContentManagerException, ConfigurationException, FileNotFoundException {
+  public Skin(ContentManager contentManager, String skinPropertyFile) throws ContentManagerException, ConfigurationException, FileNotFoundException {
 
     String context = contentManager.getContext();
     setPropertyFileName(skinPropertyFile);
@@ -74,7 +73,7 @@ public class Skin extends PropertyLoader {
     if (skinPropertyFile.startsWith(CLASSPATH_PREFIX)) {
       fromClassPath = true;
       String resourceName = skinPropertyFile.substring(CLASSPATH_PREFIX.length());
-      InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+      InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(ThothUtil.stripPrefix(resourceName, "/"));
       if (is == null)
         throw new ContentManagerException("Could not find " + resourceName + " on the classpath");
       load(is);
@@ -84,7 +83,7 @@ public class Skin extends PropertyLoader {
       load(fileHandle.getInputStream());
       this.skinBaseUrl = context + ThothUtil.getFolder(skinPropertyFile);
     }
-    this.skinBaseFolder = ThothUtil.absoluteFolder(ThothUtil.getFolder(skinPropertyFile));
+    this.skinBaseFolder = ThothUtil.suffix(ThothUtil.getFolder(skinPropertyFile), "/");
     this.name = getValue("name", UUID.randomUUID().toString());
     this.inheritsFrom = getValue("inheritsfrom", null);
     this.context = context;

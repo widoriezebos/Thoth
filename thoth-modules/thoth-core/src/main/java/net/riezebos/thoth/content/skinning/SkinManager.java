@@ -121,11 +121,9 @@ public class SkinManager {
     List<Skin> result = new ArrayList<>();
     for (String skinDescriptor : skinDescriptors) {
       try {
-        Skin skin = new Skin(contentManager, (fromClasspath ? Configuration.CLASSPATH_PREFIX : "") + skinDescriptor);
+        Skin skin = new Skin(contentManager, (fromClasspath ? Configuration.CLASSPATH_PREFIX : "") + ThothUtil.prefix(skinDescriptor, "/"));
         registerSkin(skin);
         result.add(skin);
-      } catch (ContextNotFoundException e) {
-        LOG.warn("Cannot create skin " + skinDescriptor + " for unknown context: " + contentManager.getContext());
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }
@@ -191,6 +189,7 @@ public class SkinManager {
   }
 
   public SkinInheritance getSkinInheritance(String path) {
+    path = ThothUtil.stripPrefix(path, "/");
     for (Entry<String, SkinInheritance> entry : skinInheritances.entrySet())
       if (path.startsWith(entry.getKey()))
         return entry.getValue();

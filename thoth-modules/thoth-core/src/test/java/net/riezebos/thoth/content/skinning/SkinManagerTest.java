@@ -12,15 +12,14 @@ import org.junit.Test;
 
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.exceptions.SkinManagerException;
+import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 
 public class SkinManagerTest {
 
   @Test
-  public void test() throws SkinManagerException, IOException, ContextNotFoundException {
+  public void test() throws IOException, ContentManagerException {
 
     ClasspathFileSystem factory = new ClasspathFileSystem();
     factory.registerFiles("net/riezebos/thoth/content/skinning/files/resources.lst");
@@ -51,15 +50,15 @@ public class SkinManagerTest {
     assertEquals("TestSkin", testSkin.getName());
     assertEquals(simpleSkin, testSkin.getSuper());
     assertEquals(3, skinMappings.size());
-    assertEquals("\\/a\\/b", skinMappings.get(0).getPattern().toString());
-    assertEquals("\\/a", skinMappings.get(1).getPattern().toString());
+    assertEquals("\\/a\\/b(.*?)", skinMappings.get(0).getPattern().toString());
+    assertEquals("\\/a(.*?)", skinMappings.get(1).getPattern().toString());
     assertEquals("(.*?)", skinMappings.get(2).getPattern().toString());
 
     String pfx1 = "/net/riezebos/thoth/content/skinning/files/testskin/";
     String pfx2 = "/net/riezebos/thoth/content/skinning/files/testskin2/";
-    
-    assertEquals("classpath:net/riezebos/thoth/skins/simpleskin/browse.tpl", testSkin.getBrowseTemplate());
-    assertEquals("classpath:net/riezebos/thoth/skins/simpleskin/error.tpl", testSkin.getErrorTemplate());
+
+    assertEquals("classpath:/net/riezebos/thoth/skins/simpleskin/browse.tpl", testSkin.getBrowseTemplate());
+    assertEquals("classpath:/net/riezebos/thoth/skins/simpleskin/error.tpl", testSkin.getErrorTemplate());
     assertEquals(pfx1 + "testindex.tpl", testSkin.getIndexTemplate());
     assertEquals(pfx1 + "testcontextindex.tpl", testSkin.getContextIndexTemplate());
     assertEquals(pfx1 + "testdiff.tpl", testSkin.getDiffTemplate());
@@ -68,8 +67,8 @@ public class SkinManagerTest {
     assertEquals(pfx1 + "testrevisions.tpl", testSkin.getRevisionTemplate());
     assertEquals(pfx1 + "testvalidationreport.tpl", testSkin.getValidationTemplate());
 
-    assertEquals("classpath:net/riezebos/thoth/skins/simpleskin/browse.tpl", testSkin2.getBrowseTemplate());
-    assertEquals("classpath:net/riezebos/thoth/skins/simpleskin/error.tpl", testSkin2.getErrorTemplate());
+    assertEquals("classpath:/net/riezebos/thoth/skins/simpleskin/browse.tpl", testSkin2.getBrowseTemplate());
+    assertEquals("classpath:/net/riezebos/thoth/skins/simpleskin/error.tpl", testSkin2.getErrorTemplate());
     assertEquals(pfx1 + "testdiff.tpl", testSkin2.getDiffTemplate());
     assertEquals(pfx1 + "testhtml.tpl", testSkin2.getHtmlTemplate());
     assertEquals(pfx1 + "testmeta.tpl", testSkin2.getMetaInformationTemplate());
@@ -77,7 +76,16 @@ public class SkinManagerTest {
     assertEquals(pfx1 + "testvalidationreport.tpl", testSkin2.getValidationTemplate());
     assertEquals(pfx2 + "test2index.tpl", testSkin2.getIndexTemplate());
     assertEquals(pfx2 + "test2contextindex.tpl", testSkin2.getContextIndexTemplate());
-    
+
+    String inheritedPath = skinManager.getInheritedPath("net/riezebos/thoth/content/skinning/files/testskin2/Webresources/a.txt");
+    assertEquals("/net/riezebos/thoth/content/skinning/files/testskin/Webresources/a.txt", inheritedPath);
+    String inheritedPath2 = skinManager.getInheritedPath("net/riezebos/thoth/content/skinning/files/testskin/Webresources/a.txt");
+    assertEquals("classpath:/net/riezebos/thoth/skins/simpleskin/Webresources/a.txt", inheritedPath2);
+
+    assertEquals(simpleSkin, skinManager.determineSkin("/something"));
+    assertEquals(testSkin, skinManager.determineSkin("/a/c/something"));
+    assertEquals(testSkin2, skinManager.determineSkin("/a/b/something"));
+
     when(mockedContentManager.getFileHandle("skins.properties")).thenReturn(factory.getFileHandle("wrong"));
     skinManager = new SkinManager(mockedContentManager, SkinManager.SKIN_PARENT_OF_ALL);
     skinMappings = skinManager.getSkinMappings();

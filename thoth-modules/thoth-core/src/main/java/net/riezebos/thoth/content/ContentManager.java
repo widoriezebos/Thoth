@@ -34,7 +34,7 @@ import net.riezebos.thoth.util.PagedList;
 
 public interface ContentManager {
 
-  public String NATIVERESOURCES = "/nativeresources/";
+  public String NATIVERESOURCES = "/nativeresources";
 
   String refresh() throws ContentManagerException;
 

@@ -64,8 +64,6 @@ import net.riezebos.thoth.util.MimeTypeUtil;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class ThothServlet extends ServletBase {
-  private static final String PLAIN_TEXT = "text/plain;charset=UTF-8";
-
   private static final Logger LOG = LoggerFactory.getLogger(ThothServlet.class);
 
   private static final long serialVersionUID = 1L;
@@ -94,7 +92,7 @@ public class ThothServlet extends ServletBase {
 
         String context = getContext(request);
         String path = getPath(request);
-        if (("/" + context + "/").equalsIgnoreCase(ContentManager.NATIVERESOURCES))
+        if (("/" + context).equalsIgnoreCase(ContentManager.NATIVERESOURCES))
           streamClassPathResource(path, request, response);
         else if (StringUtils.isBlank(context) && StringUtils.isBlank(path))
           executeCommand(indexCommand, request, response);

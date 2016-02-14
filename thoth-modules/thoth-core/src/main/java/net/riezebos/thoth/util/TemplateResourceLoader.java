@@ -34,10 +34,8 @@ public class TemplateResourceLoader extends ResourceLoader {
 
   @Override
   public InputStream getResourceStream(String sourcePath) throws ResourceNotFoundException {
-
-    if (sourcePath.startsWith(CLASSPATH_PREFIX)) {
-      sourcePath = sourcePath.substring(CLASSPATH_PREFIX.length());
-    }
+    sourcePath = ThothUtil.stripPrefix(sourcePath, CLASSPATH_PREFIX);
+    sourcePath = ThothUtil.stripPrefix(sourcePath, "/");
     InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(sourcePath);
     if (is != null)
       return is;

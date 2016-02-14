@@ -71,18 +71,18 @@ public abstract class ContentManagerBase implements ContentManager {
   @Override
   public InputStream getInputStream(String path) throws IOException {
     try {
-      String resourcePath = path;
+      String resourcePath = ThothUtil.stripPrefix(path, "/");
       InputStream inputStream = null;
       // First check whether the file exists; because then we are done.
-      FileHandle file = getFileHandle(resourcePath);
-      if (!file.isFile()) {
+      FileHandle fileHandle = getFileHandle(resourcePath);
+      if (!fileHandle.isFile()) {
         // Not found; then check for any inheritance of skin related paths.
         // Complication is that we might move from the library into the classpath so we need
         // to handle that as well here
         SkinManager skinManager = getSkinManager();
         String inheritedPath = skinManager.getInheritedPath(path);
-        
-        while (inheritedPath != null && inputStream == null && !file.isFile()) {
+
+        while (inheritedPath != null && inputStream == null && !fileHandle.isFile()) {
           resourcePath = inheritedPath;
           // Moving into classpath now?
           if (resourcePath.startsWith(Configuration.CLASSPATH_PREFIX)) {
@@ -91,7 +91,7 @@ public abstract class ContentManagerBase implements ContentManager {
           } else {
             // Ok not moved into the classpath. We have to check for the inherited file now:
             if (resourcePath != null)
-              file = getFileHandle(resourcePath);
+              fileHandle = getFileHandle(resourcePath);
           }
           // Do we need to move up the hierarchy still?
           inheritedPath = skinManager.getInheritedPath(inheritedPath);
@@ -100,8 +100,8 @@ public abstract class ContentManagerBase implements ContentManager {
 
       // If the inputstream is set now; it came from the classpath.
       // If it is not set; then it will have to come from the file now; if it exists
-      if (inputStream == null && file.isFile())
-        inputStream = file.getInputStream();
+      if (inputStream == null && fileHandle.isFile())
+        inputStream = fileHandle.getInputStream();
       return inputStream;
     } catch (ContentManagerException e) {
       throw new IOException(e);
