@@ -27,6 +27,7 @@ import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.impl.FSContentManager;
 import net.riezebos.thoth.content.impl.GitContentManager;
 import net.riezebos.thoth.content.impl.NopContentManager;
+import net.riezebos.thoth.content.impl.ZipContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 
 public class ContentManagerFactory {
@@ -51,8 +52,10 @@ public class ContentManagerFactory {
           contentManager = new GitContentManager(contextDefinition);
         else if ("fs".equalsIgnoreCase(type) || "filesystem".equalsIgnoreCase(type))
           contentManager = new FSContentManager(contextDefinition);
-        else if ("nop".equalsIgnoreCase(type) )
+        else if ("nop".equalsIgnoreCase(type))
           contentManager = new NopContentManager(contextDefinition);
+        else if ("zip".equalsIgnoreCase(type) || "jar".equalsIgnoreCase(type))
+          contentManager = new ZipContentManager(contextDefinition);
         else
           throw new ContentManagerException("Unsupported version control type: " + type);
         contentManager.refresh();

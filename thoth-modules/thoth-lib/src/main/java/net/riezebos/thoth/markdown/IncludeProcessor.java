@@ -204,7 +204,7 @@ public class IncludeProcessor extends FileProcessor {
           {
             // First determine the relative path from the root to where we are now; which actually is the currentFolder without the library prefix
             String relativePart = ThothUtil.stripPrefix(currentFolder.substring(getRootFolder().length()), "/");
-            String actualLocation = relativePart + pathSpec;
+            String actualLocation = ThothUtil.getCanonicalPath(relativePart + pathSpec);
             actualLocation = actualLocation.replace(" ", "%20"); // Encode spaces because that will also break an image link
 
             String pathname = getRootFolder() + actualLocation;

@@ -12,16 +12,16 @@ repository.1.name
 : The uniquely identifying name of a repository. A repository is currently a Git or a local folder; future versions of Thoth might support additional types of repositories. The name is used as a reference when you specify a context (see below). Note the numeric index in the name (1) which enumerates the repository definition. You can define as many repositories as long as you number them sequentially leaving no gaps. Thoth will stop at the first repository.*n*.name that does not have it’s value set.
 
 repository.1.type
-: The type of repository. Currently ‘git’ and ‘fs’ are supported.
+: The type of repository. Choose one of **git**, **filesystem**, **zip**. You can use the alias ‘fs’ for filesystem and ‘jar’ for zip.
 
 repository.1.location
-: The location of the repository. For a Git repository this will be the URL and for a FileSystem repository it is the (absolute) folder name on the filesystem.
+: The location of the repository. For a Git repository this will be the URL, for a FileSystem repository it is the (absolute) folder name on the filesystem and for a Zip it is the location of the zip (or jar) file. Note that for zips you can suffix the path with ‘!/pathinzip’ to offset the contents of the zip. So if your zip contains a root folder called Documentation (and you want that folder to serve as root inside the zip) you would have something like `location=/path/to/myzip.zip!/Documentation`
 
 repository.1.username
-: The username for logging in to the repository. In the case of FS repository this can be left blank.
+: The username for logging in to the repository. In the case of a FS or Zip repository this can be left blank.
 
 repository.1.password
-: The password for logging in to the repository. In the case of FS repository this can be left blank.
+: The password for logging in to the repository. In the case of a FS or Zip repository this can be left blank.
 
 ### Context settings
 A context if the root of a library, and corresponds to a branch in Git. For FileSystem  repositories there is not branch, but the name of the context is used in Thoth to refer to the contents. Note the numeric index in the name (1) which enumerates the context definition. You can define as many contexts as long as you number them sequentially leaving no gaps. Thoth will stop at the first context.*n*.name that does not have it’s value set.
@@ -167,7 +167,6 @@ markdown.option.EXTANCHORLINKS
 
 ## Sample configuration file
 \includecode{sample.configuration.properties}
-
 
 
 

@@ -31,7 +31,7 @@ public class DocumentNode {
   private List<DocumentNode> children = new ArrayList<DocumentNode>();
 
   public DocumentNode(String absolutefilePath, String description, int includePosition, int level) {
-    String path = ThothUtil.normalSlashes(absolutefilePath);
+    String path = ThothUtil.normalSlashes(absolutefilePath).replaceAll("\\%20", " ");
     if (!path.startsWith("/"))
       path = "/" + path;
 

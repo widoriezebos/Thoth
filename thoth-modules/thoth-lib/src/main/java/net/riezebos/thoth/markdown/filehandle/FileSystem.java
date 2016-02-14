@@ -14,7 +14,7 @@
  */
 package net.riezebos.thoth.markdown.filehandle;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 public interface FileSystem {
@@ -35,5 +35,5 @@ public interface FileSystem {
 
   FileHandle[] listFiles(FileHandle fileHandle);
 
-  InputStream getInputStream(FileHandle fileHandle) throws FileNotFoundException;
+  InputStream getInputStream(FileHandle fileHandle) throws IOException;
 }

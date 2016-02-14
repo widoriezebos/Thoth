@@ -7,8 +7,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -16,7 +18,8 @@ public class ClasspathFileSystem implements FileSystem {
 
   private String fileSystemRoot;
   private List<String> folders = new ArrayList<String>();
-  private Map<String, List<String>> folderContents = new HashMap<String, List<String>>();
+  private Map<String, List<String>> folderFiles = new HashMap<String, List<String>>();
+  private Map<String, Set<String>> subFolders = new HashMap<String, Set<String>>();
   private Map<String, Long> modified = new HashMap<String, Long>();
   private Map<String, Long> lengths = new HashMap<String, Long>();
 
@@ -27,23 +30,21 @@ public class ClasspathFileSystem implements FileSystem {
   public ClasspathFileSystem(String fileSystemRoot) {
     if (fileSystemRoot == null)
       fileSystemRoot = "";
-    if (!"".equals(fileSystemRoot))
-      fileSystemRoot = ThothUtil.stripSuffix(fileSystemRoot, "/");
-    this.fileSystemRoot = fileSystemRoot;
+    setFileSystemRoot(ThothUtil.stripSuffix(fileSystemRoot, "/"));
   }
 
-  public void registerFile(String spec) {
+  public void registerFile(String spec, long modified, long length) {
     String folder = ThothUtil.prefix(ThothUtil.getFolder(spec), "/");
     String fileName = ThothUtil.getPartBeforeFirst(ThothUtil.getFileName(spec), ",").trim();
 
     registerFolder(folder, getModification(fileName));
-    List<String> list = folderContents.get(folder);
+    List<String> list = folderFiles.get(folder);
     if (!list.contains(fileName)) {
       list.add(fileName);
 
       String path = folder + "/" + fileName;
-      modified.put(path, getModification(spec));
-      lengths.put(path, getLength(spec));
+      setModified(path, modified);
+      setLength(path, length);
     }
   }
 
@@ -51,19 +52,41 @@ public class ClasspathFileSystem implements FileSystem {
     folderSpec = ThothUtil.stripSuffix(folderSpec, "/");
 
     String folder = "";
+    Set<String> parentFolders = null;
     for (String part : folderSpec.split("/")) {
       folder += (folder.endsWith("/") ? "" : "/") + part;
-      modified.put(folder, modificationDate);
+      if (parentFolders != null)
+        parentFolders.add(part);
+
+      Set<String> nestedFolders = subFolders.get(folder);
+      if (nestedFolders == null) {
+        nestedFolders = new HashSet<String>();
+        subFolders.put(folder, nestedFolders);
+      }
+
+      setModified(folder, modificationDate);
       if (!folders.contains(folder)) {
         folders.add(folder);
-        folderContents.put(folder, new ArrayList<String>());
+        folderFiles.put(folder, new ArrayList<String>());
       }
+      parentFolders = nestedFolders;
     }
+  }
+
+  protected void setModified(String path, long modificationDate) {
+    modified.put(path, modificationDate);
+  }
+
+  protected void setLength(String path, long length) {
+    lengths.put(path, length);
   }
 
   @Override
   public FileHandle getFileHandle(String filename) {
-    String path = ThothUtil.stripSuffix(ThothUtil.prefix(filename, "/"), "/");
+    String canonicalPath = ThothUtil.getCanonicalPath(filename);
+    String path = ThothUtil.stripSuffix(ThothUtil.prefix(canonicalPath, "/"), "/");
+    if (path.equals(""))
+      path = "/";
     return new FileHandle(this, path);
   }
 
@@ -111,8 +134,11 @@ public class ClasspathFileSystem implements FileSystem {
   public List<FileHandle> list(String folderName) {
     if (isDirectory(folderName)) {
       List<FileHandle> result = new ArrayList<FileHandle>();
-      for (String name : folderContents.get(folderName)) {
-        result.add(new FileHandle(this, folderName + "/" + name));
+      for (String name : folderFiles.get(folderName)) {
+        result.add(new FileHandle(this, ThothUtil.suffix(folderName, "/") + name));
+      }
+      for (String name : subFolders.get(folderName)) {
+        result.add(new FileHandle(this, ThothUtil.suffix(folderName, "/") + name));
       }
       return result;
     }
@@ -128,8 +154,12 @@ public class ClasspathFileSystem implements FileSystem {
     BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
     String line = br.readLine();
     while (line != null) {
-      if (line.trim().length() > 0)
-        registerFile(line.trim());
+      String fileName = line.trim();
+      if (fileName.length() > 0) {
+        long modification = getModification(fileName);
+        long length = getLength(fileName);
+        registerFile(ThothUtil.getPartBeforeFirst(fileName, ",").trim(), modification, length);
+      }
       line = br.readLine();
     }
     br.close();
@@ -170,7 +200,7 @@ public class ClasspathFileSystem implements FileSystem {
     return list.toArray(new FileHandle[list.size()]);
   }
 
-  public InputStream getInputStream(FileHandle fileHandle) throws FileNotFoundException {
+  public InputStream getInputStream(FileHandle fileHandle) throws IOException {
     return getInputStream(fileHandle, true);
   }
 
@@ -178,12 +208,16 @@ public class ClasspathFileSystem implements FileSystem {
     return fileSystemRoot;
   }
 
+  protected void setFileSystemRoot(String fileSystemRoot) {
+    this.fileSystemRoot = fileSystemRoot;
+  }
+
   @Override
   public boolean exists(FileHandle fileHandle) {
     return isFile(fileHandle) || isDirectory(fileHandle);
   }
 
-  public InputStream getInputStream(FileHandle fileHandle, boolean throwOnError) throws FileNotFoundException {
+  public InputStream getInputStream(FileHandle fileHandle, boolean throwOnError) throws IOException {
     String suffix = ThothUtil.prefix(fileHandle.getCanonicalPath(), "/");
     String resourcePath = ThothUtil.stripPrefix(getFileSystemRoot() + suffix, "/");
     InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
@@ -192,4 +226,11 @@ public class ClasspathFileSystem implements FileSystem {
     return is;
   }
 
+  public List<String> getFolders() {
+    return folders;
+  }
+
+  public List<String> getFolderContents(String folderName) {
+    return folderFiles.get(ThothUtil.prefix(folderName, "/"));
+  }
 }

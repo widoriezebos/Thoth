@@ -46,7 +46,10 @@ public class ThothUtil {
       return null;
     try {
       URI uri = new URI(null, null, null, 0, normalSlashes(path), null, null);
-      return uri.normalize().getPath();
+      String canonical = uri.normalize().getPath();
+      if (canonical == null)
+        return path;
+      return canonical;
     } catch (URISyntaxException e) {
       throw new IllegalArgumentException(e);
     }

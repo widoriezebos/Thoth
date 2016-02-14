@@ -15,6 +15,7 @@
 package net.riezebos.thoth.content.skinning;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -65,7 +66,7 @@ public class Skin extends PropertyLoader {
    * @throws ConfigurationException
    * @throws FileNotFoundException
    */
-  public Skin(ContentManager contentManager, String skinPropertyFile) throws ContentManagerException, ConfigurationException, FileNotFoundException {
+  public Skin(ContentManager contentManager, String skinPropertyFile) throws ContentManagerException, ConfigurationException, IOException {
 
     String context = contentManager.getContext();
     setPropertyFileName(skinPropertyFile);

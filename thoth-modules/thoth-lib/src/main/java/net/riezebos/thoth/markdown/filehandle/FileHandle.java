@@ -14,7 +14,7 @@
  */
 package net.riezebos.thoth.markdown.filehandle;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
@@ -78,7 +78,7 @@ public class FileHandle implements Serializable, Comparable<FileHandle> {
     return fileSystem.getFileHandle(parentName);
   }
 
-  public InputStream getInputStream() throws FileNotFoundException {
+  public InputStream getInputStream() throws IOException {
     return fileSystem.getInputStream(this);
 
   }

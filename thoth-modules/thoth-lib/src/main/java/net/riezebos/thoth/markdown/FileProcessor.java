@@ -205,8 +205,8 @@ public class FileProcessor {
    * @throws IOException
    */
   protected String stepBack(String currentFolder, String destinationFolder) throws IOException {
-    String destination = canonicalize(destinationFolder);
-    String current = canonicalize(currentFolder);
+    String destination = ThothUtil.stripPrefix(canonicalize(destinationFolder), "/");
+    String current = ThothUtil.stripPrefix(canonicalize(currentFolder), "/");
 
     String[] destinationPath = destination.split("/");
     String[] currentPath = current.split("/");
@@ -432,8 +432,8 @@ public class FileProcessor {
    * @param library
    * @throws IOException
    */
-  public void setLibrary(String library) throws IOException {
-    library = fixFolderSpec(createFileHandle(library).getCanonicalPath());
+  public void setLibrary(String librarySpec) throws IOException {
+    String library = fixFolderSpec(createFileHandle(librarySpec).getCanonicalPath());
     this.library = library;
   }
 
