@@ -6,10 +6,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.junit.Test;
 
@@ -37,7 +39,9 @@ public class PropertyBasedConfigurationTest {
     assertEquals("dd-MM-yyyy", config.getDateFormatMask());
     assertEquals("01-01-1970", config.getDateFormat().format(new Date(0L)));
     assertEquals("dd-MM-yyyy HH:mm:ss", config.getTimestampFormatMask());
-    assertEquals("01-01-1970 01:00:00", config.getTimestampFormat().format(new Date(0L)));
+    SimpleDateFormat timestampFormat = config.getTimestampFormat();
+    timestampFormat.setTimeZone(TimeZone.getTimeZone("Netherlands/Amsterdam"));
+    assertEquals("01-01-1970 00:00:00", timestampFormat.format(new Date(0L)));
     assertEquals(4000, config.getParseTimeOut());
     assertEquals(2098159, config.getMarkdownOptions());
     assertEquals("http://localhost:8080/", config.getLocalHostUrl());
