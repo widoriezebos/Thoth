@@ -94,8 +94,15 @@ public class BasicFileSystem implements FileSystem {
     return result;
   }
 
+  protected boolean denied(String path) {
+    return (path.startsWith("../") || path.startsWith("/../"));
+  }
+
   @Override
   public InputStream getInputStream(FileHandle fileHandle) throws FileNotFoundException {
+    if (denied(fileHandle.getCanonicalPath()))
+      return null;
+
     return new FileInputStream(getFile(fileHandle));
   }
 

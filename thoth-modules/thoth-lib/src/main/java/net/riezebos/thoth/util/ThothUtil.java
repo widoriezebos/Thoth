@@ -44,6 +44,9 @@ public class ThothUtil {
   public static String getCanonicalPath(String path) {
     if (path == null)
       return null;
+    if (path.indexOf('/') == -1)
+      return path;
+    
     try {
       URI uri = new URI(null, null, null, 0, normalSlashes(path), null, null);
       String canonical = uri.normalize().getPath();

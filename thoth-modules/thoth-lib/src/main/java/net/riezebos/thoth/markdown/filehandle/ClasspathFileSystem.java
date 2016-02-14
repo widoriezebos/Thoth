@@ -219,11 +219,19 @@ public class ClasspathFileSystem implements FileSystem {
 
   public InputStream getInputStream(FileHandle fileHandle, boolean throwOnError) throws IOException {
     String suffix = ThothUtil.prefix(fileHandle.getCanonicalPath(), "/");
+    if (denied(suffix))
+      return null;
+
     String resourcePath = ThothUtil.stripPrefix(getFileSystemRoot() + suffix, "/");
+
     InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
     if (is == null && throwOnError)
       throw new FileNotFoundException(resourcePath);
     return is;
+  }
+
+  protected boolean denied(String path) {
+    return (path.startsWith("../") || path.startsWith("/../"));
   }
 
   public List<String> getFolders() {

@@ -7,9 +7,9 @@ For the Markdown tests, this is chapter one
 
 ##Paragraph one of chapter one
 ![](:tip)
-![](/absolute/path.tip.png)
-![](relative/path.tip.png)
-![](../relative/path.tip.png)
+![](/absolute/path/tip.png)
+![](relative/path/tip.png)
+![](../relative/path/tip.png)
 
 ##Paragraph two of chapter one
 ![](:~Test)

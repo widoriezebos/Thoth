@@ -72,7 +72,7 @@ public class FileHandle implements Serializable, Comparable<FileHandle> {
   }
 
   public FileHandle getParentFile() {
-    if (fullPath == null || fullPath.length() == 0 || fullPath.indexOf("/") == -1)
+    if (fullPath == null || fullPath.length() == 0 || fullPath.indexOf("/") == -1 || fullPath.equals("/"))
       return null;
     String parentName = ThothUtil.getPartBeforeLast(fullPath, "/");
     return fileSystem.getFileHandle(parentName);

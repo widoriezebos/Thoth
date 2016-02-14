@@ -63,8 +63,8 @@ public class ClasspathFileHandleFactoryTest {
     FileHandle walk = factory.getFileHandle("/net/riezebos/thoth/one/two/../../markdown/NotThere.md");
 
     assertEquals("/net/riezebos/thoth/markdown/NotThere.md", walk.getCanonicalPath());
-    assertEquals("/net/riezebos/thoth/one/two/../../markdown/NotThere.md", walk.getAbsolutePath());
-    assertEquals("/net/riezebos/thoth/one/two/../../markdown", walk.getParentFile().getAbsolutePath());
+    assertEquals("/net/riezebos/thoth/markdown/NotThere.md", walk.getAbsolutePath());
+    assertEquals("/net/riezebos/thoth/markdown", walk.getParentFile().getAbsolutePath());
 
     FileHandle check = factory.getFileHandle("/net/riezebos/thoth/markdown/check.txt");
     BufferedReader br = new BufferedReader(new InputStreamReader(check.getInputStream()));
