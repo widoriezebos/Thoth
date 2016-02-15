@@ -156,11 +156,11 @@ public abstract class ServletBase extends HttpServlet {
     Skin skin = getSkin(request);
     String skinBase = null;
     if (skin != null) {
-      String baseUrl = skin.getBaseUrl();
+      String baseUrl = ThothUtil.prefix(skin.getBaseUrl(), "/");
       if (skin.isFromClassPath()) {
-        skinBase = ContentManager.NATIVERESOURCES + ThothUtil.prefix(baseUrl, "/");
+        skinBase = ContentManager.NATIVERESOURCES + baseUrl;
       } else {
-        skinBase = ThothUtil.prefix(request.getContextPath() + baseUrl, "/");
+        skinBase = baseUrl;
       }
     }
     Configuration configuration = ConfigurationFactory.getConfiguration();

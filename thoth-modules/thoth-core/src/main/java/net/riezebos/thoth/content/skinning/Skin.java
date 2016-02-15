@@ -82,7 +82,7 @@ public class Skin extends PropertyLoader {
     } else {
       FileHandle fileHandle = contentManager.getFileHandle(skinPropertyFile);
       load(fileHandle.getInputStream());
-      this.skinBaseUrl = context + ThothUtil.getFolder(skinPropertyFile);
+      this.skinBaseUrl = context + ThothUtil.prefix(ThothUtil.getFolder(skinPropertyFile), "/");
     }
     this.skinBaseFolder = ThothUtil.suffix(ThothUtil.getFolder(skinPropertyFile), "/");
     this.name = getValue("name", UUID.randomUUID().toString());
