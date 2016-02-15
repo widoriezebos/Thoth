@@ -41,7 +41,6 @@ public class HtmlRendererTest extends ThothTestBase {
     Map<String, Object> arguments = getParameters(mockedConfiguration, contextName, testSkin, path);
     renderer.execute(contextName, path, arguments, testSkin, outputStream);
     String result = outputStream.toString("UTF-8").trim();
-    System.out.println(result);
     String expected = getExpected("Fourth.expected.html");
     assertEquals(expected, result);
   }
