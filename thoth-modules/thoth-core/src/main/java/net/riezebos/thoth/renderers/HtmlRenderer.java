@@ -26,7 +26,6 @@ import org.pegdown.plugins.PegDownPlugins;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -53,7 +52,7 @@ public class HtmlRenderer extends RendererBase implements Renderer {
       FileHandle fileHandle = contentManager.getFileHandle(path);
       if (fileHandle.isFile()) {
 
-        Configuration configuration = ConfigurationFactory.getConfiguration();
+        Configuration configuration = getConfiguration();
 
         MarkDownDocument markdown = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));
         String markdownSource = markdown.getMarkdown();

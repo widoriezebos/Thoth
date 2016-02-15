@@ -83,5 +83,7 @@ public interface ContentManager {
   InputStream getInputStream(String path) throws IOException;
 
   Configuration getConfiguration();
+
+  boolean isFragment(String string);
   
 }

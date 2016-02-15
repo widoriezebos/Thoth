@@ -32,6 +32,7 @@ import org.apache.velocity.app.VelocityEngine;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
@@ -47,10 +48,21 @@ public abstract class RendererBase implements Renderer {
   public static final String CRITICS = "critics";
   private static final String VELOCITY_HELPER = "thothutil";
   private static final String VELOCITY_PROPERTIES = "net/riezebos/thoth/velocity.properties";
+  private Configuration configuration = null;
 
   @Override
   public String getContentType(Map<String, Object> arguments) {
     return asJson(arguments) ? "application/json;charset=UTF-8" : "text/html;charset=UTF-8";
+  }
+
+  protected Configuration getConfiguration() {
+    if (configuration == null)
+      configuration = ConfigurationFactory.getConfiguration();
+    return configuration;
+  }
+
+  protected void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
   }
 
   protected ContentManager getContentManager(String context) throws ContentManagerException {

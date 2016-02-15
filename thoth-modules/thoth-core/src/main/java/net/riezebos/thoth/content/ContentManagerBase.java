@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -363,7 +365,10 @@ public abstract class ContentManagerBase implements ContentManager {
         } else {
           if (matcher.test(file.getAbsolutePath())) {
             result.add(new ContentNode(file.getAbsolutePath(), file));
-            hash += (file.getCanonicalPath().hashCode()) + file.lastModified();
+            Checksum sum = new CRC32();
+            byte[] bytes = file.getCanonicalPath().getBytes();
+            sum.update(bytes, 0, bytes.length);
+            hash += sum.getValue() + file.lastModified();
           }
         }
       }

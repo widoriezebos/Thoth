@@ -36,25 +36,25 @@ public class ContentManagerFactory {
 
   public static ContentManager getContentManager(String context) throws ContentManagerException {
 
-    Configuration configuration = ConfigurationFactory.getConfiguration();
-    ContextDefinition contextDefinition = configuration.getContextDefinition(context);
-    String contextName = contextDefinition.getName();
-
     ContentManager contentManager;
     synchronized (managers) {
-      contentManager = managers.get(contextName);
+      contentManager = managers.get(context);
 
       if (contentManager == null) {
+
+        Configuration configuration = ConfigurationFactory.getConfiguration();
+        ContextDefinition contextDefinition = configuration.getContextDefinition(context);
         RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
+        
         String type = repositoryDefinition.getType();
         if ("git".equalsIgnoreCase(type))
-          contentManager = registerContentManager(contextName, new GitContentManager(contextDefinition, configuration));
+          contentManager = registerContentManager(new GitContentManager(contextDefinition, configuration));
         else if ("fs".equalsIgnoreCase(type) || "filesystem".equalsIgnoreCase(type))
-          contentManager = registerContentManager(contextName, new FSContentManager(contextDefinition, configuration));
+          contentManager = registerContentManager(new FSContentManager(contextDefinition, configuration));
         else if ("nop".equalsIgnoreCase(type))
-          contentManager = registerContentManager(contextName, new NopContentManager(contextDefinition, configuration));
+          contentManager = registerContentManager(new NopContentManager(contextDefinition, configuration));
         else if ("zip".equalsIgnoreCase(type) || "jar".equalsIgnoreCase(type))
-          contentManager = registerContentManager(contextName, new ZipContentManager(contextDefinition, configuration));
+          contentManager = registerContentManager(new ZipContentManager(contextDefinition, configuration));
         else
           throw new ContentManagerException("Unsupported version control type: " + type);
       }
@@ -63,10 +63,12 @@ public class ContentManagerFactory {
     return contentManager;
   }
 
-  public static ContentManager registerContentManager(String context, ContentManager contentManager) throws ContentManagerException {
+  public static ContentManager registerContentManager(ContentManager contentManager) throws ContentManagerException {
+    String contextName = contentManager.getContextName();
     contentManager.enableAutoRefresh();
+
     synchronized (managers) {
-      managers.put(context, contentManager);
+      managers.put(contextName, contentManager);
     }
     return contentManager;
   }
