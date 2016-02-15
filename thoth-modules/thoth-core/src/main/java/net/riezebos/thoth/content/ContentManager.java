@@ -58,7 +58,7 @@ public interface ContentManager {
 
   Date getLatestRefresh();
 
-  void enableAutoRefresh();
+  void enableAutoRefresh() throws ContentManagerException;
 
   void disableAutoRefresh();
 

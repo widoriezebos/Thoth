@@ -104,18 +104,18 @@ public class Indexer {
 
   public void index() throws ContentManagerException {
 
-    String context = contentManager.getContextName();
+    String contextName = contentManager.getContextName();
     synchronized (activeIndexers) {
-      if (activeIndexers.contains(context)) {
-        LOG.warn("Indexer for context " + context + " is already (still?) active. Not starting a new index operation");
+      if (activeIndexers.contains(contextName)) {
+        LOG.warn("Indexer for context " + contextName + " is already (still?) active. Not starting a new index operation");
         return;
       }
-      activeIndexers.add(context);
+      activeIndexers.add(contextName);
     }
 
     try {
       Date start = new Date();
-      LOG.info("Indexing " + context + " to directory '" + indexFolder + "'...");
+      LOG.info("Indexing " + contextName + " to directory '" + indexFolder + "'...");
 
       IndexWriter writer = getWriter(recreate);
       IndexingContext indexingContext = new IndexingContext();
@@ -140,12 +140,12 @@ public class Indexer {
       markUnusedDocuments(indexingContext.getDirectReverseIndex());
 
       Date end = new Date();
-      LOG.info("Indexing context " + context + " took " + (end.getTime() - start.getTime()) + " milliseconds");
+      LOG.info("Indexing context " + contextName + " took " + (end.getTime() - start.getTime()) + " milliseconds");
     } catch (IOException e) {
       throw new ContentManagerException(e);
     } finally {
       synchronized (activeIndexers) {
-        activeIndexers.remove(context);
+        activeIndexers.remove(contextName);
       }
     }
   }

@@ -38,32 +38,36 @@ public class ContentManagerFactory {
 
     Configuration configuration = ConfigurationFactory.getConfiguration();
     ContextDefinition contextDefinition = configuration.getContextDefinition(context);
+    String contextName = contextDefinition.getName();
 
     ContentManager contentManager;
     synchronized (managers) {
-      contentManager = managers.get(contextDefinition.getName());
-    }
+      contentManager = managers.get(contextName);
 
-    if (contentManager == null) {
-      synchronized (managers) {
+      if (contentManager == null) {
         RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
         String type = repositoryDefinition.getType();
         if ("git".equalsIgnoreCase(type))
-          contentManager = new GitContentManager(contextDefinition, configuration);
+          contentManager = registerContentManager(contextName, new GitContentManager(contextDefinition, configuration));
         else if ("fs".equalsIgnoreCase(type) || "filesystem".equalsIgnoreCase(type))
-          contentManager = new FSContentManager(contextDefinition, configuration);
+          contentManager = registerContentManager(contextName, new FSContentManager(contextDefinition, configuration));
         else if ("nop".equalsIgnoreCase(type))
-          contentManager = new NopContentManager(contextDefinition, configuration);
+          contentManager = registerContentManager(contextName, new NopContentManager(contextDefinition, configuration));
         else if ("zip".equalsIgnoreCase(type) || "jar".equalsIgnoreCase(type))
-          contentManager = new ZipContentManager(contextDefinition, configuration);
+          contentManager = registerContentManager(contextName, new ZipContentManager(contextDefinition, configuration));
         else
           throw new ContentManagerException("Unsupported version control type: " + type);
-        contentManager.refresh();
-        contentManager.enableAutoRefresh();
-        managers.put(contextDefinition.getName(), contentManager);
       }
     }
 
+    return contentManager;
+  }
+
+  public static ContentManager registerContentManager(String context, ContentManager contentManager) throws ContentManagerException {
+    contentManager.enableAutoRefresh();
+    synchronized (managers) {
+      managers.put(context, contentManager);
+    }
     return contentManager;
   }
 

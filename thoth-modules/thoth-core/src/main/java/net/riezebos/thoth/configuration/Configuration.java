@@ -281,6 +281,11 @@ public interface Configuration {
    */
   ContextDefinition getContextDefinition(String name) throws ContextNotFoundException;
 
+  /**
+   * Returns true is the provided name references a known context
+   * @param name
+   * @return
+   */
   boolean isValidContext(String name);
 
 }

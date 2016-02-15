@@ -14,7 +14,6 @@
  */
 package net.riezebos.thoth.util;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 import org.apache.commons.collections.ExtendedProperties;
@@ -24,9 +23,13 @@ import org.apache.velocity.runtime.resource.loader.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.content.ContentManager;
+
 public class TemplateResourceLoader extends ResourceLoader {
   private static final String CLASSPATH_PREFIX = "classpath:";
   private static final Logger LOG = LoggerFactory.getLogger(TemplateResourceLoader.class);
+
+  private static ThreadLocal<ContentManager> contentManager = new ThreadLocal<ContentManager>();
 
   @Override
   public void init(ExtendedProperties configuration) {
@@ -40,7 +43,7 @@ public class TemplateResourceLoader extends ResourceLoader {
     if (is != null)
       return is;
     try {
-      return new FileInputStream(sourcePath);
+      return getContentManager().getInputStream(sourcePath);
 
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
@@ -56,5 +59,16 @@ public class TemplateResourceLoader extends ResourceLoader {
   @Override
   public long getLastModified(Resource resource) {
     return 0;
+  }
+
+  protected ContentManager getContentManager() {
+    ContentManager manager = contentManager.get();
+    if (manager == null)
+      throw new IllegalArgumentException("ContentManager is not set");
+    return manager;
+  }
+
+  public static void setContentManager(ContentManager mgr) {
+    contentManager.set(mgr);
   }
 }

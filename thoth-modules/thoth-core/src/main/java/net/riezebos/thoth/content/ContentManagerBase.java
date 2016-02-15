@@ -145,6 +145,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   protected void notifyContextContentsChanged() {
+
     try {
       getConfiguration().expireCache(getContextName());
       skinManager = null;
@@ -221,12 +222,19 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public void enableAutoRefresh() {
+  public void enableAutoRefresh() throws ContentManagerException {
     synchronized (this) {
       if (autoRefresher != null)
         autoRefresher.cancel();
       long autoRefreshIntervalMs = getContextDefinition().getRefreshIntervalMS();
-      autoRefresher = autoRefreshIntervalMs <= 0 ? null : new AutoRefresher(autoRefreshIntervalMs, this);
+      boolean disabled = autoRefreshIntervalMs <= 0;
+
+      // If we want auto refresh; let's not postpone that and do a hard one right now
+      // This we we know for sure the server is ready when the main thread is finished
+      // which might not be the case otherwise
+      if (!disabled)
+        refresh();
+      autoRefresher = disabled ? null : new AutoRefresher(autoRefreshIntervalMs, this);
     }
   }
 

@@ -38,6 +38,7 @@ import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
+import net.riezebos.thoth.util.TemplateResourceLoader;
 import net.riezebos.thoth.util.ThothCoreUtil;
 
 public abstract class RendererBase implements Renderer {
@@ -97,9 +98,12 @@ public abstract class RendererBase implements Renderer {
       Properties properties = new Properties();
       properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(VELOCITY_PROPERTIES));
       engine.init(properties);
+      TemplateResourceLoader.setContentManager(getContentManager(context));
       engine.getTemplate(template).merge(velocityContext, writer);
     } catch (Exception e) {
       throw new RenderException(e);
+    } finally {
+      TemplateResourceLoader.setContentManager(null);
     }
   }
 
