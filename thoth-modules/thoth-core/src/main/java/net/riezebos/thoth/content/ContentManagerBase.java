@@ -29,10 +29,10 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.content.search.Indexer;
@@ -55,7 +55,6 @@ public abstract class ContentManagerBase implements ContentManager {
   protected static final String NO_CHANGES_DETECTED_MSG = "No changes detected";
   protected static final String CHANGES_DETECTED_MSG = "Changes detected, reindex requested";
 
-  private String rootCanon = null;
   private boolean refreshing = false;
   private AutoRefresher autoRefresher = null;
   private Date latestRefresh = new Date();
@@ -146,23 +145,27 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   protected void notifyContextContentsChanged() {
-    CacheManager.expire(getContextName());
-    skinManager = null;
+    try {
+      getConfiguration().expireCache(getContextName());
+      skinManager = null;
 
-    Thread indexerThread = new Thread() {
-      public void run() {
-        try {
-          Indexer indexer = SearchFactory.getInstance().getIndexer(getContextName());
-          indexer.setIndexExtensions(getConfiguration().getIndexExtensions());
-          indexer.index();
-        } catch (ContentManagerException e) {
-          LOG.error(e.getMessage(), e);
+      Thread indexerThread = new Thread() {
+        public void run() {
+          try {
+            Indexer indexer = SearchFactory.getInstance().getIndexer(getContextName());
+            indexer.setIndexExtensions(getConfiguration().getIndexExtensions());
+            indexer.index();
+          } catch (ContentManagerException e) {
+            LOG.error(e.getMessage(), e);
+          }
         }
-      }
-    };
+      };
 
-    indexerThread.start();
-    LOG.info("Contents updated. Launched indexer thread for context " + getContextName());
+      indexerThread.start();
+      LOG.info("Contents updated. Launched indexer thread for context " + getContextName());
+    } catch (ContextNotFoundException e) {
+      LOG.error("Context not found (or valid anynmore): " + getContextName(), e);
+    }
   }
 
   @Override
@@ -309,21 +312,6 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public boolean accessAllowed(FileHandle file) throws IOException {
-    String rootCanon = getRootCanonical();
-    String canonicalPath = file.getCanonicalPath();
-    return canonicalPath.startsWith(rootCanon);
-  }
-
-  protected String getRootCanonical() throws IOException {
-    if (this.rootCanon == null) {
-      FileHandle root = getFileHandle(getConfiguration().getWorkspaceLocation());
-      this.rootCanon = root.getCanonicalPath();
-    }
-    return this.rootCanon;
-  }
-
-  @Override
   public List<ContentNode> list(String path) throws ContextNotFoundException, IOException {
 
     List<ContentNode> result = new ArrayList<>();
@@ -380,7 +368,7 @@ public abstract class ContentManagerBase implements ContentManager {
     List<ContentNode> result = new ArrayList<>();
 
     Path root = Paths.get("/");
-    CacheManager cacheManager = CacheManager.getInstance(getContextName());
+    CacheManager cacheManager = getConfiguration().getCacheManager(getContextName());
     Map<String, List<String>> reverseIndex = cacheManager.getReverseIndex(false);
     traverseFolders(result, value -> isFragment(value) && !reverseIndex.containsKey(value), getFileHandle(root.toString()), true);
     Collections.sort(result);
@@ -409,7 +397,8 @@ public abstract class ContentManagerBase implements ContentManager {
     return fileSystem.getFileHandle(filePath);
   }
 
-  protected Configuration getConfiguration() {
+  @Override
+  public Configuration getConfiguration() {
     return configuration;
   }
 

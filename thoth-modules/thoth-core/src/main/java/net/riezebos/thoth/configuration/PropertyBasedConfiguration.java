@@ -88,9 +88,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
       String workspaceLocation = getValue(WORKSPACELOCATION, deprecated);
       if (workspaceLocation != null) {
         workspaceLocation = workspaceLocation.replaceAll("\\\\", "/");
-        if (!workspaceLocation.endsWith("/"))
-          workspaceLocation += "/";
-        this.workspaceLocation = workspaceLocation;
+        this.workspaceLocation = ThothUtil.suffix(workspaceLocation, "/");
       }
     }
     return this.workspaceLocation;

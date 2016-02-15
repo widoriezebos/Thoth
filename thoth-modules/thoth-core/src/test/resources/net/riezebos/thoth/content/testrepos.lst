@@ -1,6 +1,7 @@
 skins.properties
 softlinks.properties
 books/Main.book
+books/Second.book
 images/tip.png
 library/TestReposSkin/index.tpl
 library/TestReposSkin/skin.properties
@@ -13,4 +14,6 @@ library/TestReposSkin2/Webresources/markdown.css
 main/Main.md
 main/Second.md
 main/Third.md
+main/Fourth.md
+main/NotReferenced.md
 main/subs/SubOne.md

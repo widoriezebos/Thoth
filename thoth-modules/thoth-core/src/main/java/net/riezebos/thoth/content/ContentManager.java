@@ -22,6 +22,7 @@ import java.util.List;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -39,8 +40,6 @@ public interface ContentManager {
   String refresh() throws ContentManagerException;
 
   void reindex();
-
-  boolean accessAllowed(FileHandle file) throws IOException;
 
   MarkDownDocument getMarkDownDocument(String documentPath, boolean suppressErrors, CriticProcessingMode criticProcessingMode)
       throws IOException, ContextNotFoundException;
@@ -83,5 +82,6 @@ public interface ContentManager {
 
   InputStream getInputStream(String path) throws IOException;
 
-
+  Configuration getConfiguration();
+  
 }

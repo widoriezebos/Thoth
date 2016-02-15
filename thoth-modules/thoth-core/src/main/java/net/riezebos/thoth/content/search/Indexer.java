@@ -54,9 +54,10 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.riezebos.thoth.CacheManager;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.CacheManager;
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -202,10 +203,23 @@ public class Indexer {
       }
     }
 
-    CacheManager cacheManager = CacheManager.getInstance(contentManager.getContextName());
+    CacheManager cacheManager = getCacheManager();
     cacheManager.cacheReverseIndex(true, indexingContext.getIndirectReverseIndex());
     cacheManager.cacheReverseIndex(false, indexingContext.getDirectReverseIndex());
     cacheManager.cacheErrors(indexingContext.getErrors());
+  }
+
+  protected CacheManager getCacheManager() {
+    try {
+      CacheManager cacheManager = getConfiguration().getCacheManager(contentManager.getContextName());
+      return cacheManager;
+    } catch (ContextNotFoundException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  protected Configuration getConfiguration() {
+    return contentManager.getConfiguration();
   }
 
   protected void sortIndexLists(Map<String, List<String>> map) {
@@ -252,7 +266,7 @@ public class Indexer {
         updateReverseIndex(indexingContext.getIndirectReverseIndex(), true, markDownDocument);
         updateReverseIndex(indexingContext.getDirectReverseIndex(), false, markDownDocument);
 
-        addToIndex(writer,  resourcePath, TYPE_DOCUMENT, markDownDocument.getTitle(), markDownDocument.getMarkdown(), markDownDocument.getMetatags());
+        addToIndex(writer, resourcePath, TYPE_DOCUMENT, markDownDocument.getTitle(), markDownDocument.getMarkdown(), markDownDocument.getMetatags());
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }
@@ -344,14 +358,14 @@ public class Indexer {
   }
 
   public Map<String, List<String>> getReverseIndex(String context, boolean indirect) throws ContextNotFoundException, ContentManagerException {
-    Map<String, List<String>> reverseIndex = CacheManager.getInstance(context).getReverseIndex(indirect);
+    Map<String, List<String>> reverseIndex = getCacheManager().getReverseIndex(indirect);
     if (reverseIndex == null)
       reverseIndex = new HashMap<>();
     return reverseIndex;
   }
 
   public List<ProcessorError> getValidationErrors() throws IndexerException {
-    List<ProcessorError> validationErrors = CacheManager.getInstance(contentManager.getContextName()).getValidationErrors();
+    List<ProcessorError> validationErrors = getCacheManager().getValidationErrors();
     if (validationErrors == null)
       validationErrors = new ArrayList<>();
     return validationErrors;

@@ -18,6 +18,24 @@ public interface Configuration {
   public static final String SKIN_PROPERTIES = "skin.properties";
 
   /**
+   * Returns a cache manager for the given context
+   * 
+   * @param context
+   * @return
+   * @throws ContextNotFoundException 
+   */
+  public CacheManager getCacheManager(String context) throws ContextNotFoundException;
+
+  /**
+   * Expires the cache for the given context
+   * 
+   * @param context
+   * @return
+   * @throws ContextNotFoundException 
+   */
+  public void expireCache(String context) throws ContextNotFoundException;
+
+  /**
    * Image recognition. Set (comma separated) the extensions (without the '.') below to determine whether a matching resource will be treated as an image
    * 
    * @return

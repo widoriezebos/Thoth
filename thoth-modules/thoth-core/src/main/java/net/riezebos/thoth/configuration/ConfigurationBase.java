@@ -28,6 +28,9 @@ import net.riezebos.thoth.util.PropertyLoader;
 
 public abstract class ConfigurationBase extends PropertyLoader implements Configuration {
 
+  private static final String GLOBAL_SITE = "*global_site*";
+
+  private Map<String, CacheManager> caches = new HashMap<>();
   private Map<String, RepositoryDefinition> repositoryDefinitions = new HashMap<>();
   private Map<String, ContextDefinition> contextDefinitions = new HashMap<>();
   private ContextDefinition global;
@@ -37,6 +40,39 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
     repoDef.setName("global-nop-repository");
     repoDef.setType("nop");
     global = new ContextDefinition(repoDef, "*global*", null, 0);
+  }
+
+  public CacheManager getCacheManager(String context) throws ContextNotFoundException {
+    context = getContextKey(context);
+    CacheManager cacheManager;
+    synchronized (caches) {
+      cacheManager = caches.get(context);
+    }
+    if (cacheManager == null) {
+      cacheManager = new CacheManager(context);
+      synchronized (caches) {
+        caches.put(context, cacheManager);
+      }
+    }
+    return cacheManager;
+  }
+
+  protected String getContextKey(String context) throws ContextNotFoundException {
+    if (context == null)
+      context = GLOBAL_SITE;
+    else
+      getContextDefinition(context); // validate
+    context = context.toLowerCase().trim();
+    return context;
+  }
+
+  public void expireCache(String context) throws ContextNotFoundException {
+    context = getContextKey(context);
+    synchronized (caches) {
+      caches.remove(context);
+      // We do not know where the global site is getting it's data from so expire that one as well just to be safe
+      caches.remove(GLOBAL_SITE);
+    }
   }
 
   @Override
@@ -136,4 +172,5 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
       }
     } while (doneOne);
   }
+
 }

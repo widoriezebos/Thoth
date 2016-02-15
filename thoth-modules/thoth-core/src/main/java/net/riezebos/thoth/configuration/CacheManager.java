@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth;
+package net.riezebos.thoth.configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,43 +32,14 @@ import net.riezebos.thoth.markdown.util.LineInfo;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 
 public class CacheManager {
-  private static final String GLOBAL_SITE = "*global_site*";
-
-  private static Map<String, CacheManager> instances = new HashMap<>();
   private static Object fileLock = new Object();
 
   private Map<String, Map<String, List<String>>> reverseIndexes = new HashMap<>();
   private Map<String, List<ProcessorError>> errorMap = new HashMap<>();
   private String context;
 
-  public CacheManager(String context) {
+  protected CacheManager(String context) {
     this.setContext(context);
-  }
-
-  public static CacheManager getInstance(String context) {
-    if (context == null)
-      context = GLOBAL_SITE;
-    CacheManager cacheManager;
-    synchronized (instances) {
-      cacheManager = instances.get(context);
-    }
-    if (cacheManager == null) {
-      cacheManager = new CacheManager(context);
-      synchronized (instances) {
-        instances.put(context, cacheManager);
-      }
-    }
-    return cacheManager;
-  }
-
-  public static void expire(String context) {
-    if (context == null)
-      context = GLOBAL_SITE;
-    synchronized (instances) {
-      instances.remove(context);
-      // We do not know where the global site is getting it's data from so expire that one as well just to be safe
-      instances.remove(GLOBAL_SITE);
-    }
   }
 
   public static Object getFileLock() {
