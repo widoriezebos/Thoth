@@ -20,6 +20,7 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.ContentManagerBase;
@@ -30,7 +31,7 @@ import net.riezebos.thoth.markdown.filehandle.ZipFileSystem;
 import net.riezebos.thoth.util.PagedList;
 
 /**
- * Very simple content manager: just get the content from the filesystem; hence no support for collaboration nor synchronization with other servers.
+ * Very simple content manager: just get the content from a zip; hence no support for collaboration nor synchronization with other servers.
  * 
  * @author wido
  */
@@ -38,8 +39,8 @@ public class ZipContentManager extends ContentManagerBase {
 
   private long previousTimestamp = 0;
 
-  public ZipContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
-    super(contextDefinition);
+  public ZipContentManager(ContextDefinition contextDefinition, Configuration configuration) throws ContentManagerException {
+    super(contextDefinition, configuration);
     try {
       validateContextDefinition(contextDefinition);
       setFileSystem(new ZipFileSystem(contextDefinition.getRepositoryDefinition().getLocation()));
@@ -64,7 +65,7 @@ public class ZipContentManager extends ContentManagerBase {
       notifyContextContentsChanged();
     previousTimestamp = latestModification;
 
-    return getContext() + ": " + (changes ? CHANGES_DETECTED_MSG : NO_CHANGES_DETECTED_MSG);
+    return getContextName() + ": " + (changes ? CHANGES_DETECTED_MSG : NO_CHANGES_DETECTED_MSG);
   }
 
   @Override

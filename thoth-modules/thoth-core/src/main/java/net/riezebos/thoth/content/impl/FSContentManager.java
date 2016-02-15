@@ -20,6 +20,7 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.ContentManagerBase;
@@ -39,8 +40,8 @@ public class FSContentManager extends ContentManagerBase {
 
   private long previousChecksum = 0;
 
-  public FSContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
-    super(contextDefinition);
+  public FSContentManager(ContextDefinition contextDefinition, Configuration configuration) throws ContentManagerException {
+    super(contextDefinition, configuration);
     validateContextDefinition(contextDefinition);
     String fsroot = ThothUtil.normalSlashes(contextDefinition.getRepositoryDefinition().getLocation());
     setFileSystem(new BasicFileSystem(fsroot));
@@ -65,7 +66,7 @@ public class FSContentManager extends ContentManagerBase {
       throw new ContentManagerException(e);
     }
 
-    return getContext() + ": " + (changes ? CHANGES_DETECTED_MSG : NO_CHANGES_DETECTED_MSG);
+    return getContextName() + ": " + (changes ? CHANGES_DETECTED_MSG : NO_CHANGES_DETECTED_MSG);
   }
 
   @Override

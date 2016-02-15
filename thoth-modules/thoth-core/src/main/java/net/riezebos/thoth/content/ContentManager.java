@@ -63,9 +63,7 @@ public interface ContentManager {
 
   void disableAutoRefresh();
 
-  String getContext();
-
-  String getContextFolder() throws ContextNotFoundException;
+  String getContextName();
 
   String getIndexFolder() throws ContextNotFoundException;
 

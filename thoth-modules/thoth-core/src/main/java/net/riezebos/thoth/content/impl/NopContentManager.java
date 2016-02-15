@@ -17,12 +17,12 @@ package net.riezebos.thoth.content.impl;
 import java.util.ArrayList;
 import java.util.Date;
 
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.util.PagedList;
 
@@ -33,16 +33,9 @@ import net.riezebos.thoth.util.PagedList;
  */
 public class NopContentManager extends ContentManagerBase {
 
-  private String packageRoot;
-
-  public NopContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
-    super(contextDefinition);
+  public NopContentManager(ContextDefinition contextDefinition, Configuration configuration) throws ContentManagerException {
+    super(contextDefinition, configuration);
     setFileSystem(new ClasspathFileSystem("non/existing/class/root/so/will/not/serve/anything"));
-  }
-
-  @Override
-  public String getContextFolder() throws ContextNotFoundException {
-    return packageRoot;
   }
 
   /**
@@ -53,7 +46,7 @@ public class NopContentManager extends ContentManagerBase {
   @Override
   protected synchronized String cloneOrPull() throws ContentManagerException {
 
-    return getContext() + ": NOP";
+    return getContextName() + ": NOP";
   }
 
   @Override

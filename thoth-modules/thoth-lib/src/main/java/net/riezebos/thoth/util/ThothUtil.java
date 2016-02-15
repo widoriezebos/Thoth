@@ -46,7 +46,7 @@ public class ThothUtil {
       return null;
     if (path.indexOf('/') == -1)
       return path;
-    
+
     try {
       URI uri = new URI(null, null, null, 0, normalSlashes(path), null, null);
       String canonical = uri.normalize().getPath();
@@ -354,6 +354,7 @@ public class ThothUtil {
       sb.append("\n");
       line = br.readLine();
     }
+    is.close();
     return sb.toString();
   }
 }

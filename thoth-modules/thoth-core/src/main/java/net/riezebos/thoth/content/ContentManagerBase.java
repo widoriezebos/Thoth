@@ -34,7 +34,6 @@ import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
@@ -63,9 +62,13 @@ public abstract class ContentManagerBase implements ContentManager {
   private ContextDefinition contextDefinition;
   private SkinManager skinManager;
   private FileSystem fileSystem;
+  private Configuration configuration;
 
-  public ContentManagerBase(ContextDefinition contextDefinition) {
+  protected abstract String cloneOrPull() throws ContentManagerException;
+
+  public ContentManagerBase(ContextDefinition contextDefinition, Configuration configuration) {
     this.contextDefinition = contextDefinition;
+    this.configuration = configuration;
   }
 
   @Override
@@ -86,7 +89,7 @@ public abstract class ContentManagerBase implements ContentManager {
           resourcePath = inheritedPath;
           // Moving into classpath now?
           if (resourcePath.startsWith(Configuration.CLASSPATH_PREFIX)) {
-            String resourceName = resourcePath.substring(Configuration.CLASSPATH_PREFIX.length());
+            String resourceName = ThothUtil.stripPrefix(resourcePath.substring(Configuration.CLASSPATH_PREFIX.length()), "/");
             inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
           } else {
             // Ok not moved into the classpath. We have to check for the inherited file now:
@@ -108,24 +111,18 @@ public abstract class ContentManagerBase implements ContentManager {
     }
   }
 
-  public String getContext() {
+  public String getContextName() {
     return getContextDefinition().getName();
-  }
-
-  public String getBranch() {
-    return getContextDefinition().getBranch();
   }
 
   public ContextDefinition getContextDefinition() {
     return contextDefinition;
   }
 
-  protected abstract String cloneOrPull() throws ContentManagerException;
-
   @Override
   public SkinManager getSkinManager() throws SkinManagerException {
     if (skinManager == null)
-      skinManager = new SkinManager(this, ConfigurationFactory.getConfiguration().getDefaultSkin());
+      skinManager = new SkinManager(this, getConfiguration().getDefaultSkin());
     return skinManager;
   }
 
@@ -149,14 +146,14 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   protected void notifyContextContentsChanged() {
-    CacheManager.expire(getContext());
+    CacheManager.expire(getContextName());
     skinManager = null;
 
     Thread indexerThread = new Thread() {
       public void run() {
         try {
-          Indexer indexer = SearchFactory.getInstance().getIndexer(getContext());
-          indexer.setIndexExtensions(ConfigurationFactory.getConfiguration().getIndexExtensions());
+          Indexer indexer = SearchFactory.getInstance().getIndexer(getContextName());
+          indexer.setIndexExtensions(getConfiguration().getIndexExtensions());
           indexer.index();
         } catch (ContentManagerException e) {
           LOG.error(e.getMessage(), e);
@@ -165,7 +162,7 @@ public abstract class ContentManagerBase implements ContentManager {
     };
 
     indexerThread.start();
-    LOG.info("Contents updated. Launched indexer thread for context " + getContext());
+    LOG.info("Contents updated. Launched indexer thread for context " + getContextName());
   }
 
   @Override
@@ -173,7 +170,7 @@ public abstract class ContentManagerBase implements ContentManager {
       throws IOException, ContextNotFoundException {
     String documentPath = ThothUtil.normalSlashes(path);
     FileHandle file = getFileHandle(documentPath);
-    Configuration configuration = ConfigurationFactory.getConfiguration();
+    Configuration configuration = getConfiguration();
 
     IncludeProcessor processor = getIncludeProcessor(criticProcessingMode, documentPath);
 
@@ -195,7 +192,7 @@ public abstract class ContentManagerBase implements ContentManager {
   protected IncludeProcessor getIncludeProcessor(CriticProcessingMode criticProcessingMode, String documentPath) throws ContextNotFoundException, IOException {
     String rootFolder = documentPath.indexOf('/') == -1 ? "" : ThothUtil.getFolder(documentPath);
 
-    Configuration configuration = ConfigurationFactory.getConfiguration();
+    Configuration configuration = getConfiguration();
     IncludeProcessor processor = new IncludeProcessor();
     processor.setFileSystem(getFileSystem());
     processor.setLibrary("");
@@ -256,7 +253,7 @@ public abstract class ContentManagerBase implements ContentManager {
     FileHandle folder = getFileHandle("/");
     List<Book> result = new ArrayList<>();
 
-    collectBooks(folder.getCanonicalPath(), folder, result, ConfigurationFactory.getConfiguration().getBookExtensions());
+    collectBooks(folder.getCanonicalPath(), folder, result, getConfiguration().getBookExtensions());
     Collections.sort(result);
     return result;
   }
@@ -288,33 +285,27 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public String getContextFolder() throws ContextNotFoundException {
-    Configuration config = ConfigurationFactory.getConfiguration();
-    return config.getWorkspaceLocation() + getContext() + "/";
-  }
-
-  @Override
   public String getIndexFolder() throws ContextNotFoundException {
-    Configuration config = ConfigurationFactory.getConfiguration();
-    return config.getWorkspaceLocation() + getContext() + "-index/lucene/";
+    Configuration config = getConfiguration();
+    return config.getWorkspaceLocation() + getContextName() + "-index/lucene/";
   }
 
   @Override
   public String getReverseIndexFileName() throws ContextNotFoundException {
-    Configuration config = ConfigurationFactory.getConfiguration();
-    return config.getWorkspaceLocation() + getContext() + "-index/reverseindex.bin";
+    Configuration config = getConfiguration();
+    return config.getWorkspaceLocation() + getContextName() + "-index/reverseindex.bin";
   }
 
   @Override
   public String getReverseIndexIndirectFileName() throws ContextNotFoundException {
-    Configuration config = ConfigurationFactory.getConfiguration();
-    return config.getWorkspaceLocation() + getContext() + "-index/indirectreverseindex.bin";
+    Configuration config = getConfiguration();
+    return config.getWorkspaceLocation() + getContextName() + "-index/indirectreverseindex.bin";
   }
 
   @Override
   public String getErrorFileName() throws ContextNotFoundException {
-    Configuration config = ConfigurationFactory.getConfiguration();
-    return config.getWorkspaceLocation() + getContext() + "-index/errors.bin";
+    Configuration config = getConfiguration();
+    return config.getWorkspaceLocation() + getContextName() + "-index/errors.bin";
   }
 
   @Override
@@ -326,7 +317,7 @@ public abstract class ContentManagerBase implements ContentManager {
 
   protected String getRootCanonical() throws IOException {
     if (this.rootCanon == null) {
-      FileHandle root = getFileHandle(ConfigurationFactory.getConfiguration().getWorkspaceLocation());
+      FileHandle root = getFileHandle(getConfiguration().getWorkspaceLocation());
       this.rootCanon = root.getCanonicalPath();
     }
     return this.rootCanon;
@@ -389,7 +380,7 @@ public abstract class ContentManagerBase implements ContentManager {
     List<ContentNode> result = new ArrayList<>();
 
     Path root = Paths.get("/");
-    CacheManager cacheManager = CacheManager.getInstance(getContext());
+    CacheManager cacheManager = CacheManager.getInstance(getContextName());
     Map<String, List<String>> reverseIndex = cacheManager.getReverseIndex(false);
     traverseFolders(result, value -> isFragment(value) && !reverseIndex.containsKey(value), getFileHandle(root.toString()), true);
     Collections.sort(result);
@@ -397,7 +388,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   public boolean isFragment(String path) {
-    return ConfigurationFactory.getConfiguration().isFragment(path);
+    return getConfiguration().isFragment(path);
   }
 
   @Override
@@ -416,6 +407,10 @@ public abstract class ContentManagerBase implements ContentManager {
 
   public FileHandle getFileHandle(String filePath) {
     return fileSystem.getFileHandle(filePath);
+  }
+
+  protected Configuration getConfiguration() {
+    return configuration;
   }
 
 }

@@ -60,7 +60,7 @@ public class SkinManager {
     this.setContentManager(contentManager);
     this.defaultSkinName = defaultSkinName;
     try {
-      String context = contentManager.getContext();
+      String context = contentManager.getContextName();
 
       List<Skin> allSkins = getBuiltinSkins(contentManager);
       allSkins.addAll(getLocalSkins(contentManager));
@@ -82,16 +82,19 @@ public class SkinManager {
   protected void setupInheritance(List<Skin> allSkins) {
     for (Skin skin : allSkins) {
       String inheritsFrom = skin.getInheritsFrom();
-      if (StringUtils.isNotBlank(inheritsFrom)) {
-        Skin superSkin = getSkinByName(inheritsFrom);
-        if (superSkin == null) {
-          LOG.error("Skin with name " + inheritsFrom //
-              + " not defined. Check skin.properties of Skin defined by " //
-              + skin.getPropertyFileName());
-          superSkin = getSkinByName(SKIN_PARENT_OF_ALL);
-          if (superSkin == null)
-            LOG.error("In trouble now: skin " + SKIN_PARENT_OF_ALL + " is not defined");
-        }
+      if (StringUtils.isBlank(inheritsFrom))
+        inheritsFrom = SKIN_PARENT_OF_ALL;
+
+      Skin superSkin = getSkinByName(inheritsFrom);
+      if (superSkin == null) {
+        LOG.error("Skin with name " + inheritsFrom //
+            + " not defined. Check skin.properties of Skin defined by " //
+            + skin.getPropertyFileName());
+        superSkin = getSkinByName(SKIN_PARENT_OF_ALL);
+        if (superSkin == null)
+          LOG.error("In trouble now: skin " + SKIN_PARENT_OF_ALL + " is not defined");
+      }
+      if (skin != superSkin) {
         skin.setSuper(superSkin);
         registerSkinInheritance(new SkinInheritance(skin, superSkin));
       }

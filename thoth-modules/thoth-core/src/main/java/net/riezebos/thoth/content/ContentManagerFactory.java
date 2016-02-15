@@ -49,13 +49,13 @@ public class ContentManagerFactory {
         RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
         String type = repositoryDefinition.getType();
         if ("git".equalsIgnoreCase(type))
-          contentManager = new GitContentManager(contextDefinition);
+          contentManager = new GitContentManager(contextDefinition, configuration);
         else if ("fs".equalsIgnoreCase(type) || "filesystem".equalsIgnoreCase(type))
-          contentManager = new FSContentManager(contextDefinition);
+          contentManager = new FSContentManager(contextDefinition, configuration);
         else if ("nop".equalsIgnoreCase(type))
-          contentManager = new NopContentManager(contextDefinition);
+          contentManager = new NopContentManager(contextDefinition, configuration);
         else if ("zip".equalsIgnoreCase(type) || "jar".equalsIgnoreCase(type))
-          contentManager = new ZipContentManager(contextDefinition);
+          contentManager = new ZipContentManager(contextDefinition, configuration);
         else
           throw new ContentManagerException("Unsupported version control type: " + type);
         contentManager.refresh();

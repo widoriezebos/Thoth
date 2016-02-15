@@ -17,8 +17,8 @@ import net.riezebos.thoth.util.ThothUtil;
 public class ClasspathFileSystem implements FileSystem {
 
   private String fileSystemRoot;
-  private List<String> folders = new ArrayList<String>();
-  private Map<String, List<String>> folderFiles = new HashMap<String, List<String>>();
+  private Set<String> folders = new HashSet<String>();
+  private Map<String, Set<String>> folderFiles = new HashMap<String, Set<String>>();
   private Map<String, Set<String>> subFolders = new HashMap<String, Set<String>>();
   private Map<String, Long> modified = new HashMap<String, Long>();
   private Map<String, Long> lengths = new HashMap<String, Long>();
@@ -38,7 +38,7 @@ public class ClasspathFileSystem implements FileSystem {
     String fileName = ThothUtil.getPartBeforeFirst(ThothUtil.getFileName(spec), ",").trim();
 
     registerFolder(folder, getModification(fileName));
-    List<String> list = folderFiles.get(folder);
+    Set<String> list = folderFiles.get(folder);
     if (!list.contains(fileName)) {
       list.add(fileName);
 
@@ -67,7 +67,7 @@ public class ClasspathFileSystem implements FileSystem {
       setModified(folder, modificationDate);
       if (!folders.contains(folder)) {
         folders.add(folder);
-        folderFiles.put(folder, new ArrayList<String>());
+        folderFiles.put(folder, new HashSet<String>());
       }
       parentFolders = nestedFolders;
     }
@@ -154,11 +154,12 @@ public class ClasspathFileSystem implements FileSystem {
     BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
     String line = br.readLine();
     while (line != null) {
-      String fileName = line.trim();
-      if (fileName.length() > 0) {
-        long modification = getModification(fileName);
-        long length = getLength(fileName);
-        registerFile(ThothUtil.getPartBeforeFirst(fileName, ",").trim(), modification, length);
+      String fileNameSpec = line.trim();
+      if (fileNameSpec.length() > 0) {
+        long modification = getModification(fileNameSpec);
+        long length = getLength(fileNameSpec);
+        String fileName = ThothUtil.prefix(ThothUtil.getPartBeforeFirst(fileNameSpec, ",").trim(), "/");
+        registerFile(fileName, modification, length);
       }
       line = br.readLine();
     }
@@ -234,11 +235,11 @@ public class ClasspathFileSystem implements FileSystem {
     return (path.startsWith("../") || path.startsWith("/../"));
   }
 
-  public List<String> getFolders() {
+  public Set<String> getFolders() {
     return folders;
   }
 
-  public List<String> getFolderContents(String folderName) {
+  public Set<String> getFolderContents(String folderName) {
     return folderFiles.get(ThothUtil.prefix(folderName, "/"));
   }
 }

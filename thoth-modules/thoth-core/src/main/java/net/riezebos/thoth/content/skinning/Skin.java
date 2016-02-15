@@ -68,7 +68,7 @@ public class Skin extends PropertyLoader {
    */
   public Skin(ContentManager contentManager, String skinPropertyFile) throws ContentManagerException, ConfigurationException, IOException {
 
-    String context = contentManager.getContext();
+    String context = contentManager.getContextName();
     setPropertyFileName(skinPropertyFile);
 
     if (skinPropertyFile.startsWith(CLASSPATH_PREFIX)) {

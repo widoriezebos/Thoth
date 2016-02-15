@@ -103,7 +103,7 @@ public class Indexer {
 
   public void index() throws ContentManagerException {
 
-    String context = contentManager.getContext();
+    String context = contentManager.getContextName();
     synchronized (activeIndexers) {
       if (activeIndexers.contains(context)) {
         LOG.warn("Indexer for context " + context + " is already (still?) active. Not starting a new index operation");
@@ -202,7 +202,7 @@ public class Indexer {
       }
     }
 
-    CacheManager cacheManager = CacheManager.getInstance(contentManager.getContext());
+    CacheManager cacheManager = CacheManager.getInstance(contentManager.getContextName());
     cacheManager.cacheReverseIndex(true, indexingContext.getIndirectReverseIndex());
     cacheManager.cacheReverseIndex(false, indexingContext.getDirectReverseIndex());
     cacheManager.cacheErrors(indexingContext.getErrors());
@@ -279,13 +279,13 @@ public class Indexer {
 
     if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
       // New index, so we just add the document (no old document can be there):
-      LOG.debug("Indexer for context " + contentManager.getContext() + " added " + resourcePath);
+      LOG.debug("Indexer for context " + contentManager.getContextName() + " added " + resourcePath);
       writer.addDocument(document);
     } else {
       // Existing index (an old copy of this document may have been indexed) so
       // we use updateDocument instead to replace the old one matching the exact
       // path, if present:
-      LOG.debug("Indexer for context " + contentManager.getContext() + " updated " + resourcePath);
+      LOG.debug("Indexer for context " + contentManager.getContextName() + " updated " + resourcePath);
       writer.updateDocument(new Term(INDEX_PATH, resourcePath), document);
     }
   }
@@ -351,7 +351,7 @@ public class Indexer {
   }
 
   public List<ProcessorError> getValidationErrors() throws IndexerException {
-    List<ProcessorError> validationErrors = CacheManager.getInstance(contentManager.getContext()).getValidationErrors();
+    List<ProcessorError> validationErrors = CacheManager.getInstance(contentManager.getContextName()).getValidationErrors();
     if (validationErrors == null)
       validationErrors = new ArrayList<>();
     return validationErrors;

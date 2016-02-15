@@ -19,36 +19,35 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.util.PagedList;
 import net.riezebos.thoth.util.ThothUtil;
 
 /**
- * Very simple content manager: just get the content from the filesystem; hence no support for collaboration nor synchronization with other servers.
+ * Very simple content manager: just get the content from the classpath; hence no support for collaboration nor synchronization with other servers.
  * 
  * @author wido
  */
 public class ClasspathContentManager extends ContentManagerBase {
 
-  private String packageRoot;
+  public ClasspathContentManager(ContextDefinition contextDefinition, Configuration configuration, ClasspathFileSystem fileSystem)
+      throws ContentManagerException {
+    super(contextDefinition, configuration);
+    setFileSystem(fileSystem);
+  }
 
-  public ClasspathContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
-    super(contextDefinition);
+  public ClasspathContentManager(ContextDefinition contextDefinition, Configuration configuration) throws ContentManagerException {
+    super(contextDefinition, configuration);
     validateContextDefinition(contextDefinition);
     String fsroot = ThothUtil.normalSlashes(contextDefinition.getRepositoryDefinition().getLocation());
     setFileSystem(new ClasspathFileSystem(fsroot));
-  }
-
-  @Override
-  public String getContextFolder() throws ContextNotFoundException {
-    return packageRoot;
   }
 
   /**
@@ -59,7 +58,7 @@ public class ClasspathContentManager extends ContentManagerBase {
   @Override
   protected synchronized String cloneOrPull() throws ContentManagerException {
 
-    return getContext() + ": classpath based. Will do nothing";
+    return getContextName() + ": classpath based. Will do nothing";
   }
 
   @Override

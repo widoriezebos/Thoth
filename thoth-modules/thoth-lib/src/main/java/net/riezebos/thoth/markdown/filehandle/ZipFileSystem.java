@@ -3,7 +3,7 @@ package net.riezebos.thoth.markdown.filehandle;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -76,7 +76,7 @@ public class ZipFileSystem extends ClasspathFileSystem {
       return false;
 
     String folderName = ThothUtil.prefix(ThothUtil.getFolder(canonicalPath), "/");
-    List<String> folderContents = getFolderContents(folderName);
+    Set<String> folderContents = getFolderContents(folderName);
     return folderContents != null && folderContents.contains(ThothUtil.getFileName(canonicalPath));
   }
 

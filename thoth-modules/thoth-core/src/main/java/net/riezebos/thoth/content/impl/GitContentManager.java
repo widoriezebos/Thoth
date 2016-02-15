@@ -72,8 +72,8 @@ public class GitContentManager extends ContentManagerBase {
   private static final Logger LOG = LoggerFactory.getLogger(GitContentManager.class);
   private static final String HEAD_TREE = "HEAD^{tree}";
 
-  public GitContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
-    super(contextDefinition);
+  public GitContentManager(ContextDefinition contextDefinition, Configuration configuration) throws ContentManagerException {
+    super(contextDefinition, configuration);
     validateContextDefinition(contextDefinition);
     setFileSystem(new BasicFileSystem(getContextFolder()));
   }
@@ -117,21 +117,21 @@ public class GitContentManager extends ContentManagerBase {
 
               String message = pullResult.isSuccessful() ? ": Pull successful, " : ": Pull of failed, ";
               message += changes ? CHANGES_DETECTED_MSG : NO_CHANGES_DETECTED_MSG;
-              info(log, getContext() + message);
+              info(log, getContextName() + message);
 
               setLatestRefresh(new Date());
             } catch (Exception e) {
               severe(log, e);
             }
           } else {
-            info(log, getContext() + ": Cloning from " + repositoryUrl + " to " + contextFolder);
+            info(log, getContextName() + ": Cloning from " + repositoryUrl + " to " + contextFolder);
             target.mkdirs();
             try (Git result = Git.cloneRepository()//
                 .setURI(repositoryUrl)//
                 .setBranch(getBranch())//
                 .setCredentialsProvider(credentialsProvider)//
                 .setDirectory(target).call()) {
-              info(log, getContext() + ": Cloned repository: " + result.getRepository().getDirectory());
+              info(log, getContextName() + ": Cloned repository: " + result.getRepository().getDirectory());
               setLatestRefresh(new Date());
               notifyContextContentsChanged();
             } catch (Exception e) {
@@ -148,6 +148,10 @@ public class GitContentManager extends ContentManagerBase {
     }
 
     return log.toString();
+  }
+
+  public String getBranch() {
+    return getContextDefinition().getBranch();
   }
 
   protected Git getRepository() throws ContextNotFoundException, IOException {
@@ -394,6 +398,11 @@ public class GitContentManager extends ContentManagerBase {
       throw new ContentManagerException("Location not set for repositiory " + repositoryDefinition.getName());
     if (StringUtils.isBlank(contextDefinition.getBranch()))
       throw new ContentManagerException("Branch not set for context " + contextDefinition.getName());
+  }
+
+  public String getContextFolder() throws ContextNotFoundException {
+    Configuration config = ConfigurationFactory.getConfiguration();
+    return config.getWorkspaceLocation() + getContextName() + "/";
   }
 
   protected void info(StringBuilder log, String message) {

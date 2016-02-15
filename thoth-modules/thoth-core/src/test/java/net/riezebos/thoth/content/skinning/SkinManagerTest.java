@@ -33,8 +33,7 @@ public class SkinManagerTest {
     FileHandle skinHandle2 = factory.getFileHandle(skin2);
 
     ContentManager mockedContentManager = mock(ContentManager.class);
-    when(mockedContentManager.getContext()).thenReturn("testcontext");
-    when(mockedContentManager.getContextFolder()).thenReturn("net/riezebos/thoth/content/");
+    when(mockedContentManager.getContextName()).thenReturn("testcontext");
     when(mockedContentManager.getFileHandle("skins.properties")).thenReturn(skinsHandle);
     when(mockedContentManager.getFileHandle(skin1)).thenReturn(skinHandle1);
     when(mockedContentManager.getFileHandle(skin2)).thenReturn(skinHandle2);
