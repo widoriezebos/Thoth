@@ -31,7 +31,7 @@ import net.riezebos.thoth.util.ThothUtil;
 public class ContentManagerBaseTest {
 
   @Test
-  public void test() throws ContentManagerException, IOException {
+  public void testContentManagerBase() throws ContentManagerException, IOException {
 
     String contextName = "MockedContext";
     CacheManager mockedCacheManager = mock(CacheManager.class);

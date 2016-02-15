@@ -21,7 +21,7 @@ import net.riezebos.thoth.exceptions.ContextNotFoundException;
 public class PropertyBasedConfigurationTest {
 
   @Test
-  public void test() throws ConfigurationException, ContextNotFoundException {
+  public void testPropertyBasedConfiguration() throws ConfigurationException, ContextNotFoundException {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     InputStream is = contextClassLoader.getResourceAsStream("net/riezebos/thoth/configuration/test.configuration.properties");
     PropertyBasedConfiguration config = new PropertyBasedConfiguration();

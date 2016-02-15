@@ -32,6 +32,6 @@ import net.riezebos.thoth.util.ThothUtilTest;
     CriticMarkupProcessorTest.class, DeleteTranslatorTest.class, HighlightTranslatorTest.class, InsertTranslatorTest.class, SubstitutionTranslatorTest.class,
     DocumentNodeTest.class, LineInfoTest.class, ProcessorErrorTest.class, SoftLinkTranslationTest.class, MarkDownDocumentTest.class, FileProcessorTest.class,
     ThothUtilTest.class, BasicFileHandleFactoryTest.class, FileHandleTest.class, ClasspathFileHandleFactoryTest.class, IncludeProcessorTest.class})
-public class AllTests {
+public class AllLibTests {
 
 }
