@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,9 +15,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.commands.Command;
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.testutil.MockServletOutputStream;
 import net.riezebos.thoth.testutil.ThothTestBase;
 
@@ -111,11 +117,58 @@ public class ThothServletTest extends ThothTestBase {
     setRequestParameter("output", null);
     setRequestParameter("skin", "TestReposSkin2");
     response = createHttpResponse();
-    thothServlet.doGet(request, response);
+    thothServlet.doPost(request, response);
     sos = (MockServletOutputStream) response.getOutputStream();
     result = sos.getContentsAsString();
     assertTrue(result.indexOf("Skinned by TESTREPOSSKIN2") != -1);
     assertTrue(result.indexOf("Yes there is a title!</title>") != -1);
+  }
+
+  @Test
+  public void testError() throws ServletException, IOException, ContextNotFoundException, ContentManagerException {
+
+    String contextName = "TestContext";
+    String path = "/main/Fourth.md";
+
+    ContentManager contentManager = registerTestContentManager(contextName);
+    HttpServletRequest request = createHttpRequest(contextName, path);
+    HttpServletResponse response = createHttpResponse();
+
+    ThothServlet thothServlet = new ThothServlet();
+    thothServlet.setConfiguration(contentManager.getConfiguration());
+    thothServlet.init();
+
+    thothServlet.registerCommand(getFailingCommand());
+    setRequestParameter("cmd", "fail");
+    thothServlet.doGet(request, response);
+    MockServletOutputStream sos = (MockServletOutputStream) response.getOutputStream();
+    String result = sos.getContentsAsString();
+    assertTrue(result.indexOf("Thoth is very sorry about this") != -1);
+  }
+
+  protected Command getFailingCommand() {
+    return new Command() {
+
+      @Override
+      public void setConfiguration(Configuration configuration) {
+
+      }
+
+      @Override
+      public String getTypeCode() {
+        return "fail";
+      }
+
+      @Override
+      public String getContentType(Map<String, Object> arguments) {
+        return "fail";
+      }
+
+      @Override
+      public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+        throw new RenderException("I was only meant to fail so don't blame me");
+      }
+    };
   }
 
 }
