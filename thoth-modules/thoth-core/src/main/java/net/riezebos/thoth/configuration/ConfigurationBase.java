@@ -129,6 +129,9 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
         String refreshSeconds = getValue("context." + idx + ".refreshseconds", "60");
         long refreshMs = Long.parseLong(refreshSeconds) * 1000;
 
+        if (repository == null)
+          throw new ConfigurationException("Repository setting not correct for context." + idx + ".repository");
+
         RepositoryDefinition repositoryDefinition = repositoryDefinitions.get(repository.toLowerCase());
         if (repositoryDefinition == null)
           throw new ConfigurationException("Context " + contextName + " references undefined Repository '" + repository + "'");
