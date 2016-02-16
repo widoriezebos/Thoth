@@ -1,6 +1,8 @@
 package net.riezebos.thoth.testutil;
 
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -11,10 +13,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.configuration.CacheManager;
@@ -22,6 +32,7 @@ import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerBase;
+import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -32,6 +43,10 @@ import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class ThothTestBase {
+
+  private Map<String, Object> parameters = new HashMap<>();
+  private String latestContentType;
+  private Integer latestError;
 
   protected ContentManager getContentManager(Configuration mockedConfiguration, ContextDefinition mockedContext, ClasspathFileSystem fileSystem)
       throws ContentManagerException {
@@ -44,6 +59,16 @@ public class ThothTestBase {
     ClasspathFileSystem fileSystem = new ClasspathFileSystem(location);
     fileSystem.registerFiles("net/riezebos/thoth/content/testrepos.lst");
     return fileSystem;
+  }
+
+  protected ContentManager registerTestContentManager(String contextName) throws ContextNotFoundException, ContentManagerException, IOException {
+    CacheManager mockedCacheManager = mockCacheManager();
+    Configuration mockedConfiguration = mockConfiguration(mockedCacheManager);
+    ContextDefinition mockedContext = mockContextDefinition(contextName);
+    ClasspathFileSystem fileSystem = getClasspathFileSystem();
+    ContentManager contentManager = getContentManager(mockedConfiguration, mockedContext, fileSystem);
+    ContentManagerFactory.registerContentManager(contentManager);
+    return contentManager;
   }
 
   protected ContextDefinition mockContextDefinition(String contextName) {
@@ -75,6 +100,28 @@ public class ThothTestBase {
     when(mockedCacheManager.getReverseIndex(true)).thenReturn(getReverseIndexIndirect());
     when(mockedCacheManager.getReverseIndex(false)).thenReturn(getReverseIndex());
     return mockedCacheManager;
+  }
+
+  protected HttpServletRequest getRequest(String contextName, String path) throws IOException {
+    String fullPath = ThothUtil.prefix(contextName, "/") + path;
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRequestURI()).thenReturn(fullPath);
+    when(request.getContextPath()).thenReturn(ThothUtil.prefix(contextName, "/"));
+    when(request.getServletPath()).thenReturn(fullPath);
+    when(request.getPathInfo()).thenReturn(fullPath);
+    when(request.getParameterNames()).thenReturn(getParameterNames());
+    recordGetParameter(request);
+    return request;
+  }
+
+  protected HttpServletResponse getResponse() throws IOException {
+    HttpServletResponse response = mock(HttpServletResponse.class);
+    MockServletOutputStream sos = new MockServletOutputStream();
+    when(response.getOutputStream()).thenReturn(sos);
+    recordSendError(response);
+    recordSetContentType(response);
+    resetContentAndError();
+    return response;
   }
 
   protected String getExpected(String path) throws IOException {
@@ -158,5 +205,61 @@ public class ThothTestBase {
       throw new IllegalArgumentException(someDate);
     }
     return now;
+  }
+
+  protected void recordGetParameter(HttpServletRequest response) throws IOException {
+    doAnswer(new Answer<Object>() {
+      public Object answer(InvocationOnMock invocation) {
+        Object[] args = invocation.getArguments();
+        return ThothTestBase.this.getParameter(args);
+      }
+    }).when(response).getParameter(anyString());
+  }
+
+  protected void recordSendError(HttpServletResponse response) throws IOException {
+    doAnswer(new Answer<Object>() {
+      public Object answer(InvocationOnMock invocation) {
+        Object[] args = invocation.getArguments();
+        ThothTestBase.this.sendError(args);
+        return null;
+      }
+    }).when(response).sendError(anyInt());
+  }
+
+  protected void recordSetContentType(HttpServletResponse response) throws IOException {
+    doAnswer(new Answer<Object>() {
+      public Object answer(InvocationOnMock invocation) {
+        Object[] args = invocation.getArguments();
+        ThothTestBase.this.setContentType(args);
+        return null;
+      }
+    }).when(response).setContentType(anyString());
+  }
+
+  protected void resetContentAndError() {
+    latestContentType = null;
+    latestError = null;
+  }
+
+  protected void setContentType(Object[] args) {
+    latestContentType = (String) args[0];
+  }
+
+  protected void sendError(Object[] args) {
+    latestError = (Integer) args[0];
+  }
+
+  protected Enumeration<String> getParameterNames() {
+    return Collections.enumeration(parameters.keySet());
+  }
+
+  protected Object getParameter(Object[] args) {
+    Object key = args[0];
+    Object result = parameters.get(key);
+    return result;
+  }
+
+  protected void setRequestParameter(String name, Object value) {
+    parameters.put(name, value);
   }
 }

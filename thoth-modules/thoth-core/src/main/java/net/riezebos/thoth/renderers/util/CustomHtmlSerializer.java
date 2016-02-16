@@ -23,6 +23,7 @@ import org.pegdown.ast.HeaderNode;
 import org.pegdown.ast.InlineHtmlNode;
 import org.pegdown.ast.Node;
 import org.pegdown.ast.ParaNode;
+import org.pegdown.ast.SpecialTextNode;
 import org.pegdown.ast.SuperNode;
 import org.pegdown.ast.TableNode;
 import org.pegdown.ast.TextNode;
@@ -37,7 +38,7 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
     super(linkRenderer);
   }
 
-  // Add class to a table to that Markdown based tables can be separated from any other tables present in the 
+  // Add class to a table to that Markdown based tables can be separated from any other tables present in the
   // resulting HTML.
   @Override
   public void visit(TableNode node) {
@@ -51,7 +52,7 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
   public void visit(TextNode node) {
     if (currentTableNode != null) {
       String text = node.getText();
-      text = text.replaceAll("([/\\.\\,\\\\])", "$1<wbr>") + "<wbr>";
+      text = text.replaceAll("([/\\,\\\\])", "$1<wbr/>");
       if (abbreviations.isEmpty()) {
         printer.print(text);
       } else {
@@ -59,6 +60,13 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
       }
     } else
       super.visit(node);
+  }
+
+  @Override
+  public void visit(SpecialTextNode node) {
+    super.visit(node);
+    if (currentTableNode != null)
+      printer.print("<wbr/>");
   }
 
   // Suppress printing <p></p> around inline HTML because that makes no sense (might break nesting)
@@ -76,7 +84,7 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
   @Override
   public void visit(HeaderNode node) {
     String tag = "h" + node.getLevel();
-    
+
     boolean startWasNewLine = printer.endsWithNewLine();
     printer.println();
     printer.print('<').print(tag).print('>');
@@ -84,7 +92,8 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
     writeBookmarks(node);
     visitChildren(node);
     printer.print('<').print('/').print(tag).print('>');
-    if (startWasNewLine) printer.println();
+    if (startWasNewLine)
+      printer.println();
   }
 
   protected void writeBookmarks(HeaderNode node) {

@@ -47,7 +47,6 @@ import net.riezebos.thoth.commands.RevisionsCommand;
 import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
@@ -80,7 +79,7 @@ public class ThothServlet extends ServletBase {
     super.init();
     setupCommands();
     setupRenderers();
-    List<String> documentExtensions = ConfigurationFactory.getConfiguration().getDocumentExtensions();
+    List<String> documentExtensions = getConfiguration().getDocumentExtensions();
     renderedExtensions.addAll(documentExtensions);
   }
 
@@ -158,7 +157,7 @@ public class ThothServlet extends ServletBase {
     registerRenderer(new RawRenderer());
 
     // Setup any custom renderers
-    List<CustomRendererDefinition> customRendererDefinitions = ConfigurationFactory.getConfiguration().getCustomRenderers();
+    List<CustomRendererDefinition> customRendererDefinitions = getConfiguration().getCustomRenderers();
     for (CustomRendererDefinition customRendererDefinition : customRendererDefinitions) {
       CustomRenderer renderer = new CustomRenderer(customRendererDefinition);
       renderer.setTypeCode(customRendererDefinition.getExtension());
@@ -201,13 +200,14 @@ public class ThothServlet extends ServletBase {
       Renderer renderer = getRenderer(request.getParameter("output"));
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
       RenderResult renderResult = renderer.execute(getContext(request), getPath(request), getParameters(request), getSkin(request), bos);
+      String requestURI = request.getRequestURI();
       switch (renderResult) {
       case NOT_FOUND:
-        LOG.info("404 on request " + request.getRequestURI());
+        LOG.info("404 on request " + requestURI);
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
         break;
       case FORBIDDEN:
-        LOG.warn("Denied request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
+        LOG.warn("Denied request " + requestURI + " in " + (System.currentTimeMillis() - ms) + " ms");
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
         break;
       default:
@@ -217,7 +217,7 @@ public class ThothServlet extends ServletBase {
         response.setContentType(renderer.getContentType(getParameters(request)));
         IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
       }
-      LOG.debug("Handled request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");
+      LOG.debug("Handled request " + requestURI + " in " + (System.currentTimeMillis() - ms) + " ms");
       result = true;
     }
     return result;
@@ -236,7 +236,7 @@ public class ThothServlet extends ServletBase {
   protected void executeCommand(Command command, HttpServletRequest request, HttpServletResponse response)
       throws RenderException, ServletException, IOException {
     String context = getContext(request);
-    if (StringUtils.isBlank(context) || ConfigurationFactory.getConfiguration().isValidContext(context)) {
+    if (StringUtils.isBlank(context) || getConfiguration().isValidContext(context)) {
       Map<String, Object> parameters = getParameters(request);
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
       command.execute(context, getPath(request), parameters, getSkin(request), bos);

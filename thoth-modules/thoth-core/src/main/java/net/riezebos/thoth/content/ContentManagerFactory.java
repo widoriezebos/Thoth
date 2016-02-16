@@ -14,7 +14,6 @@
  */
 package net.riezebos.thoth.content;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +44,7 @@ public class ContentManagerFactory {
         Configuration configuration = ConfigurationFactory.getConfiguration();
         ContextDefinition contextDefinition = configuration.getContextDefinition(context);
         RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
-        
+
         String type = repositoryDefinition.getType();
         if ("git".equalsIgnoreCase(type))
           contentManager = registerContentManager(new GitContentManager(contextDefinition, configuration));
@@ -90,18 +89,17 @@ public class ContentManagerFactory {
       getContentManager(context);
   }
 
-  public static String getRefreshTimestamp(String contextName) throws ContentManagerException {
-    Configuration configuration = ConfigurationFactory.getConfiguration();
-    SimpleDateFormat dateFormat = configuration.getTimestampFormat();
+  public static Date getRefreshTimestamp(String contextName) throws ContentManagerException {
+
     Date latestRefresh = new Date(0L);
-    for (String context : configuration.getContexts()) {
-      ContentManager contentManager = getContentManager(context);
-      Date refresh = contentManager.getLatestRefresh();
-      if (refresh != null && latestRefresh.compareTo(refresh) < 0)
-        latestRefresh = refresh;
+    synchronized (managers) {
+      for (ContentManager contentManager : managers.values()) {
+        Date refresh = contentManager.getLatestRefresh();
+        if (refresh != null && latestRefresh.compareTo(refresh) < 0)
+          latestRefresh = refresh;
+      }
     }
-    String refresh = latestRefresh == null ? "Never" : dateFormat.format(latestRefresh);
-    return refresh;
+    return latestRefresh;
   }
 
   public static void shutDown() throws ContentManagerException {

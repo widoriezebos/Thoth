@@ -28,10 +28,12 @@ import net.riezebos.thoth.markdown.util.SoftLinkTranslationTest;
 import net.riezebos.thoth.util.ThothUtilTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({BookClassificationTest.class, BookmarkTest.class, BookmarkUsageTest.class, BookTest.class, ContentNodeTest.class, CommentTranslatorTest.class,
-    CriticMarkupProcessorTest.class, DeleteTranslatorTest.class, HighlightTranslatorTest.class, InsertTranslatorTest.class, SubstitutionTranslatorTest.class,
-    DocumentNodeTest.class, LineInfoTest.class, ProcessorErrorTest.class, SoftLinkTranslationTest.class, MarkDownDocumentTest.class, FileProcessorTest.class,
-    ThothUtilTest.class, BasicFileHandleFactoryTest.class, FileHandleTest.class, ClasspathFileHandleFactoryTest.class, IncludeProcessorTest.class})
+@SuiteClasses({BookClassificationTest.class, BookmarkTest.class, BookmarkUsageTest.class, BookTest.class, //
+    ContentNodeTest.class, CommentTranslatorTest.class, CriticMarkupProcessorTest.class, DeleteTranslatorTest.class, //
+    HighlightTranslatorTest.class, InsertTranslatorTest.class, SubstitutionTranslatorTest.class, //
+    DocumentNodeTest.class, LineInfoTest.class, ProcessorErrorTest.class, SoftLinkTranslationTest.class, //
+    MarkDownDocumentTest.class, FileProcessorTest.class, ThothUtilTest.class, BasicFileHandleFactoryTest.class, //
+    FileHandleTest.class, ClasspathFileHandleFactoryTest.class, IncludeProcessorTest.class})
 public class AllLibTests {
 
 }

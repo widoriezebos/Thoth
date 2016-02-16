@@ -15,6 +15,7 @@
 package net.riezebos.thoth.servlets;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ import net.riezebos.thoth.util.ThothUtil;
 public abstract class ServletBase extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(ServletBase.class);
+  private Configuration configuration = null;
 
   protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
 
@@ -111,7 +113,7 @@ public abstract class ServletBase extends HttpServlet {
   public Skin getSkin(HttpServletRequest request) throws ServletException {
     try {
       Skin skin = null;
-      Configuration configuration = ConfigurationFactory.getConfiguration();
+      Configuration configuration = getConfiguration();
 
       String context = getContext(request);
       if (!StringUtils.isBlank(context) && !configuration.isValidContext(context))
@@ -143,6 +145,16 @@ public abstract class ServletBase extends HttpServlet {
     }
   }
 
+  protected Configuration getConfiguration() {
+    if (configuration == null)
+      configuration = ConfigurationFactory.getConfiguration();
+    return configuration;
+  }
+
+  protected void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
+  }
+
   protected Map<String, Object> getParameters(HttpServletRequest request) throws ServletException {
     Map<String, Object> result = new HashMap<>();
 
@@ -163,7 +175,7 @@ public abstract class ServletBase extends HttpServlet {
         skinBase = baseUrl;
       }
     }
-    Configuration configuration = ConfigurationFactory.getConfiguration();
+    Configuration configuration = getConfiguration();
     Date now = new Date();
     String path = ThothUtil.prefix(getPath(request), "/");
     result.put(Renderer.CONTEXT_PARAMETER, contextName);
@@ -181,7 +193,9 @@ public abstract class ServletBase extends HttpServlet {
 
   private String getRefreshTimestamp(String contextName) {
     try {
-      return ContentManagerFactory.getRefreshTimestamp(contextName);
+      Date refreshTimestamp = ContentManagerFactory.getRefreshTimestamp(contextName);
+      SimpleDateFormat timestampFormat = getConfiguration().getTimestampFormat();
+      return refreshTimestamp == null ? "Never" : timestampFormat.format(refreshTimestamp);
     } catch (ContentManagerException e) {
       LOG.error(e.getMessage(), e);
       return "Unknown";
