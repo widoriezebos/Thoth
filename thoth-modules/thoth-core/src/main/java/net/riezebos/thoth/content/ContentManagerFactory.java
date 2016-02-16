@@ -110,7 +110,7 @@ public class ContentManagerFactory {
 
     Configuration configuration = ConfigurationFactory.getConfiguration();
     for (String context : configuration.getContexts())
-      report.append(getContentManager(context).refresh());
+      report.append(getContentManager(context).refresh()+"\n");
     return report.toString();
   }
 

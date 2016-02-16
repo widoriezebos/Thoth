@@ -147,7 +147,7 @@ public class GitContentManager extends ContentManagerBase {
       throw new ContentManagerException(e);
     }
 
-    return log.toString();
+    return log.toString().trim();
   }
 
   public String getBranch() {
