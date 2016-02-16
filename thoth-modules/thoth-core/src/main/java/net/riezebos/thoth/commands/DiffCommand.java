@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -42,7 +41,7 @@ public class DiffCommand extends RendererBase implements Command {
     try {
       RenderResult result = RenderResult.OK;
       ContentManager contentManager = getContentManager(context);
-      Configuration configuration = ConfigurationFactory.getConfiguration();
+      Configuration configuration = getConfiguration();
       SimpleDateFormat dateFormat = configuration.getTimestampFormat();
       String commitId = getString(arguments, "commitId");
       SourceDiff diff = contentManager.getDiff(commitId);

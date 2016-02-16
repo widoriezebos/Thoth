@@ -10,10 +10,11 @@ import net.riezebos.thoth.content.skinning.SkinManagerTest;
 import net.riezebos.thoth.renderers.CustomRendererTest;
 import net.riezebos.thoth.renderers.HtmlRendererTest;
 import net.riezebos.thoth.renderers.RawRendererTest;
+import net.riezebos.thoth.servlets.ThothServletTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({PropertyBasedConfigurationTest.class, ContentManagerBaseTest.class, SkinManagerTest.class, //
-    HtmlRendererTest.class, CustomRendererTest.class, RawRendererTest.class})
+    HtmlRendererTest.class, CustomRendererTest.class, RawRendererTest.class, ThothServletTest.class})
 
 public class AllCoreTests {
 

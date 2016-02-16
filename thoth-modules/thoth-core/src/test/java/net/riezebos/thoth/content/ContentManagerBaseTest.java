@@ -24,9 +24,10 @@ public class ContentManagerBaseTest extends ThothTestBase {
   @Test
   public void testContentManagerBase() throws ContentManagerException, IOException {
 
+    String contextName = "MockedContext";
     CacheManager mockedCacheManager = mockCacheManager();
-    Configuration mockedConfiguration = mockConfiguration(mockedCacheManager);
-    ContextDefinition mockedContext = mockContextDefinition("MockedContext");
+    Configuration mockedConfiguration = mockConfiguration(mockedCacheManager, contextName);
+    ContextDefinition mockedContext = mockContextDefinition(contextName);
     ClasspathFileSystem fileSystem = getClasspathFileSystem();
     ContentManager contentManager = getContentManager(mockedConfiguration, mockedContext, fileSystem);
 
@@ -59,7 +60,7 @@ public class ContentManagerBaseTest extends ThothTestBase {
     markdown = markDownDocument.getMarkdown().replaceAll("\t", "    ");
     expected = getExpected("Second.book.expected.md");
     assertEquals(expected.trim(), markdown.trim());
-    assertEquals(38309905638L, contentManager.getContextChecksum());
+    assertEquals(39022364121L, contentManager.getContextChecksum());
     assertEquals(2, contentManager.list("/books").size());
     assertEquals(1, contentManager.list("/images").size());
     assertEquals(1, contentManager.list("/images/tip.png").size());

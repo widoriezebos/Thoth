@@ -55,13 +55,13 @@ public abstract class RendererBase implements Renderer {
     return asJson(arguments) ? "application/json;charset=UTF-8" : "text/html;charset=UTF-8";
   }
 
-  protected Configuration getConfiguration() {
+  public Configuration getConfiguration() {
     if (configuration == null)
       configuration = ConfigurationFactory.getConfiguration();
     return configuration;
   }
 
-  protected void setConfiguration(Configuration configuration) {
+  public void setConfiguration(Configuration configuration) {
     this.configuration = configuration;
   }
 

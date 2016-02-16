@@ -6,6 +6,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,12 +18,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -63,7 +66,7 @@ public class ThothTestBase {
 
   protected ContentManager registerTestContentManager(String contextName) throws ContextNotFoundException, ContentManagerException, IOException {
     CacheManager mockedCacheManager = mockCacheManager();
-    Configuration mockedConfiguration = mockConfiguration(mockedCacheManager);
+    Configuration mockedConfiguration = mockConfiguration(mockedCacheManager, contextName);
     ContextDefinition mockedContext = mockContextDefinition(contextName);
     ClasspathFileSystem fileSystem = getClasspathFileSystem();
     ContentManager contentManager = getContentManager(mockedConfiguration, mockedContext, fileSystem);
@@ -78,7 +81,7 @@ public class ThothTestBase {
     return mockedContext;
   }
 
-  protected Configuration mockConfiguration(CacheManager mockedCacheManager) throws ContextNotFoundException {
+  protected Configuration mockConfiguration(CacheManager mockedCacheManager, String contextName) throws ContextNotFoundException {
     Configuration mockedConfiguration = mock(Configuration.class);
     when(mockedConfiguration.getWorkspaceLocation()).thenReturn("/some/workspace/");
     when(mockedConfiguration.getDefaultSkin()).thenReturn("SimpleSkin");
@@ -92,6 +95,9 @@ public class ThothTestBase {
     when(mockedConfiguration.getCacheManager(anyString())).thenReturn(mockedCacheManager);
     when(mockedConfiguration.getParseTimeOut()).thenReturn(4000L);
     when(mockedConfiguration.getMarkdownOptions()).thenReturn(2098159);
+    when(mockedConfiguration.isValidContext(contextName)).thenReturn(true);
+    when(mockedConfiguration.getMainIndexSkinContext()).thenReturn(contextName);
+    when(mockedConfiguration.getContexts()).thenReturn(Arrays.asList(contextName));
     return mockedConfiguration;
   }
 
@@ -102,7 +108,7 @@ public class ThothTestBase {
     return mockedCacheManager;
   }
 
-  protected HttpServletRequest getRequest(String contextName, String path) throws IOException {
+  protected HttpServletRequest createHttpRequest(String contextName, String path) throws IOException {
     String fullPath = ThothUtil.prefix(contextName, "/") + path;
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRequestURI()).thenReturn(fullPath);
@@ -114,7 +120,7 @@ public class ThothTestBase {
     return request;
   }
 
-  protected HttpServletResponse getResponse() throws IOException {
+  protected HttpServletResponse createHttpResponse() throws IOException {
     HttpServletResponse response = mock(HttpServletResponse.class);
     MockServletOutputStream sos = new MockServletOutputStream();
     when(response.getOutputStream()).thenReturn(sos);
@@ -125,11 +131,26 @@ public class ThothTestBase {
   }
 
   protected String getExpected(String path) throws IOException {
-    path = "net/riezebos/thoth/content/expected/" + path;
+    path = "net/riezebos/thoth/content/expected/" + ThothUtil.stripPrefix(path, "/");
     InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
     if (resourceAsStream == null)
       throw new FileNotFoundException(path + " not found");
     return ThothUtil.readInputStream(resourceAsStream).trim();
+  }
+
+  protected byte[] getExpectedBytes(String path) throws IOException {
+    path = "net/riezebos/thoth/content/expected/" + ThothUtil.stripPrefix(path, "/");
+    return getBytes(path);
+  }
+
+  protected byte[] getBytes(String path) throws FileNotFoundException, IOException {
+    path = ThothUtil.stripPrefix(path, "/");
+    InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+    if (resourceAsStream == null)
+      throw new FileNotFoundException(path + " not found");
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    IOUtils.copy(resourceAsStream, bos);
+    return bos.toByteArray();
   }
 
   protected String getAsString(ContentManager contentManager, String path) throws IOException {
@@ -241,8 +262,16 @@ public class ThothTestBase {
     latestError = null;
   }
 
+  protected String getLatestContentType() {
+    return latestContentType;
+  }
+
   protected void setContentType(Object[] args) {
     latestContentType = (String) args[0];
+  }
+
+  public Integer getLatestError() {
+    return latestError;
   }
 
   protected void sendError(Object[] args) {
@@ -250,7 +279,7 @@ public class ThothTestBase {
   }
 
   protected Enumeration<String> getParameterNames() {
-    return Collections.enumeration(parameters.keySet());
+    return Collections.enumeration(new HashSet<>(parameters.keySet()));
   }
 
   protected Object getParameter(Object[] args) {

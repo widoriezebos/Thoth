@@ -172,10 +172,12 @@ public class ThothServlet extends ServletBase {
   }
 
   protected void registerRenderer(Renderer renderer) {
+    renderer.setConfiguration(getConfiguration());
     renderers.put(renderer.getTypeCode().toLowerCase(), renderer);
   }
 
   protected void registerCommand(Command command) {
+    command.setConfiguration(getConfiguration());
     commands.put(command.getTypeCode().toLowerCase(), command);
   }
 
@@ -253,15 +255,20 @@ public class ThothServlet extends ServletBase {
     long ms = System.currentTimeMillis();
 
     String path = getPath(request);
-    String context = getContext(request);
-    ContentManager contentManager = ContentManagerFactory.getContentManager(context);
+    String contextName = getContext(request);
+    if (getConfiguration().isValidContext(contextName)) {
+      ContentManager contentManager = ContentManagerFactory.getContentManager(contextName);
 
-    InputStream is = contentManager.getInputStream(path);
-    if (is != null) {
-      setMimeType(getRequestPath(request), response);
-      IOUtils.copy(is, response.getOutputStream());
+      InputStream is = contentManager.getInputStream(path);
+      if (is != null) {
+        setMimeType(getRequestPath(request), response);
+        IOUtils.copy(is, response.getOutputStream());
+      } else {
+        LOG.warn("404 on request " + request.getRequestURI());
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      }
     } else {
-      LOG.warn("404 on request " + request.getRequestURI());
+      LOG.warn("404 on context of request " + request.getRequestURI());
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
     LOG.debug("Handled request " + request.getRequestURI() + " in " + (System.currentTimeMillis() - ms) + " ms");

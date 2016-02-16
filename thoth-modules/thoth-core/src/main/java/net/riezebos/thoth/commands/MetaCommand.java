@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
@@ -49,7 +48,7 @@ public class MetaCommand extends RendererBase implements Command {
 
       DocumentNode root = markDownDocument.getDocumentStructure();
       List<DocumentNode> documentNodes = root.flatten(true);
-      int pageSize = ConfigurationFactory.getConfiguration().getFileMaxRevisions();
+      int pageSize = getConfiguration().getFileMaxRevisions();
 
       Map<String, List<Commit>> commitMap = new HashMap<>();
       List<Commit> commitList = new ArrayList<>();

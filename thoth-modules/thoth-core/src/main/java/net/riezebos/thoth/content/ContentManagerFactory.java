@@ -16,8 +16,9 @@ package net.riezebos.thoth.content;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
@@ -33,29 +34,35 @@ public class ContentManagerFactory {
 
   private static Map<String, ContentManager> managers = new HashMap<>();
 
-  public static ContentManager getContentManager(String context) throws ContentManagerException {
+  public static ContentManager getContentManager(String contextName) throws ContentManagerException {
 
     ContentManager contentManager;
     synchronized (managers) {
-      contentManager = managers.get(context);
+      contentManager = managers.get(contextName);
 
       if (contentManager == null) {
 
-        Configuration configuration = ConfigurationFactory.getConfiguration();
-        ContextDefinition contextDefinition = configuration.getContextDefinition(context);
-        RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
+        if (StringUtils.isBlank(contextName)) {
+          RepositoryDefinition repositoryDefinition = new RepositoryDefinition();
+          repositoryDefinition.setType("nop");
+          contentManager = registerContentManager(new NopContentManager(new ContextDefinition(repositoryDefinition, "", "", 0), null));
+        } else {
+          Configuration configuration = ConfigurationFactory.getConfiguration();
+          ContextDefinition contextDefinition = configuration.getContextDefinition(contextName);
+          RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
 
-        String type = repositoryDefinition.getType();
-        if ("git".equalsIgnoreCase(type))
-          contentManager = registerContentManager(new GitContentManager(contextDefinition, configuration));
-        else if ("fs".equalsIgnoreCase(type) || "filesystem".equalsIgnoreCase(type))
-          contentManager = registerContentManager(new FSContentManager(contextDefinition, configuration));
-        else if ("nop".equalsIgnoreCase(type))
-          contentManager = registerContentManager(new NopContentManager(contextDefinition, configuration));
-        else if ("zip".equalsIgnoreCase(type) || "jar".equalsIgnoreCase(type))
-          contentManager = registerContentManager(new ZipContentManager(contextDefinition, configuration));
-        else
-          throw new ContentManagerException("Unsupported version control type: " + type);
+          String type = repositoryDefinition.getType();
+          if ("git".equalsIgnoreCase(type))
+            contentManager = registerContentManager(new GitContentManager(contextDefinition, configuration));
+          else if ("fs".equalsIgnoreCase(type) || "filesystem".equalsIgnoreCase(type))
+            contentManager = registerContentManager(new FSContentManager(contextDefinition, configuration));
+          else if ("nop".equalsIgnoreCase(type))
+            contentManager = registerContentManager(new NopContentManager(contextDefinition, configuration));
+          else if ("zip".equalsIgnoreCase(type) || "jar".equalsIgnoreCase(type))
+            contentManager = registerContentManager(new ZipContentManager(contextDefinition, configuration));
+          else
+            throw new ContentManagerException("Unsupported version control type: " + type);
+        }
       }
     }
 
@@ -70,16 +77,6 @@ public class ContentManagerFactory {
       managers.put(contextName, contentManager);
     }
     return contentManager;
-  }
-
-  /**
-   * Returns a list of Contexts as defined by the Configuration
-   * 
-   * @return
-   */
-  public static List<String> getContexts() {
-    Configuration configuration = ConfigurationFactory.getConfiguration();
-    return configuration.getContexts();
   }
 
   // Touches all the contexts. Can be used to warm up a server

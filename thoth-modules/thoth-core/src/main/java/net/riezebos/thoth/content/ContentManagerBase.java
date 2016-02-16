@@ -36,6 +36,7 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
@@ -412,6 +413,8 @@ public abstract class ContentManagerBase implements ContentManager {
 
   @Override
   public Configuration getConfiguration() {
+    if (configuration == null)
+      configuration = ConfigurationFactory.getConfiguration();
     return configuration;
   }
 

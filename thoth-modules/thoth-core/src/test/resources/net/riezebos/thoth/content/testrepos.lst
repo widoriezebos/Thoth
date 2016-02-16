@@ -8,6 +8,7 @@ library/TestReposSkin/skin.properties
 library/TestReposSkin/Webresources/a.txt
 library/TestReposSkin/Webresources/markdown.css
 library/TestReposSkin2/contextindex.tpl
+library/TestReposSkin2/html.tpl
 library/TestReposSkin2/skin.properties
 library/TestReposSkin2/Webresources/b.txt
 library/TestReposSkin2/Webresources/markdown.css
