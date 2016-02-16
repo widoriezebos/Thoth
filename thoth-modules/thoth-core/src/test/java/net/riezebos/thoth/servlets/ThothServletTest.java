@@ -1,3 +1,17 @@
+/* Copyright (c) 2016 W.T.J. Riezebos
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.riezebos.thoth.servlets;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -33,11 +47,10 @@ public class ThothServletTest extends ThothTestBase {
     String contextName = "TestContext";
     String path = "/main/Fourth.md";
 
+    setRequestParameter("output", "raw");
     ContentManager contentManager = registerTestContentManager(contextName);
     HttpServletRequest request = createHttpRequest(contextName, path);
     HttpServletResponse response = createHttpResponse();
-
-    setRequestParameter("output", "raw");
 
     ThothServlet thothServlet = new ThothServlet();
     thothServlet.setConfiguration(contentManager.getConfiguration());
@@ -113,9 +126,10 @@ public class ThothServletTest extends ThothTestBase {
     assertTrue(result.indexOf("Please select one of the contexts") != -1);
     assertTrue(result.indexOf("TestContext</a>") != -1);
 
-    request = createHttpRequest(contextName, "/main/Fourth.md");
     setRequestParameter("output", null);
+    setRequestParameter("critics", "show");
     setRequestParameter("skin", "TestReposSkin2");
+    request = createHttpRequest(contextName, "/main/Fourth.md");
     response = createHttpResponse();
     thothServlet.doPost(request, response);
     sos = (MockServletOutputStream) response.getOutputStream();
@@ -144,6 +158,27 @@ public class ThothServletTest extends ThothTestBase {
     MockServletOutputStream sos = (MockServletOutputStream) response.getOutputStream();
     String result = sos.getContentsAsString();
     assertTrue(result.indexOf("Thoth is very sorry about this") != -1);
+  }
+
+  @Test
+  public void testJson() throws ServletException, IOException, ContextNotFoundException, ContentManagerException {
+
+    String contextName = "TestContext";
+    String path = "/";
+
+    setRequestParameter("mode", "json");
+    ContentManager contentManager = registerTestContentManager(contextName);
+    HttpServletRequest request = createHttpRequest(contextName, path);
+    HttpServletResponse response = createHttpResponse();
+
+    ThothServlet thothServlet = new ThothServlet();
+    thothServlet.setConfiguration(contentManager.getConfiguration());
+    thothServlet.init();
+
+    thothServlet.doGet(request, response);
+    MockServletOutputStream sos = (MockServletOutputStream) response.getOutputStream();
+    String result = sos.getContentsAsString();
+    assertTrue(result.indexOf("\"skinbase\":\"/TestContext/library/TestReposSkin\"") != -1);
   }
 
   protected Command getFailingCommand() {

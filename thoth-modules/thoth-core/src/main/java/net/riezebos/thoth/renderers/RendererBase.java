@@ -91,7 +91,7 @@ public abstract class RendererBase implements Renderer {
 
   protected void executeJson(Map<String, Object> variables, OutputStream outputStream) throws ServletException {
     try {
-      boolean prettyPrintJson = ConfigurationFactory.getConfiguration().isPrettyPrintJson();
+      boolean prettyPrintJson = getConfiguration().isPrettyPrintJson();
       ObjectMapper mapper = new ObjectMapper();
       ObjectWriter writer = prettyPrintJson ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
       writer.writeValue(outputStream, variables);

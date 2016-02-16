@@ -1,3 +1,17 @@
+/* Copyright (c) 2016 W.T.J. Riezebos
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.riezebos.thoth.content;
 
 import static org.junit.Assert.assertEquals;
@@ -14,6 +28,7 @@ import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
+import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
@@ -31,6 +46,11 @@ public class ContentManagerBaseTest extends ThothTestBase {
     ClasspathFileSystem fileSystem = getClasspathFileSystem();
     ContentManager contentManager = getContentManager(mockedConfiguration, mockedContext, fileSystem);
 
+    
+    Skin testReposSkin2 = contentManager.getSkinManager().getSkinByName("TestReposSkin2");
+    
+    assertEquals("/library/TestReposSkin2/", testReposSkin2.getSkinBaseFolder());
+    assertEquals("MockedContext/library/TestReposSkin2", testReposSkin2.getBaseUrl());
     assertEquals("MockedContext: classpath based. Will do nothing", contentManager.refresh());
 
     assertEquals(2, contentManager.getBooks().size());
