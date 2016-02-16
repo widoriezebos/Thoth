@@ -211,7 +211,7 @@ public class IncludeProcessorTest {
   public void testUsage() throws IOException {
     IncludeProcessor includeProcessor = new IncludeProcessor();
     String outMessage = execMain(includeProcessor, new String[] {"-help"});
-    assertTrue(outMessage.startsWith("Usage:"));
+    assertTrue(outMessage.indexOf("Usage:") != -1);
 
     includeProcessor.setFileSystem(getFileHandleFactory());
     includeProcessor.setLibrary("/net/riezebos/thoth/");
