@@ -44,4 +44,8 @@ public class ThothCoreUtil extends ThothUtil {
       return null;
     return ConfigurationFactory.getConfiguration().getDateFormat().format(date);
   }
+
+  public static String getVersion() {
+    return getVersion(Version.CORE);
+  }
 }

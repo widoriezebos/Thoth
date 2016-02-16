@@ -372,6 +372,7 @@ public class IncludeProcessor extends FileProcessor {
   }
 
   protected void printUsage() {
+    pl("Thoth Include processor v" + ThothUtil.getVersion(ThothUtil.Version.LIB));
     pl("Usage: java " + IncludeProcessor.class.getName() + " <arguments>");
     pl();
     pl("Description:");

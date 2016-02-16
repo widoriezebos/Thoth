@@ -28,6 +28,7 @@ import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.servlets.ThothServlet;
+import net.riezebos.thoth.util.ThothUtil;
 
 /**
  * @author wido
@@ -35,7 +36,8 @@ import net.riezebos.thoth.servlets.ThothServlet;
 public class Thoth {
 
   public void start(String args[]) throws Exception {
-    System.out.println("Thoth is firing up. Please hang on...");
+    System.out.println("Thoth standalone v" + ThothUtil.getVersion(ThothUtil.Version.STANDALONE));
+    System.out.println("Server is firing up. Please hang on...");
     String configurationFile = ConfigurationFactory.determinePropertyPath();
 
     if (args.length > 0) {
@@ -76,7 +78,7 @@ public class Thoth {
     context.setHandler(handler);
 
     server.setHandler(context);
-    
+
     System.out.println("Setting up content managers...");
     // Warm up the server
     ContentManagerFactory.touch();

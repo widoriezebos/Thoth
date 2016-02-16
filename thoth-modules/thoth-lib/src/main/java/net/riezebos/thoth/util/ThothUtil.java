@@ -33,6 +33,10 @@ import java.util.regex.Pattern;
 public class ThothUtil {
   private static final int DEFAULT_ADDITIONAL_BUFFERSIZE = 10;
 
+  public static enum Version {
+    LIB, CORE, SERVER, STANDALONE
+  };
+
   public static String encodeUrl(String url) {
     try {
       return URLEncoder.encode(url, "UTF-8");
@@ -356,5 +360,32 @@ public class ThothUtil {
     }
     is.close();
     return sb.toString();
+  }
+
+  public static String getVersion(Version version) {
+
+    String type;
+    switch (version) {
+    case LIB:
+      type = "lib";
+    case CORE:
+      type = "core";
+    case SERVER:
+      type = "server";
+    case STANDALONE:
+      type = "standalone";
+    default:
+      type = "lib";
+    }
+
+    String versres = "net/riezebos/thoth/" + type + ".version";
+    InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(versres);
+    if (resourceAsStream == null)
+      return "unknown";
+    try {
+      return readInputStream(resourceAsStream).trim();
+    } catch (IOException e) {
+      return "unknown";
+    }
   }
 }
