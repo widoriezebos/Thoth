@@ -24,6 +24,7 @@ import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
+import net.riezebos.thoth.content.impl.ClasspathContentManager;
 import net.riezebos.thoth.content.impl.FSContentManager;
 import net.riezebos.thoth.content.impl.GitContentManager;
 import net.riezebos.thoth.content.impl.NopContentManager;
@@ -32,9 +33,21 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 
 public class ContentManagerFactory {
 
-  private static Map<String, ContentManager> managers = new HashMap<>();
+  private Map<String, ContentManager> managers = new HashMap<>();
 
-  public static ContentManager getContentManager(String contextName) throws ContentManagerException {
+  private Configuration configuration = null;
+
+  private static ContentManagerFactory contentManagerFactory = null;
+
+  public static ContentManagerFactory getInstance() {
+    synchronized (ContentManagerFactory.class) {
+      if (contentManagerFactory == null)
+        contentManagerFactory = new ContentManagerFactory();
+      return contentManagerFactory;
+    }
+  }
+
+  public ContentManager getContentManager(String contextName) throws ContentManagerException {
 
     ContentManager contentManager;
     synchronized (managers) {
@@ -47,7 +60,7 @@ public class ContentManagerFactory {
           repositoryDefinition.setType("nop");
           contentManager = registerContentManager(new NopContentManager(new ContextDefinition(repositoryDefinition, "", "", 0), null));
         } else {
-          Configuration configuration = ConfigurationFactory.getConfiguration();
+          Configuration configuration = getConfiguration();
           ContextDefinition contextDefinition = configuration.getContextDefinition(contextName);
           RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
 
@@ -56,6 +69,8 @@ public class ContentManagerFactory {
             contentManager = registerContentManager(new GitContentManager(contextDefinition, configuration));
           else if ("fs".equalsIgnoreCase(type) || "filesystem".equalsIgnoreCase(type))
             contentManager = registerContentManager(new FSContentManager(contextDefinition, configuration));
+          else if ("classpath".equalsIgnoreCase(type) || "cp".equalsIgnoreCase(type))
+            contentManager = registerContentManager(new ClasspathContentManager(contextDefinition, configuration));
           else if ("nop".equalsIgnoreCase(type))
             contentManager = registerContentManager(new NopContentManager(contextDefinition, configuration));
           else if ("zip".equalsIgnoreCase(type) || "jar".equalsIgnoreCase(type))
@@ -69,7 +84,17 @@ public class ContentManagerFactory {
     return contentManager;
   }
 
-  public static ContentManager registerContentManager(ContentManager contentManager) throws ContentManagerException {
+  public Configuration getConfiguration() {
+    if (configuration == null)
+      configuration = ConfigurationFactory.getConfiguration();
+    return configuration;
+  }
+
+  public void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
+  }
+
+  public ContentManager registerContentManager(ContentManager contentManager) throws ContentManagerException {
     String contextName = contentManager.getContextName();
     contentManager.enableAutoRefresh();
 
@@ -80,13 +105,13 @@ public class ContentManagerFactory {
   }
 
   // Touches all the contexts. Can be used to warm up a server
-  public static void touch() throws ContentManagerException {
-    Configuration configuration = ConfigurationFactory.getConfiguration();
+  public void touch() throws ContentManagerException {
+    Configuration configuration = getConfiguration();
     for (String context : configuration.getContexts())
       getContentManager(context);
   }
 
-  public static Date getRefreshTimestamp(String contextName) throws ContentManagerException {
+  public Date getRefreshTimestamp(String contextName) throws ContentManagerException {
 
     Date latestRefresh = new Date(0L);
     synchronized (managers) {
@@ -99,23 +124,23 @@ public class ContentManagerFactory {
     return latestRefresh;
   }
 
-  public static void shutDown() throws ContentManagerException {
-    Configuration configuration = ConfigurationFactory.getConfiguration();
+  public void shutDown() throws ContentManagerException {
+    Configuration configuration = getConfiguration();
     for (String context : configuration.getContexts())
       getContentManager(context).disableAutoRefresh();
   }
 
-  public static String pullAll() throws ContentManagerException {
+  public String pullAll() throws ContentManagerException {
     StringBuilder report = new StringBuilder();
 
-    Configuration configuration = ConfigurationFactory.getConfiguration();
+    Configuration configuration = getConfiguration();
     for (String context : configuration.getContexts())
-      report.append(getContentManager(context).refresh()+"\n");
+      report.append(getContentManager(context).refresh() + "\n");
     return report.toString();
   }
 
-  public static void reindexAll() throws ContentManagerException {
-    Configuration configuration = ConfigurationFactory.getConfiguration();
+  public void reindexAll() throws ContentManagerException {
+    Configuration configuration = getConfiguration();
     for (String context : configuration.getContexts())
       getContentManager(context).reindex();
   }

@@ -144,7 +144,7 @@ public class CacheManager {
 
   public ContentManager getContentManager(String context) throws CachemanagerException {
     try {
-      return ContentManagerFactory.getContentManager(context);
+      return ContentManagerFactory.getInstance().getContentManager(context);
     } catch (ContentManagerException e) {
       throw new CachemanagerException(e);
     }

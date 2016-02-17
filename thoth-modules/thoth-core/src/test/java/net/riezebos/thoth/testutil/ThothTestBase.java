@@ -85,7 +85,7 @@ public class ThothTestBase {
     ContextDefinition mockedContext = mockContextDefinition(contextName);
     ClasspathFileSystem fileSystem = getClasspathFileSystem();
     ContentManager contentManager = getContentManager(mockedConfiguration, mockedContext, fileSystem);
-    ContentManagerFactory.registerContentManager(contentManager);
+    ContentManagerFactory.getInstance().registerContentManager(contentManager);
     return contentManager;
   }
 
@@ -154,10 +154,15 @@ public class ThothTestBase {
 
   protected String getExpected(String path) throws IOException {
     path = "net/riezebos/thoth/content/expected/" + ThothUtil.stripPrefix(path, "/");
+    InputStream resourceAsStream = getClassPathResource(path);
+    return ThothUtil.readInputStream(resourceAsStream).trim();
+  }
+
+  protected InputStream getClassPathResource(String path) throws FileNotFoundException {
     InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
     if (resourceAsStream == null)
       throw new FileNotFoundException(path + " not found");
-    return ThothUtil.readInputStream(resourceAsStream).trim();
+    return resourceAsStream;
   }
 
   protected byte[] getExpectedBytes(String path) throws IOException {
@@ -167,9 +172,7 @@ public class ThothTestBase {
 
   protected byte[] getBytes(String path) throws FileNotFoundException, IOException {
     path = ThothUtil.stripPrefix(path, "/");
-    InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-    if (resourceAsStream == null)
-      throw new FileNotFoundException(path + " not found");
+    InputStream resourceAsStream = getClassPathResource(path);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     IOUtils.copy(resourceAsStream, bos);
     return bos.toByteArray();

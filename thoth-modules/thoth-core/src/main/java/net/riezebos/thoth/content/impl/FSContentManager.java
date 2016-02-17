@@ -14,6 +14,7 @@
  */
 package net.riezebos.thoth.content.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,6 +66,7 @@ public class FSContentManager extends ContentManagerBase {
     } catch (IOException e) {
       throw new ContentManagerException(e);
     }
+    setLatestRefresh(new Date());
 
     return getContextName() + ": " + (changes ? CHANGES_DETECTED_MSG : NO_CHANGES_DETECTED_MSG);
   }
@@ -82,8 +84,12 @@ public class FSContentManager extends ContentManagerBase {
 
   protected void validateContextDefinition(ContextDefinition contextDefinition) throws ContentManagerException {
     RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
-    if (StringUtils.isBlank(repositoryDefinition.getLocation()))
+    String location = repositoryDefinition.getLocation();
+    if (StringUtils.isBlank(location))
       throw new ContentManagerException("Location not set for repositiory " + repositoryDefinition.getName());
+    File check = new File(location);
+    if (!check.exists())
+      throw new ContentManagerException("Location " + location + " specified by repository " + repositoryDefinition.getName() + " does not exist.");
   }
 
   @Override

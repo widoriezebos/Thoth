@@ -123,7 +123,7 @@ public abstract class ServletBase extends HttpServlet {
         context = configuration.getMainIndexSkinContext();
       }
 
-      ContentManager contentManager = ContentManagerFactory.getContentManager(context);
+      ContentManager contentManager = getContentManagerFactory().getContentManager(context);
       SkinManager skinManager = contentManager.getSkinManager();
       String path = getPath(request);
 
@@ -193,13 +193,17 @@ public abstract class ServletBase extends HttpServlet {
 
   private String getRefreshTimestamp(String contextName) {
     try {
-      Date refreshTimestamp = ContentManagerFactory.getRefreshTimestamp(contextName);
+      Date refreshTimestamp = getContentManagerFactory().getRefreshTimestamp(contextName);
       SimpleDateFormat timestampFormat = getConfiguration().getTimestampFormat();
       return refreshTimestamp == null ? "Never" : timestampFormat.format(refreshTimestamp);
     } catch (ContentManagerException e) {
       LOG.error(e.getMessage(), e);
       return "Unknown";
     }
+  }
+
+  protected ContentManagerFactory getContentManagerFactory() {
+    return ContentManagerFactory.getInstance();
   }
 
   protected Skin getSkinNoFail(HttpServletRequest request) {

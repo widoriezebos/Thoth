@@ -33,7 +33,7 @@ public class SearchFactory {
   }
 
   public Indexer getIndexer(String context) throws ContentManagerException {
-    ContentManager contentManager = ContentManagerFactory.getContentManager(context);
+    ContentManager contentManager = ContentManagerFactory.getInstance().getContentManager(context);
     return new Indexer(contentManager);
   }
 

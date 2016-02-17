@@ -81,7 +81,7 @@ public class Thoth {
 
     System.out.println("Setting up content managers...");
     // Warm up the server
-    ContentManagerFactory.touch();
+    ContentManagerFactory.getInstance().touch();
 
     server.start();
     System.out.println("Thoth server started.\n"//
@@ -102,7 +102,7 @@ public class Thoth {
     System.out.println("Stopping server.\n(First waiting for any auto refresh to finish though)");
     server.stop();
     server.join();
-    ContentManagerFactory.shutDown();
+    ContentManagerFactory.getInstance().shutDown();
   }
 
   protected String tryConfigFile(String defaultConfigFileName) {

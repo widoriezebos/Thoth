@@ -45,7 +45,6 @@ import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.CachemanagerException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.exceptions.IndexerException;
 import net.riezebos.thoth.exceptions.SkinManagerException;
 import net.riezebos.thoth.markdown.IncludeProcessor;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
@@ -58,6 +57,7 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class ContentManagerBase implements ContentManager {
   private static final Logger LOG = LoggerFactory.getLogger(ContentManagerBase.class);
+  private static final int MINIMUM_INTERVAL = 30000;
   protected static final String NO_CHANGES_DETECTED_MSG = "No changes detected";
   protected static final String CHANGES_DETECTED_MSG = "Changes detected, reindex requested";
 
@@ -240,6 +240,10 @@ public abstract class ContentManagerBase implements ContentManager {
       // which might not be the case otherwise
       if (!disabled)
         refresh();
+
+      if (autoRefreshIntervalMs < MINIMUM_INTERVAL)
+        autoRefreshIntervalMs = MINIMUM_INTERVAL;
+
       autoRefresher = disabled ? null : new AutoRefresher(autoRefreshIntervalMs, this);
     }
   }

@@ -48,7 +48,6 @@ import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -257,7 +256,7 @@ public class ThothServlet extends ServletBase {
     String path = getPath(request);
     String contextName = getContext(request);
     if (getConfiguration().isValidContext(contextName)) {
-      ContentManager contentManager = ContentManagerFactory.getContentManager(contextName);
+      ContentManager contentManager = getContentManagerFactory().getContentManager(contextName);
 
       InputStream is = contentManager.getInputStream(path);
       if (is != null) {

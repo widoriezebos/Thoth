@@ -43,7 +43,7 @@ public class ReindexCommand extends RendererBase implements Command {
     try {
 
       if (StringUtils.isBlank(context))
-        ContentManagerFactory.reindexAll();
+        ContentManagerFactory.getInstance().reindexAll();
       else {
         ContentManager contentManager = getContentManager(context);
         contentManager.reindex();

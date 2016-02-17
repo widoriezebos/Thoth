@@ -46,7 +46,8 @@ public class NopContentManager extends ContentManagerBase {
   @Override
   protected synchronized String cloneOrPull() throws ContentManagerException {
 
-    return getContextName() + ": NOP";
+    setLatestRefresh(new Date());
+    return getContextName() + ": NOP. Will do nothing";
   }
 
   @Override

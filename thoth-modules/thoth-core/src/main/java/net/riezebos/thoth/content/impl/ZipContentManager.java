@@ -64,6 +64,7 @@ public class ZipContentManager extends ContentManagerBase {
     if (changes)
       notifyContextContentsChanged();
     previousTimestamp = latestModification;
+    setLatestRefresh(new Date());
 
     return getContextName() + ": " + (changes ? CHANGES_DETECTED_MSG : NO_CHANGES_DETECTED_MSG);
   }

@@ -59,7 +59,7 @@ public class Searcher {
 
   public PagedList<SearchResult> search(String queryExpression, int pageNumber, int pageSize) throws SearchException {
     try {
-      ContentManager contentManager = ContentManagerFactory.getContentManager(getContext());
+      ContentManager contentManager = ContentManagerFactory.getInstance().getContentManager(getContext());
       String indexFolder = contentManager.getIndexFolder();
       IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)));
       IndexSearcher searcher = new IndexSearcher(reader);
@@ -125,7 +125,7 @@ public class Searcher {
 
   protected void linkBooks(List<SearchResult> searchResults) throws ContentManagerException {
 
-    ContentManager contentManager = ContentManagerFactory.getContentManager(getContext());
+    ContentManager contentManager = ContentManagerFactory.getInstance().getContentManager(getContext());
     Map<String, List<String>> reverseIndexIndirect = contentManager.getReverseIndex(true);
 
     List<String> bookExtensions = ConfigurationFactory.getConfiguration().getBookExtensions();

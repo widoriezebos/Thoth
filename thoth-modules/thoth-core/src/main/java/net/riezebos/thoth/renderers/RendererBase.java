@@ -66,7 +66,7 @@ public abstract class RendererBase implements Renderer {
   }
 
   protected ContentManager getContentManager(String context) throws ContentManagerException {
-    return ContentManagerFactory.getContentManager(context);
+    return ContentManagerFactory.getInstance().getContentManager(context);
   }
 
   protected String getString(Map<String, Object> arguments, String key) {

@@ -18,19 +18,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AutoRefresher extends Thread {
+  private static final int MIN_INTERVAL = 1000;
   private static final Logger LOG = LoggerFactory.getLogger(AutoRefresher.class);
   private static int SLICE = 100;
 
-  private static final int MINIMUM_INTERVAL = 30000;
   private long interval;
   private ContentManager contentManager;
   private boolean cancelRequested = false;
 
   public AutoRefresher(long interval, ContentManager contentManager) {
 
-    if (interval < MINIMUM_INTERVAL)
-      interval = MINIMUM_INTERVAL;
-
+    if (interval < MIN_INTERVAL)
+      interval = 1000;
     this.interval = interval;
     this.contentManager = contentManager;
 

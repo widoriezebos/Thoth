@@ -46,11 +46,11 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   private Set<String> _fragmentExtensions = null;
   private Set<String> _bookExtensions = null;
 
-  protected PropertyBasedConfiguration() throws ConfigurationException {
+  public PropertyBasedConfiguration() throws ConfigurationException {
   }
 
   @Override
-  protected void load(InputStream inStream) throws ConfigurationException {
+  public void load(InputStream inStream) throws ConfigurationException {
     super.load(inStream);
     String extensionSpec = getImageExtensions();
     for (String ext : extensionSpec.split("\\,"))

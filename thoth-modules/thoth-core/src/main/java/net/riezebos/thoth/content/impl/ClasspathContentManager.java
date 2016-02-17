@@ -59,6 +59,7 @@ public class ClasspathContentManager extends ContentManagerBase {
   @Override
   protected synchronized String cloneOrPull() throws ContentManagerException {
 
+    setLatestRefresh(new Date());
     return getContextName() + ": classpath based. Will do nothing";
   }
 
