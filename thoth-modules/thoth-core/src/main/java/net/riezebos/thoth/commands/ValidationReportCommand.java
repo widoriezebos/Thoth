@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.riezebos.thoth.content.search.SearchFactory;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.util.ProcessorError;
@@ -34,7 +34,8 @@ public class ValidationReportCommand extends RendererBase implements Command {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      List<ProcessorError> errors = SearchFactory.getInstance().getIndexer(context).getValidationErrors();
+      ContentManager contentManager = getContentManager(context);
+      List<ProcessorError> errors = contentManager.getValidationErrors();
 
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("errors", errors);

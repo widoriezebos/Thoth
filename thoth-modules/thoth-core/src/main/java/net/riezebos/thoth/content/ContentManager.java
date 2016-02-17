@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.ContentNode;
@@ -31,6 +32,7 @@ import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.SkinManagerException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
+import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.PagedList;
 
 public interface ContentManager {
@@ -85,5 +87,9 @@ public interface ContentManager {
   Configuration getConfiguration();
 
   boolean isFragment(String string);
-  
+
+  List<ProcessorError> getValidationErrors() throws ContentManagerException;
+
+  Map<String, List<String>> getReverseIndex(boolean indirect) throws ContentManagerException;
+
 }

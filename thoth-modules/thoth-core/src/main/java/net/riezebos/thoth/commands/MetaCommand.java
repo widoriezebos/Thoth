@@ -23,8 +23,6 @@ import java.util.Map;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.search.Indexer;
-import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
@@ -59,10 +57,8 @@ public class MetaCommand extends RendererBase implements Command {
       }
       Collections.sort(commitList, new CommitComparator());
 
-      SearchFactory searchFactory = SearchFactory.getInstance();
-      Indexer indexer = searchFactory.getIndexer(context);
-      Map<String, List<String>> reverseIndex = indexer.getReverseIndex(context, false);
-      Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(context, true);
+      Map<String, List<String>> reverseIndex = contentManager.getReverseIndex(false);
+      Map<String, List<String>> reverseIndexIndirect = contentManager.getReverseIndex(true);
       List<String> usedBy = reverseIndex.get("/" + path);
       List<String> usedByIndirect = reverseIndexIndirect.get("/" + path);
       Map<String, String> metatags = markDownDocument.getMetatags();

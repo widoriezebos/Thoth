@@ -16,8 +16,10 @@ package net.riezebos.thoth.configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,9 +27,9 @@ import java.util.Map;
 
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
+import net.riezebos.thoth.exceptions.CachemanagerException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.exceptions.IndexerException;
 import net.riezebos.thoth.markdown.util.LineInfo;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 
@@ -55,7 +57,7 @@ public class CacheManager {
    * @throws ContentManagerException
    */
   @SuppressWarnings("unchecked")
-  public Map<String, List<String>> getReverseIndex(boolean indirect) throws ContextNotFoundException, ContentManagerException {
+  public Map<String, List<String>> getReverseIndex(boolean indirect) throws CachemanagerException {
     String key = getCacheKey(indirect);
     Map<String, List<String>> map;
 
@@ -78,14 +80,37 @@ public class CacheManager {
           }
         }
       }
-    } catch (IOException | ClassNotFoundException e) {
-      throw new IndexerException(getContext());
+    } catch (IOException | ClassNotFoundException | ContextNotFoundException e) {
+      throw new CachemanagerException(getContext());
     }
     return map;
   }
 
+  public void persistIndexingContext(IndexingContext indexingContext) throws CachemanagerException {
+    try {
+      ContentManager contentManager = getContentManager(context);
+      String reverseIndexFile = contentManager.getReverseIndexFileName();
+      String indirectReverseIndexFile = contentManager.getReverseIndexIndirectFileName();
+      String errorFile = contentManager.getErrorFileName();
+
+      synchronized (CacheManager.getFileLock()) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(reverseIndexFile)))) {
+          oos.writeObject(indexingContext.getDirectReverseIndex());
+        }
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(indirectReverseIndexFile)))) {
+          oos.writeObject(indexingContext.getIndirectReverseIndex());
+        }
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(errorFile)))) {
+          oos.writeObject(indexingContext.getErrors());
+        }
+      }
+    } catch (Exception e) {
+      throw new CachemanagerException(e);
+    }
+  }
+
   @SuppressWarnings("unchecked")
-  public List<ProcessorError> getValidationErrors() throws IndexerException {
+  public List<ProcessorError> getValidationErrors() throws CachemanagerException {
     List<ProcessorError> errors;
     synchronized (errorMap) {
       errors = errorMap.get(getContext());
@@ -112,16 +137,16 @@ public class CacheManager {
         }
       }
     } catch (IOException | ContextNotFoundException e) {
-      throw new IndexerException(getContext() + ": " + e.getMessage(), e);
+      throw new CachemanagerException(getContext() + ": " + e.getMessage(), e);
     }
     return errors;
   }
 
-  public ContentManager getContentManager(String context) throws IndexerException {
+  public ContentManager getContentManager(String context) throws CachemanagerException {
     try {
       return ContentManagerFactory.getContentManager(context);
     } catch (ContentManagerException e) {
-      throw new IndexerException(e);
+      throw new CachemanagerException(e);
     }
   }
 

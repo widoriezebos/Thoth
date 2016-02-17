@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -41,8 +42,10 @@ import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.content.skinning.SkinManager;
+import net.riezebos.thoth.exceptions.CachemanagerException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.exceptions.IndexerException;
 import net.riezebos.thoth.exceptions.SkinManagerException;
 import net.riezebos.thoth.markdown.IncludeProcessor;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
@@ -382,7 +385,7 @@ public abstract class ContentManagerBase implements ContentManager {
     List<ContentNode> result = new ArrayList<>();
 
     Path root = Paths.get("/");
-    CacheManager cacheManager = getConfiguration().getCacheManager(getContextName());
+    CacheManager cacheManager = getCachemanager();
     Map<String, List<String>> reverseIndex = cacheManager.getReverseIndex(false);
     traverseFolders(result, value -> isFragment(value) && !reverseIndex.containsKey(value), getFileHandle(root.toString()), true);
     Collections.sort(result);
@@ -416,6 +419,42 @@ public abstract class ContentManagerBase implements ContentManager {
     if (configuration == null)
       configuration = ConfigurationFactory.getConfiguration();
     return configuration;
+  }
+
+  protected CacheManager getCachemanager() {
+    try {
+      return getConfiguration().getCacheManager(getContextName());
+    } catch (ContextNotFoundException e) {
+      // Since this can never happen because without a valid context there will be no contentmanager
+      // We make it really ugly if we fail here; but otherwise will not bother:
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  @Override
+  public Map<String, List<String>> getReverseIndex(boolean indirect) throws ContentManagerException {
+    try {
+      CacheManager cacheManager = getCachemanager();
+      Map<String, List<String>> reverseIndex = cacheManager.getReverseIndex(indirect);
+      if (reverseIndex == null)
+        reverseIndex = new HashMap<>();
+      return reverseIndex;
+    } catch (CachemanagerException e) {
+      throw new ContentManagerException(e);
+    }
+  }
+
+  @Override
+  public List<ProcessorError> getValidationErrors() throws ContentManagerException {
+    try {
+      CacheManager cacheManager = getCachemanager();
+      List<ProcessorError> validationErrors = cacheManager.getValidationErrors();
+      if (validationErrors == null)
+        validationErrors = new ArrayList<>();
+      return validationErrors;
+    } catch (CachemanagerException e) {
+      throw new ContentManagerException(e);
+    }
   }
 
 }

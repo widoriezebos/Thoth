@@ -47,6 +47,7 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
+import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.ContentManagerFactory;
@@ -89,7 +90,13 @@ public class ThothTestBase {
   }
 
   protected ContextDefinition mockContextDefinition(String contextName) {
+    RepositoryDefinition mockedRepos = mock(RepositoryDefinition.class);
+    when(mockedRepos.getLocation()).thenReturn("/");
+    when(mockedRepos.getName()).thenReturn("MockedRepos");
+    when(mockedRepos.getType()).thenReturn("nop");
+    
     ContextDefinition mockedContext = mock(ContextDefinition.class);
+    when(mockedContext.getRepositoryDefinition()).thenReturn(mockedRepos);
     when(mockedContext.getName()).thenReturn(contextName);
     when(mockedContext.getRefreshIntervalMS()).thenReturn(0L);
     return mockedContext;
@@ -103,6 +110,7 @@ public class ThothTestBase {
     when(mockedConfiguration.getBookExtensions()).thenReturn(Arrays.asList(new String[] {"book"}));
     when(mockedConfiguration.getDocumentExtensions()).thenReturn(Arrays.asList(new String[] {"md"}));
     when(mockedConfiguration.getImageExtensions()).thenReturn("png");
+    when(mockedConfiguration.getIndexExtensions()).thenReturn("md,book");
     when(mockedConfiguration.isFragment(anyString())).thenReturn(true);
     when(mockedConfiguration.getDateFormat()).thenReturn(new SimpleDateFormat("dd-MM-yyyy"));
     when(mockedConfiguration.getTimestampFormat()).thenReturn(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss"));

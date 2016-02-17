@@ -40,6 +40,7 @@ public class ClasspathContentManager extends ContentManagerBase {
   public ClasspathContentManager(ContextDefinition contextDefinition, Configuration configuration, ClasspathFileSystem fileSystem)
       throws ContentManagerException {
     super(contextDefinition, configuration);
+    validateContextDefinition(contextDefinition);
     setFileSystem(fileSystem);
   }
 

@@ -14,11 +14,7 @@
  */
 package net.riezebos.thoth.content.search;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,15 +54,14 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
+import net.riezebos.thoth.configuration.IndexingContext;
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.exceptions.CachemanagerException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.exceptions.IndexerException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.markdown.util.DocumentNode;
-import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class Indexer {
@@ -89,17 +84,11 @@ public class Indexer {
   private Set<String> extensions = new HashSet<>();
   private static Set<String> activeIndexers = new HashSet<>();
 
-  public static void main(String[] args) throws ContentManagerException {
-    Indexer indexer = SearchFactory.getInstance().getIndexer("Erasmus");
-    indexer.index();
-    System.out.println("Done");
-  }
-
   protected Indexer(ContentManager contentManager) throws ContextNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
     this.indexFolder = contentManager.getIndexFolder();
     this.contextFolder = contentManager.getFileHandle("/");
-    this.setIndexExtensions(ConfigurationFactory.getConfiguration().getIndexExtensions());
+    this.setIndexExtensions(getConfiguration().getIndexExtensions());
   }
 
   public void index() throws ContentManagerException {
@@ -150,27 +139,12 @@ public class Indexer {
     }
   }
 
-  protected IndexWriter getWriter(boolean wipeIndex) throws IOException {
-    Directory dir = FSDirectory.open(Paths.get(indexFolder));
-    Analyzer analyzer = new StandardAnalyzer();
-    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-
-    if (wipeIndex) {
-      iwc.setOpenMode(OpenMode.CREATE);
-    } else {
-      iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
-    }
-
-    IndexWriter writer = new IndexWriter(dir, iwc);
-    return writer;
-  }
-
   protected void markUnusedDocuments(Map<String, List<String>> directReverseIndex) throws IOException, ContentManagerException {
 
     String indexFolder = contentManager.getIndexFolder();
 
-    try (IndexWriter writer = getWriter(false); IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)))) {
-      IndexSearcher searcher = new IndexSearcher(reader);
+    try (IndexWriter writer = getWriter(false); IndexReader reader = getIndexReader(indexFolder)) {
+      IndexSearcher searcher = getIndexSearcher(reader);
       for (ContentNode node : contentManager.getUnusedFragments()) {
         TermQuery query = new TermQuery(new Term(Indexer.INDEX_PATH, node.getPath()));
 
@@ -186,27 +160,17 @@ public class Indexer {
     }
   }
 
-  protected void cacheResults(IndexingContext indexingContext) throws ContextNotFoundException, IOException, FileNotFoundException {
-    String reverseIndexFile = contentManager.getReverseIndexFileName();
-    String indirectReverseIndexFile = contentManager.getReverseIndexIndirectFileName();
-    String errorFile = contentManager.getErrorFileName();
-
-    synchronized (CacheManager.getFileLock()) {
-      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(reverseIndexFile)))) {
-        oos.writeObject(indexingContext.getDirectReverseIndex());
-      }
-      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(indirectReverseIndexFile)))) {
-        oos.writeObject(indexingContext.getIndirectReverseIndex());
-      }
-      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(errorFile)))) {
-        oos.writeObject(indexingContext.getErrors());
-      }
-    }
+  protected void cacheResults(IndexingContext indexingContext) throws CachemanagerException {
+    persistCaches(indexingContext);
 
     CacheManager cacheManager = getCacheManager();
     cacheManager.cacheReverseIndex(true, indexingContext.getIndirectReverseIndex());
     cacheManager.cacheReverseIndex(false, indexingContext.getDirectReverseIndex());
     cacheManager.cacheErrors(indexingContext.getErrors());
+  }
+
+  protected void persistCaches(IndexingContext indexingContext) throws CachemanagerException {
+    getCacheManager().persistIndexingContext(indexingContext);
   }
 
   protected CacheManager getCacheManager() {
@@ -357,41 +321,46 @@ public class Indexer {
     return !extensions.contains(pathName.substring(idx + 1).toLowerCase());
   }
 
-  public Map<String, List<String>> getReverseIndex(String context, boolean indirect) throws ContextNotFoundException, ContentManagerException {
-    Map<String, List<String>> reverseIndex = getCacheManager().getReverseIndex(indirect);
-    if (reverseIndex == null)
-      reverseIndex = new HashMap<>();
-    return reverseIndex;
+  /**
+   * Get the actual implementation (Lucene) of the IndexSearcher
+   * 
+   * @param reader
+   * @return
+   */
+  protected IndexSearcher getIndexSearcher(IndexReader reader) {
+    return new IndexSearcher(reader);
   }
 
-  public List<ProcessorError> getValidationErrors() throws IndexerException {
-    List<ProcessorError> validationErrors = getCacheManager().getValidationErrors();
-    if (validationErrors == null)
-      validationErrors = new ArrayList<>();
-    return validationErrors;
+  /**
+   * Get the actual implementation of the DirectoryReader
+   * 
+   * @param indexFolder
+   * @return
+   * @throws IOException
+   */
+  protected IndexReader getIndexReader(String indexFolder) throws IOException {
+    return DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)));
   }
 
-  class IndexingContext {
-    private Map<String, List<String>> indirectReverseIndex = new HashMap<>();
-    private Map<String, List<String>> directReverseIndex = new HashMap<>();
-    private List<ProcessorError> errors = new ArrayList<>();
-    private Set<String> referencedLocalResources = new HashSet<>();
+  /**
+   * Get the actual implementation of the indexWriter
+   * 
+   * @param wipeIndex
+   * @return
+   * @throws IOException
+   */
+  protected IndexWriter getWriter(boolean wipeIndex) throws IOException {
+    Directory dir = FSDirectory.open(Paths.get(indexFolder));
+    Analyzer analyzer = new StandardAnalyzer();
+    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
-    public Map<String, List<String>> getIndirectReverseIndex() {
-      return indirectReverseIndex;
+    if (wipeIndex) {
+      iwc.setOpenMode(OpenMode.CREATE);
+    } else {
+      iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
     }
 
-    public Map<String, List<String>> getDirectReverseIndex() {
-      return directReverseIndex;
-    }
-
-    public List<ProcessorError> getErrors() {
-      return errors;
-    }
-
-    public Set<String> getReferencedLocalResources() {
-      return referencedLocalResources;
-    }
-
+    IndexWriter writer = new IndexWriter(dir, iwc);
+    return writer;
   }
 }

@@ -25,13 +25,9 @@ import org.junit.Test;
 
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
-import net.riezebos.thoth.configuration.CacheManager;
-import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
-import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.testutil.ThothTestBase;
 
 public class ContentManagerBaseTest extends ThothTestBase {
@@ -40,15 +36,10 @@ public class ContentManagerBaseTest extends ThothTestBase {
   public void testContentManagerBase() throws ContentManagerException, IOException {
 
     String contextName = "MockedContext";
-    CacheManager mockedCacheManager = mockCacheManager();
-    Configuration mockedConfiguration = mockConfiguration(mockedCacheManager, contextName);
-    ContextDefinition mockedContext = mockContextDefinition(contextName);
-    ClasspathFileSystem fileSystem = getClasspathFileSystem();
-    ContentManager contentManager = getContentManager(mockedConfiguration, mockedContext, fileSystem);
+    ContentManager contentManager = registerTestContentManager(contextName);
 
-    
     Skin testReposSkin2 = contentManager.getSkinManager().getSkinByName("TestReposSkin2");
-    
+
     assertEquals("/library/TestReposSkin2/", testReposSkin2.getSkinBaseFolder());
     assertEquals("MockedContext/library/TestReposSkin2", testReposSkin2.getBaseUrl());
     assertEquals("MockedContext: classpath based. Will do nothing", contentManager.refresh());

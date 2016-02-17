@@ -125,9 +125,8 @@ public class Searcher {
 
   protected void linkBooks(List<SearchResult> searchResults) throws ContentManagerException {
 
-    SearchFactory searchFactory = SearchFactory.getInstance();
-    Indexer indexer = searchFactory.getIndexer(getContext());
-    Map<String, List<String>> reverseIndexIndirect = indexer.getReverseIndex(getContext(), true);
+    ContentManager contentManager = ContentManagerFactory.getContentManager(getContext());
+    Map<String, List<String>> reverseIndexIndirect = contentManager.getReverseIndex(true);
 
     List<String> bookExtensions = ConfigurationFactory.getConfiguration().getBookExtensions();
     for (SearchResult searchResult : searchResults) {
