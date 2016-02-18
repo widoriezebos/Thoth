@@ -60,7 +60,10 @@ import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.filehandle.BasicFileSystem;
+import net.riezebos.thoth.markdown.filehandle.FileSystem;
 import net.riezebos.thoth.util.PagedList;
+import net.riezebos.thoth.util.ThothCoreUtil;
+import net.riezebos.thoth.util.ThothUtil;
 
 /**
  * Support GIT based version control as the manager for the content
@@ -75,7 +78,11 @@ public class GitContentManager extends ContentManagerBase {
   public GitContentManager(ContextDefinition contextDefinition, Configuration configuration) throws ContentManagerException {
     super(contextDefinition, configuration);
     validateContextDefinition(contextDefinition);
-    setFileSystem(new BasicFileSystem(getContextFolder()));
+    setFileSystem(createFileSystem());
+  }
+
+  protected FileSystem createFileSystem() throws ContextNotFoundException {
+    return new BasicFileSystem(getContextFolder());
   }
 
   @Override
@@ -162,7 +169,7 @@ public class GitContentManager extends ContentManagerBase {
 
   @Override
   public PagedList<Commit> getCommits(String path, int pageNumber, int pageSize) throws ContentManagerException {
-    path = ensureRelative(path);
+    path = ThothUtil.stripPrefix(path, "/");
     try (Git repos = getRepository()) {
       Repository repository = repos.getRepository();
       List<Commit> commits = new ArrayList<>();
@@ -189,17 +196,9 @@ public class GitContentManager extends ContentManagerBase {
     }
   }
 
-  protected String ensureRelative(String path) {
-    if (path == null)
-      return null;
-    if (path.startsWith("/"))
-      path = path.substring(1);
-    return path;
-  }
-
   protected Commit getCommit(Repository repository, RevCommit revCommit, String path)
       throws MissingObjectException, IncorrectObjectTypeException, IOException, UnsupportedEncodingException {
-    path = ensureRelative(path);
+    path = ThothUtil.stripPrefix(path, "/");
 
     Commit commit = new Commit();
     commit.setAuthor(revCommit.getAuthorIdent().getName());
@@ -318,7 +317,7 @@ public class GitContentManager extends ContentManagerBase {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     loader.copyTo(out);
     byte[] byteArray = out.toByteArray();
-    int length = charLength(byteArray);
+    int length = ThothCoreUtil.charLength(byteArray);
 
     String body;
     if (length == -1)
@@ -326,44 +325,6 @@ public class GitContentManager extends ContentManagerBase {
     else
       body = new String(byteArray, "UTF-8");
     return body;
-  }
-
-  /**
-   * Returns the number of UTF-8 characters, or -1 if the array does not contain a valid UTF-8 string. Overlong encodings, null characters, invalid Unicode
-   * values, and surrogates are accepted.
-   */
-  public int charLength(byte[] bytes) {
-    int charCount = 0, expectedLen;
-
-    for (int i = 0; i < bytes.length; i++) {
-      charCount++;
-      // Lead byte analysis
-      if ((bytes[i] & 0b10000000) == 0b00000000)
-        continue;
-      else if ((bytes[i] & 0b11100000) == 0b11000000)
-        expectedLen = 2;
-      else if ((bytes[i] & 0b11110000) == 0b11100000)
-        expectedLen = 3;
-      else if ((bytes[i] & 0b11111000) == 0b11110000)
-        expectedLen = 4;
-      else if ((bytes[i] & 0b11111100) == 0b11111000)
-        expectedLen = 5;
-      else if ((bytes[i] & 0b11111110) == 0b11111100)
-        expectedLen = 6;
-      else
-        return -1;
-
-      // Count trailing bytes
-      while (--expectedLen > 0) {
-        if (++i >= bytes.length) {
-          return -1;
-        }
-        if ((bytes[i] & 0b11000000) != 0b10000000) {
-          return -1;
-        }
-      }
-    }
-    return charCount;
   }
 
   protected CredentialsProvider getCredentialsProvider() {
@@ -400,7 +361,7 @@ public class GitContentManager extends ContentManagerBase {
   }
 
   public String getContextFolder() throws ContextNotFoundException {
-    Configuration config = ConfigurationFactory.getConfiguration();
+    Configuration config = getConfiguration();
     return config.getWorkspaceLocation() + getContextName() + "/";
   }
 

@@ -18,11 +18,23 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import net.riezebos.thoth.commands.BrowseCommandTest;
+import net.riezebos.thoth.commands.ContextIndexCommandTest;
+import net.riezebos.thoth.commands.DiffCommandTest;
+import net.riezebos.thoth.commands.ErrorPageCommandTest;
+import net.riezebos.thoth.commands.IndexCommandTest;
+import net.riezebos.thoth.commands.MetaCommandTest;
+import net.riezebos.thoth.commands.PullCommandTest;
+import net.riezebos.thoth.commands.ReindexCommandTest;
+import net.riezebos.thoth.commands.RevisionsCommandTest;
+import net.riezebos.thoth.commands.SearchCommandTest;
+import net.riezebos.thoth.commands.ValidationReportCommandTest;
 import net.riezebos.thoth.configuration.CacheManagerTest;
 import net.riezebos.thoth.configuration.PropertyBasedConfigurationTest;
 import net.riezebos.thoth.content.AutoRefresherTest;
 import net.riezebos.thoth.content.ContentManagerBaseTest;
 import net.riezebos.thoth.content.ContentManagerFactoryTest;
+import net.riezebos.thoth.content.impl.GitContentManagerTest;
 import net.riezebos.thoth.content.search.FragmentTest;
 import net.riezebos.thoth.content.search.IndexerTest;
 import net.riezebos.thoth.content.search.SearcherTest;
@@ -40,8 +52,11 @@ import net.riezebos.thoth.util.DiscardingListTest;
 @SuiteClasses({PropertyBasedConfigurationTest.class, ContentManagerBaseTest.class, SkinManagerTest.class, //
     HtmlRendererTest.class, CustomRendererTest.class, RawRendererTest.class, ThothServletTest.class, //
     FragmentTest.class, IndexerTest.class, AutoRefresherTest.class, ContentManagerFactoryTest.class, //
-    ExceptionTest.class, CommitTest.class, SourceDiffTest.class, SearcherTest.class, CacheManagerTest.class,//
-    DiscardingListTest.class})
+    ExceptionTest.class, CommitTest.class, SourceDiffTest.class, SearcherTest.class, CacheManagerTest.class, //
+    DiscardingListTest.class, BrowseCommandTest.class, ContextIndexCommandTest.class, //
+    DiffCommandTest.class, ErrorPageCommandTest.class, IndexCommandTest.class, MetaCommandTest.class, //
+    PullCommandTest.class, ReindexCommandTest.class, RevisionsCommandTest.class, SearchCommandTest.class, //
+    ValidationReportCommandTest.class, GitContentManagerTest.class})
 
 public class AllCoreTests {
 

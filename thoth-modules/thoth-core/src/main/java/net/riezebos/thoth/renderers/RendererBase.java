@@ -105,7 +105,7 @@ public abstract class RendererBase implements Renderer {
 
     try (PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8")), true)) {
       VelocityContext velocityContext = new VelocityContext(variables);
-      velocityContext.put(VELOCITY_HELPER, new ThothCoreUtil());
+      velocityContext.put(VELOCITY_HELPER, new ThothCoreUtil(getConfiguration()));
       VelocityEngine engine = new VelocityEngine();
       Properties properties = new Properties();
       properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(VELOCITY_PROPERTIES));

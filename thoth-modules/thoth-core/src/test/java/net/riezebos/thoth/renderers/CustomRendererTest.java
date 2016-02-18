@@ -25,8 +25,6 @@ import org.junit.Test;
 
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.skinning.Skin;
-import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
@@ -43,8 +41,6 @@ public class CustomRendererTest extends ThothTestBase {
 
     ContentManager contentManager = registerTestContentManager(contextName);
     Configuration configuration = contentManager.getConfiguration();
-    SkinManager skinManager = contentManager.getSkinManager();
-    Skin testSkin = skinManager.getSkinByName("TestReposSkin1");
 
     CustomRendererDefinition def = new CustomRendererDefinition(extension, contentType, commandLine);
     TestCustomRenderer renderer = new TestCustomRenderer(def);
@@ -52,8 +48,8 @@ public class CustomRendererTest extends ThothTestBase {
 
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    Map<String, Object> arguments = getParameters(configuration, contextName, testSkin, path);
-    renderer.execute(contextName, path, arguments, testSkin, outputStream);
+    Map<String, Object> arguments = getParameters(contentManager, path);
+    renderer.execute(contextName, path, arguments, getSkin(contentManager), outputStream);
     String result = outputStream.toString("UTF-8").trim();
     assertEquals("rendered", result);
     assertEquals(contentType, renderer.getContentType(new HashMap<String, Object>()));

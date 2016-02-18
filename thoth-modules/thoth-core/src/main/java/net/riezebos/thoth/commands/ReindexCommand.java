@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 
@@ -45,8 +46,7 @@ public class ReindexCommand extends RendererBase implements Command {
       if (StringUtils.isBlank(context))
         ContentManagerFactory.getInstance().reindexAll();
       else {
-        ContentManager contentManager = getContentManager(context);
-        contentManager.reindex();
+        reindex(context);
       }
       Map<String, Object> variables = new HashMap<>(arguments);
       String log = "Reindex reuested. Running in the background";
@@ -64,5 +64,10 @@ public class ReindexCommand extends RendererBase implements Command {
     } catch (Exception e) {
       throw new RenderException(e);
     }
+  }
+
+  protected void reindex(String context) throws ContentManagerException {
+    ContentManager contentManager = getContentManager(context);
+    contentManager.reindex();
   }
 }

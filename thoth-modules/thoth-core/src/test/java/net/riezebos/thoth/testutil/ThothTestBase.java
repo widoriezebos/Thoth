@@ -54,8 +54,10 @@ import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.exceptions.SkinManagerException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.renderers.Renderer;
@@ -86,7 +88,9 @@ public class ThothTestBase {
     ContextDefinition mockedContext = mockContextDefinition(contextName);
     ClasspathFileSystem fileSystem = getClasspathFileSystem();
     ContentManager contentManager = getContentManager(mockedConfiguration, mockedContext, fileSystem);
-    ContentManagerFactory.getInstance().registerContentManager(contentManager);
+    ContentManagerFactory contentManagerFactory = ContentManagerFactory.getInstance();
+    contentManagerFactory.registerContentManager(contentManager);
+    contentManagerFactory.setConfiguration(mockedConfiguration);
     return contentManager;
   }
 
@@ -215,9 +219,18 @@ public class ThothTestBase {
     return result;
   }
 
-  protected Map<String, Object> getParameters(Configuration configuration, String contextName, Skin skin, String path) {
+  protected Skin getSkin(ContentManager contentManager) throws SkinManagerException {
+    SkinManager skinManager = contentManager.getSkinManager();
+    return skinManager.getSkinByName("TestReposSkin1");
+  }
+
+  protected Map<String, Object> getParameters(ContentManager contentManager, String path) throws SkinManagerException {
     Map<String, Object> result = new HashMap<>();
 
+    String contextName = contentManager.getContextName();
+    Configuration configuration = contentManager.getConfiguration();
+
+    Skin skin = getSkin(contentManager);
     String skinBase = null;
     if (skin != null) {
       String baseUrl = skin.getBaseUrl();

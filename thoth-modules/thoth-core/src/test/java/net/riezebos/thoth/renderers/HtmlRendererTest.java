@@ -26,7 +26,6 @@ import org.junit.Test;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
-import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.Renderer.RenderResult;
@@ -40,15 +39,14 @@ public class HtmlRendererTest extends ThothTestBase {
 
     ContentManager contentManager = registerTestContentManager(contextName);
     Configuration configuration = contentManager.getConfiguration();
-    SkinManager skinManager = contentManager.getSkinManager();
-    Skin testSkin = skinManager.getSkinByName("TestReposSkin1");
+    Skin testSkin = getSkin(contentManager);
 
     HtmlRenderer renderer = new HtmlRenderer();
     renderer.setConfiguration(configuration);
 
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    Map<String, Object> arguments = getParameters(configuration, contextName, testSkin, path);
+    Map<String, Object> arguments = getParameters(contentManager, path);
     renderer.execute(contextName, path, arguments, testSkin, outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Fourth.expected.html");
@@ -59,23 +57,21 @@ public class HtmlRendererTest extends ThothTestBase {
     RenderResult renderResult = renderer.execute(contextName, "/wrong/path.md", arguments, testSkin, outputStream);
     assertEquals(RenderResult.NOT_FOUND, renderResult);
   }
-  
+
   @Test
   public void testTable() throws ContextNotFoundException, ContentManagerException, IOException {
 
     String contextName = "TestContext";
     ContentManager contentManager = registerTestContentManager(contextName);
     Configuration configuration = contentManager.getConfiguration();
-    SkinManager skinManager = contentManager.getSkinManager();
-    Skin testSkin = skinManager.getSkinByName("TestReposSkin1");
 
     HtmlRenderer renderer = new HtmlRenderer();
     renderer.setConfiguration(configuration);
 
     String path = "/main/Table.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    Map<String, Object> arguments = getParameters(configuration, contextName, testSkin, path);
-    renderer.execute(contextName, path, arguments, testSkin, outputStream);
+    Map<String, Object> arguments = getParameters(contentManager, path);
+    renderer.execute(contextName, path, arguments, getSkin(contentManager), outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Table.expected.html");
     assertEquals(expected, result);

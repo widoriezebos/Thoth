@@ -25,7 +25,9 @@ import org.apache.commons.lang3.StringUtils;
 import net.riezebos.thoth.content.search.SearchResult;
 import net.riezebos.thoth.content.search.Searcher;
 import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.exceptions.SearchException;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.util.PagedList;
 
@@ -47,12 +49,11 @@ public class SearchCommand extends RendererBase implements Command {
       boolean hasMore = false;
 
       try {
-        Searcher searcher = new Searcher(getContentManager(context));
         if (StringUtils.isBlank(query))
           errorMessage = "Do you feel lucky?";
         else {
           int pageSize = getConfiguration().getMaxSearchResults();
-          PagedList<SearchResult> pagedList = searcher.search(query, pageNumber, pageSize);
+          PagedList<SearchResult> pagedList = search(context, query, pageNumber, pageSize);
           searchResults.addAll(pagedList.getList());
           hasMore = pagedList.hasMore();
         }
@@ -81,6 +82,12 @@ public class SearchCommand extends RendererBase implements Command {
     } catch (Exception e) {
       throw new RenderException(e);
     }
+  }
+
+  protected PagedList<SearchResult> search(String context, String query, Integer pageNumber, int pageSize) throws ContentManagerException, SearchException {
+    Searcher searcher = new Searcher(getContentManager(context));
+    PagedList<SearchResult> pagedList = searcher.search(query, pageNumber, pageSize);
+    return pagedList;
   }
 
 }
