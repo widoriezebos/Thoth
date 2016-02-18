@@ -54,7 +54,7 @@ public interface ContentManager {
 
   List<ContentNode> list(String path) throws ContextNotFoundException, IOException;
 
-  public List<ContentNode> find(String fileSpec, boolean recursive) throws ContextNotFoundException, IOException;
+  public List<ContentNode> find(String fileSpec, boolean recursive) throws IOException;
 
   List<ContentNode> getUnusedFragments() throws IOException, ContentManagerException;
 

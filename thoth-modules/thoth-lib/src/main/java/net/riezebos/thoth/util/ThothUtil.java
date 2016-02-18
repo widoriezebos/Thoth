@@ -15,10 +15,12 @@
 package net.riezebos.thoth.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -387,5 +389,14 @@ public class ThothUtil {
     } catch (IOException e) {
       return "unknown";
     }
+  }
+
+  public static String getStack() {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+    PrintWriter pw = new PrintWriter(bos);
+    new Exception().printStackTrace(pw);
+    pw.close();
+    return bos.toString();
   }
 }

@@ -34,7 +34,6 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class PropertyBasedConfiguration extends ConfigurationBase implements Configuration {
 
-  private static final String DEFAULT_TIMESTAMP_FMT = "dd-MM-yyyy HH:mm:ss";
   private static final String DEFAULT_DATE_FMT = "dd-MM-yyyy";
 
   private static final Logger LOG = LoggerFactory.getLogger(PropertyBasedConfiguration.class);

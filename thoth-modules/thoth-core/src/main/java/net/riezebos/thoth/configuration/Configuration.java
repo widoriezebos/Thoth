@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 
 public interface Configuration {
+
+  public static final String DEFAULT_TIMESTAMP_FMT = "dd-MM-yyyy HH:mm:ss";
 
   public static final String BUILT_PROPERTIES = "net/riezebos/thoth/default.configuration.properties";
   public static final String WORKSPACELOCATION = "workspacelocation";
@@ -22,18 +25,18 @@ public interface Configuration {
    * 
    * @param context
    * @return
-   * @throws ContextNotFoundException 
+   * @throws ContextNotFoundException
    */
-  public CacheManager getCacheManager(String context) throws ContextNotFoundException;
+  public CacheManager getCacheManager(ContentManager contentManager);
 
   /**
    * Expires the cache for the given context
    * 
    * @param context
    * @return
-   * @throws ContextNotFoundException 
+   * @throws ContextNotFoundException
    */
-  public void expireCache(String context) throws ContextNotFoundException;
+  public void expireCache(ContentManager contentManager);
 
   /**
    * Image recognition. Set (comma separated) the extensions (without the '.') below to determine whether a matching resource will be treated as an image
@@ -283,6 +286,7 @@ public interface Configuration {
 
   /**
    * Returns true is the provided name references a known context
+   * 
    * @param name
    * @return
    */

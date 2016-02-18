@@ -16,17 +16,19 @@ package net.riezebos.thoth.configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.CachemanagerException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -38,20 +40,33 @@ public class CacheManager {
 
   private Map<String, Map<String, List<String>>> reverseIndexes = new HashMap<>();
   private Map<String, List<ProcessorError>> errorMap = new HashMap<>();
-  private String context;
+  private ContentManager contentManager;
 
-  protected CacheManager(String context) {
-    this.setContext(context);
+  protected CacheManager(ContentManager contentManager) {
+    this.contentManager = contentManager;
   }
 
   public static Object getFileLock() {
     return fileLock;
   }
 
+  protected InputStream createInputStream(String resourcePath) throws FileNotFoundException {
+    return new FileInputStream(resourcePath);
+  }
+
+  protected OutputStream createOutputStream(String resourcePath) throws FileNotFoundException {
+    return new FileOutputStream(new File(resourcePath));
+  }
+
+  protected void deleteFile(String fileName) {
+    File file = new File(fileName);
+    file.delete();
+  }
+
   /**
    * Returns a 'used by' map for documents. Returns null when indexing has not yet completed (ever) for the given context.
    *
-   * @param context
+   * @param contextName
    * @return
    * @throws ContextNotFoundException
    * @throws ContentManagerException
@@ -67,40 +82,39 @@ public class CacheManager {
 
     try {
       if (map == null) {
-        String indexFileName = indirect ? getContentManager(getContext()).getReverseIndexIndirectFileName()//
-            : getContentManager(getContext()).getReverseIndexFileName();
+        String indexFileName = indirect ? getContentManager().getReverseIndexIndirectFileName()//
+            : getContentManager().getReverseIndexFileName();
 
-        File reverseIndexFile = new File(indexFileName);
-        if (reverseIndexFile.isFile()) {
-          synchronized (fileLock) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(reverseIndexFile))) {
+        synchronized (fileLock) {
+          InputStream inputStream = createInputStream(indexFileName);
+          if (inputStream != null)
+            try (ObjectInputStream ois = new ObjectInputStream(inputStream)) {
               map = (Map<String, List<String>>) ois.readObject();
               cacheReverseIndex(indirect, map);
             }
-          }
         }
       }
     } catch (IOException | ClassNotFoundException | ContextNotFoundException e) {
-      throw new CachemanagerException(getContext());
+      throw new CachemanagerException(getContextName());
     }
     return map;
   }
 
   public void persistIndexingContext(IndexingContext indexingContext) throws CachemanagerException {
     try {
-      ContentManager contentManager = getContentManager(context);
+      ContentManager contentManager = getContentManager();
       String reverseIndexFile = contentManager.getReverseIndexFileName();
       String indirectReverseIndexFile = contentManager.getReverseIndexIndirectFileName();
       String errorFile = contentManager.getErrorFileName();
 
-      synchronized (CacheManager.getFileLock()) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(reverseIndexFile)))) {
+      synchronized (getFileLock()) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(createOutputStream(reverseIndexFile))) {
           oos.writeObject(indexingContext.getDirectReverseIndex());
         }
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(indirectReverseIndexFile)))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(createOutputStream(indirectReverseIndexFile))) {
           oos.writeObject(indexingContext.getIndirectReverseIndex());
         }
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(errorFile)))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(createOutputStream(errorFile))) {
           oos.writeObject(indexingContext.getErrors());
         }
       }
@@ -113,45 +127,36 @@ public class CacheManager {
   public List<ProcessorError> getValidationErrors() throws CachemanagerException {
     List<ProcessorError> errors;
     synchronized (errorMap) {
-      errors = errorMap.get(getContext());
+      errors = errorMap.get(getContextName());
     }
 
     try {
       if (errors == null) {
-        String errorFileName = getContentManager(getContext()).getErrorFileName();
+        String errorFileName = getContentManager().getErrorFileName();
 
-        File errorFile = new File(errorFileName);
-        if (errorFile.isFile()) {
-          synchronized (fileLock) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(errorFile))) {
+        synchronized (fileLock) {
+          InputStream inputStream = createInputStream(errorFileName);
+          if (inputStream != null)
+            try (ObjectInputStream ois = new ObjectInputStream(inputStream)) {
               errors = (List<ProcessorError>) ois.readObject();
               cacheErrors(errors);
             } catch (ClassNotFoundException e) {
               // This is no doubt caused by loading an old version of the serialized object stream.
               // Let's ignore it and delete the file. Will be fine after the next re-index
-              errorFile.delete();
+              deleteFile(errorFileName);
               errors = new ArrayList<ProcessorError>();
               errors.add(new ProcessorError(new LineInfo(".", 0), "Error messages out of date. Please reindex"));
             }
-          }
         }
       }
     } catch (IOException | ContextNotFoundException e) {
-      throw new CachemanagerException(getContext() + ": " + e.getMessage(), e);
+      throw new CachemanagerException(getContextName() + ": " + e.getMessage(), e);
     }
     return errors;
   }
 
-  public ContentManager getContentManager(String context) throws CachemanagerException {
-    try {
-      return ContentManagerFactory.getInstance().getContentManager(context);
-    } catch (ContentManagerException e) {
-      throw new CachemanagerException(e);
-    }
-  }
-
   protected String getCacheKey(boolean indirect) {
-    String key = indirect + getContext();
+    String key = indirect + getContextName();
     return key;
   }
 
@@ -164,20 +169,20 @@ public class CacheManager {
 
   public void cacheErrors(List<ProcessorError> errors) {
     synchronized (errorMap) {
-      errorMap.put(getContext(), errors);
+      errorMap.put(getContextName(), errors);
     }
   }
 
-  private String getContext() {
-    return context;
+  private String getContextName() {
+    return getContentManager().getContextName();
   }
 
-  private void setContext(String context) {
-    this.context = context;
+  public ContentManager getContentManager() {
+    return contentManager;
   }
 
   @Override
   public String toString() {
-    return "Cache for " + getContext();
+    return "Cache for " + getContextName();
   }
 }

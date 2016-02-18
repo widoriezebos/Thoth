@@ -18,6 +18,7 @@ import java.io.Serializable;
 
 public class ProcessorError implements Serializable, Comparable<ProcessorError> {
 
+
   private static final long serialVersionUID = 1L;
 
   private LineInfo currentLineInfo;
@@ -68,5 +69,36 @@ public class ProcessorError implements Serializable, Comparable<ProcessorError> 
   @Override
   public int compareTo(ProcessorError o) {
     return getDescription().compareTo(o.getDescription());
+  }
+  
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((currentLineInfo == null) ? 0 : currentLineInfo.hashCode());
+    result = prime * result + ((errorMessage == null) ? 0 : errorMessage.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    ProcessorError other = (ProcessorError) obj;
+    if (currentLineInfo == null) {
+      if (other.currentLineInfo != null)
+        return false;
+    } else if (!currentLineInfo.equals(other.currentLineInfo))
+      return false;
+    if (errorMessage == null) {
+      if (other.errorMessage != null)
+        return false;
+    } else if (!errorMessage.equals(other.errorMessage))
+      return false;
+    return true;
   }
 }

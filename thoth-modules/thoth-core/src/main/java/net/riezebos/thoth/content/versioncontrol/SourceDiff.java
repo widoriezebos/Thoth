@@ -14,7 +14,14 @@
  */
 package net.riezebos.thoth.content.versioncontrol;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.util.diff_match_patch;
+import net.riezebos.thoth.util.diff_match_patch.Diff;
 
 /**
  * @author wido
@@ -27,11 +34,10 @@ public class SourceDiff {
   private String commitMessage;
 
   public SourceDiff(String author, String oldSource, String newSource, Date timeModified) {
-    super();
-    this.author = author;
-    this.oldSource = oldSource;
-    this.newSource = newSource;
-    this.timeModified = timeModified;
+    setAuthor(author);
+    setOldSource(oldSource);
+    setNewSource(newSource);
+    setTimeModified(timeModified);
   }
 
   public String getOldSource() {
@@ -74,8 +80,18 @@ public class SourceDiff {
     this.commitMessage = commitMessage;
   }
 
+  public List<Diff> getDiffs() {
+    diff_match_patch dmp = new diff_match_patch();
+    LinkedList<Diff> diffs = dmp.diff_main(oldSource == null ? "" : oldSource, newSource == null ? "" : newSource);
+    dmp.diff_cleanupSemantic(diffs);
+    return diffs;
+  }
+
   @Override
   public String toString() {
-    return getTimeModified() + ": " + getAuthor();
+    SimpleDateFormat sdf = new SimpleDateFormat(Configuration.DEFAULT_TIMESTAMP_FMT);
+    String timestamp = getTimeModified() == null ? "null" : sdf.format(getTimeModified());
+
+    return timestamp + ": " + getAuthor();
   }
 }

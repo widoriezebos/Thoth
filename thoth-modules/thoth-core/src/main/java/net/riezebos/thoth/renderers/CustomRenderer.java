@@ -39,9 +39,6 @@ public class CustomRenderer extends RendererBase implements Renderer {
   private String contentType;
   private String commandLine;
 
-  public CustomRenderer() {
-  }
-
   public CustomRenderer(CustomRendererDefinition definition) {
     setTypeCode(definition.getExtension());
     setContentType(definition.getContentType());

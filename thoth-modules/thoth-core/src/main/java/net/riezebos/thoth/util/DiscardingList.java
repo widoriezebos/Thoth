@@ -1,5 +1,6 @@
 package net.riezebos.thoth.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -43,9 +44,8 @@ public class DiscardingList<T> implements List<T> {
     return new Object[0];
   }
 
-  @Override
   public <T2> T2[] toArray(T2[] a) {
-    throw new IllegalArgumentException("Not implemented");
+    return new ArrayList<>().toArray(a);
   }
 
   @Override
@@ -109,27 +109,27 @@ public class DiscardingList<T> implements List<T> {
 
   @Override
   public int indexOf(Object o) {
-    return 0;
+    return -1;
   }
 
   @Override
   public int lastIndexOf(Object o) {
-    return 0;
+    return -1;
   }
 
   @Override
   public ListIterator<T> listIterator() {
-    return null;
+    return new ArrayList<T>().listIterator();
   }
 
   @Override
   public ListIterator<T> listIterator(int index) {
-    return null;
+    return new ArrayList<T>().listIterator();
   }
 
   @Override
   public List<T> subList(int fromIndex, int toIndex) {
-    return null;
+    return new ArrayList<T>();
   }
 
 }

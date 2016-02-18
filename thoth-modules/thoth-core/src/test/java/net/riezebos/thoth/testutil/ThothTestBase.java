@@ -14,6 +14,7 @@
  */
 package net.riezebos.thoth.testutil;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -94,7 +95,7 @@ public class ThothTestBase {
     when(mockedRepos.getLocation()).thenReturn("/");
     when(mockedRepos.getName()).thenReturn("MockedRepos");
     when(mockedRepos.getType()).thenReturn("nop");
-    
+
     ContextDefinition mockedContext = mock(ContextDefinition.class);
     when(mockedContext.getRepositoryDefinition()).thenReturn(mockedRepos);
     when(mockedContext.getName()).thenReturn(contextName);
@@ -114,7 +115,7 @@ public class ThothTestBase {
     when(mockedConfiguration.isFragment(anyString())).thenReturn(true);
     when(mockedConfiguration.getDateFormat()).thenReturn(new SimpleDateFormat("dd-MM-yyyy"));
     when(mockedConfiguration.getTimestampFormat()).thenReturn(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss"));
-    when(mockedConfiguration.getCacheManager(anyString())).thenReturn(mockedCacheManager);
+    when(mockedConfiguration.getCacheManager(any())).thenReturn(mockedCacheManager);
     when(mockedConfiguration.getParseTimeOut()).thenReturn(4000L);
     when(mockedConfiguration.getMarkdownOptions()).thenReturn(2098159);
     when(mockedConfiguration.isValidContext(contextName)).thenReturn(true);

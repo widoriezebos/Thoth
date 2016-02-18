@@ -14,6 +14,7 @@
  */
 package net.riezebos.thoth.content.search;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,30 +40,29 @@ import org.apache.lucene.search.highlight.TextFragment;
 import org.apache.lucene.store.FSDirectory;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.SearchException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.util.PagedList;
 import net.riezebos.thoth.util.ThothCoreUtil;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class Searcher {
 
-  private String context;
+  private ContentManager contentManager;
 
-  protected Searcher(String context) {
-    this.setContext(context);
+  public Searcher(ContentManager contentManager) {
+    this.contentManager = contentManager;
   }
 
   public PagedList<SearchResult> search(String queryExpression, int pageNumber, int pageSize) throws SearchException {
     try {
-      ContentManager contentManager = ContentManagerFactory.getInstance().getContentManager(getContext());
-      String indexFolder = contentManager.getIndexFolder();
-      IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)));
-      IndexSearcher searcher = new IndexSearcher(reader);
+      IndexReader reader = getIndexReader(contentManager);
+      IndexSearcher searcher = getIndexSearcher(reader);
       Analyzer analyzer = new StandardAnalyzer();
 
       QueryParser parser = new QueryParser(Indexer.INDEX_CONTENTS, analyzer);
@@ -89,7 +89,8 @@ public class Searcher {
           searchResult.setIndexNumber((pageNumber - 1) * pageSize + idx);
           searchResult.setDocument(documentPath);
 
-          if (Indexer.TYPE_DOCUMENT.equals(document.get(Indexer.INDEX_TYPE))) {
+          String type = document.get(Indexer.INDEX_TYPE);
+          if (Indexer.TYPE_DOCUMENT.equals(type)) {
             searchResult.setResource(false);
             MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(documentPath, true, CriticProcessingMode.DO_NOTHING);
             String contents = markDownDocument.getMarkdown();
@@ -123,15 +124,25 @@ public class Searcher {
     }
   }
 
+  protected IndexSearcher getIndexSearcher(IndexReader reader) {
+    IndexSearcher searcher = new IndexSearcher(reader);
+    return searcher;
+  }
+
+  protected IndexReader getIndexReader(ContentManager contentManager) throws ContextNotFoundException, IOException {
+    String indexFolder = contentManager.getIndexFolder();
+    IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)));
+    return reader;
+  }
+
   protected void linkBooks(List<SearchResult> searchResults) throws ContentManagerException {
 
-    ContentManager contentManager = ContentManagerFactory.getInstance().getContentManager(getContext());
     Map<String, List<String>> reverseIndexIndirect = contentManager.getReverseIndex(true);
 
-    List<String> bookExtensions = ConfigurationFactory.getConfiguration().getBookExtensions();
+    List<String> bookExtensions = getConfiguration().getBookExtensions();
     for (SearchResult searchResult : searchResults) {
       String document = searchResult.getDocument();
-      List<String> list = reverseIndexIndirect.get("/" + document);
+      List<String> list = reverseIndexIndirect.get(ThothUtil.prefix(document, "/"));
       if (list != null) {
         for (String name : list) {
           int idx = name.lastIndexOf('.');
@@ -146,12 +157,8 @@ public class Searcher {
     }
   }
 
-  public String getContext() {
-    return context;
-  }
-
-  private void setContext(String context) {
-    this.context = context;
+  protected Configuration getConfiguration() {
+    return contentManager.getConfiguration();
   }
 
 }

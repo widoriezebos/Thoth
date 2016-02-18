@@ -16,8 +16,8 @@ package net.riezebos.thoth.commands;
 
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +27,6 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
-import net.riezebos.thoth.util.diff_match_patch;
 import net.riezebos.thoth.util.diff_match_patch.Diff;
 
 public class DiffCommand extends RendererBase implements Command {
@@ -49,20 +48,15 @@ public class DiffCommand extends RendererBase implements Command {
       String timestamp = "00-00-0000 00:00:00";
       String commitMessage = "Commit not found";
       String author = "Diff not found";
-      LinkedList<Diff> diffs = new LinkedList<>();
+      List<Diff> diffs = new ArrayList<>();
       if (diff != null) {
         timestamp = dateFormat.format(diff.getTimeModified());
-
-        String newSource = diff.getNewSource();
-        String oldSource = diff.getOldSource();
         commitMessage = diff.getCommitMessage();
         author = diff.getAuthor();
         if (commitMessage != null)
           commitMessage = commitMessage.trim();
 
-        diff_match_patch dmp = new diff_match_patch();
-        diffs = dmp.diff_main(oldSource, newSource);
-        dmp.diff_cleanupSemantic(diffs);
+        diffs = diff.getDiffs();
         body = prettyPrintHtml(diffs);
       }
       boolean asJson = asJson(arguments);

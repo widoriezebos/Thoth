@@ -28,7 +28,7 @@ public class Fragment {
   }
 
   public void setText(String text) {
-    this.text = text.trim();
+    this.text = text == null ? null : text.trim();
   }
 
   @Override

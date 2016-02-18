@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.content.search.SearchResult;
 import net.riezebos.thoth.content.search.Searcher;
 import net.riezebos.thoth.content.skinning.Skin;
@@ -48,7 +47,7 @@ public class SearchCommand extends RendererBase implements Command {
       boolean hasMore = false;
 
       try {
-        Searcher searcher = SearchFactory.getInstance().getSearcher(context);
+        Searcher searcher = new Searcher(getContentManager(context));
         if (StringUtils.isBlank(query))
           errorMessage = "Do you feel lucky?";
         else {

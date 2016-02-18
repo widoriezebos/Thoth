@@ -84,7 +84,7 @@ public class Indexer {
   private Set<String> extensions = new HashSet<>();
   private static Set<String> activeIndexers = new HashSet<>();
 
-  protected Indexer(ContentManager contentManager) throws ContextNotFoundException, ContentManagerException {
+  public Indexer(ContentManager contentManager) throws ContextNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
     this.indexFolder = contentManager.getIndexFolder();
     this.contextFolder = contentManager.getFileHandle("/");
@@ -174,12 +174,7 @@ public class Indexer {
   }
 
   protected CacheManager getCacheManager() {
-    try {
-      CacheManager cacheManager = getConfiguration().getCacheManager(contentManager.getContextName());
-      return cacheManager;
-    } catch (ContextNotFoundException e) {
-      throw new IllegalArgumentException(e);
-    }
+    return getConfiguration().getCacheManager(contentManager);
   }
 
   protected Configuration getConfiguration() {

@@ -231,7 +231,6 @@ public class GitContentManager extends ContentManagerBase {
           treeWalk.setFilter(PathFilter.create(path));
           if (treeWalk.next()) {
             Revision fileRevision = new Revision(Action.ADD, path);
-            fileRevision.setCommitMessage(revCommit.getFullMessage());
             fileRevision.setCommitId(ObjectId.toString(revCommit.getId()) + "/" + path);
             commit.addRevision(fileRevision);
           }
@@ -306,7 +305,7 @@ public class GitContentManager extends ContentManagerBase {
   protected Revision createFileRevision(DiffEntry diff, SimpleDiffFormatter df, RevCommit revCommit) throws IOException, UnsupportedEncodingException {
     Action action = translateAction(diff.getChangeType());
     Revision fileRevision = new Revision(action, action.equals(Action.DELETE) ? diff.getOldPath() : diff.getNewPath());
-    fileRevision.setCommitMessage(revCommit.getFullMessage());
+    fileRevision.setMessage(revCommit.getFullMessage());
     fileRevision.setCommitId(ObjectId.toString(revCommit.getId()) + "/" + diff.getNewPath());
     return fileRevision;
   }

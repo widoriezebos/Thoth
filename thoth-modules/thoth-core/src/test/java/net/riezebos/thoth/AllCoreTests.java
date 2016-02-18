@@ -18,24 +18,30 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import net.riezebos.thoth.configuration.CacheManagerTest;
 import net.riezebos.thoth.configuration.PropertyBasedConfigurationTest;
 import net.riezebos.thoth.content.AutoRefresherTest;
 import net.riezebos.thoth.content.ContentManagerBaseTest;
 import net.riezebos.thoth.content.ContentManagerFactoryTest;
 import net.riezebos.thoth.content.search.FragmentTest;
 import net.riezebos.thoth.content.search.IndexerTest;
+import net.riezebos.thoth.content.search.SearcherTest;
 import net.riezebos.thoth.content.skinning.SkinManagerTest;
+import net.riezebos.thoth.content.versioncontrol.CommitTest;
+import net.riezebos.thoth.content.versioncontrol.SourceDiffTest;
 import net.riezebos.thoth.exceptions.ExceptionTest;
 import net.riezebos.thoth.renderers.CustomRendererTest;
 import net.riezebos.thoth.renderers.HtmlRendererTest;
 import net.riezebos.thoth.renderers.RawRendererTest;
 import net.riezebos.thoth.servlets.ThothServletTest;
+import net.riezebos.thoth.util.DiscardingListTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({PropertyBasedConfigurationTest.class, ContentManagerBaseTest.class, SkinManagerTest.class, //
     HtmlRendererTest.class, CustomRendererTest.class, RawRendererTest.class, ThothServletTest.class, //
     FragmentTest.class, IndexerTest.class, AutoRefresherTest.class, ContentManagerFactoryTest.class, //
-    ExceptionTest.class})
+    ExceptionTest.class, CommitTest.class, SourceDiffTest.class, SearcherTest.class, CacheManagerTest.class,//
+    DiscardingListTest.class})
 
 public class AllCoreTests {
 

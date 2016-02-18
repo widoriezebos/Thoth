@@ -40,7 +40,6 @@ import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.content.search.Indexer;
-import net.riezebos.thoth.content.search.SearchFactory;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.CachemanagerException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -152,27 +151,23 @@ public abstract class ContentManagerBase implements ContentManager {
 
   protected void notifyContextContentsChanged() {
 
-    try {
-      getConfiguration().expireCache(getContextName());
-      skinManager = null;
+    getConfiguration().expireCache(this);
+    skinManager = null;
 
-      Thread indexerThread = new Thread() {
-        public void run() {
-          try {
-            Indexer indexer = SearchFactory.getInstance().getIndexer(getContextName());
-            indexer.setIndexExtensions(getConfiguration().getIndexExtensions());
-            indexer.index();
-          } catch (ContentManagerException e) {
-            LOG.error(e.getMessage(), e);
-          }
+    Thread indexerThread = new Thread() {
+      public void run() {
+        try {
+          Indexer indexer = new Indexer(ContentManagerBase.this);
+          indexer.setIndexExtensions(getConfiguration().getIndexExtensions());
+          indexer.index();
+        } catch (ContentManagerException e) {
+          LOG.error(e.getMessage(), e);
         }
-      };
+      }
+    };
 
-      indexerThread.start();
-      LOG.info("Contents updated. Launched indexer thread for context " + getContextName());
-    } catch (ContextNotFoundException e) {
-      LOG.error("Context not found (or valid anynmore): " + getContextName(), e);
-    }
+    indexerThread.start();
+    LOG.info("Contents updated. Launched indexer thread for context " + getContextName());
   }
 
   @Override
@@ -348,7 +343,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
-  public List<ContentNode> find(String fileSpec, boolean recursive) throws ContextNotFoundException, IOException {
+  public List<ContentNode> find(String fileSpec, boolean recursive) throws IOException {
     List<ContentNode> result = new ArrayList<>();
 
     String folder = ThothUtil.getFolder(fileSpec);
@@ -426,13 +421,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   protected CacheManager getCachemanager() {
-    try {
-      return getConfiguration().getCacheManager(getContextName());
-    } catch (ContextNotFoundException e) {
-      // Since this can never happen because without a valid context there will be no contentmanager
-      // We make it really ugly if we fail here; but otherwise will not bother:
-      throw new IllegalArgumentException(e);
-    }
+    return getConfiguration().getCacheManager(this);
   }
 
   @Override

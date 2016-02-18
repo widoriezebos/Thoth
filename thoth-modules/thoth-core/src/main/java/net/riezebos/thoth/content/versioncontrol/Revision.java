@@ -26,18 +26,20 @@ public class Revision {
   private Commit commit;
   private Action action;
   private String path;
-  private String commitMessage;
+  private String revisionMessage;
   private String commitId;
 
   public Revision(Action action, String path) {
-    if (!path.startsWith("/"))
-      path = "/" + path;
-    this.action = action;
-    this.path = path;
+    setPath(ThothUtil.prefix(path, "/"));
+    setAction(action);
   }
 
-  public void setCommit(Commit commit) {
-    this.commit = commit;
+  public String getPath() {
+    return path;
+  }
+
+  public void setPath(String path) {
+    this.path = path;
   }
 
   public Action getAction() {
@@ -48,16 +50,12 @@ public class Revision {
     this.action = action;
   }
 
-  public String getPath() {
-    return path;
+  public void setCommit(Commit commit) {
+    this.commit = commit;
   }
 
   public String getFileName() {
     return ThothUtil.getFileName(path);
-  }
-
-  public void setPath(String path) {
-    this.path = path;
   }
 
   @Override
@@ -65,12 +63,8 @@ public class Revision {
     return action + ": " + getPath();
   }
 
-  public void setCommitMessage(String commitMessage) {
-    this.commitMessage = commitMessage == null ? commitMessage : commitMessage.trim();
-  }
-
-  public String getCommitMessage() {
-    return commitMessage;
+  public void setMessage(String commitMessage) {
+    this.revisionMessage = commitMessage == null ? commitMessage : commitMessage.trim();
   }
 
   public void setCommitId(String commitId) {
@@ -78,22 +72,26 @@ public class Revision {
   }
 
   public String getCommitId() {
-    return commitId;
+    if (commitId != null)
+      return commitId;
+    return commit == null ? null : commit.getId();
   }
 
   public String getAuthor() {
-    return commit.getAuthor();
+    return commit == null ? null : commit.getAuthor();
   }
 
   public Date getTimestamp() {
-    return commit.getTimestamp();
+    return commit == null ? null : commit.getTimestamp();
   }
 
   public String getMessage() {
-    return commit.getMessage();
+    if (revisionMessage != null)
+      return revisionMessage;
+    return commit == null ? null : commit.getMessage();
   }
 
   public String getShortMessage() {
-    return commit.getShortMessage();
+    return commit == null ? null : commit.getShortMessage();
   }
 }

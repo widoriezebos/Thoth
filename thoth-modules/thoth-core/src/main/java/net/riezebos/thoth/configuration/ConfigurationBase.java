@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.util.PropertyLoader;
@@ -42,34 +43,34 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
     global = new ContextDefinition(repoDef, "*global*", null, 0);
   }
 
-  public CacheManager getCacheManager(String context) throws ContextNotFoundException {
-    context = getContextKey(context);
+  public CacheManager getCacheManager(ContentManager contentManager) {
+    String contextKey = getContextKey(contentManager);
     CacheManager cacheManager;
     synchronized (caches) {
-      cacheManager = caches.get(context);
+      cacheManager = caches.get(contextKey);
     }
     if (cacheManager == null) {
-      cacheManager = new CacheManager(context);
+      cacheManager = new CacheManager(contentManager);
       synchronized (caches) {
-        caches.put(context, cacheManager);
+        caches.put(contextKey, cacheManager);
       }
     }
     return cacheManager;
   }
 
-  protected String getContextKey(String context) throws ContextNotFoundException {
-    if (context == null)
-      context = GLOBAL_SITE;
+  protected String getContextKey(ContentManager contentManager) {
+    String contextKey;
+    if (contentManager == null)
+      contextKey = GLOBAL_SITE;
     else
-      getContextDefinition(context); // validate
-    context = context.toLowerCase().trim();
-    return context;
+      contextKey = contentManager.getContextName().toLowerCase().trim();
+    return contextKey;
   }
 
-  public void expireCache(String context) throws ContextNotFoundException {
-    context = getContextKey(context);
+  public void expireCache(ContentManager contentManager) {
+    String contextKey = getContextKey(contentManager);
     synchronized (caches) {
-      caches.remove(context);
+      caches.remove(contextKey);
       // We do not know where the global site is getting it's data from so expire that one as well just to be safe
       caches.remove(GLOBAL_SITE);
     }

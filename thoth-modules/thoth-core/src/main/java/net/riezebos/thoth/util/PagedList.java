@@ -35,4 +35,9 @@ public class PagedList<T> {
     return hasMore;
   }
 
+  @Override
+  public String toString() {
+    return list.toString();
+  }
+
 }
