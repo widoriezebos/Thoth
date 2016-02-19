@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,15 +35,15 @@ public class ClasspathFileSystem implements FileSystem {
   }
 
   public void registerFile(String spec, long modified, long length) {
-    String folder = ThothUtil.prefix(ThothUtil.getFolder(spec), "/");
+    String folder = ThothUtil.absoluteFolder(ThothUtil.getFolder(spec));
     String fileName = ThothUtil.getPartBeforeFirst(ThothUtil.getFileName(spec), ",").trim();
 
     registerFolder(folder, getModification(fileName));
-    Set<String> list = folderFiles.get(folder);
+    Set<String> list = folderFiles.get(ThothUtil.absoluteFolder(folder));
     if (!list.contains(fileName)) {
       list.add(fileName);
 
-      String path = folder + "/" + fileName;
+      String path = ThothUtil.prefix(folder, "/") + fileName;
       setModified(path, modified);
       setLength(path, length);
     }
@@ -55,19 +56,22 @@ public class ClasspathFileSystem implements FileSystem {
     Set<String> parentFolders = null;
     for (String part : folderSpec.split("/")) {
       folder += (folder.endsWith("/") ? "" : "/") + part;
+
+      String absoluteFolder = ThothUtil.absoluteFolder(folder);
+
       if (parentFolders != null)
         parentFolders.add(part);
 
-      Set<String> nestedFolders = subFolders.get(folder);
+      Set<String> nestedFolders = subFolders.get(absoluteFolder);
       if (nestedFolders == null) {
         nestedFolders = new HashSet<String>();
-        subFolders.put(folder, nestedFolders);
+        subFolders.put(absoluteFolder, nestedFolders);
       }
 
-      setModified(folder, modificationDate);
-      if (!folders.contains(folder)) {
-        folders.add(folder);
-        folderFiles.put(folder, new HashSet<String>());
+      setModified(absoluteFolder, modificationDate);
+      if (!folders.contains(absoluteFolder)) {
+        folders.add(absoluteFolder);
+        folderFiles.put(absoluteFolder, new HashSet<String>());
       }
       parentFolders = nestedFolders;
     }
@@ -98,7 +102,7 @@ public class ClasspathFileSystem implements FileSystem {
   public boolean isFile(FileHandle fileHandle) {
     if (fileHandle == null || fileHandle.getAbsolutePath() == null || fileHandle.getAbsolutePath().length() == 0)
       return false;
-    if (folders.contains(fileHandle.getCanonicalPath()))
+    if (folders.contains(ThothUtil.absoluteFolder(fileHandle.getCanonicalPath())))
       return false;
 
     boolean isFile = false;
@@ -117,12 +121,18 @@ public class ClasspathFileSystem implements FileSystem {
     return isDirectory(fileHandle.getCanonicalPath());
   }
 
+  @Override
+  public boolean delete(FileHandle fileHandle) {
+    return false;
+  }
+
   private boolean isDirectory(String fileName) {
-    return folders.contains(fileName);
+    return folders.contains(fileName) || folders.contains(ThothUtil.absoluteFolder(fileName));
   }
 
   public long lastModified(FileHandle fileHandle) {
-    Long lng = modified.get(fileHandle.getCanonicalPath());
+    String canonicalPath = fileHandle.getCanonicalPath();
+    Long lng = modified.get(canonicalPath);
     return lng == null ? 0 : lng;
   }
 
@@ -134,10 +144,10 @@ public class ClasspathFileSystem implements FileSystem {
   public List<FileHandle> list(String folderName) {
     if (isDirectory(folderName)) {
       List<FileHandle> result = new ArrayList<FileHandle>();
-      for (String name : folderFiles.get(folderName)) {
+      for (String name : folderFiles.get(ThothUtil.absoluteFolder(folderName))) {
         result.add(new FileHandle(this, ThothUtil.suffix(folderName, "/") + name));
       }
-      for (String name : subFolders.get(folderName)) {
+      for (String name : subFolders.get(ThothUtil.absoluteFolder(folderName))) {
         result.add(new FileHandle(this, ThothUtil.suffix(folderName, "/") + name));
       }
       return result;
@@ -159,6 +169,10 @@ public class ClasspathFileSystem implements FileSystem {
         long modification = getModification(fileNameSpec);
         long length = getLength(fileNameSpec);
         String fileName = ThothUtil.prefix(ThothUtil.getPartBeforeFirst(fileNameSpec, ",").trim(), "/");
+        fileName = ThothUtil.prefix(fileName, "/");
+        if (fileName.startsWith(getFileSystemRoot()))
+          fileName = fileName.substring(getFileSystemRoot().length());
+
         registerFile(fileName, modification, length);
       }
       line = br.readLine();
@@ -231,6 +245,11 @@ public class ClasspathFileSystem implements FileSystem {
     return is;
   }
 
+  @Override
+  public OutputStream getOutputStream(FileHandle fileHandle) throws IOException {
+    throw new IOException("getOutputStream is not supported for ClasspathFileSystem");
+  }
+
   protected boolean denied(String path) {
     return (path.startsWith("../") || path.startsWith("/../"));
   }
@@ -240,6 +259,11 @@ public class ClasspathFileSystem implements FileSystem {
   }
 
   public Set<String> getFolderContents(String folderName) {
-    return folderFiles.get(ThothUtil.prefix(folderName, "/"));
+    return folderFiles.get(ThothUtil.absoluteFolder(folderName));
+  }
+
+  @Override
+  public Set<String> getCreatedFiles() {
+    return new HashSet<String>();
   }
 }

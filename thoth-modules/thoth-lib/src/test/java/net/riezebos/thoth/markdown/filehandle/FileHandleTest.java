@@ -34,6 +34,7 @@ public class FileHandleTest {
     assertFalse(basicFileHandle.exists());
     assertFalse(basicFileHandle.isFile());
     assertFalse(basicFileHandle.isDirectory());
+    assertEquals(fs, basicFileHandle.getFileSystem());
     assertEquals("/some/file/other", basicFileHandle.getAbsolutePath());
     assertEquals("/some/file/other", basicFileHandle.getCanonicalPath());
     assertNull(basicFileHandle.list());

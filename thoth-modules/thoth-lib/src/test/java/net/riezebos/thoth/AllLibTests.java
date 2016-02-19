@@ -32,9 +32,10 @@ import net.riezebos.thoth.markdown.critics.DeleteTranslatorTest;
 import net.riezebos.thoth.markdown.critics.HighlightTranslatorTest;
 import net.riezebos.thoth.markdown.critics.InsertTranslatorTest;
 import net.riezebos.thoth.markdown.critics.SubstitutionTranslatorTest;
-import net.riezebos.thoth.markdown.filehandle.BasicFileHandleFactoryTest;
-import net.riezebos.thoth.markdown.filehandle.ClasspathFileHandleFactoryTest;
+import net.riezebos.thoth.markdown.filehandle.BasicFileSystemTest;
+import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystemTest;
 import net.riezebos.thoth.markdown.filehandle.FileHandleTest;
+import net.riezebos.thoth.markdown.filehandle.ZipFileSystemTest;
 import net.riezebos.thoth.markdown.util.DocumentNodeTest;
 import net.riezebos.thoth.markdown.util.LineInfoTest;
 import net.riezebos.thoth.markdown.util.ProcessorErrorTest;
@@ -46,8 +47,8 @@ import net.riezebos.thoth.util.ThothUtilTest;
     ContentNodeTest.class, CommentTranslatorTest.class, CriticMarkupProcessorTest.class, DeleteTranslatorTest.class, //
     HighlightTranslatorTest.class, InsertTranslatorTest.class, SubstitutionTranslatorTest.class, //
     DocumentNodeTest.class, LineInfoTest.class, ProcessorErrorTest.class, SoftLinkTranslationTest.class, //
-    MarkDownDocumentTest.class, FileProcessorTest.class, ThothUtilTest.class, BasicFileHandleFactoryTest.class, //
-    FileHandleTest.class, ClasspathFileHandleFactoryTest.class, IncludeProcessorTest.class})
+    MarkDownDocumentTest.class, FileProcessorTest.class, ThothUtilTest.class, FileHandleTest.class, //
+    ClasspathFileSystemTest.class, ZipFileSystemTest.class, IncludeProcessorTest.class, BasicFileSystemTest.class})
 public class AllLibTests {
 
 }

@@ -34,7 +34,9 @@ import net.riezebos.thoth.configuration.PropertyBasedConfigurationTest;
 import net.riezebos.thoth.content.AutoRefresherTest;
 import net.riezebos.thoth.content.ContentManagerBaseTest;
 import net.riezebos.thoth.content.ContentManagerFactoryTest;
+import net.riezebos.thoth.content.impl.FSContentManagerTest;
 import net.riezebos.thoth.content.impl.GitContentManagerTest;
+import net.riezebos.thoth.content.impl.ZipContentManagerTest;
 import net.riezebos.thoth.content.search.FragmentTest;
 import net.riezebos.thoth.content.search.IndexerTest;
 import net.riezebos.thoth.content.search.SearcherTest;
@@ -47,6 +49,8 @@ import net.riezebos.thoth.renderers.HtmlRendererTest;
 import net.riezebos.thoth.renderers.RawRendererTest;
 import net.riezebos.thoth.servlets.ThothServletTest;
 import net.riezebos.thoth.util.DiscardingListTest;
+import net.riezebos.thoth.util.ThothCoreUtilTest;
+import net.riezebos.thoth.util.diff_match_patchTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({PropertyBasedConfigurationTest.class, ContentManagerBaseTest.class, SkinManagerTest.class, //
@@ -56,7 +60,8 @@ import net.riezebos.thoth.util.DiscardingListTest;
     DiscardingListTest.class, BrowseCommandTest.class, ContextIndexCommandTest.class, //
     DiffCommandTest.class, ErrorPageCommandTest.class, IndexCommandTest.class, MetaCommandTest.class, //
     PullCommandTest.class, ReindexCommandTest.class, RevisionsCommandTest.class, SearchCommandTest.class, //
-    ValidationReportCommandTest.class, GitContentManagerTest.class})
+    ValidationReportCommandTest.class, GitContentManagerTest.class, FSContentManagerTest.class, //
+    ZipContentManagerTest.class, ThothCoreUtilTest.class, diff_match_patchTest.class})
 
 public class AllCoreTests {
 

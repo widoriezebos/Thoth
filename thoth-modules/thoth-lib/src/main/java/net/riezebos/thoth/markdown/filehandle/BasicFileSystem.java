@@ -17,19 +17,26 @@ package net.riezebos.thoth.markdown.filehandle;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.riezebos.thoth.util.ThothUtil;
 
 public class BasicFileSystem implements FileSystem {
 
   private String fileSystemRoot;
+  private Set<String> createdFiles = new HashSet<String>();
 
   public BasicFileSystem() {
     this(null);
   }
 
   public BasicFileSystem(String fileSystemRoot) {
+    fileSystemRoot = ThothUtil.normalSlashes(fileSystemRoot);
     if (fileSystemRoot == null)
       fileSystemRoot = "/";
     if (!"/".equals(fileSystemRoot))
@@ -44,42 +51,54 @@ public class BasicFileSystem implements FileSystem {
   }
 
   protected File getFile(FileHandle fileHandle) {
-    String fileName = fileSystemRoot + ThothUtil.prefix(fileHandle.getCanonicalPath(), "/");
+    if (fileHandle == null)
+      return null;
+    String localPath = ThothUtil.prefix(fileHandle.getCanonicalPath(), "/");
+    if (denied(localPath))
+      throw new IllegalArgumentException("Access denied");
+    String fileName = fileSystemRoot + localPath;
     return new File(fileName);
   }
 
   @Override
   public boolean exists(FileHandle fileHandle) {
-    return getFile(fileHandle).exists();
+    return fileHandle == null ? false : getFile(fileHandle).exists();
+  }
+
+  @Override
+  public boolean delete(FileHandle fileHandle) {
+    return fileHandle == null ? false : getFile(fileHandle).delete();
   }
 
   @Override
   public boolean isFile(FileHandle fileHandle) {
-    return getFile(fileHandle).isFile();
+    return fileHandle == null ? false : getFile(fileHandle).isFile();
   }
 
   @Override
   public boolean isDirectory(FileHandle fileHandle) {
-    return getFile(fileHandle).isDirectory();
+    return fileHandle == null ? false : getFile(fileHandle).isDirectory();
   }
 
   @Override
   public long lastModified(FileHandle fileHandle) {
-    return getFile(fileHandle).lastModified();
+    return fileHandle == null ? 0L : getFile(fileHandle).lastModified();
   }
 
   @Override
   public long length(FileHandle fileHandle) {
-    return getFile(fileHandle).length();
+    return fileHandle == null ? 0L : getFile(fileHandle).length();
   }
 
   @Override
   public String[] list(FileHandle fileHandle) {
-    return getFile(fileHandle).list();
+    return fileHandle == null ? null : getFile(fileHandle).list();
   }
 
   @Override
   public FileHandle[] listFiles(FileHandle fileHandle) {
+    if (fileHandle == null)
+      return null;
     File[] listFiles = getFile(fileHandle).listFiles();
     if (listFiles == null)
       return null;
@@ -103,7 +122,27 @@ public class BasicFileSystem implements FileSystem {
     if (denied(fileHandle.getCanonicalPath()))
       return null;
 
-    return new FileInputStream(getFile(fileHandle));
+    try {
+      return new FileInputStream(getFile(fileHandle));
+    } catch (FileNotFoundException e) {
+      throw new FileNotFoundException(fileHandle.getAbsolutePath());
+    }
   }
 
+  @Override
+  public OutputStream getOutputStream(FileHandle fileHandle) throws IOException {
+    String canonicalPath = fileHandle.getCanonicalPath();
+
+    // Implicitly create any paths we need
+    File file = getFile(fileHandle);
+    File parent = file.getParentFile();
+    parent.mkdirs();
+    createdFiles.add(canonicalPath);
+    return new FileOutputStream(file);
+  }
+
+  @Override
+  public Set<String> getCreatedFiles() {
+    return createdFiles;
+  }
 }

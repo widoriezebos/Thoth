@@ -18,19 +18,18 @@ import java.io.Serializable;
 
 public class ProcessorError implements Serializable, Comparable<ProcessorError> {
 
-
   private static final long serialVersionUID = 1L;
 
   private LineInfo currentLineInfo;
   private String errorMessage;
 
   public ProcessorError(LineInfo currentLineInfo, String errorMessage) {
-    this.currentLineInfo = currentLineInfo;
-    this.errorMessage = errorMessage;
+    setCurrentLineInfo(currentLineInfo);
+    setErrorMessage(errorMessage);
   }
 
   public void setCurrentLineInfo(LineInfo currentLineInfo) {
-    this.currentLineInfo = currentLineInfo.clone();
+    this.currentLineInfo = currentLineInfo == null ? null : currentLineInfo.clone();
   }
 
   public LineInfo getCurrentLineInfo() {
@@ -70,7 +69,7 @@ public class ProcessorError implements Serializable, Comparable<ProcessorError> 
   public int compareTo(ProcessorError o) {
     return getDescription().compareTo(o.getDescription());
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 31;

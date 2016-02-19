@@ -28,19 +28,19 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ClasspathFileHandleFactoryTest {
+public class ClasspathFileSystemTest {
 
   @Test
   public void test() throws IOException {
-    ClasspathFileSystem factory = new ClasspathFileSystem();
-    factory.registerFiles("/net/riezebos/thoth/resources.lst");
-    FileHandle fileHandler = factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeProcessor.md");
-    FileHandle fileHandler2 = factory.getFileHandle("net/riezebos/thoth/markdown/IncludeProcessor.md");
-    FileHandle fileHandler3 = factory.getFileHandle("net/riezebos/thoth/markdown/NotThere.md");
-    FileHandle folderHandler = factory.getFileHandle("net/riezebos/thoth");
-    FileHandle folderHandler2 = factory.getFileHandle("net/riezebos/thoth/");
-    FileHandle folderHandler3 = factory.getFileHandle("net/riezebos/Nuts/");
-    FileHandle folderHandler4 = factory.getFileHandle(null);
+    ClasspathFileSystem cpfs = new ClasspathFileSystem();
+    cpfs.registerFiles("/net/riezebos/thoth/resources.lst");
+    FileHandle fileHandler = cpfs.getFileHandle("/net/riezebos/thoth/markdown/IncludeProcessor.md");
+    FileHandle fileHandler2 = cpfs.getFileHandle("net/riezebos/thoth/markdown/IncludeProcessor.md");
+    FileHandle fileHandler3 = cpfs.getFileHandle("net/riezebos/thoth/markdown/NotThere.md");
+    FileHandle folderHandler = cpfs.getFileHandle("net/riezebos/thoth");
+    FileHandle folderHandler2 = cpfs.getFileHandle("net/riezebos/thoth/");
+    FileHandle folderHandler3 = cpfs.getFileHandle("net/riezebos/Nuts/");
+    FileHandle folderHandler4 = cpfs.getFileHandle(null);
 
     assertEquals(20000L, fileHandler.lastModified());
     assertEquals(fileHandler.getName(), fileHandler2.getName());
@@ -59,28 +59,28 @@ public class ClasspathFileHandleFactoryTest {
     assertFalse(folderHandler3.isFile());
     assertFalse(folderHandler4.isFile());
 
-    assertFalse(factory.getFileHandle("NotThere").isFile());
-    assertFalse(factory.isFile(null));
-    assertFalse(factory.getFileHandle(null).isFile());
-    assertTrue(factory.getFileHandle("/net/riezebos/thoth/markdown/IncludeProcessor.md").isFile());
-    assertFalse(factory.getFileHandle("/net/wrong/thoth/markdown/IncludeProcessor.md").isFile());
+    assertFalse(cpfs.getFileHandle("NotThere").isFile());
+    assertFalse(cpfs.isFile(null));
+    assertFalse(cpfs.getFileHandle(null).isFile());
+    assertTrue(cpfs.getFileHandle("/net/riezebos/thoth/markdown/IncludeProcessor.md").isFile());
+    assertFalse(cpfs.getFileHandle("/net/wrong/thoth/markdown/IncludeProcessor.md").isFile());
 
-    FileHandle folder = factory.getFileHandle("net/riezebos/thoth/markdown/");
+    FileHandle folder = cpfs.getFileHandle("net/riezebos/thoth/markdown/");
     List<String> lst = Arrays.asList(folder.list());
     assertTrue(lst.contains("IncludeProcessor.md"));
     assertTrue(lst.contains("IncludeProcessorNoToc.md"));
-    assertNull(factory.getFileHandle("net/riezebos/thoth/nofolder/").list());
+    assertNull(cpfs.getFileHandle("net/riezebos/thoth/nofolder/").list());
 
     List<FileHandle> lst2 = Arrays.asList(folder.listFiles());
     assertTrue(lst2.contains(fileHandler));
 
-    FileHandle walk = factory.getFileHandle("/net/riezebos/thoth/one/two/../../markdown/NotThere.md");
+    FileHandle walk = cpfs.getFileHandle("/net/riezebos/thoth/one/two/../../markdown/NotThere.md");
 
     assertEquals("/net/riezebos/thoth/markdown/NotThere.md", walk.getCanonicalPath());
     assertEquals("/net/riezebos/thoth/markdown/NotThere.md", walk.getAbsolutePath());
     assertEquals("/net/riezebos/thoth/markdown", walk.getParentFile().getAbsolutePath());
 
-    FileHandle check = factory.getFileHandle("/net/riezebos/thoth/markdown/check.txt");
+    FileHandle check = cpfs.getFileHandle("/net/riezebos/thoth/markdown/check.txt");
     BufferedReader br = new BufferedReader(new InputStreamReader(check.getInputStream()));
     String line = br.readLine();
     assertEquals("check", line);

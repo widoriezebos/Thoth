@@ -27,6 +27,7 @@ import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.markdown.filehandle.FileSystem;
 import net.riezebos.thoth.markdown.filehandle.ZipFileSystem;
 import net.riezebos.thoth.util.PagedList;
 
@@ -42,11 +43,21 @@ public class ZipContentManager extends ContentManagerBase {
   public ZipContentManager(ContextDefinition contextDefinition, Configuration configuration) throws ContentManagerException {
     super(contextDefinition, configuration);
     try {
-      validateContextDefinition(contextDefinition);
-      setFileSystem(new ZipFileSystem(contextDefinition.getRepositoryDefinition().getLocation()));
+      ZipFileSystem fileSystem = new ZipFileSystem(contextDefinition.getRepositoryDefinition().getLocation());
+      setup(contextDefinition, fileSystem);
     } catch (IOException e) {
       throw new ContentManagerException(e);
     }
+  }
+
+  public ZipContentManager(ContextDefinition contextDefinition, Configuration configuration, FileSystem fileSystem) throws ContentManagerException {
+    super(contextDefinition, configuration);
+    setup(contextDefinition, fileSystem);
+  }
+
+  protected void setup(ContextDefinition contextDefinition, FileSystem fileSystem) throws ContentManagerException {
+    validateContextDefinition(contextDefinition);
+    setFileSystem(fileSystem);
   }
 
   /**

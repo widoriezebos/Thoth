@@ -19,7 +19,7 @@ public class ZipFileSystem extends ClasspathFileSystem {
   }
 
   public ZipFileSystem(FileHandle zipFile, String root) throws IOException {
-    setup(zipFile, root);
+    setup(zipFile, ThothUtil.suffix(root, "/"));
   }
 
   public ZipFileSystem(String pathToZipFile) throws IOException {
@@ -75,9 +75,13 @@ public class ZipFileSystem extends ClasspathFileSystem {
     if (getFolders().contains(canonicalPath))
       return false;
 
-    String folderName = ThothUtil.prefix(ThothUtil.getFolder(canonicalPath), "/");
+    if (getFolders().contains(ThothUtil.absoluteFolder(canonicalPath)))
+      return false;
+
+    String folderName = ThothUtil.absoluteFolder(ThothUtil.getFolder(canonicalPath));
     Set<String> folderContents = getFolderContents(folderName);
-    return folderContents != null && folderContents.contains(ThothUtil.getFileName(canonicalPath));
+    String fileName = ThothUtil.getFileName(canonicalPath);
+    return folderContents != null && folderContents.contains(fileName);
   }
 
   public InputStream getInputStream(FileHandle fileHandle, boolean throwOnError) throws IOException {

@@ -14,7 +14,8 @@
  */
 package net.riezebos.thoth.markdown.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -25,6 +26,15 @@ public class LineInfoTest {
     LineInfo info = new LineInfo("/some/file/path.txt", 1);
     assertEquals("/some/file/path.txt", info.getFile());
     assertEquals(1, info.getLine());
+
+    LineInfo info2 = new LineInfo("/some/file/path.txt", 1);
+    assertTrue(info.equals(info2));
+    assertTrue(info.hashCode() == info2.hashCode());
+
+    info2 = info.clone();
+    assertTrue(info.equals(info2));
+    assertTrue(info.hashCode() == info2.hashCode());
+
   }
 
 }

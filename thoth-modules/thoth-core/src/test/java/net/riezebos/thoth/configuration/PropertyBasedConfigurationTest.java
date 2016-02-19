@@ -18,9 +18,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -29,13 +32,17 @@ import java.util.TimeZone;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.markdown.util.LineInfo;
+import net.riezebos.thoth.markdown.util.ProcessorError;
+import net.riezebos.thoth.testutil.ThothTestBase;
 
-public class PropertyBasedConfigurationTest {
+public class PropertyBasedConfigurationTest extends ThothTestBase {
 
   @Test
-  public void testPropertyBasedConfiguration() throws ConfigurationException, ContextNotFoundException {
+  public void testPropertyBasedConfiguration() throws ConfigurationException, ContentManagerException, IOException {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     InputStream is = contextClassLoader.getResourceAsStream("net/riezebos/thoth/configuration/test.configuration.properties");
     PropertyBasedConfiguration config = new PropertyBasedConfiguration();
@@ -83,6 +90,22 @@ public class PropertyBasedConfigurationTest {
 
     assertTrue(config.isResource("nothing"));
     assertTrue(config.isResource("nothing.properties"));
+
+    ContentManager testContentManager = registerTestContentManager("justatest");
+    CacheManager cacheManager = config.getCacheManager(testContentManager);
+    ArrayList<ProcessorError> errors = new ArrayList<>();
+    errors.add(new ProcessorError(new LineInfo("file", 0), "errorMessage"));
+    cacheManager.cacheErrors(errors);
+    assertEquals(1, cacheManager.getValidationErrors().size());
+    config.expireCache(testContentManager);
+    cacheManager = config.getCacheManager(testContentManager);
+
+    try {
+      cacheManager.getValidationErrors();
+      fail("This should have failed because cannot read from persistent store");
+    } catch (Exception e) {
+      // expected
+    }
   }
 
   private boolean compareSet(String spec, Collection<String> list) {

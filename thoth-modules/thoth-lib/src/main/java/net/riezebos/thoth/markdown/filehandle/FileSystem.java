@@ -16,6 +16,8 @@ package net.riezebos.thoth.markdown.filehandle;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Set;
 
 public interface FileSystem {
 
@@ -27,6 +29,8 @@ public interface FileSystem {
 
   boolean isDirectory(FileHandle fileHandle);
 
+  boolean delete(FileHandle fileHandle);
+
   long lastModified(FileHandle fileHandle);
 
   long length(FileHandle fileHandle);
@@ -36,4 +40,9 @@ public interface FileSystem {
   FileHandle[] listFiles(FileHandle fileHandle);
 
   InputStream getInputStream(FileHandle fileHandle) throws IOException;
+
+  OutputStream getOutputStream(FileHandle fileHandle) throws IOException;
+
+  Set<String> getCreatedFiles();
+
 }

@@ -41,7 +41,6 @@ public class CommandTest extends ThothTestBase {
       arguments.putAll(args);
     command.execute(contextName, path, arguments, skin, outputStream);
     String result = outputStream.toString("UTF-8").trim();
-    System.out.println(result);
     for (String check : htmlExists)
       assertTrue(check, result.indexOf(check) != -1);
 
@@ -50,7 +49,6 @@ public class CommandTest extends ThothTestBase {
       outputStream = new ByteArrayOutputStream();
       command.execute(contextName, path, arguments, skin, outputStream);
       result = outputStream.toString("UTF-8").trim();
-      System.out.println(result);
       assertTrue(result, result.startsWith("{\"") && result.endsWith("}"));
 
       for (String check : jsonExists)

@@ -14,11 +14,15 @@
  */
 package net.riezebos.thoth.markdown.filehandle;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,6 +36,66 @@ public class ZipFileSystemTest {
 
   @Test
   public void test() throws IOException {
+    ClasspathFileSystem cpfactory = new ClasspathFileSystem("/net/riezebos/thoth");
+    cpfactory.registerFile("/markdown.zip", 0L, 0L);
+    FileHandle zipFileHandle = cpfactory.getFileHandle("markdown.zip");
+    ZipFileSystem zfs = new ZipFileSystem(zipFileHandle, "/");
+
+    FileHandle fileHandle = zfs.getFileHandle("/markdown/IncludeProcessor.md");
+    FileHandle fileHandle2 = zfs.getFileHandle("markdown/IncludeProcessor.md");
+    FileHandle fileHandle3 = zfs.getFileHandle("markdown/NotThere.md");
+    FileHandle folderHandle = zfs.getFileHandle("");
+    FileHandle folderHandle2 = zfs.getFileHandle("/");
+    FileHandle folderHandle3 = zfs.getFileHandle("net/riezebos/Nuts/");
+    FileHandle folderHandle4 = zfs.getFileHandle(null);
+
+    assertEquals(1455656332000L, fileHandle.lastModified());
+    assertEquals(fileHandle.getName(), fileHandle2.getName());
+    assertEquals("/markdown/IncludeProcessor.md", fileHandle2.toString());
+    assertTrue(fileHandle.exists());
+    assertFalse(fileHandle.isDirectory());
+    assertTrue(fileHandle.isFile());
+
+    assertTrue(fileHandle2.exists());
+    assertFalse(fileHandle2.isDirectory());
+    assertTrue(fileHandle2.isFile());
+    assertTrue(fileHandle2.isFile());
+    assertFalse(fileHandle3.exists());
+    assertTrue(folderHandle.isDirectory());
+    assertTrue(folderHandle2.isDirectory());
+    assertFalse(folderHandle3.isFile());
+    assertFalse(folderHandle4.isFile());
+
+    assertFalse(zfs.getFileHandle("NotThere").isFile());
+    assertFalse(zfs.isFile(null));
+    assertFalse(zfs.getFileHandle(null).isFile());
+    assertTrue(zfs.getFileHandle("/markdown/IncludeProcessor.md").isFile());
+    assertFalse(zfs.getFileHandle("/net/wrong/thoth/markdown/IncludeProcessor.md").isFile());
+
+    FileHandle folder = zfs.getFileHandle("markdown/");
+    List<String> lst = Arrays.asList(folder.list());
+    assertTrue(lst.contains("IncludeProcessor.md"));
+    assertTrue(lst.contains("IncludeProcessorNoToc.md"));
+    assertNull(zfs.getFileHandle("nofolder/").list());
+
+    List<FileHandle> lst2 = Arrays.asList(folder.listFiles());
+    assertTrue(lst2.contains(fileHandle));
+
+    FileHandle walk = zfs.getFileHandle("/one/two/../../markdown/NotThere.md");
+
+    assertEquals("/markdown/NotThere.md", walk.getCanonicalPath());
+    assertEquals("/markdown/NotThere.md", walk.getAbsolutePath());
+    assertEquals("/markdown", walk.getParentFile().getAbsolutePath());
+
+    FileHandle check = zfs.getFileHandle("/markdown/check.txt");
+    BufferedReader br = new BufferedReader(new InputStreamReader(check.getInputStream()));
+    String line = br.readLine();
+    assertEquals("check", line);
+    br.close();
+  }
+
+  @Test
+  public void test2() throws IOException {
 
     ClasspathFileSystem fs = new ClasspathFileSystem();
     FileHandle fileHandle = fs.getFileHandle(TEST_ZIP);

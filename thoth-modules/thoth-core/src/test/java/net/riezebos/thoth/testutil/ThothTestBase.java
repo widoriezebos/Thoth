@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +54,8 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
+import net.riezebos.thoth.content.impl.FSContentManager;
+import net.riezebos.thoth.content.impl.util.TestFSContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -72,6 +75,25 @@ public class ThothTestBase {
   protected ContentManager getContentManager(Configuration mockedConfiguration, ContextDefinition mockedContext, ClasspathFileSystem fileSystem)
       throws ContentManagerException {
     ContentManagerBase contentManager = new ClasspathContentManager(mockedContext, mockedConfiguration, fileSystem);
+    return contentManager;
+  }
+
+  protected FSContentManager createTempFSContentManager(Configuration mockedConfiguration) throws IOException, ContentManagerException {
+    File tmpFile = File.createTempFile("thoth", "test");
+    tmpFile.deleteOnExit();
+    String fsroot = ThothUtil.suffix(ThothUtil.normalSlashes(tmpFile.getParent()), "/") + "fstestroot/";
+    File fsRootFile = new File(fsroot);
+    fsRootFile.mkdirs();
+    fsRootFile.deleteOnExit();
+
+    RepositoryDefinition repodef = new RepositoryDefinition();
+    repodef.setLocation(fsroot);
+    repodef.setName("testrepos");
+    repodef.setType("filesystem");
+
+    ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", 0);
+
+    FSContentManager contentManager = new TestFSContentManager(contextDef, mockedConfiguration);
     return contentManager;
   }
 

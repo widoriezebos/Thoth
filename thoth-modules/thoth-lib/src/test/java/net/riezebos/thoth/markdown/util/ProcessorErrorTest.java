@@ -15,6 +15,8 @@
 package net.riezebos.thoth.markdown.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -25,9 +27,23 @@ public class ProcessorErrorTest {
 
     ProcessorError error = new ProcessorError(new LineInfo("path/file.txt", 1), "Error message");
     assertEquals("/path/file.txt", error.getCurrentLineInfo().getFile());
+    assertEquals("/path/file.txt", error.getFile());
     assertEquals(1, error.getCurrentLineInfo().getLine());
+    assertEquals(1, error.getLine());
     assertEquals("Error message", error.getErrorMessage());
     assertEquals("/path/file.txt(1): Error message", error.getDescription());
+    assertEquals("/path/file.txt(1): Error message", error.toString());
+
+    ProcessorError error2 = new ProcessorError(new LineInfo("path/file.txt", 1), "Error message");
+    assertTrue(error.getFileRelated());
+    assertTrue(error.equals(error2));
+    assertTrue(error2.compareTo(error) == 0);
+    assertTrue(error2.hashCode() == error.hashCode());
+    
+    ProcessorError error3 = new ProcessorError(new LineInfo("path/file.txt", 1), "Other message");
+    assertTrue(error2.compareTo(error3) != 0);
+    assertFalse(error2.equals(error3));
+
   }
 
 }

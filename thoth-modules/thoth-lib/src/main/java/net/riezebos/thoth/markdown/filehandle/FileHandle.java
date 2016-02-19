@@ -16,6 +16,7 @@ package net.riezebos.thoth.markdown.filehandle;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 import net.riezebos.thoth.util.ThothUtil;
@@ -23,12 +24,16 @@ import net.riezebos.thoth.util.ThothUtil;
 public class FileHandle implements Serializable, Comparable<FileHandle> {
 
   private static final long serialVersionUID = 1L;
-  FileSystem fileSystem;
+  private FileSystem fileSystem;
   private String fullPath;
 
   public FileHandle(FileSystem fileSystem, String fullPath) {
     this.fileSystem = fileSystem;
     this.fullPath = fullPath;
+  }
+
+  public FileSystem getFileSystem() {
+    return fileSystem;
   }
 
   public String getName() {
@@ -41,6 +46,10 @@ public class FileHandle implements Serializable, Comparable<FileHandle> {
 
   public String getAbsolutePath() {
     return fullPath;
+  }
+
+  public boolean delete() {
+    return fileSystem.delete(this);
   }
 
   public boolean exists() {
@@ -80,7 +89,10 @@ public class FileHandle implements Serializable, Comparable<FileHandle> {
 
   public InputStream getInputStream() throws IOException {
     return fileSystem.getInputStream(this);
+  }
 
+  public OutputStream getOutputStream() throws IOException {
+    return fileSystem.getOutputStream(this);
   }
 
   @Override
@@ -94,6 +106,46 @@ public class FileHandle implements Serializable, Comparable<FileHandle> {
       return fullPath.compareTo(((FileHandle) other).fullPath);
     else
       return -1;
+  }
+
+  public void importTree(FileHandle rootSource) throws IOException {
+    if (!this.isDirectory())
+      throw new IOException("Can only import to a directory; " + this.getAbsolutePath() + " is file");
+    importTree(rootSource, rootSource, this);
+  }
+
+  protected void importTree(FileHandle originalRoot, FileHandle rootSource, FileHandle targetFolder) throws IOException {
+
+    if (!targetFolder.isDirectory())
+      throw new IOException("Destination " + targetFolder.getAbsolutePath() + " is not a directory");
+    if (rootSource.isDirectory()) {
+      for (FileHandle source : rootSource.listFiles()) {
+        if (source.isDirectory())
+          importTree(originalRoot, source, targetFolder);
+        else {
+          String originalCanonicalPath = originalRoot.getCanonicalPath();
+          String currentCanonicalPath = rootSource.getCanonicalPath();
+          String currentPrefix = ThothUtil.suffix(currentCanonicalPath.substring(originalCanonicalPath.length()), "/");
+
+          String destPath = ThothUtil.suffix(targetFolder.getAbsolutePath(), "/") + currentPrefix + source.getName();
+          // Special case for root copies
+          destPath = destPath.replaceAll("//", "/");
+          FileHandle destFile = targetFolder.getFileSystem().getFileHandle(destPath);
+          OutputStream outputStream = null;
+          InputStream inputStream = null;
+          try {
+            outputStream = destFile.getOutputStream();
+            inputStream = source.getInputStream();
+            FileHandleUtil.copy(inputStream, outputStream);
+          } finally {
+            if (outputStream != null)
+              outputStream.close();
+            if (inputStream != null)
+              inputStream.close();
+          }
+        }
+      }
+    }
   }
 
   @Override
@@ -126,5 +178,4 @@ public class FileHandle implements Serializable, Comparable<FileHandle> {
       return false;
     return true;
   }
-
 }

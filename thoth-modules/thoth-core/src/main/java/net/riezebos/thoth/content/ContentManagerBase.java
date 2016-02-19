@@ -401,7 +401,7 @@ public abstract class ContentManagerBase implements ContentManager {
     return traverseFolders(new DiscardingList<ContentNode>(), value -> pattern.matcher(ThothUtil.getFileName(value)).matches(), getFileHandle("/"), true);
   }
 
-  protected FileSystem getFileSystem() {
+  public FileSystem getFileSystem() {
     return fileSystem;
   }
 
