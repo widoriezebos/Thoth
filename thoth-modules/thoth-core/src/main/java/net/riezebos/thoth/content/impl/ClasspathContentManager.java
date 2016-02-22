@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -37,13 +37,13 @@ import net.riezebos.thoth.util.ThothUtil;
  */
 public class ClasspathContentManager extends ContentManagerBase {
 
-  public ClasspathContentManager(ContextDefinition contextDefinition, ThothContext context, ClasspathFileSystem fileSystem) throws ContentManagerException {
+  public ClasspathContentManager(ContextDefinition contextDefinition, ThothEnvironment context, ClasspathFileSystem fileSystem) throws ContentManagerException {
     super(contextDefinition, context);
     validateContextDefinition(contextDefinition);
     setFileSystem(fileSystem);
   }
 
-  public ClasspathContentManager(ContextDefinition contextDefinition, ThothContext context) throws ContentManagerException {
+  public ClasspathContentManager(ContextDefinition contextDefinition, ThothEnvironment context) throws ContentManagerException {
     super(contextDefinition, context);
     validateContextDefinition(contextDefinition);
     String fsroot = ThothUtil.normalSlashes(contextDefinition.getRepositoryDefinition().getLocation());

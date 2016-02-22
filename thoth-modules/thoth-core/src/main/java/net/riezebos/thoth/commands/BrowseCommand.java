@@ -22,15 +22,15 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.beans.ContentNode;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 
 public class BrowseCommand extends RendererBase implements Command {
 
-  public BrowseCommand(ThothContext thothContext) {
-    super(thothContext);
+  public BrowseCommand(ThothEnvironment thothEnvironment) {
+    super(thothEnvironment);
   }
 
   @Override

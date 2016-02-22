@@ -19,15 +19,15 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 
 public class PullCommand extends RendererBase implements Command {
 
-  public PullCommand(ThothContext thothContext) {
-    super(thothContext);
+  public PullCommand(ThothEnvironment thothEnvironment) {
+    super(thothEnvironment);
   }
 
   @Override

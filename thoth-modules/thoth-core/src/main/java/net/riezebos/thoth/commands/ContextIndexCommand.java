@@ -22,7 +22,7 @@ import java.util.Set;
 
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -31,8 +31,8 @@ import net.riezebos.thoth.util.Classifier;
 
 public class ContextIndexCommand extends RendererBase implements Command {
 
-  public ContextIndexCommand(ThothContext thothContext) {
-    super(thothContext);
+  public ContextIndexCommand(ThothEnvironment thothEnvironment) {
+    super(thothEnvironment);
   }
 
   @Override

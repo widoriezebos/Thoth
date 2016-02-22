@@ -22,7 +22,7 @@ import java.util.Date;
 import org.junit.Test;
 
 import net.riezebos.thoth.configuration.PropertyBasedConfiguration;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
 import net.riezebos.thoth.content.impl.NopContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
@@ -37,23 +37,23 @@ public class ThothContextTest extends ThothTestBase {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException, ConfigurationException {
     Date now = new Date();
-    ThothContext thothContext = createThothContext("indextest");
+    ThothEnvironment thothEnvironment = createThothContext("indextest");
 
     PropertyBasedConfiguration configuration = new PropertyBasedConfiguration();
     configuration.load(getClassPathResource(CONFIG_FILE));
-    thothContext.setConfiguration(configuration);
+    thothEnvironment.setConfiguration(configuration);
 
-    ContentManager globalContext = thothContext.getContentManager("");
+    ContentManager globalContext = thothEnvironment.getContentManager("");
     assertTrue(globalContext instanceof NopContentManager);
-    ContentManager cpContentManager = thothContext.getContentManager("ClasspathContext");
+    ContentManager cpContentManager = thothEnvironment.getContentManager("ClasspathContext");
     assertTrue(cpContentManager instanceof ClasspathContentManager);
-    ContentManager nopContentManager = thothContext.getContentManager("NothingnessContext");
+    ContentManager nopContentManager = thothEnvironment.getContentManager("NothingnessContext");
     assertTrue(nopContentManager instanceof NopContentManager);
 
-    thothContext.touch();
-    Date refreshTimestamp = thothContext.getRefreshTimestamp(cpContentManager.getContextName());
+    thothEnvironment.touch();
+    Date refreshTimestamp = thothEnvironment.getRefreshTimestamp(cpContentManager.getContextName());
     assertTrue(refreshTimestamp.getTime() > now.getTime());
-    String log = thothContext.pullAll();
+    String log = thothEnvironment.pullAll();
     assertTrue(log.indexOf("Will do nothing") != -1);
   }
 

@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -41,7 +41,7 @@ public class FSContentManager extends ContentManagerBase {
 
   private long previousChecksum = 0;
 
-  public FSContentManager(ContextDefinition contextDefinition, ThothContext context) throws ContentManagerException {
+  public FSContentManager(ContextDefinition contextDefinition, ThothEnvironment context) throws ContentManagerException {
     super(contextDefinition, context);
     validateContextDefinition(contextDefinition);
     String fsroot = ThothUtil.normalSlashes(contextDefinition.getRepositoryDefinition().getLocation());

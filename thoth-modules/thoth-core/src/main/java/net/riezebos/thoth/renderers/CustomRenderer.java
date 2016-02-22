@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
@@ -40,8 +40,8 @@ public class CustomRenderer extends RendererBase implements Renderer {
   private String contentType;
   private String commandLine;
 
-  public CustomRenderer(ThothContext thothContext, CustomRendererDefinition definition) {
-    super(thothContext);
+  public CustomRenderer(ThothEnvironment thothEnvironment, CustomRendererDefinition definition) {
+    super(thothEnvironment);
     setTypeCode(definition.getExtension());
     setContentType(definition.getContentType());
     setCommandLine(definition.getCommandLine());

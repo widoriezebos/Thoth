@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -40,7 +40,7 @@ public class ZipContentManager extends ContentManagerBase {
 
   private long previousTimestamp = 0;
 
-  public ZipContentManager(ContextDefinition contextDefinition, ThothContext context) throws ContentManagerException {
+  public ZipContentManager(ContextDefinition contextDefinition, ThothEnvironment context) throws ContentManagerException {
     super(contextDefinition, context);
     try {
       ZipFileSystem fileSystem = new ZipFileSystem(contextDefinition.getRepositoryDefinition().getLocation());
@@ -50,7 +50,7 @@ public class ZipContentManager extends ContentManagerBase {
     }
   }
 
-  public ZipContentManager(ContextDefinition contextDefinition, ThothContext context, FileSystem fileSystem) throws ContentManagerException {
+  public ZipContentManager(ContextDefinition contextDefinition, ThothEnvironment context, FileSystem fileSystem) throws ContentManagerException {
     super(contextDefinition, context);
     setup(contextDefinition, fileSystem);
   }

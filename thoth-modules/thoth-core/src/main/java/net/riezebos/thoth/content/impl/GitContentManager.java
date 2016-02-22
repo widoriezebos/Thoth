@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.Revision;
@@ -75,7 +75,7 @@ public class GitContentManager extends ContentManagerBase {
   private static final Logger LOG = LoggerFactory.getLogger(GitContentManager.class);
   private static final String HEAD_TREE = "HEAD^{tree}";
 
-  public GitContentManager(ContextDefinition contextDefinition, ThothContext context) throws ContentManagerException {
+  public GitContentManager(ContextDefinition contextDefinition, ThothEnvironment context) throws ContentManagerException {
     super(contextDefinition, context);
     validateContextDefinition(contextDefinition);
     setFileSystem(createFileSystem());

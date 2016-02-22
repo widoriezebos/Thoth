@@ -9,7 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import net.riezebos.thoth.commands.Command;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -56,10 +56,10 @@ public class CommandTest extends ThothTestBase {
     }
   }
 
-  protected ThothContext setupContentManager() throws ContextNotFoundException, ContentManagerException, IOException {
-    ThothContext thothContext = createThothContext(contextName);
-    contentManager = createTestContentManager(thothContext, contextName);
-    thothContext.registerContentManager(contentManager);
-    return thothContext;
+  protected ThothEnvironment setupContentManager() throws ContextNotFoundException, ContentManagerException, IOException {
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    contentManager = createTestContentManager(thothEnvironment, contextName);
+    thothEnvironment.registerContentManager(contentManager);
+    return thothEnvironment;
   }
 }

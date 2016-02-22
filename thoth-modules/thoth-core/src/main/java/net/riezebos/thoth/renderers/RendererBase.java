@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -47,10 +47,10 @@ public abstract class RendererBase implements Renderer {
   public static final String CRITICS = "critics";
   private static final String VELOCITY_HELPER = "thothutil";
   private static final String VELOCITY_PROPERTIES = "net/riezebos/thoth/velocity.properties";
-  private ThothContext thothContext = null;
+  private ThothEnvironment thothEnvironment = null;
 
-  public RendererBase(ThothContext thothContext) {
-    this.thothContext = thothContext;
+  public RendererBase(ThothEnvironment thothEnvironment) {
+    this.thothEnvironment = thothEnvironment;
   }
 
   @Override
@@ -58,8 +58,8 @@ public abstract class RendererBase implements Renderer {
     return asJson(arguments) ? "application/json;charset=UTF-8" : "text/html;charset=UTF-8";
   }
 
-  public ThothContext getContext() {
-    return thothContext;
+  public ThothEnvironment getContext() {
+    return thothEnvironment;
   }
 
   protected Configuration getConfiguration() {
@@ -67,7 +67,7 @@ public abstract class RendererBase implements Renderer {
   }
 
   protected ContentManager getContentManager(String context) throws ContentManagerException {
-    return thothContext.getContentManager(context);
+    return thothEnvironment.getContentManager(context);
   }
 
   protected String getString(Map<String, Object> arguments, String key) {

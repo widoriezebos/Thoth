@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -36,11 +36,11 @@ public class HtmlRendererTest extends ThothTestBase {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
     String contextName = "TestContext";
-    ThothContext thothContext = createThothContext(contextName);
-    ContentManager contentManager = createTestContentManager(thothContext, contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
     Skin testSkin = getSkin(contentManager);
 
-    HtmlRenderer renderer = new HtmlRenderer(thothContext);
+    HtmlRenderer renderer = new HtmlRenderer(thothEnvironment);
 
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -60,10 +60,10 @@ public class HtmlRendererTest extends ThothTestBase {
   public void testTable() throws ContextNotFoundException, ContentManagerException, IOException {
 
     String contextName = "TestContext";
-    ThothContext thothContext = createThothContext(contextName);
-    ContentManager contentManager = createTestContentManager(thothContext, contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
 
-    HtmlRenderer renderer = new HtmlRenderer(thothContext);
+    HtmlRenderer renderer = new HtmlRenderer(thothEnvironment);
 
     String path = "/main/Table.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

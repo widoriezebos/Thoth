@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -26,7 +26,7 @@ public class ZipContentManagerTest extends ThothTestBase {
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
 
     String contextName = "testzip";
-    ThothContext thothContext = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
 
     ClasspathFileSystem cpFS = new ClasspathFileSystem("/net/riezebos/thoth");
     cpFS.registerFile("/markdown.zip", 0L, 0L);
@@ -40,7 +40,7 @@ public class ZipContentManagerTest extends ThothTestBase {
 
     ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", 0);
 
-    ZipContentManager contentManager = new ZipContentManager(contextDef, thothContext, zfs);
+    ZipContentManager contentManager = new ZipContentManager(contextDef, thothEnvironment, zfs);
 
     String log = contentManager.cloneOrPull();
     assertTrue(log.indexOf("testfs: No changes detected") != -1);

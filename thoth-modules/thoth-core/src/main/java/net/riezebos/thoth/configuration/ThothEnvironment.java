@@ -19,12 +19,12 @@ import net.riezebos.thoth.content.impl.ZipContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 
-public class ThothContext {
+public class ThothEnvironment {
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
   public static final String CONFIGKEY_DEPRECATED = "configuration";
   public static final String CONFIGKEY = "thoth_configuration";
   private static final String GLOBAL_SITE = "*global_site*";
-  private static ThothContext sharedThothContext = null;
+  private static ThothEnvironment sharedThothContext = null;
 
   private Map<String, ContentManager> managers = new HashMap<>();
   private Configuration configuration = null;
@@ -163,14 +163,14 @@ public class ThothContext {
     return contextKey;
   }
 
-  public static void registerSharedContext(ThothContext thothContext) {
-    sharedThothContext = thothContext;
+  public static void registerSharedContext(ThothEnvironment thothEnvironment) {
+    sharedThothContext = thothEnvironment;
   }
 
-  public static ThothContext getSharedThothContext() {
-    synchronized (ThothContext.class) {
+  public static ThothEnvironment getSharedThothContext() {
+    synchronized (ThothEnvironment.class) {
       if (sharedThothContext == null)
-        sharedThothContext = new ThothContext();
+        sharedThothContext = new ThothEnvironment();
       return sharedThothContext;
     }
   }

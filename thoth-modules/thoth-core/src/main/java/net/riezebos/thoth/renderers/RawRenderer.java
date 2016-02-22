@@ -22,7 +22,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -31,8 +31,8 @@ import net.riezebos.thoth.markdown.filehandle.FileHandle;
 public class RawRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "raw";
 
-  public RawRenderer(ThothContext thothContext) {
-    super(thothContext);
+  public RawRenderer(ThothEnvironment thothEnvironment) {
+    super(thothEnvironment);
   }
 
   public String getTypeCode() {

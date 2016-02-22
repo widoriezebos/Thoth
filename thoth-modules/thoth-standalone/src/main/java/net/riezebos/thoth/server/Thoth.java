@@ -25,7 +25,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.servlets.ThothServlet;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -35,8 +35,8 @@ import net.riezebos.thoth.util.ThothUtil;
 public class Thoth {
 
   public void start(String args[]) throws Exception {
-    ThothContext thothContext = new ThothContext();
-    ThothContext.registerSharedContext(thothContext);
+    ThothEnvironment thothContext = new ThothEnvironment();
+    ThothEnvironment.registerSharedContext(thothContext);
 
     System.out.println("Thoth standalone v" + ThothUtil.getVersion(ThothUtil.Version.STANDALONE));
     System.out.println("Server is firing up. Please hang on...");
@@ -52,15 +52,15 @@ public class Thoth {
     if (configurationFile == null) {
       String message = "No Configuration found. Please specify a configuration file to use either by\n"//
           + "1) Passing it as a command line argument i.e. 'java " + Thoth.class.getName() + " /my/own/configuration.properties'\n"//
-          + "2) Setting an environment variable i.e. set " + ThothContext.CONFIGKEY + "=/my/own/configuration.properties\n"//
-          + "3) Passing a System variable to the Java VM i.e. -D" + ThothContext.CONFIGKEY + "=/my/own/configuration.properties";
+          + "2) Setting an environment variable i.e. set " + ThothEnvironment.CONFIGKEY + "=/my/own/configuration.properties\n"//
+          + "3) Passing a System variable to the Java VM i.e. -D" + ThothEnvironment.CONFIGKEY + "=/my/own/configuration.properties";
       throw new IllegalArgumentException(message);
     }
     File check = new File(configurationFile);
     if (!check.exists())
       throw new FileNotFoundException("Configuration file " + configurationFile + " not found");
 
-    System.setProperty(ThothContext.CONFIGKEY, configurationFile);
+    System.setProperty(ThothEnvironment.CONFIGKEY, configurationFile);
 
     Configuration configuration = thothContext.getConfiguration();
     Server server = new Server(8080);

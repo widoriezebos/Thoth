@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
@@ -31,8 +31,8 @@ import net.riezebos.thoth.util.PagedList;
 
 public class RevisionsCommand extends RendererBase implements Command {
 
-  public RevisionsCommand(ThothContext thothContext) {
-    super(thothContext);
+  public RevisionsCommand(ThothEnvironment thothEnvironment) {
+    super(thothEnvironment);
   }
 
   @Override

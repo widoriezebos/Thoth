@@ -21,15 +21,15 @@ import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 
 public class TestCustomRenderer extends CustomRenderer {
 
   private String executedCommand = null;
 
-  public TestCustomRenderer(ThothContext thothContext, CustomRendererDefinition definition) {
-    super(thothContext, definition);
+  public TestCustomRenderer(ThothEnvironment thothEnvironment, CustomRendererDefinition definition) {
+    super(thothEnvironment, definition);
   }
 
   public String getExecutedCommand() {

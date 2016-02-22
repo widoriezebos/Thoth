@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
@@ -43,7 +43,7 @@ import net.riezebos.thoth.util.ThothUtil;
 public abstract class ServletBase extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(ServletBase.class);
-  private ThothContext thothContext = null;
+  private ThothEnvironment thothEnvironment = null;
 
   protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
 
@@ -53,16 +53,16 @@ public abstract class ServletBase extends HttpServlet {
   @Override
   public void init() throws ServletException {
     super.init();
-    if (thothContext == null)
-      thothContext = ThothContext.getSharedThothContext();
+    if (thothEnvironment == null)
+      thothEnvironment = ThothEnvironment.getSharedThothContext();
   }
 
-  public ThothContext getThothContext() {
-    return thothContext;
+  public ThothEnvironment getThothContext() {
+    return thothEnvironment;
   }
 
-  public void setThothContext(ThothContext thothContext) {
-    this.thothContext = thothContext;
+  public void setThothContext(ThothEnvironment thothEnvironment) {
+    this.thothEnvironment = thothEnvironment;
   }
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

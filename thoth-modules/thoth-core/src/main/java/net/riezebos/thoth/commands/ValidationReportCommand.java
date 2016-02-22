@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -28,8 +28,8 @@ import net.riezebos.thoth.renderers.RendererBase;
 
 public class ValidationReportCommand extends RendererBase implements Command {
 
-  public ValidationReportCommand(ThothContext thothContext) {
-    super(thothContext);
+  public ValidationReportCommand(ThothEnvironment thothEnvironment) {
+    super(thothEnvironment);
   }
 
   @Override

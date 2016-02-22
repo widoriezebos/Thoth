@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.search.SearchResult;
 import net.riezebos.thoth.content.search.Searcher;
 import net.riezebos.thoth.content.skinning.Skin;
@@ -34,8 +34,8 @@ import net.riezebos.thoth.util.PagedList;
 
 public class SearchCommand extends RendererBase implements Command {
 
-  public SearchCommand(ThothContext thothContext) {
-    super(thothContext);
+  public SearchCommand(ThothEnvironment thothEnvironment) {
+    super(thothEnvironment);
   }
 
   @Override

@@ -49,7 +49,7 @@ import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.configuration.TestCacheManager;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
@@ -71,24 +71,24 @@ public class ThothTestBase {
   private String latestContentType;
   private Integer latestError;
 
-  protected ThothContext createThothContext(String contextName) throws ContextNotFoundException, ContentManagerException {
-    ThothContext thothContext = new ThothContext();
+  protected ThothEnvironment createThothContext(String contextName) throws ContextNotFoundException, ContentManagerException {
+    ThothEnvironment thothEnvironment = new ThothEnvironment();
     Configuration mockedConfiguration = mockConfiguration(contextName);
-    thothContext.setConfiguration(mockedConfiguration);
-    return thothContext;
+    thothEnvironment.setConfiguration(mockedConfiguration);
+    return thothEnvironment;
   }
 
-  protected ContentManager createTestContentManager(ThothContext thothContext, String contextName) throws IOException, ContentManagerException {
+  protected ContentManager createTestContentManager(ThothEnvironment thothEnvironment, String contextName) throws IOException, ContentManagerException {
     ContextDefinition mockedContext = mockContextDefinition(contextName);
     ClasspathFileSystem fileSystem = getClasspathFileSystem();
-    ContentManagerBase contentManager = new ClasspathContentManager(mockedContext, thothContext, fileSystem);
-    thothContext.registerContentManager(contentManager);
+    ContentManagerBase contentManager = new ClasspathContentManager(mockedContext, thothEnvironment, fileSystem);
+    thothEnvironment.registerContentManager(contentManager);
     contentManager.setCacheManager(new TestCacheManager(contentManager));
     return contentManager;
   }
 
   protected FSContentManager createTempFSContentManager(String contextName) throws IOException, ContentManagerException {
-    ThothContext thothContext = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
     File tmpFile = File.createTempFile("thoth", "test");
     tmpFile.deleteOnExit();
     String fsroot = ThothUtil.suffix(ThothUtil.normalSlashes(tmpFile.getParent()), "/") + "fstestroot/";
@@ -103,7 +103,7 @@ public class ThothTestBase {
 
     ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", 0);
 
-    FSContentManager contentManager = new TestFSContentManager(contextDef, thothContext);
+    FSContentManager contentManager = new TestFSContentManager(contextDef, thothEnvironment);
     return contentManager;
   }
 

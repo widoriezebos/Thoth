@@ -38,7 +38,7 @@ import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.CachemanagerException;
@@ -66,14 +66,14 @@ public abstract class ContentManagerBase implements ContentManager {
   private ContextDefinition contextDefinition;
   private SkinManager skinManager;
   private FileSystem fileSystem;
-  private ThothContext thothContext;
+  private ThothEnvironment thothEnvironment;
   private CacheManager cacheManager = null;
 
   protected abstract String cloneOrPull() throws ContentManagerException;
 
-  public ContentManagerBase(ContextDefinition contextDefinition, ThothContext thothContext) {
+  public ContentManagerBase(ContextDefinition contextDefinition, ThothEnvironment thothEnvironment) {
     this.contextDefinition = contextDefinition;
-    this.thothContext = thothContext;
+    this.thothEnvironment = thothEnvironment;
   }
 
   @Override
@@ -416,7 +416,7 @@ public abstract class ContentManagerBase implements ContentManager {
 
   @Override
   public Configuration getConfiguration() {
-    return thothContext.getConfiguration();
+    return thothEnvironment.getConfiguration();
   }
 
   @Override

@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
@@ -37,8 +37,8 @@ public class ContentManagerBaseTest extends ThothTestBase {
   public void testContentManagerBase() throws ContentManagerException, IOException {
 
     String contextName = "MockedContext";
-    ThothContext thothContext = createThothContext(contextName);
-    ContentManager contentManager = createTestContentManager(thothContext, contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
 
     Skin testReposSkin2 = contentManager.getSkinManager().getSkinByName("TestReposSkin2");
 

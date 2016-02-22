@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Test;
 
 import net.riezebos.thoth.commands.Command;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -47,14 +47,14 @@ public class ThothServletTest extends ThothTestBase {
     String path = "/main/Fourth.md";
 
     setRequestParameter("output", "raw");
-    ThothContext thothContext = createThothContext(contextName);
-    createTestContentManager(thothContext, contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    createTestContentManager(thothEnvironment, contextName);
 
     HttpServletRequest request = createHttpRequest(contextName, path);
     HttpServletResponse response = createHttpResponse();
 
     ThothServlet thothServlet = new ThothServlet();
-    thothServlet.setThothContext(thothContext);
+    thothServlet.setThothContext(thothEnvironment);
     thothServlet.init();
 
     thothServlet.doGet(request, response);
@@ -144,14 +144,14 @@ public class ThothServletTest extends ThothTestBase {
 
     String contextName = "TestContext";
     String path = "/main/Fourth.md";
-    ThothContext thothContext = createThothContext(contextName);
-    createTestContentManager(thothContext, contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    createTestContentManager(thothEnvironment, contextName);
 
     HttpServletRequest request = createHttpRequest(contextName, path);
     HttpServletResponse response = createHttpResponse();
 
     ThothServlet thothServlet = new ThothServlet();
-    thothServlet.setThothContext(thothContext);
+    thothServlet.setThothContext(thothEnvironment);
     thothServlet.init();
 
     thothServlet.registerCommand(getFailingCommand());
@@ -167,15 +167,15 @@ public class ThothServletTest extends ThothTestBase {
 
     String contextName = "TestContext";
     String path = "/";
-    ThothContext thothContext = createThothContext(contextName);
-    createTestContentManager(thothContext, contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    createTestContentManager(thothEnvironment, contextName);
 
     setRequestParameter("mode", "json");
     HttpServletRequest request = createHttpRequest(contextName, path);
     HttpServletResponse response = createHttpResponse();
 
     ThothServlet thothServlet = new ThothServlet();
-    thothServlet.setThothContext(thothContext);
+    thothServlet.setThothContext(thothEnvironment);
     thothServlet.init();
 
     thothServlet.doGet(request, response);

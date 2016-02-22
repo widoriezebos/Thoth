@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.impl.util.TestGitContentManager;
 import net.riezebos.thoth.content.versioncontrol.Revision.Action;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -20,7 +20,7 @@ public class GitContentManagerTest extends ThothTestBase {
   public void test() throws ContentManagerException {
     String contextName = "testgit";
 
-    ThothContext thothContext = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
     RepositoryDefinition repodef = new RepositoryDefinition();
     repodef.setLocation("http://someserver/somerepos.git");
     repodef.setName("testrepos");
@@ -29,7 +29,7 @@ public class GitContentManagerTest extends ThothTestBase {
     repodef.setType("git");
 
     ContextDefinition contextDef = new ContextDefinition(repodef, "testgit", "branch", 0);
-    GitContentManager contentManager = new TestGitContentManager(contextDef, thothContext);
+    GitContentManager contentManager = new TestGitContentManager(contextDef, thothEnvironment);
 
     contentManager.disableAutoRefresh();
     assertTrue(contentManager.supportsVersionControl());

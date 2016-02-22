@@ -28,8 +28,8 @@ public class CacheManagerTest extends ThothTestBase {
     Map<String, List<String>> reverseIndexIndirect = new HashMap<String, List<String>>();
 
     String contextName = "TestCacheContext";
-    ThothContext thothContext = createThothContext(contextName);
-    ContentManager contentManager = createTestContentManager(thothContext, contextName);
+    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
     TestCacheManager mgr = new TestCacheManager(contentManager);
     mgr.setMockReverseIndexes(false);
     mgr.cacheErrors(errors);

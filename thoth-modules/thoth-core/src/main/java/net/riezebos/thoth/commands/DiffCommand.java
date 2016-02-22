@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -32,8 +32,8 @@ import net.riezebos.thoth.util.diff_match_patch.Diff;
 
 public class DiffCommand extends RendererBase implements Command {
 
-  public DiffCommand(ThothContext thothContext) {
-    super(thothContext);
+  public DiffCommand(ThothEnvironment thothEnvironment) {
+    super(thothEnvironment);
   }
 
   @Override

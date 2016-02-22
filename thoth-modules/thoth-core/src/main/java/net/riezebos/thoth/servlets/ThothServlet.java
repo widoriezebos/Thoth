@@ -47,7 +47,7 @@ import net.riezebos.thoth.commands.RevisionsCommand;
 import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ThothContext;
+import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -135,21 +135,21 @@ public class ThothServlet extends ServletBase {
   }
 
   protected void setupCommands() {
-    ThothContext thothContext = getThothContext();
-    indexCommand = new IndexCommand(thothContext);
-    contextIndexCommand = new ContextIndexCommand(thothContext);
+    ThothEnvironment thothEnvironment = getThothContext();
+    indexCommand = new IndexCommand(thothEnvironment);
+    contextIndexCommand = new ContextIndexCommand(thothEnvironment);
 
     registerCommand(contextIndexCommand);
-    registerCommand(new DiffCommand(thothContext));
+    registerCommand(new DiffCommand(thothEnvironment));
     registerCommand(indexCommand);
-    registerCommand(new MetaCommand(thothContext));
-    registerCommand(new PullCommand(thothContext));
-    registerCommand(new ReindexCommand(thothContext));
-    registerCommand(new RevisionsCommand(thothContext));
-    registerCommand(new SearchCommand(thothContext));
-    registerCommand(new ValidationReportCommand(thothContext));
-    registerCommand(new BrowseCommand(thothContext));
-    registerCommand(new ErrorPageCommand(thothContext));
+    registerCommand(new MetaCommand(thothEnvironment));
+    registerCommand(new PullCommand(thothEnvironment));
+    registerCommand(new ReindexCommand(thothEnvironment));
+    registerCommand(new RevisionsCommand(thothEnvironment));
+    registerCommand(new SearchCommand(thothEnvironment));
+    registerCommand(new ValidationReportCommand(thothEnvironment));
+    registerCommand(new BrowseCommand(thothEnvironment));
+    registerCommand(new ErrorPageCommand(thothEnvironment));
   }
 
   protected void setupRenderers() {
