@@ -216,6 +216,10 @@ public class ThothServlet extends ServletBase {
         // encountering an error. This might complicate error handling (rendering an error page)
         // otherwise
         response.setContentType(renderer.getContentType(getParameters(request)));
+
+        String fileName = ThothUtil.getNameOnly(path) + "." + renderer.getTypeCode();
+        response.setHeader("Content-Disposition", "filename=" + fileName);
+
         IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
       }
       LOG.debug("Handled request " + requestURI + " in " + (System.currentTimeMillis() - ms) + " ms");
