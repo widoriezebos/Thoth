@@ -1,15 +1,17 @@
-category: Configuration
+category: Intro
 
 <p style="text-align:center;font-size:40pt">
 <img style="display: block;margin-left:auto;margin-right:auto;width:250px" src="../Images/ThothLogo.png"/>
 <br/>
-Configuring Thoth<br/>
+Thoth Overview
+<br/>
 </p>
 
 <h1>Table of contents</h1>
 \tableofcontents
 
 \include{/Copyright.md}
-\include{/Setup/Setup by Example.md}
-\include{/Basics/Skins.md}
-\include{/Setup/Configuration.md}
+\include{/Overview/Introduction.md}
+\include{/Overview/Name.md}
+\include{/Overview/Features.md}
+\include{/Overview/Technicalities.md}

@@ -3,7 +3,7 @@ category: Intro
 <p style="text-align:center;font-size:40pt">
 <img style="display: block;margin-left:auto;margin-right:auto;width:250px" src="../Images/ThothLogo.png"/>
 <br/>
-Working with Thoth
+Thoth Reader's Guide<br/>
 <br/>
 </p>
 
@@ -13,7 +13,3 @@ Working with Thoth
 
 \include{/Copyright.md}
 
-\include{/Basics/The Thoth Toolset.md}
-\include{/Basics/Git concepts.md}
-\include{/Basics/Editing with Thoth.md}
-\include{/Basics/Thoth Markdown basics.md}
