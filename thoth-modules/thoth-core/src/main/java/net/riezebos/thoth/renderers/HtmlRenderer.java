@@ -26,6 +26,7 @@ import org.pegdown.plugins.PegDownPlugins;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -35,6 +36,10 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class HtmlRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "html";
+
+  public HtmlRenderer(ThothContext thothContext) {
+    super(thothContext);
+  }
 
   public String getTypeCode() {
     return TYPE;

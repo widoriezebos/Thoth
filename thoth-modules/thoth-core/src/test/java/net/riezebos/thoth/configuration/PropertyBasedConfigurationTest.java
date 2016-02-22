@@ -91,14 +91,16 @@ public class PropertyBasedConfigurationTest extends ThothTestBase {
     assertTrue(config.isResource("nothing"));
     assertTrue(config.isResource("nothing.properties"));
 
-    ContentManager testContentManager = registerTestContentManager("justatest");
-    CacheManager cacheManager = config.getCacheManager(testContentManager);
+    String contextName = "justatest";
+    ThothContext thothContext = createThothContext(contextName);
+    ContentManager testContentManager = createTestContentManager(thothContext, contextName);
+    CacheManager cacheManager = testContentManager.getCacheManager();
     ArrayList<ProcessorError> errors = new ArrayList<>();
     errors.add(new ProcessorError(new LineInfo("file", 0), "errorMessage"));
     cacheManager.cacheErrors(errors);
     assertEquals(1, cacheManager.getValidationErrors().size());
-    config.expireCache(testContentManager);
-    cacheManager = config.getCacheManager(testContentManager);
+    testContentManager.expireCache();
+    cacheManager = testContentManager.getCacheManager();
 
     try {
       cacheManager.getValidationErrors();

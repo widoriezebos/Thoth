@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -35,10 +36,10 @@ public class RawRendererTest extends ThothTestBase {
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
     String contextName = "TestContext";
 
-    ContentManager contentManager = registerTestContentManager(contextName);
+    ThothContext thothContext = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothContext, contextName);
 
-    RawRenderer renderer = new RawRenderer();
-    renderer.setConfiguration(contentManager.getConfiguration());
+    RawRenderer renderer = new RawRenderer(thothContext);
 
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -57,7 +58,8 @@ public class RawRendererTest extends ThothTestBase {
   @Test
   public void testBase() throws ContextNotFoundException, ContentManagerException, IOException {
 
-    RawRenderer renderer = new RawRenderer();
+    ThothContext thothContext = createThothContext("TestContext");
+    RawRenderer renderer = new RawRenderer(thothContext);
     Map<String, Object> map = new HashMap<>();
     map.put("num", "123");
     assertEquals(new Integer(123), renderer.getInteger(map, "num"));

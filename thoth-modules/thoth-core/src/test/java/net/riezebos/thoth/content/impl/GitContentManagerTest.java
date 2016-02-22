@@ -6,10 +6,9 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.junit.Test;
 
-import net.riezebos.thoth.configuration.CacheManager;
-import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.impl.util.TestGitContentManager;
 import net.riezebos.thoth.content.versioncontrol.Revision.Action;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -19,10 +18,9 @@ public class GitContentManagerTest extends ThothTestBase {
 
   @Test
   public void test() throws ContentManagerException {
-    CacheManager mockedCacheManager = mockCacheManager();
     String contextName = "testgit";
-    Configuration mockedConfiguration = mockConfiguration(mockedCacheManager, contextName);
 
+    ThothContext thothContext = createThothContext(contextName);
     RepositoryDefinition repodef = new RepositoryDefinition();
     repodef.setLocation("http://someserver/somerepos.git");
     repodef.setName("testrepos");
@@ -31,7 +29,7 @@ public class GitContentManagerTest extends ThothTestBase {
     repodef.setType("git");
 
     ContextDefinition contextDef = new ContextDefinition(repodef, "testgit", "branch", 0);
-    GitContentManager contentManager = new TestGitContentManager(contextDef, mockedConfiguration);
+    GitContentManager contentManager = new TestGitContentManager(contextDef, thothContext);
 
     contentManager.disableAutoRefresh();
     assertTrue(contentManager.supportsVersionControl());

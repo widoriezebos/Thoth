@@ -33,7 +33,7 @@ import net.riezebos.thoth.configuration.CacheManagerTest;
 import net.riezebos.thoth.configuration.PropertyBasedConfigurationTest;
 import net.riezebos.thoth.content.AutoRefresherTest;
 import net.riezebos.thoth.content.ContentManagerBaseTest;
-import net.riezebos.thoth.content.ContentManagerFactoryTest;
+import net.riezebos.thoth.content.ThothContextTest;
 import net.riezebos.thoth.content.impl.FSContentManagerTest;
 import net.riezebos.thoth.content.impl.GitContentManagerTest;
 import net.riezebos.thoth.content.impl.ZipContentManagerTest;
@@ -55,7 +55,7 @@ import net.riezebos.thoth.util.diff_match_patchTest;
 @RunWith(Suite.class)
 @SuiteClasses({PropertyBasedConfigurationTest.class, ContentManagerBaseTest.class, SkinManagerTest.class, //
     HtmlRendererTest.class, CustomRendererTest.class, RawRendererTest.class, ThothServletTest.class, //
-    FragmentTest.class, IndexerTest.class, AutoRefresherTest.class, ContentManagerFactoryTest.class, //
+    FragmentTest.class, IndexerTest.class, AutoRefresherTest.class, ThothContextTest.class, //
     ExceptionTest.class, CommitTest.class, SourceDiffTest.class, SearcherTest.class, CacheManagerTest.class, //
     DiscardingListTest.class, BrowseCommandTest.class, ContextIndexCommandTest.class, //
     DiffCommandTest.class, ErrorPageCommandTest.class, IndexCommandTest.class, MetaCommandTest.class, //

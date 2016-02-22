@@ -16,7 +16,6 @@ public class BrowseCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"\"/TestContext/skins.properties\""};
     String[] jsonExists = new String[] {"\"path\":\"/skins.properties\""};
 
-    testCommand(new BrowseCommand(), "/", "browse", htmlExists, jsonExists);
+    testCommand(new BrowseCommand(setupContentManager()), "/", "browse", htmlExists, jsonExists);
   }
-
 }

@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.search.util.TestIndexer;
 import net.riezebos.thoth.content.search.util.WriteResult;
@@ -48,7 +49,9 @@ public class IndexerTest extends ThothTestBase {
 
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
-    ContentManager contentManager = registerTestContentManager("indextest");
+    String contextName = "indextest";
+    ThothContext thothContext = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothContext, contextName);
     TestIndexer indexer = new TestIndexer(contentManager);
     indexer.index();
 

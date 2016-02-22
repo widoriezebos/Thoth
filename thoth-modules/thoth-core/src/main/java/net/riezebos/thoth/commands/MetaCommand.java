@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
@@ -31,6 +32,10 @@ import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.renderers.RendererBase;
 
 public class MetaCommand extends RendererBase implements Command {
+
+  public MetaCommand(ThothContext thothContext) {
+    super(thothContext);
+  }
 
   @Override
   public String getTypeCode() {
@@ -46,7 +51,7 @@ public class MetaCommand extends RendererBase implements Command {
 
       DocumentNode root = markDownDocument.getDocumentStructure();
       List<DocumentNode> documentNodes = root.flatten(true);
-      int pageSize = getConfiguration().getFileMaxRevisions();
+      int pageSize = getContext().getConfiguration().getFileMaxRevisions();
 
       Map<String, List<Commit>> commitMap = new HashMap<>();
       List<Commit> commitList = new ArrayList<>();

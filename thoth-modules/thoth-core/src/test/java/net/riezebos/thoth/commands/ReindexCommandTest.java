@@ -17,7 +17,7 @@ public class ReindexCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"Reindex reuested. Running in the background"};
     String[] jsonExists = new String[] {"\"log\":\"Reindex reuested. Running in the background\""};
 
-    testCommand(new TestReindexCommand(), "/", "reindex", htmlExists, jsonExists);
+    testCommand(new TestReindexCommand(setupContentManager()), "/", "reindex", htmlExists, jsonExists);
   }
 
 }

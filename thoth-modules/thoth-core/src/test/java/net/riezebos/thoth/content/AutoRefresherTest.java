@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.testutil.ThothTestBase;
@@ -30,7 +31,9 @@ public class AutoRefresherTest extends ThothTestBase {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
 
-    ContentManager contentManager = registerTestContentManager("RefreshContext");
+    String contextName = "RefreshContext";
+    ThothContext thothContext = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothContext, contextName);
 
     AutoRefresher refresher = new AutoRefresher(0, contentManager);
     Date now = new Date();

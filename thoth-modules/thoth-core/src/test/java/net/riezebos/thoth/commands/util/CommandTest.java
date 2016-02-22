@@ -9,7 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import net.riezebos.thoth.commands.Command;
-import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -20,6 +20,9 @@ import net.riezebos.thoth.testutil.ThothTestBase;
 
 public class CommandTest extends ThothTestBase {
 
+  private ContentManager contentManager;
+  private String contextName = "TestContext";
+
   protected void testCommand(Command command, String path, String code, String[] htmlExists, String[] jsonExists)
       throws ContextNotFoundException, ContentManagerException, IOException, SkinManagerException, RenderException, UnsupportedEncodingException {
     testCommand(command, path, code, htmlExists, jsonExists, null);
@@ -27,13 +30,10 @@ public class CommandTest extends ThothTestBase {
 
   protected void testCommand(Command command, String path, String code, String[] htmlExists, String[] jsonExists, Map<String, String> args)
       throws ContextNotFoundException, ContentManagerException, IOException, SkinManagerException, RenderException, UnsupportedEncodingException {
-    String contextName = "TestContext";
-    ContentManager contentManager = registerTestContentManager(contextName);
-    Configuration configuration = contentManager.getConfiguration();
+
     Skin skin = getSkin(contentManager);
 
     assertEquals(code, command.getTypeCode());
-    command.setConfiguration(configuration);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Map<String, Object> arguments = getParameters(contentManager, path);
@@ -56,4 +56,10 @@ public class CommandTest extends ThothTestBase {
     }
   }
 
+  protected ThothContext setupContentManager() throws ContextNotFoundException, ContentManagerException, IOException {
+    ThothContext thothContext = createThothContext(contextName);
+    contentManager = createTestContentManager(thothContext, contextName);
+    thothContext.registerContentManager(contentManager);
+    return thothContext;
+  }
 }

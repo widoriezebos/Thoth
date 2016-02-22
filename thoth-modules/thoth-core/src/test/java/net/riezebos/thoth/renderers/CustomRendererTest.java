@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -39,12 +39,11 @@ public class CustomRendererTest extends ThothTestBase {
     String extension = "pdf";
     String commandLine = "output={${output}} url={${url}}";
 
-    ContentManager contentManager = registerTestContentManager(contextName);
-    Configuration configuration = contentManager.getConfiguration();
+    ThothContext thothContext = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothContext, contextName);
 
     CustomRendererDefinition def = new CustomRendererDefinition(extension, contentType, commandLine);
-    TestCustomRenderer renderer = new TestCustomRenderer(def);
-    renderer.setConfiguration(configuration);
+    TestCustomRenderer renderer = new TestCustomRenderer(thothContext, def);
 
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

@@ -18,11 +18,16 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 
 public class ErrorPageCommand extends RendererBase implements Command {
+
+  public ErrorPageCommand(ThothContext thothContext) {
+    super(thothContext);
+  }
 
   public static final String COMMAND = "error";
 

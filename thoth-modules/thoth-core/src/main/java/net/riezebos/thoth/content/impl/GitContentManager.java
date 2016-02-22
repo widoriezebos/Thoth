@@ -48,9 +48,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.Revision;
@@ -75,8 +75,8 @@ public class GitContentManager extends ContentManagerBase {
   private static final Logger LOG = LoggerFactory.getLogger(GitContentManager.class);
   private static final String HEAD_TREE = "HEAD^{tree}";
 
-  public GitContentManager(ContextDefinition contextDefinition, Configuration configuration) throws ContentManagerException {
-    super(contextDefinition, configuration);
+  public GitContentManager(ContextDefinition contextDefinition, ThothContext context) throws ContentManagerException {
+    super(contextDefinition, context);
     validateContextDefinition(contextDefinition);
     setFileSystem(createFileSystem());
   }
@@ -94,7 +94,7 @@ public class GitContentManager extends ContentManagerBase {
   protected synchronized String cloneOrPull() throws ContentManagerException {
     StringBuilder log = new StringBuilder();
     try {
-      Configuration config = ConfigurationFactory.getConfiguration();
+      Configuration config = getConfiguration();
       RepositoryDefinition repositoryDefinition = getContextDefinition().getRepositoryDefinition();
       String repositoryUrl = repositoryDefinition.getLocation();
       String workspaceLocation = config.getWorkspaceLocation();

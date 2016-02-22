@@ -14,7 +14,6 @@
  */
 package net.riezebos.thoth.testutil;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -46,13 +45,13 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import net.riezebos.thoth.beans.ContentNode;
-import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RepositoryDefinition;
+import net.riezebos.thoth.configuration.TestCacheManager;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerBase;
-import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
 import net.riezebos.thoth.content.impl.FSContentManager;
 import net.riezebos.thoth.content.impl.util.TestFSContentManager;
@@ -72,13 +71,24 @@ public class ThothTestBase {
   private String latestContentType;
   private Integer latestError;
 
-  protected ContentManager getContentManager(Configuration mockedConfiguration, ContextDefinition mockedContext, ClasspathFileSystem fileSystem)
-      throws ContentManagerException {
-    ContentManagerBase contentManager = new ClasspathContentManager(mockedContext, mockedConfiguration, fileSystem);
+  protected ThothContext createThothContext(String contextName) throws ContextNotFoundException, ContentManagerException {
+    ThothContext thothContext = new ThothContext();
+    Configuration mockedConfiguration = mockConfiguration(contextName);
+    thothContext.setConfiguration(mockedConfiguration);
+    return thothContext;
+  }
+
+  protected ContentManager createTestContentManager(ThothContext thothContext, String contextName) throws IOException, ContentManagerException {
+    ContextDefinition mockedContext = mockContextDefinition(contextName);
+    ClasspathFileSystem fileSystem = getClasspathFileSystem();
+    ContentManagerBase contentManager = new ClasspathContentManager(mockedContext, thothContext, fileSystem);
+    thothContext.registerContentManager(contentManager);
+    contentManager.setCacheManager(new TestCacheManager(contentManager));
     return contentManager;
   }
 
-  protected FSContentManager createTempFSContentManager(Configuration mockedConfiguration) throws IOException, ContentManagerException {
+  protected FSContentManager createTempFSContentManager(String contextName) throws IOException, ContentManagerException {
+    ThothContext thothContext = createThothContext(contextName);
     File tmpFile = File.createTempFile("thoth", "test");
     tmpFile.deleteOnExit();
     String fsroot = ThothUtil.suffix(ThothUtil.normalSlashes(tmpFile.getParent()), "/") + "fstestroot/";
@@ -93,7 +103,7 @@ public class ThothTestBase {
 
     ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", 0);
 
-    FSContentManager contentManager = new TestFSContentManager(contextDef, mockedConfiguration);
+    FSContentManager contentManager = new TestFSContentManager(contextDef, thothContext);
     return contentManager;
   }
 
@@ -102,18 +112,6 @@ public class ThothTestBase {
     ClasspathFileSystem fileSystem = new ClasspathFileSystem(location);
     fileSystem.registerFiles("net/riezebos/thoth/content/testrepos.lst");
     return fileSystem;
-  }
-
-  protected ContentManager registerTestContentManager(String contextName) throws ContextNotFoundException, ContentManagerException, IOException {
-    CacheManager mockedCacheManager = mockCacheManager();
-    Configuration mockedConfiguration = mockConfiguration(mockedCacheManager, contextName);
-    ContextDefinition mockedContext = mockContextDefinition(contextName);
-    ClasspathFileSystem fileSystem = getClasspathFileSystem();
-    ContentManager contentManager = getContentManager(mockedConfiguration, mockedContext, fileSystem);
-    ContentManagerFactory contentManagerFactory = ContentManagerFactory.getInstance();
-    contentManagerFactory.registerContentManager(contentManager);
-    contentManagerFactory.setConfiguration(mockedConfiguration);
-    return contentManager;
   }
 
   protected ContextDefinition mockContextDefinition(String contextName) {
@@ -129,7 +127,7 @@ public class ThothTestBase {
     return mockedContext;
   }
 
-  protected Configuration mockConfiguration(CacheManager mockedCacheManager, String contextName) throws ContextNotFoundException {
+  protected Configuration mockConfiguration(String contextName) throws ContextNotFoundException {
     Configuration mockedConfiguration = mock(Configuration.class);
     when(mockedConfiguration.getWorkspaceLocation()).thenReturn("/some/workspace/");
     when(mockedConfiguration.getDefaultSkin()).thenReturn("SimpleSkin");
@@ -141,20 +139,12 @@ public class ThothTestBase {
     when(mockedConfiguration.isFragment(anyString())).thenReturn(true);
     when(mockedConfiguration.getDateFormat()).thenReturn(new SimpleDateFormat("dd-MM-yyyy"));
     when(mockedConfiguration.getTimestampFormat()).thenReturn(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss"));
-    when(mockedConfiguration.getCacheManager(any())).thenReturn(mockedCacheManager);
     when(mockedConfiguration.getParseTimeOut()).thenReturn(4000L);
     when(mockedConfiguration.getMarkdownOptions()).thenReturn(2098159);
     when(mockedConfiguration.isValidContext(contextName)).thenReturn(true);
     when(mockedConfiguration.getMainIndexSkinContext()).thenReturn(contextName);
     when(mockedConfiguration.getContexts()).thenReturn(Arrays.asList(contextName));
     return mockedConfiguration;
-  }
-
-  protected CacheManager mockCacheManager() throws ContextNotFoundException, ContentManagerException {
-    CacheManager mockedCacheManager = mock(CacheManager.class);
-    when(mockedCacheManager.getReverseIndex(true)).thenReturn(getReverseIndexIndirect());
-    when(mockedCacheManager.getReverseIndex(false)).thenReturn(getReverseIndex());
-    return mockedCacheManager;
   }
 
   protected HttpServletRequest createHttpRequest(String contextName, String path) throws IOException {
@@ -210,26 +200,6 @@ public class ThothTestBase {
     if (inputStream == null)
       return null;
     return ThothUtil.readInputStream(inputStream);
-  }
-
-  protected Map<String, List<String>> getReverseIndex() {
-    Map<String, List<String>> result = new HashMap<>();
-    result.put("/main/subs/SubOne.md", Arrays.asList(new String[] {"/main/Main.md"}));
-    result.put("/main/Main.md", Arrays.asList(new String[] {"/books/Main.book"}));
-    result.put("/main/Second.md", Arrays.asList(new String[] {"/books/Main.book", "/books/Second.book"}));
-    result.put("/main/Third.md", Arrays.asList(new String[] {"/books/Main.book"}));
-    result.put("/main/Fourth.md", Arrays.asList(new String[] {"/books/Second.book"}));
-    return result;
-  }
-
-  protected Map<String, List<String>> getReverseIndexIndirect() {
-    Map<String, List<String>> result = new HashMap<>();
-    result.put("/main/subs/SubOne.md", Arrays.asList(new String[] {"/main/Main.md", "/books/Main.book"}));
-    result.put("/main/Main.md", Arrays.asList(new String[] {"/books/Main.book"}));
-    result.put("/main/Second.md", Arrays.asList(new String[] {"/books/Main.book", "/books/Second.book"}));
-    result.put("/main/Third.md", Arrays.asList(new String[] {"/books/Main.book", "/books/Main.book"}));
-    result.put("/main/Fourth.md", Arrays.asList(new String[] {"/books/Second.book"}));
-    return result;
   }
 
   protected List<ContentNode> getNodes(ClasspathFileSystem factory, String... paths) {

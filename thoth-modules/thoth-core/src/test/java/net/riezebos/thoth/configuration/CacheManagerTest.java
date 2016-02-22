@@ -27,13 +27,16 @@ public class CacheManagerTest extends ThothTestBase {
     Map<String, List<String>> reverseIndex = new HashMap<String, List<String>>();
     Map<String, List<String>> reverseIndexIndirect = new HashMap<String, List<String>>();
 
-    ContentManager contentManager = registerTestContentManager("TestCacheContext");
+    String contextName = "TestCacheContext";
+    ThothContext thothContext = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothContext, contextName);
     TestCacheManager mgr = new TestCacheManager(contentManager);
+    mgr.setMockReverseIndexes(false);
     mgr.cacheErrors(errors);
     mgr.cacheReverseIndex(true, reverseIndexIndirect);
     mgr.cacheReverseIndex(false, reverseIndex);
 
-    assertNotNull(CacheManager.getFileLock());
+    assertNotNull(mgr.getFileLock());
     assertEquals(contentManager, mgr.getContentManager());
     assertEquals(reverseIndex, mgr.getReverseIndex(false));
     assertEquals(reverseIndexIndirect, mgr.getReverseIndex(true));
@@ -48,6 +51,7 @@ public class CacheManagerTest extends ThothTestBase {
     mgr.persistIndexingContext(indexingContext);
 
     TestCacheManager mgr2 = new TestCacheManager(contentManager);
+    mgr2.setMockReverseIndexes(false);
     mgr2.setResources(mgr.getResources());
     assertEquals(mgr2.getValidationErrors(), indexingContext.getErrors());
     assertEquals(mgr2.getReverseIndex(true), indexingContext.getIndirectReverseIndex());

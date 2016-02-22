@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
@@ -19,24 +18,6 @@ public interface Configuration {
   public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
   public static final String CLASSPATH_PREFIX = "classpath:";
   public static final String SKIN_PROPERTIES = "skin.properties";
-
-  /**
-   * Returns a cache manager for the given context
-   * 
-   * @param context
-   * @return
-   * @throws ContextNotFoundException
-   */
-  public CacheManager getCacheManager(ContentManager contentManager);
-
-  /**
-   * Expires the cache for the given context
-   * 
-   * @param context
-   * @return
-   * @throws ContextNotFoundException
-   */
-  public void expireCache(ContentManager contentManager);
 
   /**
    * Image recognition. Set (comma separated) the extensions (without the '.') below to determine whether a matching resource will be treated as an image

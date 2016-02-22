@@ -37,8 +37,8 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.configuration.ContextDefinition;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.search.Indexer;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.CachemanagerException;
@@ -66,13 +66,14 @@ public abstract class ContentManagerBase implements ContentManager {
   private ContextDefinition contextDefinition;
   private SkinManager skinManager;
   private FileSystem fileSystem;
-  private Configuration configuration;
+  private ThothContext thothContext;
+  private CacheManager cacheManager = null;
 
   protected abstract String cloneOrPull() throws ContentManagerException;
 
-  public ContentManagerBase(ContextDefinition contextDefinition, Configuration configuration) {
+  public ContentManagerBase(ContextDefinition contextDefinition, ThothContext thothContext) {
     this.contextDefinition = contextDefinition;
-    this.configuration = configuration;
+    this.thothContext = thothContext;
   }
 
   @Override
@@ -151,7 +152,8 @@ public abstract class ContentManagerBase implements ContentManager {
 
   protected void notifyContextContentsChanged() {
 
-    getConfiguration().expireCache(this);
+    // expire caches
+    expireCache();
     skinManager = null;
 
     Thread indexerThread = new Thread() {
@@ -384,8 +386,7 @@ public abstract class ContentManagerBase implements ContentManager {
     List<ContentNode> result = new ArrayList<>();
 
     Path root = Paths.get("/");
-    CacheManager cacheManager = getCachemanager();
-    Map<String, List<String>> reverseIndex = cacheManager.getReverseIndex(false);
+    Map<String, List<String>> reverseIndex = getReverseIndex(false);
     traverseFolders(result, value -> isFragment(value) && !reverseIndex.containsKey(value), getFileHandle(root.toString()), true);
     Collections.sort(result);
     return result;
@@ -415,19 +416,25 @@ public abstract class ContentManagerBase implements ContentManager {
 
   @Override
   public Configuration getConfiguration() {
-    if (configuration == null)
-      configuration = ConfigurationFactory.getConfiguration();
-    return configuration;
+    return thothContext.getConfiguration();
   }
 
-  protected CacheManager getCachemanager() {
-    return getConfiguration().getCacheManager(this);
+  @Override
+  public CacheManager getCacheManager() {
+    if (cacheManager == null)
+      cacheManager = new CacheManager(this);
+    return cacheManager;
+  }
+
+  @Override
+  public void expireCache() {
+    cacheManager = null;
   }
 
   @Override
   public Map<String, List<String>> getReverseIndex(boolean indirect) throws ContentManagerException {
     try {
-      CacheManager cacheManager = getCachemanager();
+      CacheManager cacheManager = getCacheManager();
       Map<String, List<String>> reverseIndex = cacheManager.getReverseIndex(indirect);
       if (reverseIndex == null)
         reverseIndex = new HashMap<>();
@@ -440,7 +447,7 @@ public abstract class ContentManagerBase implements ContentManager {
   @Override
   public List<ProcessorError> getValidationErrors() throws ContentManagerException {
     try {
-      CacheManager cacheManager = getCachemanager();
+      CacheManager cacheManager = getCacheManager();
       List<ProcessorError> validationErrors = cacheManager.getValidationErrors();
       if (validationErrors == null)
         validationErrors = new ArrayList<>();
@@ -448,6 +455,11 @@ public abstract class ContentManagerBase implements ContentManager {
     } catch (CachemanagerException e) {
       throw new ContentManagerException(e);
     }
+  }
+
+  public void setCacheManager(CacheManager cacheManager) {
+    this.cacheManager = cacheManager;
+
   }
 
 }

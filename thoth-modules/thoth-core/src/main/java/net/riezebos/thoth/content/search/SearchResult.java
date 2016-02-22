@@ -17,9 +17,7 @@ package net.riezebos.thoth.content.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.riezebos.thoth.configuration.ConfigurationFactory;
 import net.riezebos.thoth.markdown.util.DocumentNode;
-import net.riezebos.thoth.util.ThothUtil;
 
 public class SearchResult {
 
@@ -27,6 +25,7 @@ public class SearchResult {
   private List<Fragment> fragments = new ArrayList<>();
   private List<DocumentNode> bookReferences = new ArrayList<>();
   private boolean isResource = false;
+  private boolean isImage = false;
   private int indexNumber;
 
   public String getDocument() {
@@ -67,8 +66,11 @@ public class SearchResult {
   }
 
   public boolean isImage() {
-    String extension = ThothUtil.getExtension(document);
-    return ConfigurationFactory.getConfiguration().isImageExtension(extension);
+    return isImage;
+  }
+
+  public void setImage(boolean isImage) {
+    this.isImage = isImage;
   }
 
   public void setIndexNumber(int indexNumber) {

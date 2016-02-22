@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -30,6 +31,10 @@ import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.util.diff_match_patch.Diff;
 
 public class DiffCommand extends RendererBase implements Command {
+
+  public DiffCommand(ThothContext thothContext) {
+    super(thothContext);
+  }
 
   @Override
   public String getTypeCode() {
@@ -40,7 +45,7 @@ public class DiffCommand extends RendererBase implements Command {
     try {
       RenderResult result = RenderResult.OK;
       ContentManager contentManager = getContentManager(context);
-      Configuration configuration = getConfiguration();
+      Configuration configuration = getContext().getConfiguration();
       SimpleDateFormat dateFormat = configuration.getTimestampFormat();
       String commitId = getString(arguments, "commitId");
       SourceDiff diff = contentManager.getDiff(commitId);

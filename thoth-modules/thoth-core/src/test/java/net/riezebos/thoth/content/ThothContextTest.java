@@ -22,6 +22,7 @@ import java.util.Date;
 import org.junit.Test;
 
 import net.riezebos.thoth.configuration.PropertyBasedConfiguration;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
 import net.riezebos.thoth.content.impl.NopContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
@@ -29,32 +30,30 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.testutil.ThothTestBase;
 
-public class ContentManagerFactoryTest extends ThothTestBase {
+public class ThothContextTest extends ThothTestBase {
 
   private static final String CONFIG_FILE = "net/riezebos/thoth/content/contentmanagerfactorytest.configuration.properties";
 
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException, ConfigurationException {
     Date now = new Date();
-    registerTestContentManager("indextest");
-
-    ContentManagerFactory contentManagerFactory = ContentManagerFactory.getInstance();
+    ThothContext thothContext = createThothContext("indextest");
 
     PropertyBasedConfiguration configuration = new PropertyBasedConfiguration();
     configuration.load(getClassPathResource(CONFIG_FILE));
-    contentManagerFactory.setConfiguration(configuration);
+    thothContext.setConfiguration(configuration);
 
-    ContentManager globalContext = contentManagerFactory.getContentManager("");
+    ContentManager globalContext = thothContext.getContentManager("");
     assertTrue(globalContext instanceof NopContentManager);
-    ContentManager cpContentManager = contentManagerFactory.getContentManager("ClasspathContext");
+    ContentManager cpContentManager = thothContext.getContentManager("ClasspathContext");
     assertTrue(cpContentManager instanceof ClasspathContentManager);
-    ContentManager nopContentManager = contentManagerFactory.getContentManager("NothingnessContext");
+    ContentManager nopContentManager = thothContext.getContentManager("NothingnessContext");
     assertTrue(nopContentManager instanceof NopContentManager);
 
-    contentManagerFactory.touch();
-    Date refreshTimestamp = contentManagerFactory.getRefreshTimestamp(cpContentManager.getContextName());
+    thothContext.touch();
+    Date refreshTimestamp = thothContext.getRefreshTimestamp(cpContentManager.getContextName());
     assertTrue(refreshTimestamp.getTime() > now.getTime());
-    String log = contentManagerFactory.pullAll();
+    String log = thothContext.pullAll();
     assertTrue(log.indexOf("Will do nothing") != -1);
   }
 

@@ -174,7 +174,7 @@ public class Indexer {
   }
 
   protected CacheManager getCacheManager() {
-    return getConfiguration().getCacheManager(contentManager);
+    return contentManager.getCacheManager(); 
   }
 
   protected Configuration getConfiguration() {

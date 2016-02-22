@@ -16,7 +16,7 @@ public class RevisionsCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"Latest changes"};
     String[] jsonExists = new String[] {"\"path\":\"/main/Main.md\""};
 
-    testCommand(new RevisionsCommand(), "/main/Main.md", "revisions", htmlExists, jsonExists);
+    testCommand(new RevisionsCommand(setupContentManager()), "/main/Main.md", "revisions", htmlExists, jsonExists);
   }
 
 }

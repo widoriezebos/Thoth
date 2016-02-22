@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
@@ -29,6 +30,10 @@ import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.util.PagedList;
 
 public class RevisionsCommand extends RendererBase implements Command {
+
+  public RevisionsCommand(ThothContext thothContext) {
+    super(thothContext);
+  }
 
   @Override
   public String getTypeCode() {
@@ -43,7 +48,7 @@ public class RevisionsCommand extends RendererBase implements Command {
       if (pageNumber == null)
         pageNumber = 1;
 
-      int pageSize = getConfiguration().getContextMaxRevisions();
+      int pageSize = getContext().getConfiguration().getContextMaxRevisions();
       PagedList<Commit> pagedList = contentManager.getCommits(null, pageNumber, pageSize);
       List<Commit> commitList = pagedList.getList();
       boolean hasMore = pagedList.hasMore();

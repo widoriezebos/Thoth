@@ -36,17 +36,17 @@ import net.riezebos.thoth.markdown.util.LineInfo;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 
 public class CacheManager {
-  private static Object fileLock = new Object();
+  private Object fileLock = new Object();
 
   private Map<String, Map<String, List<String>>> reverseIndexes = new HashMap<>();
   private Map<String, List<ProcessorError>> errorMap = new HashMap<>();
   private ContentManager contentManager;
 
-  protected CacheManager(ContentManager contentManager) {
+  public CacheManager(ContentManager contentManager) {
     this.contentManager = contentManager;
   }
 
-  public static Object getFileLock() {
+  public Object getFileLock() {
     return fileLock;
   }
 

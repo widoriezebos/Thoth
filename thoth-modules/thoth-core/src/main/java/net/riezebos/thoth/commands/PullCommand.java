@@ -19,12 +19,16 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.riezebos.thoth.content.ContentManagerFactory;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 
 public class PullCommand extends RendererBase implements Command {
+
+  public PullCommand(ThothContext thothContext) {
+    super(thothContext);
+  }
 
   @Override
   public String getTypeCode() {
@@ -38,7 +42,7 @@ public class PullCommand extends RendererBase implements Command {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      String log = ContentManagerFactory.getInstance().pullAll();
+      String log = getContext().pullAll();
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("log", log);
 

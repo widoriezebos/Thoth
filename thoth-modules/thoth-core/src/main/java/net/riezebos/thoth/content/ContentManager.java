@@ -23,6 +23,7 @@ import java.util.Map;
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.content.versioncontrol.Commit;
@@ -91,5 +92,9 @@ public interface ContentManager {
   List<ProcessorError> getValidationErrors() throws ContentManagerException;
 
   Map<String, List<String>> getReverseIndex(boolean indirect) throws ContentManagerException;
+
+  CacheManager getCacheManager();
+
+  void expireCache();
 
 }

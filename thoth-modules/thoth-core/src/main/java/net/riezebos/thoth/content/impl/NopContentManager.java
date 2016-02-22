@@ -17,8 +17,8 @@ package net.riezebos.thoth.content.impl;
 import java.util.ArrayList;
 import java.util.Date;
 
-import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
@@ -33,8 +33,8 @@ import net.riezebos.thoth.util.PagedList;
  */
 public class NopContentManager extends ContentManagerBase {
 
-  public NopContentManager(ContextDefinition contextDefinition, Configuration configuration) throws ContentManagerException {
-    super(contextDefinition, configuration);
+  public NopContentManager(ContextDefinition contextDefinition, ThothContext context) throws ContentManagerException {
+    super(contextDefinition, context);
     setFileSystem(new ClasspathFileSystem("non/existing/class/root/so/will/not/serve/anything"));
   }
 

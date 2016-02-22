@@ -110,6 +110,9 @@ public class Searcher {
             }
           } else {
             searchResult.setResource(true);
+            String extension = ThothUtil.getExtension(documentPath);
+            searchResult.setImage(getConfiguration().isImageExtension(extension));
+
             searchResult.addFragment(new Fragment(document.get(Indexer.INDEX_TITLE)));
           }
           searchResults.add(searchResult);

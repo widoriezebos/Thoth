@@ -8,8 +8,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import net.riezebos.thoth.configuration.CacheManager;
-import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -25,11 +23,7 @@ public class FSContentManagerTest extends ThothTestBase {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
 
-    CacheManager mockedCacheManager = mockCacheManager();
-    String contextName = "testgit";
-    Configuration mockedConfiguration = mockConfiguration(mockedCacheManager, contextName);
-
-    FSContentManager contentManager = createTempFSContentManager(mockedConfiguration);
+    FSContentManager contentManager = createTempFSContentManager("testgit");
     ClasspathFileSystem classpathFileSystem = getClasspathFileSystem();
 
     FileHandle rootSource = classpathFileSystem.getFileHandle("/");

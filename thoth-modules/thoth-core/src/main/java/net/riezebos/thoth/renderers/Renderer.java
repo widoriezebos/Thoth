@@ -17,7 +17,6 @@ package net.riezebos.thoth.renderers;
 import java.io.OutputStream;
 import java.util.Map;
 
-import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 
@@ -38,8 +37,6 @@ public interface Renderer {
   public enum RenderResult {
     OK, NOT_FOUND, FORBIDDEN
   };
-
-  void setConfiguration(Configuration configuration);
 
   public String getTypeCode();
 

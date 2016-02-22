@@ -47,6 +47,7 @@ import net.riezebos.thoth.commands.RevisionsCommand;
 import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -111,7 +112,7 @@ public class ThothServlet extends ServletBase {
   protected void handleError(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
     Command errorPageCommand = getCommand(ErrorPageCommand.COMMAND);
     if (errorPageCommand == null)
-      errorPageCommand = new ErrorPageCommand(); // Fallback; we should not fail here
+      errorPageCommand = new ErrorPageCommand(getThothContext()); // Fallback; we should not fail here
 
     String context = getContextNoFail(request);
     String path = getPathNoFail(request);
@@ -134,31 +135,32 @@ public class ThothServlet extends ServletBase {
   }
 
   protected void setupCommands() {
-    indexCommand = new IndexCommand();
-    contextIndexCommand = new ContextIndexCommand();
+    ThothContext thothContext = getThothContext();
+    indexCommand = new IndexCommand(thothContext);
+    contextIndexCommand = new ContextIndexCommand(thothContext);
 
     registerCommand(contextIndexCommand);
-    registerCommand(new DiffCommand());
+    registerCommand(new DiffCommand(thothContext));
     registerCommand(indexCommand);
-    registerCommand(new MetaCommand());
-    registerCommand(new PullCommand());
-    registerCommand(new ReindexCommand());
-    registerCommand(new RevisionsCommand());
-    registerCommand(new SearchCommand());
-    registerCommand(new ValidationReportCommand());
-    registerCommand(new BrowseCommand());
-    registerCommand(new ErrorPageCommand());
+    registerCommand(new MetaCommand(thothContext));
+    registerCommand(new PullCommand(thothContext));
+    registerCommand(new ReindexCommand(thothContext));
+    registerCommand(new RevisionsCommand(thothContext));
+    registerCommand(new SearchCommand(thothContext));
+    registerCommand(new ValidationReportCommand(thothContext));
+    registerCommand(new BrowseCommand(thothContext));
+    registerCommand(new ErrorPageCommand(thothContext));
   }
 
   protected void setupRenderers() {
-    defaultRenderer = new HtmlRenderer();
+    defaultRenderer = new HtmlRenderer(getThothContext());
     registerRenderer(defaultRenderer);
-    registerRenderer(new RawRenderer());
+    registerRenderer(new RawRenderer(getThothContext()));
 
     // Setup any custom renderers
     List<CustomRendererDefinition> customRendererDefinitions = getConfiguration().getCustomRenderers();
     for (CustomRendererDefinition customRendererDefinition : customRendererDefinitions) {
-      CustomRenderer renderer = new CustomRenderer(customRendererDefinition);
+      CustomRenderer renderer = new CustomRenderer(getThothContext(), customRendererDefinition);
       renderer.setTypeCode(customRendererDefinition.getExtension());
       renderer.setContentType(customRendererDefinition.getContentType());
       renderer.setCommandLine(customRendererDefinition.getCommandLine());
@@ -171,12 +173,10 @@ public class ThothServlet extends ServletBase {
   }
 
   protected void registerRenderer(Renderer renderer) {
-    renderer.setConfiguration(getConfiguration());
     renderers.put(renderer.getTypeCode().toLowerCase(), renderer);
   }
 
   protected void registerCommand(Command command) {
-    command.setConfiguration(getConfiguration());
     commands.put(command.getTypeCode().toLowerCase(), command);
   }
 
@@ -256,7 +256,7 @@ public class ThothServlet extends ServletBase {
     String path = getPath(request);
     String contextName = getContext(request);
     if (getConfiguration().isValidContext(contextName)) {
-      ContentManager contentManager = getContentManagerFactory().getContentManager(contextName);
+      ContentManager contentManager = getThothContext().getContentManager(contextName);
 
       InputStream is = contentManager.getInputStream(path);
       if (is != null) {

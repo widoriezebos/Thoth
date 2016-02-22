@@ -22,6 +22,7 @@ import java.util.Set;
 
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -29,6 +30,10 @@ import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.util.Classifier;
 
 public class ContextIndexCommand extends RendererBase implements Command {
+
+  public ContextIndexCommand(ThothContext thothContext) {
+    super(thothContext);
+  }
 
   @Override
   public String getTypeCode() {
@@ -42,7 +47,7 @@ public class ContextIndexCommand extends RendererBase implements Command {
 
       List<Book> books = contentManager.getBooks();
 
-      Set<String> classificationNames = getConfiguration().getContextIndexClassifications();
+      Set<String> classificationNames = getContext().getConfiguration().getContextIndexClassifications();
       classificationNames.add("folder");
 
       // The order is important: to not allow a name clash to overwrite built in variables

@@ -25,8 +25,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
-import net.riezebos.thoth.content.ContentManagerFactory;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.servlets.ThothServlet;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -36,9 +35,12 @@ import net.riezebos.thoth.util.ThothUtil;
 public class Thoth {
 
   public void start(String args[]) throws Exception {
+    ThothContext thothContext = new ThothContext();
+    ThothContext.registerSharedContext(thothContext);
+
     System.out.println("Thoth standalone v" + ThothUtil.getVersion(ThothUtil.Version.STANDALONE));
     System.out.println("Server is firing up. Please hang on...");
-    String configurationFile = ConfigurationFactory.determinePropertyPath();
+    String configurationFile = thothContext.determinePropertyPath();
 
     if (args.length > 0) {
       configurationFile = tryConfigFile(args[0]);
@@ -50,18 +52,17 @@ public class Thoth {
     if (configurationFile == null) {
       String message = "No Configuration found. Please specify a configuration file to use either by\n"//
           + "1) Passing it as a command line argument i.e. 'java " + Thoth.class.getName() + " /my/own/configuration.properties'\n"//
-          + "2) Setting an environment variable i.e. set " + ConfigurationFactory.CONFIGKEY + "=/my/own/configuration.properties\n"//
-          + "3) Passing a System variable to the Java VM i.e. -D" + ConfigurationFactory.CONFIGKEY + "=/my/own/configuration.properties";
+          + "2) Setting an environment variable i.e. set " + ThothContext.CONFIGKEY + "=/my/own/configuration.properties\n"//
+          + "3) Passing a System variable to the Java VM i.e. -D" + ThothContext.CONFIGKEY + "=/my/own/configuration.properties";
       throw new IllegalArgumentException(message);
     }
     File check = new File(configurationFile);
     if (!check.exists())
       throw new FileNotFoundException("Configuration file " + configurationFile + " not found");
 
-    System.setProperty(ConfigurationFactory.CONFIGKEY, configurationFile);
+    System.setProperty(ThothContext.CONFIGKEY, configurationFile);
 
-    Configuration configuration = ConfigurationFactory.getConfiguration();
-
+    Configuration configuration = thothContext.getConfiguration();
     Server server = new Server(8080);
     ServerConnector httpConnector = new ServerConnector(server);
     httpConnector.setHost(configuration.getEmbeddedServerName());
@@ -81,7 +82,7 @@ public class Thoth {
 
     System.out.println("Setting up content managers...");
     // Warm up the server
-    ContentManagerFactory.getInstance().touch();
+    thothContext.touch();
 
     server.start();
     System.out.println("Thoth server started.\n"//
@@ -102,7 +103,7 @@ public class Thoth {
     System.out.println("Stopping server.\n(First waiting for any auto refresh to finish though)");
     server.stop();
     server.join();
-    ContentManagerFactory.getInstance().shutDown();
+    thothContext.shutDown();
   }
 
   protected String tryConfigFile(String defaultConfigFileName) {

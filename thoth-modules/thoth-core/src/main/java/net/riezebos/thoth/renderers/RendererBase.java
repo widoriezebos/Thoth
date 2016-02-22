@@ -33,9 +33,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
@@ -48,25 +47,27 @@ public abstract class RendererBase implements Renderer {
   public static final String CRITICS = "critics";
   private static final String VELOCITY_HELPER = "thothutil";
   private static final String VELOCITY_PROPERTIES = "net/riezebos/thoth/velocity.properties";
-  private Configuration configuration = null;
+  private ThothContext thothContext = null;
+
+  public RendererBase(ThothContext thothContext) {
+    this.thothContext = thothContext;
+  }
 
   @Override
   public String getContentType(Map<String, Object> arguments) {
     return asJson(arguments) ? "application/json;charset=UTF-8" : "text/html;charset=UTF-8";
   }
 
-  public Configuration getConfiguration() {
-    if (configuration == null)
-      configuration = ConfigurationFactory.getConfiguration();
-    return configuration;
+  public ThothContext getContext() {
+    return thothContext;
   }
 
-  public void setConfiguration(Configuration configuration) {
-    this.configuration = configuration;
+  protected Configuration getConfiguration() {
+    return getContext().getConfiguration();
   }
 
   protected ContentManager getContentManager(String context) throws ContentManagerException {
-    return ContentManagerFactory.getInstance().getContentManager(context);
+    return thothContext.getContentManager(context);
   }
 
   protected String getString(Map<String, Object> arguments, String key) {

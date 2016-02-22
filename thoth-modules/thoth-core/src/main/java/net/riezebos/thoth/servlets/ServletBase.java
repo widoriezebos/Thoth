@@ -31,9 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ConfigurationFactory;
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
-import net.riezebos.thoth.content.ContentManagerFactory;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -44,11 +43,26 @@ import net.riezebos.thoth.util.ThothUtil;
 public abstract class ServletBase extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(ServletBase.class);
-  private Configuration configuration = null;
+  private ThothContext thothContext = null;
 
   protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
 
   public ServletBase() {
+  }
+
+  @Override
+  public void init() throws ServletException {
+    super.init();
+    if (thothContext == null)
+      thothContext = ThothContext.getSharedThothContext();
+  }
+
+  public ThothContext getThothContext() {
+    return thothContext;
+  }
+
+  public void setThothContext(ThothContext thothContext) {
+    this.thothContext = thothContext;
   }
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -123,7 +137,7 @@ public abstract class ServletBase extends HttpServlet {
         context = configuration.getMainIndexSkinContext();
       }
 
-      ContentManager contentManager = getContentManagerFactory().getContentManager(context);
+      ContentManager contentManager = getThothContext().getContentManager(context);
       SkinManager skinManager = contentManager.getSkinManager();
       String path = getPath(request);
 
@@ -146,13 +160,7 @@ public abstract class ServletBase extends HttpServlet {
   }
 
   protected Configuration getConfiguration() {
-    if (configuration == null)
-      configuration = ConfigurationFactory.getConfiguration();
-    return configuration;
-  }
-
-  protected void setConfiguration(Configuration configuration) {
-    this.configuration = configuration;
+    return getThothContext().getConfiguration();
   }
 
   protected Map<String, Object> getParameters(HttpServletRequest request) throws ServletException {
@@ -193,17 +201,13 @@ public abstract class ServletBase extends HttpServlet {
 
   private String getRefreshTimestamp(String contextName) {
     try {
-      Date refreshTimestamp = getContentManagerFactory().getRefreshTimestamp(contextName);
+      Date refreshTimestamp = getThothContext().getRefreshTimestamp(contextName);
       SimpleDateFormat timestampFormat = getConfiguration().getTimestampFormat();
       return refreshTimestamp == null ? "Never" : timestampFormat.format(refreshTimestamp);
     } catch (ContentManagerException e) {
       LOG.error(e.getMessage(), e);
       return "Unknown";
     }
-  }
-
-  protected ContentManagerFactory getContentManagerFactory() {
-    return ContentManagerFactory.getInstance();
   }
 
   protected Skin getSkinNoFail(HttpServletRequest request) {

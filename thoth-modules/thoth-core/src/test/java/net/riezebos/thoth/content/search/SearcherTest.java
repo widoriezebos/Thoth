@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import net.riezebos.thoth.configuration.ThothContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.search.util.TestSearcher;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -47,7 +48,8 @@ public class SearcherTest extends ThothTestBase {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
     String contextName = "searchtest";
-    ContentManager contentManager = registerTestContentManager(contextName);
+    ThothContext thothContext = createThothContext(contextName);
+    ContentManager contentManager = createTestContentManager(thothContext, contextName);
     Searcher searcher = new TestSearcher(contentManager);
     
     PagedList<SearchResult> search = searcher.search("Main.md", 0, 25);
