@@ -60,41 +60,42 @@ renderer.1.contenttype
 renderer.1.command
 : The OS level command to render the output. The following keywords can be used for substitution in the command:
 
-- url, the URL where to fetch the contents from
+- input, the file that contains the source document
+- url, the URL where to fetch the contents of the source document from. Note that this is an alternative method of specifying the input (without using the input file directly)
 - output, the name of the file to write the rendered contents to
 - context, the name of the context
 - path, the path of the file in the context
 - title, the title of the document
 
-An example of a command:
+An few examples of custom renderers (note the use of ${url} and ${input}):
 
-	/usr/local/bin/prince ${url} -o ${output} --media=print --page-size=A4 --page-margin=20mm
+	renderer.1.extension=pdf 
+	renderer.1.contenttype=application/pdf 
+	renderer.1.command=/usr/local/bin/prince ${url}?suppresserrors=true -o ${output} --javascript --media=print --page-size=A4 --page-margin=20mm 
+	
+	renderer.2.extension=docx
+	renderer.2.contenttype=application/vnd.openxmlformats-officedocument.wordprocessingml.document 
+	renderer.2.command=/usr/local/bin/pandoc -s -r html -t docx ${input} -o ${output}
+	
+	renderer.3.extension=epub
+	renderer.3.contenttype=application/epub+zip
+	renderer.2.command=/usr/local/bin/pandoc -s -r html -t epub ${input} -o ${output}
+	
+	renderer.4.extension=rtf
+	renderer.4.contenttype=application/rtf
+	renderer.2.command=/usr/local/bin/pandoc -s -r html -t rtf ${input} -o ${output}
 
-context.classifications
-: Comma separated list of classifications. The default branch index page uses the classifications of the documents to create an initial structure. There must be meta tags in the documents matching the classification (i.e. category: primers) for a classification names ‘category’. Default value = category,audience,folder
-
-search.maxresults
-: The number of search results to show per page of results
-
+### Format masks 
 formatmask.timestamp
 : The format mask to use for timestamps. Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html) for more information about this mask). Default value = dd-MM-yyyy HH:mm:ss
 
 formatmask.date
 : The format mask to use for dates (without the time part). Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html) for more information about this mask). Default value = dd-MM-yyyy
 
-versioncontrol.maxfilerevisions
-: The maximum number of revisions to retrieve for the metadata page. Default = 10
+### File classification
+context.classifications
+: Comma separated list of classifications. The default branch index page uses the classifications of the documents to create an initial structure. There must be meta tags in the documents matching the classification (i.e. category: primers) for a classification named ‘category’. Default value = category,audience,folder
 
-versioncontrol.maxcontextrevisions
-: The maximum number of revisions to collect / display for latest commits for the entire context (Revisions command). Default = 25
-
-json.prettyprint
-: When a page is rendered to JSON (by adding the mode=json parameter to a request) it will be pretty printed if this setting is set to ‘true’. Default = true
-
-parsetimeout
-: The maximum time in ms that a Markdown parse by the PegDown parser can last. Default = 4000
-
-### File recognition
 documents
 : The extensions of the files that will be recognized as a 'Document' and therefore can be rendered to html, pdf etc. Default = marked,book,index,md
 
@@ -165,9 +166,24 @@ markdown.option.TASKLISTITEMS
 markdown.option.EXTANCHORLINKS
 : Generate anchor links for headers using complete contents of the header. Note that Thoth has it’s own method of creating actor links that might interfere with this setting. Default is off. 
 
+### Miscellaneous
+search.maxresults
+: The number of search results to show per page of results
+
+versioncontrol.maxfilerevisions
+: The maximum number of revisions to retrieve for the metadata page. Default = 10
+
+versioncontrol.maxcontextrevisions
+: The maximum number of revisions to collect / display for latest commits for the entire context (Revisions command). Default = 25
+
+json.prettyprint
+: When a page is rendered to JSON (by adding the mode=json parameter to a request) it will be pretty printed if this setting is set to ‘true’. Default = true
+
+parsetimeout
+: The maximum time in ms that a Markdown parse by the PegDown parser can last. Default = 4000
+
 ## Sample configuration file
 \includecode{sample.configuration.properties}
-
 
 
 
