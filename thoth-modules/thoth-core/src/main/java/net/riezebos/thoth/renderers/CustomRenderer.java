@@ -46,7 +46,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
   private RendererProvider rendererProvider;
   private String typeCode;
   private String contentType;
-  private String mode;
+  private String source;
   private String commandLine;
 
   public CustomRenderer(ThothEnvironment thothEnvironment, CustomRendererDefinition definition, RendererProvider rendererProvider) {
@@ -55,7 +55,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
     setTypeCode(definition.getExtension());
     setContentType(definition.getContentType());
     setCommandLine(definition.getCommandLine());
-    setMode(definition.getMode());
+    setSource(definition.getSourceRenderer());
   }
 
   public void setRendererProvider(RendererProvider rendererProvider) {
@@ -66,14 +66,14 @@ public class CustomRenderer extends RendererBase implements Renderer {
     return rendererProvider;
   }
 
-  public String getMode() {
-    return mode;
+  public String getSource() {
+    return source;
   }
 
-  public void setMode(String mode) {
-    if (StringUtils.isBlank(mode))
-      mode = HtmlRenderer.TYPE;
-    this.mode = mode;
+  public void setSource(String source) {
+    if (StringUtils.isBlank(source))
+      source = HtmlRenderer.TYPE;
+    this.source = source;
   }
 
   public String getTypeCode() {
@@ -107,9 +107,9 @@ public class CustomRenderer extends RendererBase implements Renderer {
       ByteArrayOutputStream sourceBytes = new ByteArrayOutputStream();
       RendererProvider rendererProvider = getRendererProvider();
 
-      Renderer renderer = rendererProvider.getRenderer(getMode());
+      Renderer renderer = rendererProvider.getRenderer(getSource());
       if (renderer == this)
-        throw new IllegalArgumentException("Cannot have the mode of a custom renderer pointing to itself");
+        throw new IllegalArgumentException("Cannot have the source of a custom renderer pointing to itself");
 
       RenderResult rawRenderResult = renderer.execute(context, path, arguments, skin, sourceBytes);
       if (rawRenderResult != RenderResult.OK)
@@ -117,7 +117,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
 
       RenderResult result = RenderResult.OK;
       File tempOutput = File.createTempFile("thothtemp", "." + typeCode);
-      File tempInput = File.createTempFile("thothhtml", "." + getMode());
+      File tempInput = File.createTempFile("thothhtml", "." + getSource());
       try {
         IOUtils.copy(new ByteArrayInputStream(sourceBytes.toByteArray()), new FileOutputStream(tempInput));
 

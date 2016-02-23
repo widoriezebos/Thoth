@@ -54,8 +54,8 @@ You can define any number of custom renderers. The most basic one would be a PDF
 renderer.1.extension
 : The extension to recognize this renderer. An example would be ‘pdf’, adding a parameter to a Thoth page URL ‘?output=pdf’ would then render the HTML version of that page with this renderer. Must be unique across renderers. Example: ‘pdf’
 
-renderer.1.mode
-: The type of input to produce for the custom renderer. Default is HTML but you can override this to RAW (or any other renderer for that matter, just use it’s Extension as the mode). You obviously need to avoid setting up recursive loops by pointing to a custom renderer that uses this renderer as a source somewhere in it’s chain.
+renderer.1.source
+: The type of input to produce for the custom renderer. Default is HTML but you can override this to RAW (or any other renderer for that matter, just use it’s Extension as the source attribute). You obviously need to avoid setting up recursive loops by pointing to a custom renderer that uses this renderer as a source somewhere in it’s chain.
 
 renderer.1.contenttype
 : The mime contenttype of the content rendered by this custom renderer. For PDF that would be ‘application/pdf’
@@ -73,22 +73,22 @@ renderer.1.command
 An few examples of custom renderers (note the use of ${url} and ${input}):
 
 	renderer.1.extension=pdf 
-	renderer.1.mode=html 
+	renderer.1.source=html 
 	renderer.1.contenttype=application/pdf 
 	renderer.1.command=/usr/local/bin/prince ${url}?suppresserrors=true -o ${output} --javascript --media=print --page-size=A4 --page-margin=20mm 
 	
 	renderer.2.extension=docx
-	renderer.2.mode=html 
+	renderer.2.source=html 
 	renderer.2.contenttype=application/vnd.openxmlformats-officedocument.wordprocessingml.document 
 	renderer.2.command=/usr/local/bin/pandoc -s -r html -t docx ${input} -o ${output}
 	
 	renderer.3.extension=epub
-	renderer.3.mode=html 
+	renderer.3.source=html 
 	renderer.3.contenttype=application/epub+zip
 	renderer.3.command=/usr/local/bin/pandoc -s -r html -t epub ${input} -o ${output}
 	
 	renderer.4.extension=rtf
-	renderer.4.mode=html 
+	renderer.4.source=html 
 	renderer.4.contenttype=application/rtf
 	renderer.4.command=/usr/local/bin/pandoc -s -r html -t rtf ${input} -o ${output}
 
