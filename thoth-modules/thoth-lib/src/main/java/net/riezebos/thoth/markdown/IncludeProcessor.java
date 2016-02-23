@@ -216,8 +216,9 @@ public class IncludeProcessor extends FileProcessor {
               registerBookMarkUsage(usage);
             } else {
               // Do not check http:// or mailto: kind of links
+              // TODO: check the actual bookmark (if the link contains a bookmark)
               if (pathname.indexOf(':') == -1) {
-                FileHandle check = createFileHandle(pathname.replaceAll("%20", " "));
+                FileHandle check = createFileHandle(ThothUtil.getPartBeforeFirst(pathname.replaceAll("%20", " "), "#"));
                 if (!check.exists())
                   error(getCurrentLineInfo() + ": Link invalid: " + pathSpec);
               }

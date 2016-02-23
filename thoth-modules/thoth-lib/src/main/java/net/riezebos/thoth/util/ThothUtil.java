@@ -262,61 +262,61 @@ public class ThothUtil {
   /**
    * When prefix not found; will return the entire path
    * 
-   * @param path
+   * @param value
    * @param prefix
    * @return
    */
-  public static String getPartBeforeFirst(String path, String prefix) {
-    if (path != null) {
-      int idx = path.indexOf(prefix);
+  public static String getPartBeforeFirst(String value, String prefix) {
+    if (value != null) {
+      int idx = value.indexOf(prefix);
       if (idx != -1)
-        path = path.substring(0, idx);
+        value = value.substring(0, idx);
     }
-    return path;
+    return value;
   }
 
   /**
    * When prefix not found; will return empty string
    * 
-   * @param path
+   * @param value
    * @param prefix
    * @return
    */
-  public static String getPartAfterFirst(String path, String prefix) {
-    if (path != null) {
-      int idx = path.indexOf(prefix);
+  public static String getPartAfterFirst(String value, String prefix) {
+    if (value != null) {
+      int idx = value.indexOf(prefix);
       if (idx != -1)
-        path = path.substring(idx + prefix.length());
+        value = value.substring(idx + prefix.length());
       else
-        path = "";
+        value = "";
     }
-    return path;
+    return value;
   }
 
-  public static String getPartAfterLast(String path, String prefix) {
-    if (path != null) {
-      int idx = path.lastIndexOf(prefix);
+  public static String getPartAfterLast(String value, String prefix) {
+    if (value != null) {
+      int idx = value.lastIndexOf(prefix);
       if (idx != -1)
-        path = path.substring(idx + prefix.length());
+        value = value.substring(idx + prefix.length());
     }
-    return path;
+    return value;
   }
 
-  public static String getPartBeforeLast(String path, String prefix) {
-    if (path != null) {
-      int idx = path.lastIndexOf(prefix);
+  public static String getPartBeforeLast(String value, String prefix) {
+    if (value != null) {
+      int idx = value.lastIndexOf(prefix);
       if (idx != -1)
-        path = path.substring(0, idx);
+        value = value.substring(0, idx);
     }
-    return path;
+    return value;
   }
 
-  public static String stripPrefix(String path, String prefix) {
-    if (path != null) {
-      if (path.startsWith(prefix))
-        path = path.substring(prefix.length());
+  public static String stripPrefix(String value, String prefix) {
+    if (value != null) {
+      if (value.startsWith(prefix))
+        value = value.substring(prefix.length());
     }
-    return path;
+    return value;
   }
 
   public static String getExtension(String path) {

@@ -3,7 +3,6 @@ package net.riezebos.thoth.configuration;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -155,9 +154,9 @@ public interface Configuration {
   String getDefaultSkin();
 
   /**
-   * The following classifications will be available to the context index template (grouping of documents by classification) The folder
-   * classification is built in; and is just listed below for clarity In the template (or json) the classification names are available under "classification_" +
-   * <the name specified below>
+   * The following classifications will be available to the context index template (grouping of documents by classification) The folder classification is built
+   * in; and is just listed below for clarity In the template (or json) the classification names are available under "classification_" + <the name specified
+   * below>
    */
   List<String> getContextIndexClassifications();
 
