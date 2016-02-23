@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
+import net.riezebos.thoth.renderers.HtmlRenderer;
+import net.riezebos.thoth.renderers.RawRenderer;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -45,6 +47,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   private Set<String> fragmentExtensions = null;
   private Set<String> bookExtensions = null;
   private List<String> classifications = null;
+  private List<String> outputFormats = null;
 
   public PropertyBasedConfiguration() throws ConfigurationException {
   }
@@ -304,6 +307,23 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
       this.classifications = lst;
     }
     return this.classifications;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see net.riezebos.thoth.configuration.ConfigurationT#getContextIndexClassifications()
+   */
+  @Override
+  public List<String> getOutputFormats() {
+    if (this.outputFormats == null) {
+      List<String> lst = new ArrayList<>();
+      lst.add(HtmlRenderer.TYPE);
+      lst.add(RawRenderer.TYPE);
+      for (CustomRendererDefinition customRenderer : getCustomRenderers())
+        lst.add(customRenderer.getExtension());
+      this.outputFormats = lst;
+    }
+    return this.outputFormats;
   }
 
   /*

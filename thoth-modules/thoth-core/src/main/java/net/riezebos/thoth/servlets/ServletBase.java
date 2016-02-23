@@ -195,6 +195,7 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.SKIN, skin == null ? null : skin.getName());
     result.put(Renderer.TODAY, configuration.getDateFormat().format(now));
     result.put(Renderer.NOW, configuration.getTimestampFormat().format(now));
+    result.put(Renderer.OUTPUT_FORMATS, configuration.getOutputFormats());
     result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(contextName));
     return result;
   }

@@ -33,6 +33,7 @@ public interface Renderer {
   String SKIN = "skin";
   String TODAY = "today";
   String NOW = "now";
+  String OUTPUT_FORMATS = "outputFormats";
 
   public enum RenderResult {
     OK, NOT_FOUND, FORBIDDEN

@@ -90,6 +90,7 @@ The following variables are defined for all templates
 - **today** is the current date. Formatted according to the format mask specified by the Configuration. Type: String
 - **now** is the current timestamp. Formatted according to the format mask specified by the Configuration. Type: String
 - **refresh** is the timestamp of the latest successful refresh (for version control based repositories). Formatted according to the format mask specified by the Configuration.  Type: String
+- **outputFormats** is the list of supported output formats (html, raw and any custom renderers that are defined in the configuration) Type: List\<String\>
 
 ### Types used for variables
 Most types are basic / simple types like String, List and Integer. The exception to the rule are beans Book, Diff etc. The following beans are defined as types and used below:

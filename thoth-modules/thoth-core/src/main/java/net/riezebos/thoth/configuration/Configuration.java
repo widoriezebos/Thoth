@@ -272,4 +272,9 @@ public interface Configuration {
    */
   boolean isValidContext(String name);
 
+  /**
+   * @return a list of all supported output formats, including the custom renderers that are configured
+   */
+  List<String> getOutputFormats();
+
 }
