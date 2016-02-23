@@ -58,11 +58,12 @@ import net.riezebos.thoth.renderers.HtmlRenderer;
 import net.riezebos.thoth.renderers.RawRenderer;
 import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.renderers.Renderer.RenderResult;
+import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 import net.riezebos.thoth.util.MimeTypeUtil;
 import net.riezebos.thoth.util.ThothUtil;
 
-public class ThothServlet extends ServletBase {
+public class ThothServlet extends ServletBase implements RendererProvider {
   private static final Logger LOG = LoggerFactory.getLogger(ThothServlet.class);
 
   private static final long serialVersionUID = 1L;
@@ -160,7 +161,7 @@ public class ThothServlet extends ServletBase {
     // Setup any custom renderers
     List<CustomRendererDefinition> customRendererDefinitions = getConfiguration().getCustomRenderers();
     for (CustomRendererDefinition customRendererDefinition : customRendererDefinitions) {
-      CustomRenderer renderer = new CustomRenderer(getThothContext(), customRendererDefinition);
+      CustomRenderer renderer = new CustomRenderer(getThothContext(), customRendererDefinition, this);
       renderer.setTypeCode(customRendererDefinition.getExtension());
       renderer.setContentType(customRendererDefinition.getContentType());
       renderer.setCommandLine(customRendererDefinition.getCommandLine());
@@ -180,8 +181,10 @@ public class ThothServlet extends ServletBase {
     commands.put(command.getTypeCode().toLowerCase(), command);
   }
 
-  protected Renderer getRenderer(String typeCode) {
-    Renderer renderer = renderers.get(typeCode);
+  public Renderer getRenderer(String typeCode) {
+    Renderer renderer = null;
+    if (typeCode != null)
+      renderer = renderers.get(typeCode.toLowerCase());
     if (renderer == null)
       renderer = defaultRenderer;
     return renderer;

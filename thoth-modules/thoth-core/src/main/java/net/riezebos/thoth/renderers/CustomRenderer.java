@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,18 +40,40 @@ import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 import net.riezebos.thoth.util.ThothUtil;
 
-public class CustomRenderer extends HtmlRenderer implements Renderer {
+public class CustomRenderer extends RendererBase implements Renderer {
   private static final Logger LOG = LoggerFactory.getLogger(CustomRenderer.class);
 
+  private RendererProvider rendererProvider;
   private String typeCode;
   private String contentType;
+  private String mode;
   private String commandLine;
 
-  public CustomRenderer(ThothEnvironment thothEnvironment, CustomRendererDefinition definition) {
+  public CustomRenderer(ThothEnvironment thothEnvironment, CustomRendererDefinition definition, RendererProvider rendererProvider) {
     super(thothEnvironment);
+    setRendererProvider(rendererProvider);
     setTypeCode(definition.getExtension());
     setContentType(definition.getContentType());
     setCommandLine(definition.getCommandLine());
+    setMode(definition.getMode());
+  }
+
+  public void setRendererProvider(RendererProvider rendererProvider) {
+    this.rendererProvider = rendererProvider;
+  }
+
+  public RendererProvider getRendererProvider() {
+    return rendererProvider;
+  }
+
+  public String getMode() {
+    return mode;
+  }
+
+  public void setMode(String mode) {
+    if (StringUtils.isBlank(mode))
+      mode = HtmlRenderer.TYPE;
+    this.mode = mode;
   }
 
   public String getTypeCode() {
@@ -81,23 +104,29 @@ public class CustomRenderer extends HtmlRenderer implements Renderer {
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
 
-      ByteArrayOutputStream html = new ByteArrayOutputStream();
-      RenderResult htmlRenderResult = renderHtml(context, path, arguments, skin, html);
-      if (htmlRenderResult != RenderResult.OK)
-        return htmlRenderResult;
+      ByteArrayOutputStream sourceBytes = new ByteArrayOutputStream();
+      RendererProvider rendererProvider = getRendererProvider();
+
+      Renderer renderer = rendererProvider.getRenderer(getMode());
+      if (renderer == this)
+        throw new IllegalArgumentException("Cannot have the mode of a custom renderer pointing to itself");
+
+      RenderResult rawRenderResult = renderer.execute(context, path, arguments, skin, sourceBytes);
+      if (rawRenderResult != RenderResult.OK)
+        return rawRenderResult;
 
       RenderResult result = RenderResult.OK;
-      File tempFile = File.createTempFile("thothtemp", "." + typeCode);
-      File tempHtml = File.createTempFile("thothhtml", ".html");
+      File tempOutput = File.createTempFile("thothtemp", "." + typeCode);
+      File tempInput = File.createTempFile("thothhtml", "." + getMode());
       try {
-        IOUtils.copy(new ByteArrayInputStream(html.toByteArray()), new FileOutputStream(tempHtml));
+        IOUtils.copy(new ByteArrayInputStream(sourceBytes.toByteArray()), new FileOutputStream(tempInput));
 
         Configuration configuration = getConfiguration();
         String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
 
-        arguments.put("input", tempHtml.getAbsolutePath());
+        arguments.put("input", tempInput.getAbsolutePath());
         arguments.put("url", url);
-        arguments.put("output", tempFile.getAbsolutePath());
+        arguments.put("output", tempOutput.getAbsolutePath());
         String command = ThothUtil.replaceKeywords(getCommandLine(configuration), arguments);
 
         String workingFolder = getConfiguration().getWorkspaceLocation() + context + ThothUtil.prefix(ThothUtil.getFolder(path), "/");
@@ -107,17 +136,22 @@ public class CustomRenderer extends HtmlRenderer implements Renderer {
 
         execute(command, arguments, contextLocation);
 
-        try (FileInputStream fis = new FileInputStream(tempFile)) {
+        try (FileInputStream fis = new FileInputStream(tempOutput)) {
           IOUtils.copy(fis, outputStream);
         }
       } finally {
-        tempFile.delete();
-        tempHtml.delete();
+        tempOutput.delete();
+        tempInput.delete();
       }
       return result;
-    } catch (Exception e) {
+    } catch (
+
+    Exception e)
+
+    {
       throw new RenderException(e);
     }
+
   }
 
   protected void execute(String command, Map<String, Object> arguments, File workingFolder) throws IOException {

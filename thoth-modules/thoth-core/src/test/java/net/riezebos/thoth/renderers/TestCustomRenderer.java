@@ -29,8 +29,8 @@ public class TestCustomRenderer extends CustomRenderer {
 
   private String executedCommand = null;
 
-  public TestCustomRenderer(ThothEnvironment thothEnvironment, CustomRendererDefinition definition) {
-    super(thothEnvironment, definition);
+  public TestCustomRenderer(ThothEnvironment thothEnvironment, CustomRendererDefinition definition, RendererProvider rendererProvider) {
+    super(thothEnvironment, definition, rendererProvider);
   }
 
   public String getExecutedCommand() {

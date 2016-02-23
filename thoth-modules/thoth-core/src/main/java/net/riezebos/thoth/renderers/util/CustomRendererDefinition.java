@@ -17,17 +17,23 @@ package net.riezebos.thoth.renderers.util;
 public class CustomRendererDefinition {
   private String extension;
   private String contentType;
+  private String mode;
   private String commandLine;
 
-  public CustomRendererDefinition(String extension, String contentType, String commandLine) {
+  public CustomRendererDefinition(String extension, String contentType, String mode, String commandLine) {
     super();
     this.extension = extension;
     this.contentType = contentType;
+    this.mode = mode;
     this.commandLine = commandLine;
   }
 
   public String getExtension() {
     return extension;
+  }
+
+  public String getMode() {
+    return mode;
   }
 
   public String getContentType() {

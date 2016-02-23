@@ -325,8 +325,11 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
       String extension = getValue("renderer." + idx + ".extension", null);
       String contenttype = getValue("renderer." + idx + ".contenttype", null);
       String command = getValue("renderer." + idx + ".command", null);
+      String mode = getValue("renderer." + idx + ".mode", null);
+      if (StringUtils.isBlank(mode))
+        mode = "html";
       if (extension != null) {
-        renderer = new CustomRendererDefinition(extension, contenttype, command);
+        renderer = new CustomRendererDefinition(extension, contenttype, mode, command);
         result.add(renderer);
       }
     } while (renderer != null);

@@ -37,13 +37,16 @@ public class CustomRendererTest extends ThothTestBase {
     String contextName = "TestContext";
     String contentType = "application/pdf";
     String extension = "pdf";
+    String mode = "html";
     String commandLine = "output={${output}} url={${url}}";
 
     ThothEnvironment thothEnvironment = createThothContext(contextName);
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
 
-    CustomRendererDefinition def = new CustomRendererDefinition(extension, contentType, commandLine);
-    TestCustomRenderer renderer = new TestCustomRenderer(thothEnvironment, def);
+    TestRendererProvider testRendererProvider = new TestRendererProvider(thothEnvironment);
+
+    CustomRendererDefinition def = new CustomRendererDefinition(extension, contentType, mode, commandLine);
+    TestCustomRenderer renderer = new TestCustomRenderer(thothEnvironment, def, testRendererProvider);
 
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
