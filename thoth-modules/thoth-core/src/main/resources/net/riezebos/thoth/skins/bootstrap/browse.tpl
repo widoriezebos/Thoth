@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
+    <meta charset="utf-8">
   <title>Browse ${path}</title>
   <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
   <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />

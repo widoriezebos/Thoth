@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
   <head>
+    <meta charset="utf-8">
     <title>${document.name} Meta Info</title>
     <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />

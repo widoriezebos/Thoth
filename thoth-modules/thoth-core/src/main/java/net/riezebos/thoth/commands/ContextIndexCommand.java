@@ -18,10 +18,10 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
@@ -47,7 +47,8 @@ public class ContextIndexCommand extends RendererBase implements Command {
 
       List<Book> books = contentManager.getBooks();
 
-      Set<String> classificationNames = getThothEnvironment().getConfiguration().getContextIndexClassifications();
+      Configuration configuration = getThothEnvironment().getConfiguration();
+      List<String> classificationNames = configuration.getContextIndexClassifications();
       classificationNames.add("folder");
 
       // The order is important: to not allow a name clash to overwrite built in variables
@@ -59,6 +60,7 @@ public class ContextIndexCommand extends RendererBase implements Command {
       variables.putAll(arguments);
       variables.put("books", books);
       variables.put("versioncontrolled", contentManager.supportsVersionControl());
+      variables.put("classifications", classificationNames);
 
       if (asJson(arguments))
         executeJson(variables, outputStream);

@@ -155,11 +155,11 @@ public interface Configuration {
   String getDefaultSkin();
 
   /**
-   * The following comma separated classifications will be available to the context index template (grouping of documents by classification) The folder
+   * The following classifications will be available to the context index template (grouping of documents by classification) The folder
    * classification is built in; and is just listed below for clarity In the template (or json) the classification names are available under "classification_" +
    * <the name specified below>
    */
-  Set<String> getContextIndexClassifications();
+  List<String> getContextIndexClassifications();
 
   /**
    * Pretty prent JSON responses. You might want to set this to false in a production environment; small performance benefit

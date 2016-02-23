@@ -42,8 +42,9 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   private String workspaceLocation;
   private Integer markdownOptions;
   private Set<String> imageExtensions = new HashSet<>();
-  private Set<String> _fragmentExtensions = null;
-  private Set<String> _bookExtensions = null;
+  private Set<String> fragmentExtensions = null;
+  private Set<String> bookExtensions = null;
+  private List<String> classifications = null;
 
   public PropertyBasedConfiguration() throws ConfigurationException {
   }
@@ -291,13 +292,18 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    * @see net.riezebos.thoth.configuration.ConfigurationT#getContextIndexClassifications()
    */
   @Override
-  public Set<String> getContextIndexClassifications() {
-    String value = getValue("context.classifications", "category,audience,folder");
-    Set<String> classifications = new HashSet<>();
-    for (String name : value.split("\\,")) {
-      classifications.add(name.trim());
+  public List<String> getContextIndexClassifications() {
+    if (this.classifications == null) {
+      String value = getValue("context.classifications", "category,audience,folder");
+      Set<String> classificationSet = new HashSet<>();
+      for (String name : value.split("\\,")) {
+        classificationSet.add(name.trim());
+      }
+      List<String> lst = new ArrayList<>(classificationSet);
+      Collections.sort(lst);
+      this.classifications = lst;
     }
-    return classifications;
+    return this.classifications;
   }
 
   /*
@@ -401,11 +407,11 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public boolean isFragment(String path) {
-    if (_fragmentExtensions == null) {
+    if (this.fragmentExtensions == null) {
       Set<String> fragmentExtensions = new HashSet<>();
       fragmentExtensions.addAll(getDocumentExtensions());
       fragmentExtensions.removeAll(getBookExtensions());
-      _fragmentExtensions = fragmentExtensions;
+      this.fragmentExtensions = fragmentExtensions;
     }
     if (ThothUtil.getFileName(path).startsWith("."))
       return false;
@@ -415,7 +421,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
       return false;
     else
       extension = extension.toLowerCase();
-    return _fragmentExtensions.contains(extension);
+    return fragmentExtensions.contains(extension);
   }
 
   /*
@@ -424,8 +430,8 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public boolean isBook(String path) {
-    if (_bookExtensions == null) {
-      _bookExtensions = new HashSet<>(getBookExtensions());
+    if (bookExtensions == null) {
+      bookExtensions = new HashSet<>(getBookExtensions());
     }
     if (ThothUtil.getFileName(path).startsWith("."))
       return false;
@@ -435,7 +441,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
       return false;
     else
       extension = extension.toLowerCase();
-    return _bookExtensions.contains(extension);
+    return bookExtensions.contains(extension);
   }
 
   /*
