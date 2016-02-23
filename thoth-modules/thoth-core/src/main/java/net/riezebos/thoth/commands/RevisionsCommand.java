@@ -48,7 +48,7 @@ public class RevisionsCommand extends RendererBase implements Command {
       if (pageNumber == null)
         pageNumber = 1;
 
-      int pageSize = getContext().getConfiguration().getContextMaxRevisions();
+      int pageSize = getThothEnvironment().getConfiguration().getContextMaxRevisions();
       PagedList<Commit> pagedList = contentManager.getCommits(null, pageNumber, pageSize);
       List<Commit> commitList = pagedList.getList();
       boolean hasMore = pagedList.hasMore();

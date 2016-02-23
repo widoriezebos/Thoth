@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +42,7 @@ public class TestCustomRenderer extends CustomRenderer {
   }
 
   @Override
-  protected void execute(String command) throws IOException {
+  protected void execute(String command, Map<String, Object> arguments, File workingFolder) throws IOException {
     executedCommand = command;
 
     Pattern pattern = Pattern.compile("(\\w+)\\=\\{(.*?)\\}");

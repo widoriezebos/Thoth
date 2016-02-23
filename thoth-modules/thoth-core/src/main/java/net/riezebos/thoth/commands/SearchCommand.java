@@ -57,7 +57,7 @@ public class SearchCommand extends RendererBase implements Command {
         if (StringUtils.isBlank(query))
           errorMessage = "Do you feel lucky?";
         else {
-          int pageSize = getContext().getConfiguration().getMaxSearchResults();
+          int pageSize = getThothEnvironment().getConfiguration().getMaxSearchResults();
           PagedList<SearchResult> pagedList = search(context, query, pageNumber, pageSize);
           searchResults.addAll(pagedList.getList());
           hasMore = pagedList.hasMore();

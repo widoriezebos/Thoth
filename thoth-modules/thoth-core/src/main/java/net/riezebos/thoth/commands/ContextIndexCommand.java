@@ -47,7 +47,7 @@ public class ContextIndexCommand extends RendererBase implements Command {
 
       List<Book> books = contentManager.getBooks();
 
-      Set<String> classificationNames = getContext().getConfiguration().getContextIndexClassifications();
+      Set<String> classificationNames = getThothEnvironment().getConfiguration().getContextIndexClassifications();
       classificationNames.add("folder");
 
       // The order is important: to not allow a name clash to overwrite built in variables

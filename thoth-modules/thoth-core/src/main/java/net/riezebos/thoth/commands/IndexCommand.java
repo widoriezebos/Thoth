@@ -37,7 +37,7 @@ public class IndexCommand extends RendererBase implements Command {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      List<String> contexts = getContext().getConfiguration().getContexts();
+      List<String> contexts = getThothEnvironment().getConfiguration().getContexts();
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("contexts", contexts);
 

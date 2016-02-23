@@ -48,7 +48,7 @@ public class ReindexCommand extends RendererBase implements Command {
     try {
 
       if (StringUtils.isBlank(context))
-        getContext().reindexAll();
+        getThothEnvironment().reindexAll();
       else {
         reindex(context);
       }

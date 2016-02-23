@@ -58,12 +58,12 @@ public abstract class RendererBase implements Renderer {
     return asJson(arguments) ? "application/json;charset=UTF-8" : "text/html;charset=UTF-8";
   }
 
-  public ThothEnvironment getContext() {
+  public ThothEnvironment getThothEnvironment() {
     return thothEnvironment;
   }
 
   protected Configuration getConfiguration() {
-    return getContext().getConfiguration();
+    return getThothEnvironment().getConfiguration();
   }
 
   protected ContentManager getContentManager(String context) throws ContentManagerException {
