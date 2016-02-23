@@ -15,12 +15,18 @@
 package net.riezebos.thoth.renderers;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -33,7 +39,7 @@ import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 import net.riezebos.thoth.util.ThothUtil;
 
-public class CustomRenderer extends RendererBase implements Renderer {
+public class CustomRenderer extends HtmlRenderer implements Renderer {
   private static final Logger LOG = LoggerFactory.getLogger(CustomRenderer.class);
 
   private String typeCode;
@@ -74,34 +80,58 @@ public class CustomRenderer extends RendererBase implements Renderer {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
+
+      ByteArrayOutputStream html = new ByteArrayOutputStream();
+      RenderResult htmlRenderResult = renderHtml(context, path, arguments, skin, html);
+      if (htmlRenderResult != RenderResult.OK)
+        return htmlRenderResult;
+
       RenderResult result = RenderResult.OK;
-
-      Configuration configuration = getConfiguration();
-      String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
-
       File tempFile = File.createTempFile("thothtemp", "." + typeCode);
+      File tempHtml = File.createTempFile("thothhtml", ".html");
+      try {
+        IOUtils.copy(new ByteArrayInputStream(html.toByteArray()), new FileOutputStream(tempHtml));
 
-      arguments.put("url", url);
-      arguments.put("output", tempFile.getAbsolutePath());
-      String command = ThothUtil.replaceKeywords(getCommandLine(configuration), arguments);
+        Configuration configuration = getConfiguration();
+        String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
 
-      execute(command);
+        arguments.put("input", tempHtml.getAbsolutePath());
+        arguments.put("url", url);
+        arguments.put("output", tempFile.getAbsolutePath());
+        String command = ThothUtil.replaceKeywords(getCommandLine(configuration), arguments);
 
-      try (FileInputStream fis = new FileInputStream(tempFile)) {
-        IOUtils.copy(fis, outputStream);
+        String workingFolder = getConfiguration().getWorkspaceLocation() + context + ThothUtil.prefix(ThothUtil.getFolder(path), "/");
+        File contextLocation = new File(workingFolder);
+        if (!contextLocation.isDirectory())
+          contextLocation = null;
+
+        execute(command, arguments, contextLocation);
+
+        try (FileInputStream fis = new FileInputStream(tempFile)) {
+          IOUtils.copy(fis, outputStream);
+        }
+      } finally {
+        tempFile.delete();
+        tempHtml.delete();
       }
-      tempFile.delete();
       return result;
     } catch (Exception e) {
       throw new RenderException(e);
     }
   }
 
-  protected void execute(String command) throws IOException {
+  protected void execute(String command, Map<String, Object> arguments, File workingFolder) throws IOException {
     LOG.debug("Executing " + command);
 
+    List<String> argsList = new ArrayList<>();
+    for (Entry<String, Object> entry : arguments.entrySet()) {
+      argsList.add(entry.getKey() + "=" + entry.getValue());
+    }
+
+    String[] args = argsList.isEmpty() ? null : argsList.toArray(new String[argsList.size()]);
+
     String line;
-    Process p = Runtime.getRuntime().exec(command);
+    Process p = Runtime.getRuntime().exec(command, args, workingFolder);
     BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
     while ((line = input.readLine()) != null) {
       LOG.debug(line);

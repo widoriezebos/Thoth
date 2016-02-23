@@ -14,7 +14,9 @@
  */
 package net.riezebos.thoth.renderers;
 
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +31,8 @@ import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.renderers.util.CustomHtmlSerializer;
@@ -51,45 +55,50 @@ public class HtmlRenderer extends RendererBase implements Renderer {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
-      RenderResult result = RenderResult.OK;
-
-      ContentManager contentManager = getContentManager(context);
-      FileHandle fileHandle = contentManager.getFileHandle(path);
-      if (fileHandle.isFile()) {
-
-        Configuration configuration = getConfiguration();
-
-        MarkDownDocument markdown = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));
-        String markdownSource = markdown.getMarkdown();
-
-        int extensions = configuration.getMarkdownOptions();
-        long parseTimeOut = configuration.getParseTimeOut();
-
-        RelaxedParser parser =
-            Parboiled.createParser(RelaxedParser.class, extensions, parseTimeOut, RelaxedParser.DefaultParseRunnerProvider, PegDownPlugins.NONE);
-        RootNode ast = parser.parse(ThothUtil.wrapWithNewLines(markdownSource.toCharArray()));
-
-        CustomHtmlSerializer serializer = new CustomHtmlSerializer(new LinkRenderer());
-        String body = serializer.toHtml(ast);
-
-        Map<String, Object> variables = new HashMap<>();
-        // We do not allow metatags to override built in variables.
-        Map<String, String> metatags = markdown.getMetatags();
-        variables.putAll(metatags);
-        variables.putAll(arguments);
-        // Except for the title metatag that is
-        if (metatags.containsKey(Renderer.TITLE_PARAMETER))
-          variables.put(Renderer.TITLE_PARAMETER, metatags.get(Renderer.TITLE_PARAMETER));
-        variables.put(Renderer.BODY_PARAMETER, body);
-
-        String markdownTemplate = skin.getHtmlTemplate();
-        renderTemplate(markdownTemplate, context, variables, outputStream);
-      } else {
-        result = RenderResult.NOT_FOUND;
-      }
-      return result;
+      return renderHtml(context, path, arguments, skin, outputStream);
     } catch (Exception e) {
       throw new RenderException(e);
     }
+  }
+
+  protected RenderResult renderHtml(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws ContentManagerException, IOException, ContextNotFoundException, UnsupportedEncodingException {
+    RenderResult result = RenderResult.OK;
+
+    ContentManager contentManager = getContentManager(context);
+    FileHandle fileHandle = contentManager.getFileHandle(path);
+    if (fileHandle.isFile()) {
+
+      Configuration configuration = getConfiguration();
+
+      MarkDownDocument markdown = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));
+      String markdownSource = markdown.getMarkdown();
+
+      int extensions = configuration.getMarkdownOptions();
+      long parseTimeOut = configuration.getParseTimeOut();
+
+      RelaxedParser parser =
+          Parboiled.createParser(RelaxedParser.class, extensions, parseTimeOut, RelaxedParser.DefaultParseRunnerProvider, PegDownPlugins.NONE);
+      RootNode ast = parser.parse(ThothUtil.wrapWithNewLines(markdownSource.toCharArray()));
+
+      CustomHtmlSerializer serializer = new CustomHtmlSerializer(new LinkRenderer());
+      String body = serializer.toHtml(ast);
+
+      Map<String, Object> variables = new HashMap<>();
+      // We do not allow metatags to override built in variables.
+      Map<String, String> metatags = markdown.getMetatags();
+      variables.putAll(metatags);
+      variables.putAll(arguments);
+      // Except for the title metatag that is
+      if (metatags.containsKey(Renderer.TITLE_PARAMETER))
+        variables.put(Renderer.TITLE_PARAMETER, metatags.get(Renderer.TITLE_PARAMETER));
+      variables.put(Renderer.BODY_PARAMETER, body);
+
+      String markdownTemplate = skin.getHtmlTemplate();
+      renderTemplate(markdownTemplate, context, variables, outputStream);
+    } else {
+      result = RenderResult.NOT_FOUND;
+    }
+    return result;
   }
 }
