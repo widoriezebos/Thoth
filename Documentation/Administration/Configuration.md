@@ -55,10 +55,10 @@ renderer.1.extension
 : The extension to recognize this renderer. An example would be ‘pdf’, adding a parameter to a Thoth page URL ‘?output=pdf’ would then render the HTML version of that page with this renderer. Must be unique across renderers. Example: ‘pdf’
 
 renderer.1.mode
-: The type of input to produce for the custom renderer. Default is HTML but you can override this to RAW if you want the raw markdown source to serve as input.
+: The type of input to produce for the custom renderer. Default is HTML but you can override this to RAW (or any other renderer for that matter, just use it’s Extension as the mode). You obviously need to avoid setting up recursive loops by pointing to a custom renderer that uses this renderer as a source somewhere in it’s chain.
 
 renderer.1.contenttype
-: The mime contenntype of the content rendered by this custom renderer. For PDF that would be ‘application/pdf’
+: The mime contenttype of the content rendered by this custom renderer. For PDF that would be ‘application/pdf’
 
 renderer.1.command
 : The OS level command to render the output. The following keywords can be used for substitution in the command:
