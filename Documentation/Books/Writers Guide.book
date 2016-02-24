@@ -14,7 +14,7 @@ Thoth Writer's Guide<br/>
 \include{/Copyright.md}
 \include{/Overview/Feedback.md}
 
-\include{/Writers/Concepts.md}
+\include{/Overview/Concepts.md}
 \include{/Writers/The Thoth Toolset.md}
 \include{/Overview/Setup.md,1}
 \include{/Writers/Thoth Markdown basics.md}

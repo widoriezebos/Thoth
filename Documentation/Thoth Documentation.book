@@ -16,7 +16,7 @@ Thoth Documentation
 \include{/Overview/Introduction.md}
 \include{/Overview/Name.md}
 \include{/Overview/Features.md}
-\include{/Writers/Concepts.md}
+\include{/Overview/Concepts.md}
 \include{/Writers/Thoth Markdown basics.md}
 \include{/Overview/Setup.md}
 \include{/Writers/The Thoth Toolset.md}

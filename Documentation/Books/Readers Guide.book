@@ -14,5 +14,6 @@ Thoth Reader's Guide<br/>
 \include{/Copyright.md}
 \include{/Overview/Feedback.md}
 
+\include{/Overview/Concepts.md}
 \include{/Readers/Accessing content.md}
 
