@@ -10,6 +10,8 @@ Thoth Administrator's Guide<br/>
 \tableofcontents
 
 \include{/Copyright.md}
+\include{/Overview/Feedback.md}
+
 \include{/Administration/Setup by Example.md}
 \include{/Writers/Skins.md}
 \include{/Administration/Configuration.md}

@@ -11,6 +11,8 @@ Thoth Overview
 \tableofcontents
 
 \include{/Copyright.md}
+\include{/Overview/Feedback.md}
+
 \include{/Overview/Introduction.md}
 \include{/Overview/Name.md}
 \include{/Overview/Features.md}

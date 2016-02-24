@@ -11,14 +11,17 @@ Thoth Documentation
 \tableofcontents
 
 \include{/Copyright.md}
+\include{/Overview/Feedback.md}
+
 \include{/Overview/Introduction.md}
 \include{/Overview/Name.md}
 \include{/Overview/Features.md}
+\include{/Writers/Concepts.md}
 \include{/Writers/Thoth Markdown basics.md}
 \include{/Overview/Setup.md}
 \include{/Writers/The Thoth Toolset.md}
-\include{/Writers/Git concepts.md, 1}
-\include{/Writers/Editing with Thoth.md, 1}
+\include{/Writers/Git Primer.md, 1}
+\include{/Writers/WYSIWYG.md, 1}
 \include{/Writers/Skins.md, 1}
 \include{/Administration/Installation.md}
 \include{/Administration/Configuration.md}

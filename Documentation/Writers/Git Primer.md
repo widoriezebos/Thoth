@@ -1,4 +1,4 @@
-# Git concepts
+# Git Primer
 It is important to note that Git uses a local version control repository to store all it’s information. The local repository is usually created by ‘Cloning’ the central repository. After cloning the trick is that this local repository can be synchronized with the central repository. This synchronization is done by you using ‘Pull’ and ‘Push’. ‘Pull’ fetches information from the central repository and ‘Push’ writes your local changes to the central repository. Before you can ‘Push’ your changes however there are a few steps you need to do first:
 
 1. You must commit your local changes to your local repository
@@ -72,7 +72,6 @@ Once every conflict has been resolved you can finally commit all your changes. Y
 ![](images/16%20Commit%20Resolved.png)
 
 Now Pull again to make sure nobody Pushed in the mean time and then Push yourself.
-
 
 
 

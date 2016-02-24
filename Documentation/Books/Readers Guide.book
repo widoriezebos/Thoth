@@ -12,4 +12,7 @@ Thoth Reader's Guide<br/>
 \tableofcontents
 
 \include{/Copyright.md}
+\include{/Overview/Feedback.md}
+
+\include{/Readers/Accessing content.md}
 

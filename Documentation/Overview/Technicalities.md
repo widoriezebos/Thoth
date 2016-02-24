@@ -1,7 +1,7 @@
 # Technicalities
 Thoth is built on the Java platform and is OS independent. Thoth runs on Linux, OSX and Windows with minimal hardware requirements. 
 
-## Minimum requirements
+## Minimum System Requirements
 The following are considered minimum requirements
 
 - Supported OS: Linux, OSX and Windows

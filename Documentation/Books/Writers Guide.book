@@ -12,9 +12,12 @@ Thoth Writer's Guide<br/>
 \tableofcontents
 
 \include{/Copyright.md}
+\include{/Overview/Feedback.md}
 
+\include{/Writers/Concepts.md}
 \include{/Writers/The Thoth Toolset.md}
-\include{/Writers/Git concepts.md}
-\include{/Writers/Editing with Thoth.md}
+\include{/Overview/Setup.md,1}
 \include{/Writers/Thoth Markdown basics.md}
+\include{/Writers/Git Primer.md}
 \include{/Writers/Skins.md}
+\include{/Writers/WYSIWYG.md}
