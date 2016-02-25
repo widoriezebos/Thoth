@@ -400,6 +400,8 @@ public class IncludeProcessor extends FileProcessor {
     pl("       Set to 0 to disable");
     pl("  -noerrors");
     pl("       Suppresses adding any error report at the end of the document");
+    pl("  -nonewlineheaders");
+    pl("       Do not add a new line before every header. Default is true");
     pl("  -nocomments");
     pl("       Suppresses adding a comment for every processed include. Default is false");
     pl("  -nostrip");
@@ -420,6 +422,7 @@ public class IncludeProcessor extends FileProcessor {
     Map<String, String> arguments = ThothUtil.getArgumentsMap(args);
     boolean help = arguments.containsKey("help");
     boolean nocomments = arguments.containsKey("nocomments");
+    boolean nonewlineheaders = arguments.containsKey("nonewlineheaders");
     boolean nostrip = arguments.containsKey("nostrip");
     boolean noErrors = arguments.containsKey("noerrors");
 
@@ -458,6 +461,7 @@ public class IncludeProcessor extends FileProcessor {
       setRootFolder(rootFolder);
       setMaxNumberingLevel(numberingLevel);
       setAddComments(!nocomments);
+      setAddNewlineBeforeheader(!nonewlineheaders);
       setStripTrailingWhitespace(!nostrip);
       if (softlinkFile != null)
         setSoftlinkFile(softlinkFile);

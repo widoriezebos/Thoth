@@ -298,4 +298,10 @@ public interface Configuration extends Cloneable {
    */
   public Configuration clone();
 
+  /**
+   * Automatically add a newline for every header in the source file. Default is true
+   * @return
+   */
+  boolean addNewlineBeforeheader();
+
 }

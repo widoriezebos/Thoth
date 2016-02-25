@@ -207,8 +207,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   }
 
   private boolean isOptionOn(String key) {
-    String value = getValue("markdown.option." + key, "off");
-    return value.equalsIgnoreCase("on") || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("1");
+    return isOn(getValue("markdown.option." + key, "off"));
   }
 
   /*
@@ -229,7 +228,16 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public boolean appendErrors() {
-    return getValue("markdown.appenderrors", "true").equalsIgnoreCase("true");
+    return isOn(getValue("markdown.appenderrors", "true"));
+  }
+
+  @Override
+  public boolean addNewlineBeforeheader() {
+    return isOn(getValue("markdown.newlineheaders", "true"));
+  }
+
+  protected boolean isOn(String value) {
+    return value.equalsIgnoreCase("on") || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("1");
   }
 
   /*
@@ -346,7 +354,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public boolean isPrettyPrintJson() {
-    return "true".equalsIgnoreCase(getValue("json.prettyprint", "true"));
+    return isOn(getValue("json.prettyprint", "true"));
   }
 
   /*

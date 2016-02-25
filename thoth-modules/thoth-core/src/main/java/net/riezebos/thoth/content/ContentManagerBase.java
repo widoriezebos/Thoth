@@ -206,6 +206,7 @@ public abstract class ContentManagerBase implements ContentManager {
     processor.setRootFolder(rootFolder);
     processor.setCriticProcessingMode(criticProcessingMode);
     processor.setMaxNumberingLevel(configuration.getMaxHeaderNumberingLevel());
+    processor.setAddNewlineBeforeheader(configuration.addNewlineBeforeheader()); 
     return processor;
   }
 

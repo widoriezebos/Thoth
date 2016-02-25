@@ -206,4 +206,9 @@ public class HotReloadableConfiguration implements Configuration {
     return activeConfiguration.getPropertyFileName();
   }
 
+  @Override
+  public boolean addNewlineBeforeheader() {
+    return activeConfiguration.addNewlineBeforeheader();
+  }
+
 }

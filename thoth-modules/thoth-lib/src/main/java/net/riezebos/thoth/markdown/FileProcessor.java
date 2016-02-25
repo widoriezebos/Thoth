@@ -62,6 +62,7 @@ public class FileProcessor {
   private HashMap<String, String> metaTags = new HashMap<String, String>();
   private int[] headerCounters = new int[20];
   private boolean addComments = true;
+  private boolean addNewlineBeforeheader = true;
   private boolean stripTrailingWhitespace = true;
   private String softLinkFileName = null;
   private Map<String, String> softLinkMappings = new HashMap<String, String>();
@@ -262,7 +263,7 @@ public class FileProcessor {
     if (isValidBookmark(id)) {
       bookmarks.add(new Bookmark(level, id, title));
     }
-    return "\n" + line + "\n";
+    return (addNewlineBeforeheader ? "\n" : "") + line + "\n";
   }
 
   public List<Bookmark> getBookmarks() {
@@ -655,6 +656,10 @@ public class FileProcessor {
 
   public void setAddComments(boolean addComments) {
     this.addComments = addComments;
+  }
+
+  public void setAddNewlineBeforeheader(boolean addNewlineBeforeheader) {
+    this.addNewlineBeforeheader = addNewlineBeforeheader;
   }
 
   public void setStripTrailingWhitespace(boolean stripTrailingWhitespace) {

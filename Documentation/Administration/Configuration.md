@@ -92,7 +92,7 @@ An few examples of custom renderers (note the use of ${url} and ${input}):
 	renderer.4.contenttype=application/rtf
 	renderer.4.command=/usr/local/bin/pandoc -s -r html -t rtf ${input} -o ${output}
 
-### Format masks 
+### Format masks
 formatmask.timestamp
 : The format mask to use for timestamps. Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html) for more information about this mask). Default value = dd-MM-yyyy HH:mm:ss
 
@@ -116,8 +116,12 @@ images.extensions
 : Image recognition. Set (comma separated) the extensions (without the '.') below to determine whether a matching resource will be treated as an image. Default = png,jpeg,jpg,gif,tiff,bmp
 
 ### Markdown processing options
+
+markdown.newlineheaders
+: Will add a newline before every header in the source. Avoids some parser issues where strictness is involved. Default = on
+
 markdown.appenderrors
-: Append any link / include error messages at the bottom of the document. Default = true
+: Append any link / include error messages at the bottom of the document. Default = on
 
 markdown.option.SMARTS
 : Pretty ellipses, dashes and apostrophes. Default = on
@@ -191,7 +195,6 @@ parsetimeout
 
 ## Sample configuration file
 \includecode{sample.configuration.properties}
-
 
 
 
