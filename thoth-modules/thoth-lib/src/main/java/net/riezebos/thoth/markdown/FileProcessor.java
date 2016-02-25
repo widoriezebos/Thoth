@@ -403,10 +403,7 @@ public class FileProcessor {
     if (!bookmarks.isEmpty())
       toc.append("</" + TABLEOFCONTENTS_TAG + ">");
 
-    Pattern pattern = Pattern.compile("^\\\\tableofcontents", Pattern.MULTILINE);
-    Matcher matcher = pattern.matcher(document);
-    document = matcher.replaceAll(toc.toString().trim()) + "\n";
-    return document;
+    return document.replace("\n\\tableofcontents", toc.toString().trim());
   }
 
   /**
