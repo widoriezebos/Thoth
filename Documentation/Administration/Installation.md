@@ -9,6 +9,10 @@ For desktop environments you can run Thoth without a Web Container using the Tho
 
 	java -jar thoth-standalone-1.0.0.jar
 
+By default the Thoth-standalone server is running in interactive mode (listening for commands on stdin). If you want to suppress the interactive mode and run Thoth-standalone purely as a (background process) server then add the `-server` flag:
+
+	java -jar thoth-standalone-1.0.0.jar -server
+
 ## WAR installation
 Have your Web Container and JDK8 ready and then just drop the Thoth WAR inside the web apps folder of your Web Container. And then the only requirement is that the configuration can be found through an environment variable (or -D provided JVM argument) called `thoth_configuration`. On servers with an init script for Tomcat (/etc/init.d/tomcat) you could add a script line stating 
 
