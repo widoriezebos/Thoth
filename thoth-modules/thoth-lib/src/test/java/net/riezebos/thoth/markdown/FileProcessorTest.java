@@ -260,7 +260,7 @@ public class FileProcessorTest {
         "\n" + //
         "</tableofcontents>\n" + //
         "\n" + //
-        "First line\n";
+        "First line";
 
     assertEquals(expected, doc);
   }

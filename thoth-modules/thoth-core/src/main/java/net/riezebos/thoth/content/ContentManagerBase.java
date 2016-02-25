@@ -210,7 +210,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   protected String appendErrors(IncludeProcessor processor, String markdown) {
-    markdown += "\n\tThe following problems occurred during generation of this document:\n";
+    markdown += "\n**The following problems occurred during generation of this document:**\n\n";
     for (ProcessorError error : processor.getErrors())
       markdown += "\t" + (error.getErrorMessage().replaceAll("\n", "\n\t").trim()) + "\n";
     return markdown;

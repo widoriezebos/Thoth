@@ -403,7 +403,7 @@ public class FileProcessor {
     if (!bookmarks.isEmpty())
       toc.append("</" + TABLEOFCONTENTS_TAG + ">");
 
-    return document.replace("\n\\tableofcontents", toc.toString().trim());
+    return document.replace("\n\\tableofcontents", "\n" + toc.toString().trim());
   }
 
   /**

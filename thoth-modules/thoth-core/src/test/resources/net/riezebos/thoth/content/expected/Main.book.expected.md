@@ -39,7 +39,8 @@ With some addition text
 And here's the third topic. Although counting in sequential order does not make sense right?
 It's all about the *includes*!
 
-    The following problems occurred during generation of this document:
+**The following problems occurred during generation of this document:**
+
     Include not found: yup/thisoneis/problematic.md
     /books/../main/subs/SubOne.md(8): Link invalid: imagenotthere/either.png
 

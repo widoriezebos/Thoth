@@ -35,6 +35,7 @@ public class ContentManagerBaseTest extends ThothTestBase {
 
   @Test
   public void testContentManagerBase() throws ContentManagerException, IOException {
+    String BUILT_IN_CSS_MARKER = "Avenir Next";
 
     String contextName = "MockedContext";
     ThothEnvironment thothEnvironment = createThothContext(contextName);
@@ -51,11 +52,11 @@ public class ContentManagerBaseTest extends ThothTestBase {
     assertTrue(getAsString(contentManager, "skins.properties").indexOf("TestReposSkin") != -1);
     assertTrue(getAsString(contentManager, "library/TestReposSkin/Webresources/a.txt").indexOf("a1") != -1);
     // Check inheritance of (skin related) files
-    assertTrue(getAsString(contentManager, "library/TestReposSkin/Webresources/style.css").indexOf("Thoth Documentation System") != -1);
+    assertTrue(getAsString(contentManager, "library/TestReposSkin/Webresources/style.css").indexOf(BUILT_IN_CSS_MARKER) != -1);
     assertTrue(getAsString(contentManager, "library/TestReposSkin/Webresources/markdown.css").indexOf("TestReposSkin CSS") != -1);
     assertNull(getAsString(contentManager, "library/TestReposSkin/Webresources/b.txt"));
     // Check inheritance of (skin related) files
-    assertTrue(getAsString(contentManager, "library/TestReposSkin2/Webresources/style.css").indexOf("Thoth Documentation System") != -1);
+    assertTrue(getAsString(contentManager, "library/TestReposSkin2/Webresources/style.css").indexOf(BUILT_IN_CSS_MARKER) != -1);
     assertTrue(getAsString(contentManager, "library/TestReposSkin2/Webresources/markdown.css").indexOf("TestReposSkin2 CSS") != -1);
     assertTrue(getAsString(contentManager, "library/TestReposSkin2/Webresources/b.txt").indexOf("b1") != -1);
 

@@ -464,6 +464,7 @@ public class IncludeProcessor extends FileProcessor {
       String result = execute(fileName, in);
       List<ProcessorError> errors = getErrors();
       if (!errors.isEmpty() && !noErrors) {
+        result += "\n**The following problems occurred during generation of this document:**\n\n";
         result += "\n\tThe following problems occurred during generation of this document:\n";
         for (ProcessorError error : errors)
           result += "\t" + (error.getErrorMessage().replaceAll("\n", "\n\t").trim()) + "\n";
