@@ -35,14 +35,15 @@ Of course it does not make any sense to do this because now there is no differen
 	# The velocity template that is used for the Main index (main page)
 	template.index=index.tpl
 	
-	# The velocity template that is used for the Context index (context specific page)
+	# The velocity template that is used for the Context index
 	template.contextindex=contextindex.tpl
 	
 	# Template for Markdown rendered pages
 	template.html=html.tpl
 	
 	# Template for Diff pages
-	# Supports keyword replacement for ${title} and ${body} for the body of the page
+	# Supports keyword replacement for ${title} and ${body}
+	# for the body of the page
 	template.diff=diff.tpl
 	
 	# The velocity template that is used for the meta information page
@@ -60,7 +61,8 @@ Of course it does not make any sense to do this because now there is no differen
 	# The velocity template that is used for browsing
 	template.browse=browse.tpl
 	
-	# The velocity template that is used to display any error that occurred during execution
+	# The velocity template that is used to display any error 
+	# that occurred during execution
 	template.error=error.tpl
 
 Note the _inheritsfrom_ setting. If you leave it empty then you inherit from SimpleSkin. If you put a name of another (custom) Skin there, you will inherit from that Skin. This enables you to inherit from a base Skin without having to copy anything that you did not change.

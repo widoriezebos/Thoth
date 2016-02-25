@@ -268,12 +268,18 @@ public abstract class ContentManagerBase implements ContentManager {
 
   @Override
   public List<Book> getBooks() throws ContextNotFoundException, IOException {
-    FileHandle folder = getFileHandle("/");
-    List<Book> result = new ArrayList<>();
 
-    collectBooks(folder.getCanonicalPath(), folder, result, getConfiguration().getBookExtensions());
-    Collections.sort(result);
-    return result;
+    CacheManager cacheManager = getCacheManager();
+    List<Book> books = cacheManager.getBooks();
+    if (books == null) {
+      FileHandle folder = getFileHandle("/");
+      books = new ArrayList<>();
+      collectBooks(folder.getCanonicalPath(), folder, books, getConfiguration().getBookExtensions());
+      Collections.sort(books);
+      cacheManager.setBooks(books);
+    }
+
+    return books;
   }
 
   protected void collectBooks(String contextFolder, FileHandle folder, List<Book> result, List<String> bookExtensions)

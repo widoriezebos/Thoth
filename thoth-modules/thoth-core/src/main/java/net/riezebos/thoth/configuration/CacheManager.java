@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.CachemanagerException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -41,6 +42,7 @@ public class CacheManager {
   private Map<String, Map<String, List<String>>> reverseIndexes = new HashMap<>();
   private Map<String, List<ProcessorError>> errorMap = new HashMap<>();
   private ContentManager contentManager;
+  private List<Book> books = null;
 
   public CacheManager(ContentManager contentManager) {
     this.contentManager = contentManager;
@@ -167,6 +169,14 @@ public class CacheManager {
     }
   }
 
+  public List<Book> getBooks() {
+    return books;
+  }
+
+  public void setBooks(List<Book> books) {
+    this.books = books;
+  }
+
   public void cacheErrors(List<ProcessorError> errors) {
     synchronized (errorMap) {
       errorMap.put(getContextName(), errors);
@@ -185,4 +195,5 @@ public class CacheManager {
   public String toString() {
     return "Cache for " + getContextName();
   }
+
 }

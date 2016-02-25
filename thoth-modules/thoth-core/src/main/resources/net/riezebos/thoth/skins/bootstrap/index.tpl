@@ -14,7 +14,7 @@
       <a href="${context}">${context}</a><br/>
     #end  
 
-    <br/><br>
+    <br/><br/>
     Latest successfull Pull request was at ${refresh}
     <br/>
     To update the site to the latest version right now; you can <a href=".?cmd=pull">Pull manually</a> 
