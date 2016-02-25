@@ -17,8 +17,13 @@ package net.riezebos.thoth.server;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -26,6 +31,7 @@ import org.eclipse.jetty.servlet.ServletHandler;
 
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
+import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.servlets.ThothServlet;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -35,34 +41,29 @@ import net.riezebos.thoth.util.ThothUtil;
 public class Thoth {
 
   public void start(String args[]) throws Exception {
-    ThothEnvironment thothContext = new ThothEnvironment();
-    ThothEnvironment.registerSharedContext(thothContext);
+    ThothEnvironment thothEnvironment = new ThothEnvironment();
+    ThothEnvironment.registerSharedContext(thothEnvironment);
 
-    System.out.println("Thoth standalone v" + ThothUtil.getVersion(ThothUtil.Version.STANDALONE));
-    System.out.println("Server is firing up. Please hang on...");
-    String configurationFile = thothContext.determinePropertyPath();
+    List<String> argumentsList = ThothUtil.getArgumentsList(args);
+    Map<String, String> argumentsMap = ThothUtil.getArgumentsMap(args);
+    boolean asServer = argumentsMap.containsKey("server");
 
-    if (args.length > 0) {
-      configurationFile = tryConfigFile(args[0]);
+    setupConfiguration(thothEnvironment, argumentsList);
+
+    if (argumentsMap.containsKey("help"))
+      printUsage();
+    else {
+      runServer(thothEnvironment, asServer);
     }
-    if (configurationFile == null) {
-      configurationFile = tryConfigFile("configuration.properties");
-    }
+  }
 
-    if (configurationFile == null) {
-      String message = "No Configuration found. Please specify a configuration file to use either by\n"//
-          + "1) Passing it as a command line argument i.e. 'java " + Thoth.class.getName() + " /my/own/configuration.properties'\n"//
-          + "2) Setting an environment variable i.e. set " + ThothEnvironment.CONFIGKEY + "=/my/own/configuration.properties\n"//
-          + "3) Passing a System variable to the Java VM i.e. -D" + ThothEnvironment.CONFIGKEY + "=/my/own/configuration.properties";
-      throw new IllegalArgumentException(message);
-    }
-    File check = new File(configurationFile);
-    if (!check.exists())
-      throw new FileNotFoundException("Configuration file " + configurationFile + " not found");
+  protected void runServer(ThothEnvironment thothEnvironment, boolean asServer)
+      throws Exception, ContentManagerException, InterruptedException, UnsupportedEncodingException, IOException {
 
-    System.setProperty(ThothEnvironment.CONFIGKEY, configurationFile);
+    println("Thoth standalone v" + ThothUtil.getVersion(ThothUtil.Version.STANDALONE));
+    println("Server is firing up. Please hang on...");
 
-    Configuration configuration = thothContext.getConfiguration();
+    Configuration configuration = thothEnvironment.getConfiguration();
     Server server = new Server(8080);
     ServerConnector httpConnector = new ServerConnector(server);
     httpConnector.setHost(configuration.getEmbeddedServerName());
@@ -80,33 +81,111 @@ public class Thoth {
 
     server.setHandler(context);
 
-    System.out.println("Setting up content managers...");
+    println("Setting up content managers...");
     // Warm up the server
-    thothContext.touch();
+    thothEnvironment.touch();
 
     server.start();
-    System.out.println("Thoth server started.\n"//
-        + "You can now access Thoth at http://"//
-        + configuration.getEmbeddedServerName() //
-        + ":" + configuration.getEmbeddedServerPort());
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+    println("Thoth server started.");
 
-    boolean stop = false;
-    do {
-      System.out.println("Just enter 'stop' to stop the server");
-      String line = br.readLine();
-      stop = "stop".equalsIgnoreCase(line);
-      if (!stop)
-        System.out.println("Did not recognize command. Please reenter.");
-    } while (!stop);
+    if (asServer) {
+      server.join();
+    } else {
+      println("\n"//
+          + "You can now access Thoth at http://"//
+          + configuration.getEmbeddedServerName() //
+          + ":" + configuration.getEmbeddedServerPort());
+      BufferedReader br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 
-    System.out.println("Stopping server.\n(First waiting for any auto refresh to finish though)");
-    server.stop();
-    server.join();
-    thothContext.shutDown();
+      listCommands();
+
+      boolean stop = false;
+      do {
+        print("Command: ");
+        String line = br.readLine();
+
+        if ("reload".equalsIgnoreCase(line)) {
+          configuration.reload();
+          println("Configuration reloaded from " + configuration.getPropertyFileName());
+        } else if ("pull".equalsIgnoreCase(line)) {
+          println("Pulling...");
+          thothEnvironment.pullAll();
+          println("Done...");
+        } else if ("reindex".equalsIgnoreCase(line)) {
+          println("Reindex running in the background");
+          thothEnvironment.reindexAll();
+        } else if ("stop".equalsIgnoreCase(line)) {
+          stop = true;
+        } else if (!StringUtils.isBlank(line)) {
+          println("\nDid not recognize command.");
+          listCommands();
+        }
+      } while (!stop);
+
+      println("Stopping server.\n(First waiting for any auto refresh to finish though)");
+      server.stop();
+      server.join();
+      thothEnvironment.shutDown();
+    }
   }
 
-  protected String tryConfigFile(String defaultConfigFileName) {
+  protected void listCommands() {
+    println("The following commands are supported:");
+    println("reload:  Reload the configuration");
+    println("pull:    Pull all version controlled repositories");
+    println("reindex: Force a reindex of all repositories");
+    println("stop:    Stop the server");
+  }
+
+  protected void setupConfiguration(ThothEnvironment thothEnvironment, List<String> argumentsList) throws FileNotFoundException {
+
+    String configurationFile = thothEnvironment.determinePropertyPath();
+    if (!argumentsList.isEmpty()) {
+      configurationFile = validateConfigFile(argumentsList.get(0));
+    }
+    if (configurationFile == null) {
+      configurationFile = validateConfigFile("configuration.properties");
+    }
+
+    if (configurationFile == null) {
+      String message = "No Configuration found. Please specify a configuration file to use either by\n"//
+          + "1) Passing it as a command line argument i.e. 'java " + Thoth.class.getName() + " /my/own/configuration.properties'\n"//
+          + "2) Setting an environment variable i.e. set " + ThothEnvironment.CONFIGKEY + "=/my/own/configuration.properties\n"//
+          + "3) Passing a System variable to the Java VM i.e. -D" + ThothEnvironment.CONFIGKEY + "=/my/own/configuration.properties";
+      throw new IllegalArgumentException(message);
+    }
+    File check = new File(configurationFile);
+    if (!check.exists())
+      throw new FileNotFoundException("Configuration file " + configurationFile + " not found");
+
+    System.setProperty(ThothEnvironment.CONFIGKEY, configurationFile);
+  }
+
+  protected void println(String message) {
+    System.out.println(message);
+  }
+
+  protected void print(String message) {
+    System.out.print(message);
+  }
+
+  protected void printUsage() {
+    String version = ThothUtil.getVersion(ThothUtil.Version.STANDALONE);
+    println("Thoth standalone v" + version);
+    println("Usage: java -jar thoth-standalone-" + version + ".jar [configfilename] [-server] [-help]\n");
+    println("Arguments:");
+    println("  configfilename: (Optional)");
+    println("           The path to the configuration file. If not given then Thoth");
+    println("           will use the environment variable thoth_configuration or");
+    println("           the system variable thoth_configuration.");
+    println("           As a last resort Thoth will try the working folder for a file");
+    println("           named 'configuration.properties'");
+    println("Flags:");
+    println("  -server: (Optional) run Thoth as a server. By default thoth will be interactive");
+    println("  -help:   (Optional) show this message");
+  }
+
+  protected String validateConfigFile(String defaultConfigFileName) {
     String configurationFile = null;
     File file = new File(defaultConfigFileName);
     if (file.exists())

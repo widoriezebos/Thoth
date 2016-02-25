@@ -1,6 +1,5 @@
 package net.riezebos.thoth.configuration;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Date;
 import java.util.HashMap;
@@ -128,9 +127,8 @@ public class ThothEnvironment {
           LOG.info("Using " + propertyPath + " for configuration");
           PropertyBasedConfiguration propertyBasedConfiguration = new PropertyBasedConfiguration();
           propertyBasedConfiguration.setPropertyFileName(propertyPath);
-          FileInputStream inStream = new FileInputStream(propertyPath);
-          propertyBasedConfiguration.load(inStream);
-          configuration = propertyBasedConfiguration;
+          propertyBasedConfiguration.reload();
+          configuration = new HotReloadableConfiguration(propertyBasedConfiguration);
         }
       }
       return configuration;

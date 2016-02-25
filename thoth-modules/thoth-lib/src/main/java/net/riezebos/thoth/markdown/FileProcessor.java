@@ -479,30 +479,6 @@ public class FileProcessor {
   }
 
   /**
-   * Creates a map of key/value pairs based on an array of arguments (-key [value] format, value is optional)
-   *
-   * @param args
-   * @return
-   */
-  protected static Map<String, String> getArgumentsMap(String[] args) {
-    Map<String, String> arguments = new HashMap<String, String>();
-
-    for (int i = 0; i < args.length; i++) {
-      String key = args[i];
-      if (!key.startsWith("-"))
-        throw new IllegalArgumentException("Missing parameter prefix for value " + key);
-      String value = i + 1 < args.length ? args[i + 1] : null;
-
-      if (value != null && value.startsWith("-")) {
-        value = null; // A parameter without a value (a flag) detected
-      } else
-        i++; // Make sure we do not interpret the value as a key now
-      arguments.put(key.toLowerCase().trim().substring(1), value);
-    }
-    return arguments;
-  }
-
-  /**
    * Sets the current line number
    *
    * @param line

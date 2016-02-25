@@ -417,7 +417,7 @@ public class IncludeProcessor extends FileProcessor {
   }
 
   protected void execute(String[] args) throws FileNotFoundException, IOException, UnsupportedEncodingException {
-    Map<String, String> arguments = getArgumentsMap(args);
+    Map<String, String> arguments = ThothUtil.getArgumentsMap(args);
     boolean help = arguments.containsKey("help");
     boolean nocomments = arguments.containsKey("nocomments");
     boolean nostrip = arguments.containsKey("nostrip");

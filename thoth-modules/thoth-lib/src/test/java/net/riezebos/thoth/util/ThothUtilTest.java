@@ -17,6 +17,7 @@ package net.riezebos.thoth.util;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,32 @@ public class ThothUtilTest {
   @Test
   public void testConstruct() {
     new ThothUtil();
+  }
+
+  @Test
+  public void testGetArgumentsMap() {
+    Map<String, String> argumentsMap = ThothUtil.getArgumentsMap(new String[] {"-file", "filename", "-flag", "true", "-toggle", "-toggle2"});
+    assertEquals("filename", argumentsMap.get("file"));
+    assertEquals("true", argumentsMap.get("flag"));
+    assertEquals(null, argumentsMap.get("toggle"));
+    assertTrue(argumentsMap.containsKey("toggle"));
+    assertTrue(argumentsMap.containsKey("toggle2"));
+  }
+
+  @Test
+  public void testGetArgumentsMixed() {
+    String[] args = new String[] {"file", "filename", "-flag", "true", "somethingelse", "-toggle"};
+    Map<String, String> argumentsMap = ThothUtil.getArgumentsMap(args);
+    assertNull(argumentsMap.get("file"));
+    assertEquals("true", argumentsMap.get("flag"));
+    assertEquals(null, argumentsMap.get("toggle"));
+    assertTrue(argumentsMap.containsKey("toggle"));
+    
+    List<String> argumentsList = ThothUtil.getArgumentsList(args);
+    assertEquals(3, argumentsList.size());
+    assertTrue(argumentsList.contains("file"));
+    assertTrue(argumentsList.contains("filename"));
+    assertTrue(argumentsList.contains("somethingelse"));
   }
 
   @Test

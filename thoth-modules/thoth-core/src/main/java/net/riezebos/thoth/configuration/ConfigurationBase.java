@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,6 +38,31 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
     repoDef.setName("global-nop-repository");
     repoDef.setType("nop");
     global = new ContextDefinition(repoDef, "*global*", null, 0);
+  }
+
+  public Configuration clone() {
+    try {
+      ConfigurationBase clone = (ConfigurationBase) super.clone();
+      clone.repositoryDefinitions = new HashMap<>();
+      for (Entry<String, RepositoryDefinition> entry : repositoryDefinitions.entrySet()) {
+        clone.repositoryDefinitions.put(entry.getKey(), entry.getValue().clone());
+      }
+      clone.contextDefinitions = new HashMap<>();
+      for (Entry<String, ContextDefinition> entry : contextDefinitions.entrySet()) {
+        clone.contextDefinitions.put(entry.getKey(), entry.getValue().clone());
+      }
+      clone.global = global == null ? null : global.clone();
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  @Override
+  protected void clear() {
+    super.clear();
+    repositoryDefinitions = new HashMap<>();
+    contextDefinitions = new HashMap<>();
   }
 
   @Override

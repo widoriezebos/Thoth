@@ -15,6 +15,10 @@ public class PropertyLoader {
   private Properties properties = new Properties();
   private String propertyFileName;
 
+  protected void clear() {
+    properties = new Properties();
+  }
+
   protected void load(InputStream inStream) throws ConfigurationException {
     loadDefaults();
     readInputStream(inStream);

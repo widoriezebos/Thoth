@@ -1,5 +1,6 @@
 package net.riezebos.thoth.configuration;
 
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,7 @@ import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 
-public interface Configuration {
+public interface Configuration extends Cloneable {
 
   public static final String DEFAULT_TIMESTAMP_FMT = "dd-MM-yyyy HH:mm:ss";
 
@@ -276,5 +277,25 @@ public interface Configuration {
    * @return a list of all supported output formats, including the custom renderers that are configured
    */
   List<String> getOutputFormats();
+
+  /**
+   * Reloads the configuration, supporting hot configuration changes
+   * 
+   * @throws FileNotFoundException
+   * @throws ConfigurationException
+   */
+  void reload() throws FileNotFoundException, ConfigurationException;
+
+  /**
+   * For file based configurations: return the path of the property file. For other configurations this will probably be just an informative name.
+   * 
+   * @return
+   */
+  public String getPropertyFileName();
+
+  /**
+   * @return a clone of the configuration
+   */
+  public Configuration clone();
 
 }

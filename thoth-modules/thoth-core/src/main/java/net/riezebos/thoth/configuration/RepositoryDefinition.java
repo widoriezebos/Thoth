@@ -14,7 +14,7 @@
  */
 package net.riezebos.thoth.configuration;
 
-public class RepositoryDefinition {
+public class RepositoryDefinition implements Cloneable {
   private String name;
   private String location;
   private String username;
@@ -59,6 +59,15 @@ public class RepositoryDefinition {
 
   public String getType() {
     return type;
+  }
+
+  @Override
+  protected RepositoryDefinition clone() {
+    try {
+      return (RepositoryDefinition) super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
 }

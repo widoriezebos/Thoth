@@ -14,7 +14,7 @@
  */
 package net.riezebos.thoth.configuration;
 
-public class ContextDefinition {
+public class ContextDefinition implements Cloneable {
 
   private RepositoryDefinition repositoryDefinition;
   private String name;
@@ -44,4 +44,16 @@ public class ContextDefinition {
   public long getRefreshIntervalMS() {
     return refreshIntervalMS;
   }
+
+  @Override
+  protected ContextDefinition clone() {
+    try {
+      ContextDefinition clone = (ContextDefinition) super.clone();
+      clone.repositoryDefinition = repositoryDefinition.clone();
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
 }

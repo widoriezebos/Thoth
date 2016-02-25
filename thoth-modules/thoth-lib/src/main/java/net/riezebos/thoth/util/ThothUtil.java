@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -399,4 +400,54 @@ public class ThothUtil {
     pw.close();
     return bos.toString();
   }
+
+  /**
+   * Creates a map of key/value pairs (flags) based on an array of arguments (-key [value] format, value is optional)
+   *
+   * @param args
+   * @return
+   */
+  public static Map<String, String> getArgumentsMap(String[] args) {
+    Map<String, String> arguments = new HashMap<String, String>();
+
+    for (int i = 0; i < args.length; i++) {
+      String key = args[i];
+      if (key.startsWith("-")) {
+        String value = i + 1 < args.length ? args[i + 1] : null;
+
+        if (value != null && value.startsWith("-")) {
+          value = null; // A parameter without a value (a flag) detected
+        } else
+          i++; // Make sure we do not interpret the value as a key now
+        arguments.put(key.toLowerCase().trim().substring(1), value);
+      }
+    }
+    return arguments;
+  }
+
+  /**
+   * Creates a list of the arguments that are not flags
+   *
+   * @param args
+   * @return
+   */
+  public static List<String> getArgumentsList(String[] args) {
+    List<String> arguments = new ArrayList<String>();
+
+    for (int i = 0; i < args.length; i++) {
+      String key = args[i];
+      if (key.startsWith("-")) {
+        String value = i + 1 < args.length ? args[i + 1] : null;
+
+        if (value != null && value.startsWith("-")) {
+          value = null; // A parameter without a value (a flag) detected
+        } else
+          i++; // Make sure we do not interpret the value as a key now
+      } else {
+        arguments.add(key);
+      }
+    }
+    return arguments;
+  }
+
 }

@@ -272,21 +272,6 @@ public class FileProcessorTest {
   }
 
   @Test
-  public void testGetArgumentsMap() {
-    Map<String, String> argumentsMap = FileProcessor.getArgumentsMap(new String[] {"-file", "filename", "-flag", "true", "-toggle", "-toggle2"});
-    assertEquals("filename", argumentsMap.get("file"));
-    assertEquals("true", argumentsMap.get("flag"));
-    assertEquals(null, argumentsMap.get("toggle"));
-    assertTrue(argumentsMap.containsKey("toggle"));
-    assertTrue(argumentsMap.containsKey("toggle2"));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetArgumentsMapFail() {
-    FileProcessor.getArgumentsMap(new String[] {"file", "filename", "-flag", "true", "-toggle"});
-  }
-
-  @Test
   public void testSetLineNumber() throws IOException {
     FileProcessor processor = new FileProcessor();
     processor.setLibrary("/some/library");

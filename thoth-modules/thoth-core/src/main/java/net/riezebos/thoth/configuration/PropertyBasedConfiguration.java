@@ -14,6 +14,8 @@
  */
 package net.riezebos.thoth.configuration;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,6 +52,18 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   private List<String> outputFormats = null;
 
   public PropertyBasedConfiguration() throws ConfigurationException {
+  }
+
+  @Override
+  protected void clear() {
+    super.clear();
+    workspaceLocation = null;
+    markdownOptions = null;
+    imageExtensions = new HashSet<>();
+    fragmentExtensions = null;
+    bookExtensions = null;
+    classifications = null;
+    outputFormats = null;
   }
 
   @Override
@@ -476,5 +490,11 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   @Override
   public int getMaxHeaderNumberingLevel() {
     return Integer.parseInt(getValue("markdown.maxheadernumberlevel", "3"));
+  }
+
+  public void reload() throws FileNotFoundException, ConfigurationException {
+    clear();
+    FileInputStream inStream = new FileInputStream(getPropertyFileName());
+    load(inStream);
   }
 }
