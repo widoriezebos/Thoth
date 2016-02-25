@@ -36,11 +36,11 @@ Then launch Thoth-Standalone. The easies way is to open a terminal / console win
 
 With the current directory changed to where you stored `configuration.properties` you simply type
 
-	java -jar /pathto/thoth-standalone.jar
+	java -jar /pathto/thoth-standalone-1.0.0.jar
 
 If you wan to be more specific about starting Thoth then you would do something like
 
-	java -jar /pathto/thoth-standalone.jar /pathto/configuration.properties
+	java -jar /pathto/thoth-standalone-1.0.0.jar /pathto/configuration.properties
 
 Thoth will start and display something similar to
 

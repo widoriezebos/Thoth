@@ -415,8 +415,8 @@ Use the `printf()` function.
 With a ‘\\’ you can escape any character below that might be interpreted by Markdown otherwise:
 
 \   backslash
-`   backtick
-`*   asterisk
+\`   backtick
+\`\*   asterisk
 	_   underscore
 	{}  curly braces
 	[]()  square brackets
@@ -446,7 +446,7 @@ You can include any other markdown file (or any text file for that matter) by us
 
 There is also include functionality for images using a wildcard. This enables you to add images from a folder without having to completely specifying their name. The header level for automatically determined headers can be specified as a separate argument. Specify 0 for no headers.
 
-\includeimages{images/component/*.png, 1}
+\includeimages{images/component/\*.png, 1}
 
 
 ### 7.12.3  Include Source (code block)
@@ -462,7 +462,7 @@ You can mark text with the syntax outlined below. Since this kind of markup is m
 
 Addition { ++My inserted text++}
 Deletion { --My deleted text--}
-Substitution { Original text>Changed into something else}
+Substitution { Original text\>Changed into something else}
 Comment { \>\>This is just a comment\<\<}
 Highlight { ==And this a highlighted piece of text, probably followed by a comment==}
 
@@ -634,7 +634,7 @@ The command line that is obscured in the screenshot should be similar to
 
 You can easily run Thoth as a standalone server on your laptop, using a File System based repository that points straight into your Git documentation repository. Read the section about configuring and installing Thoth on how to do this. Basically you just connect your browser to the locally running Thoth that will show you exactly what your rendered document looks like. Just save your document, switch to your browser and press the refresh-key. To do this; open a terminal and enter:
 
-**`java -jar thoth-standalone.jar /path/to/my/config.properties`**
+**`java -jar thoth-standalone-1.0.0.jar /path/to/my/config.properties`**
 
 Thoth is firing up. Please hang on...
 Setting up content managers...
@@ -668,7 +668,7 @@ http://localhost:8080/skin=Bootstrap
 In the root of your library you (should) have a plain text document called skins.properties and in this file you associate a Skin with a path. An example of this is
 
 */Datamodel/*=DataModelSkin
-*=SimpleSkin
+\*=SimpleSkin
 
 In this example any path that matches \*/Datamodel/\* will be rendered using the DataModelSkin. As a fallback any other path will be associated with SimpleSkin. Matching is done from top to bottom and the first match wins.
 
@@ -1015,7 +1015,7 @@ The template below is a simple example; it is actually the template used by Simp
 
 # foreach($context in $contexts)
   \<a href="${context}"\>${context}\</a\>\<br/\>
-# end	
+# end
 
 \<br/\>\<br\>
 Latest successfull Pull request was at ${refresh}
@@ -1043,14 +1043,14 @@ Create a configuration.properties file as described in the [Configuration]()(Adm
 
 For desktop environments you can run Thoth without a Web Container using the Thoth-standalone version which has an embedded web server. First make sure you have Java8 installed, so [grab a JRE or JDK version 8]()(https://www.java.com/en/download/) and install it. Then you can start ‘standalone Thoth’ if you either have an environment or JVM variable set (as describe above) or simply provide the location of the configuration.properties file as an argument. Not even any of this is required if you have the configuration.properties file in the working folder when starting the Thoth standalone
 
-java -jar thoth-standalone.jar
+java -jar thoth-standalone-1.0.0.jar
 
 
 ## 10.3  WAR installation
 
 Have your Web Container and JDK8 ready and then just drop the Thoth WAR inside the web apps folder of your Web Container. And then the only requirement is that the configuration can be found through an environment variable (or -D provided JVM argument) called `thoth_configuration`. On servers with an init script for Tomcat (/etc/init.d/tomcat) you could add a script line stating
 
-export thoth_configuration=/opt/conf/configuration.properties
+export thoth\_configuration=/opt/conf/configuration.properties
 
 
 [//](): # "Include /Administration/Configuration.md"
@@ -1209,7 +1209,7 @@ markdown.option.AUTOLINKS
 : Enables plain autolinks the way github flavoured markdown implements them. With this extension enabled pegdown will intelligently recognize URLs and email addresses without any further delimiters and mark them as the respective link type. See [http://github.github.com/github-flavored-markdown]()(http://github.github.com/github-flavored-markdown). Default = off
 
 markdown.option.TABLES
-: Table support similar to what Multimarkdown offers. See [http://fletcherpenney.net/multimarkdown/users\_guide/]()(http://fletcherpenney.net/multimarkdown/users_guide/). Default = on
+: Table support similar to what Multimarkdown offers. See [http://fletcherpenney.net/multimarkdown/users\_guide/]()(http://fletcherpenney.net/multimarkdown/users\_guide/). Default = on
 
 markdown.option.DEFINITIONS
 : PHP Markdown Extra style definition lists. Additionally supports the small extension proposed in the article referenced below. See [http://michelf.com/projects/php-markdown/extra/#def-list]()(http://michelf.com/projects/php-markdown/extra/#def-list) and [http://www.justatheory.com/computers/markup/modest-markdown-proposal.html]()(http://www.justatheory.com/computers/markup/modest-markdown-proposal.html) Default = on
@@ -1268,9 +1268,9 @@ parsetimeout
 
 ## 11.3  Sample configuration file
 
-###### \\#
+###### \\
 # Primary options below; these you will have to set to get things going
-###### \\#
+###### \\
 
 # The absolute path to the folder that will contain pulled branches (repositories) and search indexes
 # The workspace is to be used by Thoth alone, never edit content in there yourself because
@@ -1280,11 +1280,11 @@ parsetimeout
 workspacelocation=/path/to/your/thoth/workspace
 
 
-###### \\#
+###### \\
 # Repository and Context definitions. These specify where to get the content from
 # Can be as many repositories as you like. Make sure you number them sequentially and leave
 # no gaps (parsing will stop at the first entry that has it's name not set)
-###### \\#
+###### \\
 
 # Name (identifier for use by Thoth) of the repository
 repository.1.name=Repository1
@@ -1313,11 +1313,11 @@ context.1.repository=Repository1
 context.1.branch=Branch1
 
 
-###### \\#
+###### \\
 # Skinning related properties
-###### \\#
+###### \\
 
-# The name of the default skin to use. If not set; it will use the builtin skin named 'Builtin' 
+# The name of the default skin to use. If not set; it will use the builtin skin named 'Builtin'
 # Note that any skin can come from the classpath as long as the package remains within net/riezebos/thoth/skins/
 skin.default=SimpleSkin
 
@@ -1329,13 +1329,13 @@ skin.mainindexcontext=
 localhost=http://localhost:8080/
 
 
-###### \\#
+###### \\
 # Define any custom renderers below for for additional output formats. Make sure you number them sequentially and leave
 # no gaps (parsing will stop at the first custom renderer that has it's extension not set.
 # You can have any number of custom processors; just keep on numbering them.
-# 
+\# 
 # Note that you can also override the default html and raw renderers. Their extensions are 'raw' and 'html'
-###### \\#
+###### \\
 
 renderer.1.extension=pdf 
 renderer.1.contenttype=application/pdf 
@@ -1362,9 +1362,9 @@ renderer.5.contenttype=
 renderer.5.source=
 renderer.5.command=
 
-###### \\#
+###### \\
 # Embedded server options. Not applicable when deployed as a WAR
-###### \\#
+###### \\
 
 # The port to have the (embedded) server listen to. Default is 8080
 embedded.port=8080
@@ -1376,27 +1376,27 @@ embedded.idletimeout=30
 embedded.servername=localhost
 
 
-###### \\#
+###### \\
 # Context index (page) options
-###### \\#
+###### \\
 
-# The following comma separated classifications will be available to the context index template 
+# The following comma separated classifications will be available to the context index template
 # (grouping of documents by classification) The folder classification is built in; and is just listed below for clarity
-# In the template (or json) the classification names are available under "classification_" + \<the name specified below\>
+# In the template (or json) the classification names are available under "classification\_" + \<the name specified below\>
 context.classifications=category,audience,folder
 
 
-###### \\#
+###### \\
 # Search options
-###### \\#
+###### \\
 
 # The number of search results per page; default is 25
 search.maxresults=25
 
 
-###### \\#
+###### \\
 # More options below; but you might not necessarily have to change them
-###### \\#
+###### \\
 
 # Default timestamp format mask. Note that the month is MM and the minutes are mm. HH is 24hr and hh 12hr
 formatmask.timestamp=dd-MM-yyyy HH:mm:ss
@@ -1431,13 +1431,13 @@ index.extensions=md,book,marked,txt
 # Append any link / include error messages at the bottom of the document
 markdown.appenderrors=true
 
-# Auto number headings up to the specified level. Default is 3, set to 0 to disable 
+# Auto number headings up to the specified level. Default is 3, set to 0 to disable
 markdown.maxheadernumberlevel=3
 
-###### \\#
+###### \\
 # MARKDOWN OPTIONS BELOW
 # See https://github.com/sirthias/pegdown for a full description
-###### \\#
+###### \\
 
 # Pretty ellipses, dashes and apostrophes.
 markdown.option.SMARTS=on
@@ -1460,7 +1460,7 @@ markdown.option.HARDWRAPS=on
 markdown.option.AUTOLINKS=off
 
 # Table support similar to what Multimarkdown offers.
-# See http://fletcherpenney.net/multimarkdown/users_guide/
+# See http://fletcherpenney.net/multimarkdown/users\_guide/
 markdown.option.TABLES=on
 
 # PHP Markdown Extra style definition lists.
@@ -1471,9 +1471,9 @@ markdown.option.DEFINITIONS=on
 
 # PHP Markdown Extra style fenced code blocks.
 # See http://michelf.com/projects/php-markdown/extra/#fenced-code-blocks
-markdown.option.FENCED_CODE_BLOCKS=on
+markdown.option.FENCED\_CODE\_BLOCKS=on
 
-# Support [\[Wiki-style links]()]. URL rendering is performed by the active {@link LinkRenderer}.
+# Support [[Wiki-style links]()]. URL rendering is performed by the active {@link LinkRenderer}.
 # See http://github.github.com/github-flavored-markdown
 markdown.option.WIKILINKS=on
 
@@ -1484,10 +1484,10 @@ markdown.option.STRIKETHROUGH=on
 markdown.option.ANCHORLINKS=off
 
 # Suppresses HTML blocks. They will be accepted in the input but not be contained in the output.
-markdown.option.SUPPRESS_HTML_BLOCKS=off
+markdown.option.SUPPRESS\_HTML\_BLOCKS=off
 
 # Suppresses inline HTML tags. They will be accepted in the input but not be contained in the output.
-markdown.option.SUPPRESS_INLINE_HTML=off
+markdown.option.SUPPRESS\_INLINE\_HTML=off
 
 # Requires a space char after Atx # header prefixes, so that #dasdsdaf is not a header.
 markdown.option.ATXHEADERSPACE=off
@@ -1537,4 +1537,3 @@ Thoth would not have been possible without the great help of the following proje
 - Diff-match-patch, [https://code.google.com/archive/p/google-diff-match-patch/]()(https://code.google.com/archive/p/google-diff-match-patch/)
 - Apache Lucene, [https://lucene.apache.org/core/]()(https://lucene.apache.org/core/)
 - And of course many many other open source projects. Check the pom.xml for a complete list.
-

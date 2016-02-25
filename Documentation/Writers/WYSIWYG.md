@@ -13,7 +13,7 @@ The command line that is obscured in the screenshot should be similar to
 ## Use Thoth standalone with your browser
 You can easily run Thoth as a standalone server on your laptop, using a File System based repository that points straight into your Git documentation repository. Read the section about configuring and installing Thoth on how to do this. Basically you just connect your browser to the locally running Thoth that will show you exactly what your rendered document looks like. Just save your document, switch to your browser and press the refresh-key. To do this; open a terminal and enter:
 
-**`java -jar thoth-standalone.jar /path/to/my/config.properties`**
+**`java -jar thoth-standalone-1.0.0.jar /path/to/my/config.properties`**
 
 	Thoth is firing up. Please hang on...
 	Setting up content managers...
