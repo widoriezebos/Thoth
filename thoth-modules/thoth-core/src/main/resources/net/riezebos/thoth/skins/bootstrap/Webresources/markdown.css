@@ -6,7 +6,8 @@ Prince PDF related CSS -->body {
 }
 
 @page main { 
-    @top { content:string(doctitle); }
+    font-family: "Avenir Next", Helvetica, Arial, sans-serif;
+	@top { content:string(doctitle); }
 
     @bottom-right {
         content: "Page " counter(page);
@@ -115,9 +116,8 @@ img {
 
 body {
     font-family: "Avenir Next", Helvetica, Arial, sans-serif;
-    padding: 1em;
-    margin: auto;
-    background: #fefefe;
+    max-width:60em;
+    margin:auto;
 }
 
 h1, h2, h3, h4, h5, h6 {

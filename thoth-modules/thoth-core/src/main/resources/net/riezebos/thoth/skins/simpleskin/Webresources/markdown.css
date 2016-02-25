@@ -6,6 +6,7 @@ Prince PDF related CSS -->body {
 }
 
 @page main { 
+    font-family: "Avenir Next", Helvetica, Arial, sans-serif;
 	@top { content:string(doctitle); }
 
     @bottom-right {
@@ -19,6 +20,12 @@ Prince PDF related CSS -->body {
 <!--
 End of Prince PDF related CSS -->h1 {
 	string-set: doctitle content()
+}
+
+body {
+    font-family: "Avenir Next", Helvetica, Arial, sans-serif;
+    max-width:60em;
+    margin:auto;
 }
 
 img {
@@ -111,13 +118,6 @@ img {
 	border-top: 10px solid #ffffff;
 	background-color: #ffffff;
 	border-bottom: 10px solid #ffffff;
-}
-
-body {
-	font-family: "Avenir Next", Helvetica, Arial, sans-serif;
-	padding: 1em;
-	margin: auto;
-	background: #fefefe;
 }
 
 h1, h2, h3, h4, h5, h6 {
