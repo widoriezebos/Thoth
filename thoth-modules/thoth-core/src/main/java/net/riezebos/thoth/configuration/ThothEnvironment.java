@@ -18,7 +18,7 @@ import net.riezebos.thoth.content.impl.ZipContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 
-public class ThothEnvironment {
+public class ThothEnvironment implements ContextChangeListener {
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
   public static final String CONFIGKEY_DEPRECATED = "configuration";
   public static final String CONFIGKEY = "thoth_configuration";
@@ -27,6 +27,10 @@ public class ThothEnvironment {
 
   private Map<String, ContentManager> managers = new HashMap<>();
   private Configuration configuration = null;
+
+  public ContentManager getContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
+    return getContentManager(contextDefinition.getName());
+  }
 
   public ContentManager getContentManager(String contextName) throws ContentManagerException {
 
@@ -72,6 +76,23 @@ public class ThothEnvironment {
       managers.put(contextName, contentManager);
     }
     return contentManager;
+  }
+
+  @Override
+  public void contextAdded(ContextDefinition contextDefinition) {
+    try {
+      // Load it to make sure we are ready to go:
+      getContentManager(contextDefinition);
+    } catch (ContentManagerException e) {
+      LOG.error(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void contextRemoved(ContextDefinition contextDefinition) {
+    synchronized (managers) {
+      managers.remove(contextDefinition.getName());
+    }
   }
 
   // Touches all the contexts. Can be used to warm up a server
@@ -128,7 +149,7 @@ public class ThothEnvironment {
           PropertyBasedConfiguration propertyBasedConfiguration = new PropertyBasedConfiguration();
           propertyBasedConfiguration.setPropertyFileName(propertyPath);
           propertyBasedConfiguration.reload();
-          configuration = new HotReloadableConfiguration(propertyBasedConfiguration);
+          setConfiguration(propertyBasedConfiguration);
         }
       }
       return configuration;
@@ -138,7 +159,9 @@ public class ThothEnvironment {
   }
 
   public void setConfiguration(Configuration configuration) {
-    this.configuration = configuration;
+    HotReloadableConfiguration hotReloadableConfiguration = new HotReloadableConfiguration(configuration);
+    hotReloadableConfiguration.addContextChangeListener(this);
+    this.configuration = hotReloadableConfiguration;
   }
 
   public String determinePropertyPath() {
@@ -172,5 +195,4 @@ public class ThothEnvironment {
       return sharedThothContext;
     }
   }
-
 }

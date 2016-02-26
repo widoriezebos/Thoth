@@ -16,8 +16,11 @@ package net.riezebos.thoth.configuration;
 
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -31,19 +34,49 @@ import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 public class HotReloadableConfiguration implements Configuration {
 
   private Configuration activeConfiguration;
+  private List<ContextChangeListener> listeners = new ArrayList<>();
 
   public HotReloadableConfiguration(Configuration configuration) {
     activeConfiguration = configuration;
   }
 
+  public void addContextChangeListener(ContextChangeListener listener) {
+    listeners.add(listener);
+  }
+
+  public void removeContextChangeListener(ContextChangeListener listener) {
+    listeners.remove(listener);
+  }
+
   /**
    * Reload the configuration using a temporary clone. Only if and when the reload succeeds (and is complete) will the active configuration be replaced
-   * atomically
+   * atomically. Also notify any listeners of changes to contexts.
    */
   public void reload() throws FileNotFoundException, ConfigurationException {
+    Set<ContextDefinition> originalContextDefinitions = new HashSet<>(activeConfiguration.getContextDefinitions().values());
     Configuration newOne = activeConfiguration.clone();
     newOne.reload();
     activeConfiguration = newOne;
+    Set<ContextDefinition> newContextDefinitions = new HashSet<>(activeConfiguration.getContextDefinitions().values());
+
+    for (ContextDefinition original : originalContextDefinitions) {
+      if (!newContextDefinitions.contains(original))
+        notifyContextRemoved(original);
+    }
+    for (ContextDefinition newCtxt : newContextDefinitions) {
+      if (!originalContextDefinitions.contains(newCtxt))
+        notifyContextAdded(newCtxt);
+    }
+  }
+
+  protected void notifyContextAdded(ContextDefinition context) {
+    for (ContextChangeListener listener : listeners)
+      listener.contextAdded(context);
+  }
+
+  protected void notifyContextRemoved(ContextDefinition context) {
+    for (ContextChangeListener listener : listeners)
+      listener.contextRemoved(context);
   }
 
   @Override

@@ -56,4 +56,44 @@ public class ContextDefinition implements Cloneable {
     }
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((branch == null) ? 0 : branch.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + (int) (refreshIntervalMS ^ (refreshIntervalMS >>> 32));
+    result = prime * result + ((repositoryDefinition == null) ? 0 : repositoryDefinition.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    ContextDefinition other = (ContextDefinition) obj;
+    if (branch == null) {
+      if (other.branch != null)
+        return false;
+    } else if (!branch.equals(other.branch))
+      return false;
+    if (name == null) {
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
+    if (refreshIntervalMS != other.refreshIntervalMS)
+      return false;
+    if (repositoryDefinition == null) {
+      if (other.repositoryDefinition != null)
+        return false;
+    } else if (!repositoryDefinition.equals(other.repositoryDefinition))
+      return false;
+    return true;
+  }
+
 }
