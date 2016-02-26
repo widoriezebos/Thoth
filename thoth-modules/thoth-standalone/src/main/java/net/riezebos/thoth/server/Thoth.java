@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -115,6 +117,15 @@ public class Thoth {
           thothEnvironment.reindexAll();
         } else if ("stop".equalsIgnoreCase(line)) {
           stop = true;
+        } else if ("debug".equalsIgnoreCase(line)) {
+          LogManager.getRootLogger().setLevel(Level.DEBUG);
+          println("Logger level set to DEBUG");
+        } else if ("info".equalsIgnoreCase(line)) {
+          LogManager.getRootLogger().setLevel(Level.INFO);
+          println("Logger level set to INFO");
+        } else if ("warn".equalsIgnoreCase(line)) {
+          println("Logger level set to WARN");
+          LogManager.getRootLogger().setLevel(Level.WARN);
         } else if (!StringUtils.isBlank(line)) {
           println("\nDid not recognize command '" + line + "'");
           listCommands();
@@ -133,6 +144,9 @@ public class Thoth {
     println("reload:  Reload the configuration");
     println("pull:    Pull all version controlled repositories");
     println("reindex: Force a reindex of all repositories");
+    println("debug:   Switch to debug log level");
+    println("info:    Switch to info log level");
+    println("warn:    Switch to warn log level");
     println("stop:    Stop the server");
   }
 

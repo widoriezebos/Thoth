@@ -100,19 +100,24 @@ public class HotReloadableConfiguration implements Configuration {
       configureAutoReload();
     else
       autoRefresh = activeConfiguration.isAutoReload();
+    
+    configFileModified = getModificationTime(activeConfiguration);
   }
 
   private void notifyRendersChanges() {
+    LOG.info("Renderers changed in the configuration. Notifying listeners");
     for (ConfigurationChangeListener listener : listeners)
       listener.renderersChanged();
   }
 
   protected void notifyContextAdded(ContextDefinition context) {
+    LOG.info("Contexts added to the configuration. Notifying listeners");
     for (ConfigurationChangeListener listener : listeners)
       listener.contextAdded(context);
   }
 
   protected void notifyContextRemoved(ContextDefinition context) {
+    LOG.info("Contexts removed from the configuration. Notifying listeners");
     for (ConfigurationChangeListener listener : listeners)
       listener.contextRemoved(context);
   }
@@ -142,7 +147,6 @@ public class HotReloadableConfiguration implements Configuration {
     if (checkModified != configFileModified) {
       try {
         reload();
-        configFileModified = checkModified;
         LOG.info("Configuration changes detected, reconfiguration occurred");
       } catch (FileNotFoundException | ConfigurationException e) {
         LOG.error(e.getMessage(), e);
