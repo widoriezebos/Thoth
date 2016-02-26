@@ -108,24 +108,31 @@ public class Thoth {
         if ("reload".equalsIgnoreCase(line)) {
           configuration.reload();
           println("Configuration reloaded from " + configuration.getPropertyFileName());
+
         } else if ("pull".equalsIgnoreCase(line)) {
           println("Pulling...");
           thothEnvironment.pullAll();
           println("Done...");
+
         } else if ("reindex".equalsIgnoreCase(line)) {
           println("Reindex running in the background");
           thothEnvironment.reindexAll();
+
         } else if ("stop".equalsIgnoreCase(line)) {
           stop = true;
+
         } else if ("debug".equalsIgnoreCase(line)) {
           LogManager.getRootLogger().setLevel(Level.DEBUG);
           println("Logger level set to DEBUG");
+
         } else if ("info".equalsIgnoreCase(line)) {
           LogManager.getRootLogger().setLevel(Level.INFO);
           println("Logger level set to INFO");
+
         } else if ("warn".equalsIgnoreCase(line)) {
           println("Logger level set to WARN");
           LogManager.getRootLogger().setLevel(Level.WARN);
+
         } else if (!StringUtils.isBlank(line)) {
           println("\nDid not recognize command '" + line + "'");
           listCommands();
