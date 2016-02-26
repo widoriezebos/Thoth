@@ -1,5 +1,5 @@
 # Thoth
-Simple yet powerful Markdown based Documentation System for professional documentation writers
+Simple yet powerful Markdown based Documentation System for professional documentation writers. (Although serious bloggers might like Thoth too)
 
 ## In a hurry?
 - Markdown (text based) editing helps you focus on content and structure so you can ignore layout while writing
@@ -41,7 +41,7 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 6. Your branches pulled to to local Git repositories in your workspace and they will be indexed automatically. When this is done you can connect  
 	with your browser and get going!
 
-##Not in a hurry?
+## Not in a hurry?
 Then why don't you head on to [the full documentation of Thoth](Documentation/Thoth Documentation.md)!
 ## Copyright
 Copyright (c) 2016 W.T.J. Riezebos

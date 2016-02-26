@@ -144,6 +144,7 @@ public class ThothTestBase {
     when(mockedConfiguration.isValidContext(contextName)).thenReturn(true);
     when(mockedConfiguration.getMainIndexSkinContext()).thenReturn(contextName);
     when(mockedConfiguration.getContexts()).thenReturn(Arrays.asList(contextName));
+    when(mockedConfiguration.addNewlineBeforeheader()).thenReturn(true);
     return mockedConfiguration;
   }
 

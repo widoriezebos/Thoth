@@ -1,8 +1,10 @@
 package net.riezebos.thoth.configuration;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +20,7 @@ import net.riezebos.thoth.content.impl.ZipContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 
-public class ThothEnvironment implements ContextChangeListener {
+public class ThothEnvironment implements ConfigurationChangeListener {
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
   public static final String CONFIGKEY_DEPRECATED = "configuration";
   public static final String CONFIGKEY = "thoth_configuration";
@@ -27,6 +29,7 @@ public class ThothEnvironment implements ContextChangeListener {
 
   private Map<String, ContentManager> managers = new HashMap<>();
   private Configuration configuration = null;
+  private List<RendererChangeListener> rendererChangeListeners = new ArrayList<>();
 
   public ContentManager getContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
     return getContentManager(contextDefinition.getName());
@@ -94,6 +97,12 @@ public class ThothEnvironment implements ContextChangeListener {
       managers.remove(contextDefinition.getName());
     }
   }
+  
+  @Override
+  public void renderersChanged() {
+    for (RendererChangeListener listener : rendererChangeListeners)
+      listener.rendererDefinitionChanged();
+  }
 
   // Touches all the contexts. Can be used to warm up a server
   public void touch() throws ContentManagerException {
@@ -159,13 +168,12 @@ public class ThothEnvironment implements ContextChangeListener {
   }
 
   public void setConfiguration(Configuration configuration) {
-    if(this.configuration != null)
-    {
+    if (this.configuration != null) {
       this.configuration.discard();
     }
-    
+
     HotReloadableConfiguration hotReloadableConfiguration = new HotReloadableConfiguration(configuration);
-    hotReloadableConfiguration.addContextChangeListener(this);
+    hotReloadableConfiguration.addConfigurationChangeListener(this);
     this.configuration = hotReloadableConfiguration;
   }
 
@@ -199,5 +207,13 @@ public class ThothEnvironment implements ContextChangeListener {
         sharedThothContext = new ThothEnvironment();
       return sharedThothContext;
     }
+  }
+
+  public void addRendererChangedListener(RendererChangeListener listener) {
+    rendererChangeListeners.add(listener);
+  }
+
+  public void removeRendererChangedListener(RendererChangeListener listener) {
+    rendererChangeListeners.remove(listener);
   }
 }

@@ -321,4 +321,5 @@ public interface Configuration extends Cloneable {
    * @return The interval in seconds to look for changes to the configuration (based on the timestamp of the configuration file)
    */
   int getAutoReloadInterval();
+
 }

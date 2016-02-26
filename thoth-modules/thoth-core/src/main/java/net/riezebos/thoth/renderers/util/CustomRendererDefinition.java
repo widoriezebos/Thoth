@@ -14,7 +14,10 @@
  */
 package net.riezebos.thoth.renderers.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class CustomRendererDefinition {
+
   private String extension;
   private String contentType;
   private String sourceRenderer;
@@ -26,6 +29,14 @@ public class CustomRendererDefinition {
     this.contentType = contentType;
     this.sourceRenderer = sourceRenderer;
     this.commandLine = commandLine;
+    validate();
+  }
+
+  public void validate() {
+    if (StringUtils.isBlank(extension))
+      throw new IllegalArgumentException("The extension of renderer " + contentType + " is not set");
+    if (StringUtils.isBlank(commandLine))
+      throw new IllegalArgumentException("The commandLine of renderer " + contentType + " is not set");
   }
 
   public String getExtension() {
@@ -42,6 +53,49 @@ public class CustomRendererDefinition {
 
   public String getCommandLine() {
     return commandLine;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((commandLine == null) ? 0 : commandLine.hashCode());
+    result = prime * result + ((contentType == null) ? 0 : contentType.hashCode());
+    result = prime * result + ((extension == null) ? 0 : extension.hashCode());
+    result = prime * result + ((sourceRenderer == null) ? 0 : sourceRenderer.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    CustomRendererDefinition other = (CustomRendererDefinition) obj;
+    if (commandLine == null) {
+      if (other.commandLine != null)
+        return false;
+    } else if (!commandLine.equals(other.commandLine))
+      return false;
+    if (contentType == null) {
+      if (other.contentType != null)
+        return false;
+    } else if (!contentType.equals(other.contentType))
+      return false;
+    if (extension == null) {
+      if (other.extension != null)
+        return false;
+    } else if (!extension.equals(other.extension))
+      return false;
+    if (sourceRenderer == null) {
+      if (other.sourceRenderer != null)
+        return false;
+    } else if (!sourceRenderer.equals(other.sourceRenderer))
+      return false;
+    return true;
   }
 
 }

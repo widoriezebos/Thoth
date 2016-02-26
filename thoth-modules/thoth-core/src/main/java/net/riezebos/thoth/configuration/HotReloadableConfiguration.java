@@ -39,14 +39,20 @@ public class HotReloadableConfiguration implements Configuration {
   private static final Logger LOG = LoggerFactory.getLogger(HotReloadableConfiguration.class);
 
   private Configuration activeConfiguration;
-  private List<ContextChangeListener> listeners = new ArrayList<>();
+  private List<ConfigurationChangeListener> listeners = new ArrayList<>();
   private boolean autoRefresh = false;
   private long configFileModified;
 
   public HotReloadableConfiguration(Configuration configuration) {
     activeConfiguration = configuration;
-    configFileModified = new File(configuration.getPropertyFileName()).lastModified();
+    configFileModified = getModificationTime(configuration);
     configureAutoReload();
+  }
+
+  protected long getModificationTime(Configuration configuration) {
+    if (configuration.getPropertyFileName() == null)
+      return 0L;
+    return new File(configuration.getPropertyFileName()).lastModified();
   }
 
   @Override
@@ -54,11 +60,11 @@ public class HotReloadableConfiguration implements Configuration {
     activeConfiguration.discard();
   }
 
-  public void addContextChangeListener(ContextChangeListener listener) {
+  public void addConfigurationChangeListener(ConfigurationChangeListener listener) {
     listeners.add(listener);
   }
 
-  public void removeContextChangeListener(ContextChangeListener listener) {
+  public void removeConfigurationChangeListener(ConfigurationChangeListener listener) {
     listeners.remove(listener);
   }
 
@@ -68,10 +74,17 @@ public class HotReloadableConfiguration implements Configuration {
    */
   synchronized public void reload() throws FileNotFoundException, ConfigurationException {
     Set<ContextDefinition> originalContextDefinitions = new HashSet<>(activeConfiguration.getContextDefinitions().values());
+    List<CustomRendererDefinition> originalCustomRenderers = activeConfiguration.getCustomRenderers();
+
     Configuration newOne = activeConfiguration.clone();
     boolean reloadWasOn = activeConfiguration.isAutoReload();
     newOne.reload();
     activeConfiguration = newOne;
+
+    List<CustomRendererDefinition> newCustomRenderers = activeConfiguration.getCustomRenderers();
+    if (!originalCustomRenderers.equals(newCustomRenderers))
+      notifyRendersChanges();
+
     Set<ContextDefinition> newContextDefinitions = new HashSet<>(activeConfiguration.getContextDefinitions().values());
 
     for (ContextDefinition original : originalContextDefinitions) {
@@ -89,13 +102,18 @@ public class HotReloadableConfiguration implements Configuration {
       autoRefresh = activeConfiguration.isAutoReload();
   }
 
+  private void notifyRendersChanges() {
+    for (ConfigurationChangeListener listener : listeners)
+      listener.renderersChanged();
+  }
+
   protected void notifyContextAdded(ContextDefinition context) {
-    for (ContextChangeListener listener : listeners)
+    for (ConfigurationChangeListener listener : listeners)
       listener.contextAdded(context);
   }
 
   protected void notifyContextRemoved(ContextDefinition context) {
-    for (ContextChangeListener listener : listeners)
+    for (ConfigurationChangeListener listener : listeners)
       listener.contextRemoved(context);
   }
 
@@ -119,11 +137,12 @@ public class HotReloadableConfiguration implements Configuration {
   }
 
   protected void checkForChanges() {
-    long checkModified = new File(activeConfiguration.getPropertyFileName()).lastModified();
+    long checkModified = getModificationTime(activeConfiguration);
 
     if (checkModified != configFileModified) {
       try {
         reload();
+        configFileModified = checkModified;
         LOG.info("Configuration changes detected, reconfiguration occurred");
       } catch (FileNotFoundException | ConfigurationException e) {
         LOG.error(e.getMessage(), e);

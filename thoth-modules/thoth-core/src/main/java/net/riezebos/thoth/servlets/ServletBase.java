@@ -57,7 +57,7 @@ public abstract class ServletBase extends HttpServlet {
       thothEnvironment = ThothEnvironment.getSharedThothContext();
   }
 
-  public ThothEnvironment getThothContext() {
+  public ThothEnvironment getThothEnvironment() {
     return thothEnvironment;
   }
 
@@ -137,7 +137,7 @@ public abstract class ServletBase extends HttpServlet {
         context = configuration.getMainIndexSkinContext();
       }
 
-      ContentManager contentManager = getThothContext().getContentManager(context);
+      ContentManager contentManager = getThothEnvironment().getContentManager(context);
       SkinManager skinManager = contentManager.getSkinManager();
       String path = getPath(request);
 
@@ -160,7 +160,7 @@ public abstract class ServletBase extends HttpServlet {
   }
 
   protected Configuration getConfiguration() {
-    return getThothContext().getConfiguration();
+    return getThothEnvironment().getConfiguration();
   }
 
   protected Map<String, Object> getParameters(HttpServletRequest request) throws ServletException {
@@ -202,7 +202,7 @@ public abstract class ServletBase extends HttpServlet {
 
   private String getRefreshTimestamp(String contextName) {
     try {
-      Date refreshTimestamp = getThothContext().getRefreshTimestamp(contextName);
+      Date refreshTimestamp = getThothEnvironment().getRefreshTimestamp(contextName);
       SimpleDateFormat timestampFormat = getConfiguration().getTimestampFormat();
       return refreshTimestamp == null ? "Never" : timestampFormat.format(refreshTimestamp);
     } catch (ContentManagerException e) {

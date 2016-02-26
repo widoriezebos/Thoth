@@ -56,7 +56,7 @@ localhost
 : Custom rendering uses a forked process to render the contents. When this process needs to fetch the contents; this URL is used as the base for the path of the document. Default value is ‘http://localhost:8080/'
 
 ### Custom renderers
-You can define any number of custom renderers. The most basic one would be a PDF renderer.
+You can define any number of custom renderers. The most basic one would be a PDF or an EPUB renderer.
 
 renderer.1.extension
 : The extension to recognize this renderer. An example would be ‘pdf’, adding a parameter to a Thoth page URL ‘?output=pdf’ would then render the HTML version of that page with this renderer. Must be unique across renderers. Example: ‘pdf’
@@ -98,6 +98,14 @@ An few examples of custom renderers (note the use of ${url} and ${input}):
 	renderer.4.source=html 
 	renderer.4.contenttype=application/rtf
 	renderer.4.command=/usr/local/bin/pandoc -s -r html -t rtf ${input} -o ${output}
+
+### Using Pandoc as the HTML rendering engine
+Note that it is possible to replace the default Markdown rendering engine (based on PegDown) with any other. Just define a custom renderer with the extension ‘html’ to override the built in HTML renderer and make sure you use ‘raw’ as the source input like so:
+
+	renderer.1.extension=html
+	renderer.1.contenttype=text/html
+	renderer.1.source=raw
+	renderer.1.command=/usr/local/bin/pandoc -s -r markdown -t html ${input} -o ${output} 
 
 ### Format masks
 formatmask.timestamp
