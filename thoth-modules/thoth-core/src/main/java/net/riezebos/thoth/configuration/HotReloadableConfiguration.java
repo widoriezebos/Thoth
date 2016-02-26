@@ -14,6 +14,7 @@
  */
 package net.riezebos.thoth.configuration;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
@@ -32,12 +36,22 @@ import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
  * @author wido
  */
 public class HotReloadableConfiguration implements Configuration {
+  private static final Logger LOG = LoggerFactory.getLogger(HotReloadableConfiguration.class);
 
   private Configuration activeConfiguration;
   private List<ContextChangeListener> listeners = new ArrayList<>();
+  private boolean autoRefresh = false;
+  private long configFileModified;
 
   public HotReloadableConfiguration(Configuration configuration) {
     activeConfiguration = configuration;
+    configFileModified = new File(configuration.getPropertyFileName()).lastModified();
+    configureAutoReload();
+  }
+
+  @Override
+  public void discard() {
+    activeConfiguration.discard();
   }
 
   public void addContextChangeListener(ContextChangeListener listener) {
@@ -52,9 +66,10 @@ public class HotReloadableConfiguration implements Configuration {
    * Reload the configuration using a temporary clone. Only if and when the reload succeeds (and is complete) will the active configuration be replaced
    * atomically. Also notify any listeners of changes to contexts.
    */
-  public void reload() throws FileNotFoundException, ConfigurationException {
+  synchronized public void reload() throws FileNotFoundException, ConfigurationException {
     Set<ContextDefinition> originalContextDefinitions = new HashSet<>(activeConfiguration.getContextDefinitions().values());
     Configuration newOne = activeConfiguration.clone();
+    boolean reloadWasOn = activeConfiguration.isAutoReload();
     newOne.reload();
     activeConfiguration = newOne;
     Set<ContextDefinition> newContextDefinitions = new HashSet<>(activeConfiguration.getContextDefinitions().values());
@@ -67,6 +82,11 @@ public class HotReloadableConfiguration implements Configuration {
       if (!originalContextDefinitions.contains(newCtxt))
         notifyContextAdded(newCtxt);
     }
+
+    if (activeConfiguration.isAutoReload() && !reloadWasOn)
+      configureAutoReload();
+    else
+      autoRefresh = activeConfiguration.isAutoReload();
   }
 
   protected void notifyContextAdded(ContextDefinition context) {
@@ -77,6 +97,38 @@ public class HotReloadableConfiguration implements Configuration {
   protected void notifyContextRemoved(ContextDefinition context) {
     for (ContextChangeListener listener : listeners)
       listener.contextRemoved(context);
+  }
+
+  protected void configureAutoReload() {
+    if (activeConfiguration.isAutoReload()) {
+
+      final int autoReloadInterval = activeConfiguration.getAutoReloadInterval() * 1000;
+      new Thread() {
+        @Override
+        public void run() {
+          do {
+            try {
+              Thread.sleep(autoReloadInterval);
+            } catch (InterruptedException e) {
+            }
+            checkForChanges();
+          } while (autoRefresh);
+        }
+      }.start();
+    }
+  }
+
+  protected void checkForChanges() {
+    long checkModified = new File(activeConfiguration.getPropertyFileName()).lastModified();
+
+    if (checkModified != configFileModified) {
+      try {
+        reload();
+        LOG.info("Configuration changes detected, reconfiguration occurred");
+      } catch (FileNotFoundException | ConfigurationException e) {
+        LOG.error(e.getMessage(), e);
+      }
+    }
   }
 
   @Override
@@ -242,6 +294,16 @@ public class HotReloadableConfiguration implements Configuration {
   @Override
   public boolean addNewlineBeforeheader() {
     return activeConfiguration.addNewlineBeforeheader();
+  }
+
+  @Override
+  public boolean isAutoReload() {
+    return activeConfiguration.isAutoReload();
+  }
+
+  @Override
+  public int getAutoReloadInterval() {
+    return activeConfiguration.getAutoReloadInterval();
   }
 
 }

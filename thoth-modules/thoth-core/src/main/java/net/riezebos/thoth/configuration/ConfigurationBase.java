@@ -166,4 +166,8 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
     } while (doneOne);
   }
 
+  @Override
+  public void discard() {
+
+  }
 }

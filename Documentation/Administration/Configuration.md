@@ -39,6 +39,13 @@ context.1.refreshseconds
 : The number of seconds between automatic repository refreshes. When a change is detected an indexer updating the search index is automatically launched. Default = 60
 
 ## Optional settings
+
+config.autorefresh
+: When true the configuration will automatically (hot) reload if changes to it are detected (based on comparing file modification timestamps)
+
+config.autorefreshinterval
+: The interval (in seconds) to check whether if the configuration has changed.
+
 skin.default
 : The name of the default skin. When no skin is defined for a specific context this is the skin that will be used. Also used when no skin is defined for the main index page. Default value is ‘SimpleSkin’
 
@@ -195,7 +202,6 @@ parsetimeout
 
 ## Sample configuration file
 \includecode{sample.configuration.properties}
-
 
 
 

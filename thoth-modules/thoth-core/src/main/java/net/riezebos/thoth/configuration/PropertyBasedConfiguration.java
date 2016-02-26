@@ -505,4 +505,14 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
     FileInputStream inStream = new FileInputStream(getPropertyFileName());
     load(inStream);
   }
+
+  @Override
+  public boolean isAutoReload() {
+    return isOn(getValue("config.autorefresh", "true"));
+  }
+
+  @Override
+  public int getAutoReloadInterval() {
+    return Integer.parseInt(getValue("config.autorefreshinterval", "30"));
+  }
 }

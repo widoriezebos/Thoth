@@ -159,6 +159,11 @@ public class ThothEnvironment implements ContextChangeListener {
   }
 
   public void setConfiguration(Configuration configuration) {
+    if(this.configuration != null)
+    {
+      this.configuration.discard();
+    }
+    
     HotReloadableConfiguration hotReloadableConfiguration = new HotReloadableConfiguration(configuration);
     hotReloadableConfiguration.addContextChangeListener(this);
     this.configuration = hotReloadableConfiguration;

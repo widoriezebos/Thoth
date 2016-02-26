@@ -300,8 +300,25 @@ public interface Configuration extends Cloneable {
 
   /**
    * Automatically add a newline for every header in the source file. Default is true
+   * 
    * @return
    */
   boolean addNewlineBeforeheader();
 
+  /**
+   * Notifies that this configuration is to be discarded; so release any resources or detach any listeners
+   */
+  void discard();
+
+  /**
+   * When true configuration changes will be detected and will cause an automatic reload of the configuration to occur. Default is true
+   * 
+   * @return
+   */
+  boolean isAutoReload();
+
+  /**
+   * @return The interval in seconds to look for changes to the configuration (based on the timestamp of the configuration file)
+   */
+  int getAutoReloadInterval();
 }
