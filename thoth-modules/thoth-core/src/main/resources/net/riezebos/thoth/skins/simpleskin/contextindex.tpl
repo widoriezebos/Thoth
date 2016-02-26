@@ -2,17 +2,17 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8">
-    <title>${context} Documentation Index</title>
+    <title>${context} Index</title>
     <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css"/>
   </head>
   <body>
     
-    <h1>${context} documentation</h1>
+    <h1>${context}</h1>
     
     <form action="${contexturl}?cmd=search" method="get">
-      Search all of ${context}: <input type="text" name="query"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
+      Search all of ${context}: <input type="text" name="query" size="40"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
     </form>
     
     #if($versioncontrolled)

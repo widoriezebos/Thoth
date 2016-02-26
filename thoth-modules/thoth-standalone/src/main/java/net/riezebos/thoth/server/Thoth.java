@@ -91,8 +91,7 @@ public class Thoth {
     if (asServer) {
       server.join();
     } else {
-      println("\n"//
-          + "You can now access Thoth at http://"//
+      println("You can now access Thoth at http://"//
           + configuration.getEmbeddedServerName() //
           + ":" + configuration.getEmbeddedServerPort());
       BufferedReader br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
@@ -102,7 +101,7 @@ public class Thoth {
       boolean stop = false;
       do {
         print("Command: ");
-        String line = br.readLine();
+        String line = br.readLine().trim();
 
         if ("reload".equalsIgnoreCase(line)) {
           configuration.reload();
@@ -117,12 +116,12 @@ public class Thoth {
         } else if ("stop".equalsIgnoreCase(line)) {
           stop = true;
         } else if (!StringUtils.isBlank(line)) {
-          println("\nDid not recognize command.");
+          println("\nDid not recognize command '" + line + "'");
           listCommands();
         }
       } while (!stop);
 
-      println("Stopping server.\n(First waiting for any auto refresh to finish though)");
+      println("Stopping server...");
       server.stop();
       server.join();
       thothEnvironment.shutDown();
@@ -130,7 +129,7 @@ public class Thoth {
   }
 
   protected void listCommands() {
-    println("The following commands are supported:");
+    println("\nThe following console commands are supported:");
     println("reload:  Reload the configuration");
     println("pull:    Pull all version controlled repositories");
     println("reindex: Force a reindex of all repositories");

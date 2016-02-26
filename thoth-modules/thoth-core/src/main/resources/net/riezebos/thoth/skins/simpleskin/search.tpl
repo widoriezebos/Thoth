@@ -10,7 +10,7 @@
   <body>
     <a href="${contexturl}">Back to Index</a>
     <form action="${contexturl}" method="get">
-      Search all of ${context}: <input type="text" name="query" value="${thothutil.escapeHtml($query)}"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
+      Search all of ${context}: <input type="text" name="query" value="${thothutil.escapeHtml($query)}" size="40"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
     </form>
     
     Showing page ${page}<br/>
