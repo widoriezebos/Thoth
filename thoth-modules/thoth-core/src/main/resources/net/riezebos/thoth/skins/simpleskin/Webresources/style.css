@@ -1,162 +1,164 @@
 body {
-	font-family: "Avenir Next", Helvetica, Arial, sans-serif;
-	padding: 1em;
-	margin: auto;
-	max-width: 60em;
-	background: #fefefe
+    font-family: "Avenir Next", Helvetica, Arial, sans-serif;
+    padding: 1em;
+    margin: auto;
+    max-width: 60em;
+    background: #fefefe
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-weight: 700
+    font-weight: 700
 }
 
 h1 {
-	color: #000;
-	font-size: 28pt
+    color: #000;
+    font-size: 28pt
 }
 
 h2 {
-	border-bottom: 1px solid #CCC;
-	color: #000;
-	font-size: 24px
+    border-bottom: 1px solid #CCC;
+    color: #000;
+    font-size: 24px
 }
 
 h3 {
-	font-size: 18px
+    font-size: 18px
 }
 
 h4 {
-	font-size: 16px
+    font-size: 16px
 }
 
 h5 {
-	font-size: 14px
+    font-size: 14px
 }
 
 h6 {
-	color: #777;
-	background-color: inherit;
-	font-size: 14px
+    color: #777;
+    background-color: inherit;
+    font-size: 14px
 }
 
 hr {
-	height: .2em;
-	border: 0;
-	color: #CCC;
-	background-color: #CCC
+    height: .2em;
+    border: 0;
+    color: #CCC;
+    background-color: #CCC
 }
 
 p, blockquote, ul, ol, dl, li, table, pre {
-	margin: 15px 0
+    margin: 15px 0
 }
 
 a, a:visited {
-	color: #4183C4;
-	background-color: inherit;
-	text-decoration: none
+    color: #4183C4;
+    background-color: inherit;
+    text-decoration: none
 }
 
 #message {
-	border-radius: 6px;
-	border: 1px solid #ccc;
-	display: block;
-	width: 100%;
-	height: 60px;
-	margin: 6px 0
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    display: block;
+    width: 100%;
+    height: 60px;
+    margin: 6px 0
 }
 
 button, #ws {
-	font-size: 10pt;
-	padding: 4px 6px;
-	border-radius: 5px;
-	border: 1px solid #bbb;
-	background-color: #eee
+    font-size: 10pt;
+    padding: 4px 6px;
+    border-radius: 5px;
+    border: 1px solid #bbb;
+    background-color: #eee
 }
 
 code, pre, #ws, #message {
-	font-family: Monaco;
-	font-size: 10pt;
-	border-radius: 3px;
-	background-color: #F8F8F8;
-	color: inherit
+    font-family: Monaco;
+    font-size: 10pt;
+    border-radius: 3px;
+    background-color: #F8F8F8;
+    color: inherit
 }
 
 code {
-	border: 1px solid #EAEAEA;
-	margin: 0 2px;
-	padding: 0 5px
+    border: 1px solid #EAEAEA;
+    margin: 0 2px;
+    padding: 0 5px
 }
 
 pre {
-	border: 1px solid #CCC;
-	overflow: auto;
-	padding: 4px 8px
+    border: 1px solid #CCC;
+    overflow: auto;
+    padding: 4px 8px
 }
 
 pre>code {
-	border: 0;
-	margin: 0;
-	padding: 0
+    border: 0;
+    margin: 0;
+    padding: 0
 }
 
 #ws {
-	background-color: #f8f8f8
+    background-color: #f8f8f8
 }
 
 .send {
-	color: #7b7
+    color: #7b7
 }
 
 .server {
-	color: #79b
+    color: #79b
 }
 
 .error {
-	color: #A00
+    color: #A00
 }
 
 table {
+    border-collapse:separate;
+    border:solid #f2f2f2 1px;
+    border-radius:3px;
+    -moz-border-radius:3px;
     width : 100%
 }
 
 table tr {
-	border-bottom: 1px solid #e9e9e9
+    border-bottom: 1px solid #e9e9e9
 }
 
 table thead td, th {
-	border-left: 1px solid #f2f2f2;
-	border-right: 1px solid #d5d5d5;
-	background: #ddd repeat-x scroll 0 100%;
-	font-weight: 700;
-	text-align: left
+    border-radius:3px;
+    background: #ddd repeat-x scroll 0 100%;
+    font-weight: 700;
+    text-align: left
 }
 
 table tr td, th {
-	border: 1px solid #D5D5D5;
-	padding: 5px
+    padding: 5px
 }
 
 table tr:hover {
-	background: #fcfcfc
+    background: #f4f4f4
 }
 
 table tr ul.actions {
-	margin: 0
+    margin: 0
 }
 
 table tr ul.actions li {
-	display: inline;
-	margin-right: 5px
+    display: inline;
+    margin-right: 5px
 }
 
 table td.last {
-	width: 1px;
-	white-space: nowrap
+    width: 1px;
+    white-space: nowrap
 }
 
 th, td {
-	text-align: left;
-	vertical-align: top
+    text-align: left;
+    vertical-align: top
 }
 
 table td {
@@ -167,36 +169,36 @@ table td {
 }
 
 metatags, documentstructure, errors, fragment, searchresult, diffsection, commitmessage {
-	background-color: #fff;
-	box-shadow: .1em .1em .5em rgba(0, 0, 0, 0.45);
-	display: block;
-	margin: .3em auto;
-	padding: .7em;
-	border-radius: .25em
+    background-color: #fff;
+    box-shadow: .1em .1em .5em rgba(0, 0, 0, 0.45);
+    display: block;
+    margin: .3em auto;
+    padding: .7em;
+    border-radius: .25em
 }
 
 searchresult {
-	background-color: #eaeaea
+    background-color: #eaeaea
 }
 
 fragment b {
-	background-color: #ff0
+    background-color: #ff0
 }
 
 diffsection {
-	font-family: monospace
+    font-family: monospace
 }
 
 ins {
-	background: #20ff20
+    background: #20ff20
 }
 
 del {
-	background: #e01010;
-	color: #fff
+    background: #e01010;
+    color: #fff
 }
 
 .difflinenumber {
-	float: right;
-	background: #fff0e0
+    float: right;
+    background: #fff0e0
 }

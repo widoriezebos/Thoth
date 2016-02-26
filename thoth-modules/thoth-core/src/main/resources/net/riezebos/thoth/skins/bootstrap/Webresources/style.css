@@ -116,7 +116,11 @@ pre>code {
 }
 
 table {
-    width : 100%
+    border-collapse:separate;
+    border:solid #f2f2f2 1px;
+    border-radius:3px;
+    -moz-border-radius:3px;
+	width : 100%
 }
 
 table tr {
@@ -124,20 +128,18 @@ table tr {
 }
 
 table thead td, th {
-    border-left: 1px solid #f2f2f2;
-    border-right: 1px solid #d5d5d5;
-    background: #ddd repeat-x scroll 0 100%;
+    border-radius:3px;
+	background: #ddd repeat-x scroll 0 100%;
     font-weight: 700;
     text-align: left
 }
 
 table tr td, th {
-    border: 1px solid #D5D5D5;
     padding: 5px
 }
 
 table tr:hover {
-    background: #fcfcfc
+    background: #f4f4f4
 }
 
 table tr ul.actions {
