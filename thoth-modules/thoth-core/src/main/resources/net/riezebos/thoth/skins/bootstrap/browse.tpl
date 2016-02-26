@@ -11,7 +11,7 @@
     <a href="${contexturl}">Back to Index</a>
   
   #if(${atRoot})
-    <h1>Contents of context ${context}</h1>
+    <h1>Browse ${context}</h1>
   #else
     <h1>Browse ${path}</h1>
     <a href="..?cmd=browse">Step back</a>

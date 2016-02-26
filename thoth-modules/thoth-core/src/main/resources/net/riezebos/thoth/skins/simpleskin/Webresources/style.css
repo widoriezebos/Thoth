@@ -115,6 +115,10 @@ pre>code {
 	color: #A00
 }
 
+table {
+    width : 100%
+}
+
 table tr {
 	border-bottom: 1px solid #e9e9e9
 }
