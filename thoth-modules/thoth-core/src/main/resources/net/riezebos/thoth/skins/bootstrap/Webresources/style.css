@@ -74,8 +74,10 @@ button, #ws {
 }
 
 code, pre, #ws, #message {
-    font-family: Monaco;
-    font-size: 10pt;
+    font-family: Monaco, Consolas, Menlo, Lucida Console, Liberation Mono,
+        DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace,
+        serif, Courier;
+	font-size: 10pt;
     border-radius: 3px;
     background-color: #F8F8F8;
     color: inherit
@@ -186,7 +188,9 @@ fragment b {
 }
 
 diffsection {
-    font-family: monospace
+    font-family: Monaco, Consolas, Menlo, Lucida Console, Liberation Mono,
+        DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace,
+        serif, Courier;
 }
 
 ins {

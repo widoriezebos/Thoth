@@ -94,9 +94,9 @@ code {
 }
 
 pre {
-    font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono,
+    font-family: Monaco, Consolas, Menlo, Lucida Console, Liberation Mono,
         DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace,
-        serif;
+        serif, Courier;
     margin-bottom: 10px;
     overflow: auto;
     width: auto;
@@ -180,7 +180,9 @@ button, #ws {
 }
 
 code, pre, #ws, #message {
-    font-family: Monaco;
+    font-family: Monaco, Consolas, Menlo, Lucida Console, Liberation Mono,
+        DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace,
+        serif, Courier;
     font-size: 10pt;
     border-radius: 3px;
     background-color: #F8F8F8;

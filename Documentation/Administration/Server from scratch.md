@@ -1,5 +1,5 @@
 # Setting up a server from scratch
-In this chapter we will set up a Linux server with all the software required to run Thoth in a web container (so we will not be using the standalone server but Tomcat).
+In this chapter we will set up a Linux server with all the software required to run Thoth in a web container (so we will not be using the standalone server but Tomcat). Note that the described setup in the chapter is for reference only; depending on the version of Linux you use there might be different ways of installing the software mentioned below.
 
 ## Amazon Linux AMI
 For this example we will use an Amazon Linux image as the basis. We will start doing some groundwork like setting the correct timezone and installing Apache HTTPD
@@ -73,6 +73,21 @@ Now let’s install Pandoc to be able to render Markdown to almost anything.
 	cd /opt/download
 	wget https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-1-amd64.deb
 	ar p pandoc-1.16.0.2-1-amd64.deb data.tar.gz | sudo tar xvz --strip-components 2 -C /usr/local
+
+### Install additional fonts (Optional)
+If you like you can add TrueType fonts that can be used when rendering PDF’s (or other) server side. For plain HTML this has no effect because that happens in the browser.
+
+You can install additional (X11) fonts with this command:
+
+	yum install xorg-x11-fonts*
+
+You can also add the MS TrueType fonts in the following way:
+
+	rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm 
+
+Alternatively you can upload any of your own fonts to `/usr/share/fonts/` and clear the not cache with `sudo fc-cache -fv`
+
+One of the fonts that the Thoth’s default skin uses (SimpleSkin) is Monaco. If you want Monaco to render properly server side then you have a look at [https://github.com/cstrap/monaco-font](https://github.com/cstrap/monaco-font) and place some or all of these in the `/usr/share/fonts/` folder.
 
 ### Setting up the Thoth configuration
 We will now create the folders for use by Thoth (check the Thoth configuration file below to see the references to these folders):
