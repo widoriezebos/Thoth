@@ -101,7 +101,7 @@ public class ThothTestBase {
     repodef.setName("testrepos");
     repodef.setType("filesystem");
 
-    ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", 0);
+    ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", "", 0);
 
     FSContentManager contentManager = new TestFSContentManager(contextDef, thothEnvironment);
     return contentManager;

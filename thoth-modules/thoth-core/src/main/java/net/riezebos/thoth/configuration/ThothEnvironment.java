@@ -46,7 +46,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
         if (StringUtils.isBlank(contextName)) {
           RepositoryDefinition repositoryDefinition = new RepositoryDefinition();
           repositoryDefinition.setType("nop");
-          contentManager = registerContentManager(new NopContentManager(new ContextDefinition(repositoryDefinition, "", "", 0), this));
+          contentManager = registerContentManager(new NopContentManager(new ContextDefinition(repositoryDefinition, "", "", "", 0), this));
         } else {
           ContextDefinition contextDefinition = configuration.getContextDefinition(contextName);
           RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
@@ -97,7 +97,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
       managers.remove(contextDefinition.getName());
     }
   }
-  
+
   @Override
   public void renderersChanged() {
     for (RendererChangeListener listener : rendererChangeListeners)

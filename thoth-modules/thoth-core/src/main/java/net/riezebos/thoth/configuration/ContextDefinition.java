@@ -14,19 +14,25 @@
  */
 package net.riezebos.thoth.configuration;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ContextDefinition implements Cloneable {
 
   private RepositoryDefinition repositoryDefinition;
   private String name;
   private String branch;
+  private String library;
   private long refreshIntervalMS;
 
-  public ContextDefinition(RepositoryDefinition repositoryDefinition, String name, String branch, long refreshIntervalMS) {
+  public ContextDefinition(RepositoryDefinition repositoryDefinition, String name, String branch, String library, long refreshIntervalMS) {
     super();
     this.repositoryDefinition = repositoryDefinition;
     this.name = name;
     this.branch = branch;
     this.refreshIntervalMS = refreshIntervalMS;
+    if (StringUtils.isBlank(library))
+      library = "";
+    this.library = library;
   }
 
   public RepositoryDefinition getRepositoryDefinition() {
@@ -39,6 +45,10 @@ public class ContextDefinition implements Cloneable {
 
   public String getBranch() {
     return branch;
+  }
+
+  public String getLibrary() {
+    return library;
   }
 
   public long getRefreshIntervalMS() {
@@ -61,6 +71,7 @@ public class ContextDefinition implements Cloneable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((branch == null) ? 0 : branch.hashCode());
+    result = prime * result + ((library == null) ? 0 : library.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     result = prime * result + (int) (refreshIntervalMS ^ (refreshIntervalMS >>> 32));
     result = prime * result + ((repositoryDefinition == null) ? 0 : repositoryDefinition.hashCode());
@@ -81,6 +92,11 @@ public class ContextDefinition implements Cloneable {
         return false;
     } else if (!branch.equals(other.branch))
       return false;
+    if (library == null) {
+      if (other.library != null)
+        return false;
+    } else if (!library.equals(other.library))
+      return false;
     if (name == null) {
       if (other.name != null)
         return false;
@@ -95,5 +111,4 @@ public class ContextDefinition implements Cloneable {
       return false;
     return true;
   }
-
 }

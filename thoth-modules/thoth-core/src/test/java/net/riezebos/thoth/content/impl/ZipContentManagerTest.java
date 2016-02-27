@@ -38,7 +38,7 @@ public class ZipContentManagerTest extends ThothTestBase {
     repodef.setName("testrepos");
     repodef.setType("filesystem");
 
-    ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", 0);
+    ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", "", 0);
 
     ZipContentManager contentManager = new ZipContentManager(contextDef, thothEnvironment, zfs);
 

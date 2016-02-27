@@ -199,14 +199,16 @@ public abstract class ContentManagerBase implements ContentManager {
   protected IncludeProcessor getIncludeProcessor(CriticProcessingMode criticProcessingMode, String documentPath) throws ContextNotFoundException, IOException {
     String rootFolder = documentPath.indexOf('/') == -1 ? "" : ThothUtil.getFolder(documentPath);
 
+    ContextDefinition contextDefinition = getContextDefinition();
+    String library = contextDefinition.getLibrary();
     Configuration configuration = getConfiguration();
     IncludeProcessor processor = new IncludeProcessor();
     processor.setFileSystem(getFileSystem());
-    processor.setLibrary("");
+    processor.setLibrary(library);
     processor.setRootFolder(rootFolder);
     processor.setCriticProcessingMode(criticProcessingMode);
     processor.setMaxNumberingLevel(configuration.getMaxHeaderNumberingLevel());
-    processor.setAddNewlineBeforeheader(configuration.addNewlineBeforeheader()); 
+    processor.setAddNewlineBeforeheader(configuration.addNewlineBeforeheader());
     return processor;
   }
 

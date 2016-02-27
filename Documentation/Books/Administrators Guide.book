@@ -15,3 +15,4 @@ Thoth Administrator's Guide<br/>
 \include{/Administration/Setup by Example.md}
 \include{/Writers/Skins.md}
 \include{/Administration/Configuration.md}
+\include{/Server from scratch.md}

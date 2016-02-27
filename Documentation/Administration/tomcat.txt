@@ -1,0 +1,49 @@
+#!/bin/sh
+# Tomcat
+#
+# chkconfig: 2345 84 25
+# description: Start / stop script for Apache Tomcat
+# processname: tomcat
+
+# Source function library.
+#. /etc/init.d/functions
+
+export JAVA_HOME=$(readlink -f /opt/java/default)
+export TOMCAT_HOME=/opt/apache-tomcat-8.0.32
+export CATALINA_HOME=/opt/apache-tomcat-8.0.32
+export JAVA_OPTS="-server -Djava.library.path=${TOMCAT_HOME}/lib"
+
+export thoth_configuration=/opt/thoth-config/configuration.properties
+export CATALINA_OPTS="-Xms512m -Xmx2048m -XX:MaxPermSize=256m -Djava.awt.headless=true -Dorg.apache.catalina.session.StandardSession.ACTIVITY_CHECK=true"
+
+export PATH=${JAVA_HOME}/bin:${PATH}
+
+cd ${CATALINA_HOME}/bin || exit
+
+START() {
+  ${CATALINA_HOME}/bin/startup.sh
+}
+
+STOP() {
+  ${CATALINA_HOME}/bin/shutdown.sh
+}
+
+STATUS() {
+  ${CATALINA_HOME}/bin/version.sh
+}
+
+case $1 in
+  'start')
+    START
+    ;;
+  'stop')
+    STOP
+    ;;
+  'status')
+    STATUS
+    ;;
+  *)
+    echo 'Usage: service tomcat start|stop|status' >&2
+    exit 1
+    ;;
+esac

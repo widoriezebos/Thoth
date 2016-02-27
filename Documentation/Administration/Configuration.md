@@ -35,6 +35,9 @@ context.1.repository
 context.1.branch
 : The name of the branch to pull from Git. In the case of FS repository this can be left blank.
 
+context.1.library
+: Optional. If you do not have your documentation (your library) located at the root of the repository, you can specify the location of your library as a relative path from the root of your repository. For example, in the case of the Thoth documentation the library is set to ‘Documentation’
+
 context.1.refreshseconds
 : The number of seconds between automatic repository refreshes. When a change is detected an indexer updating the search index is automatically launched. Default = 60
 
@@ -210,6 +213,5 @@ parsetimeout
 
 ## Sample configuration file
 \includecode{sample.configuration.properties}
-
 
 

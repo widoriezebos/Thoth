@@ -28,7 +28,7 @@ public class GitContentManagerTest extends ThothTestBase {
     repodef.setPassword("password");
     repodef.setType("git");
 
-    ContextDefinition contextDef = new ContextDefinition(repodef, "testgit", "branch", 0);
+    ContextDefinition contextDef = new ContextDefinition(repodef, "testgit", "branch", "", 0);
     GitContentManager contentManager = new TestGitContentManager(contextDef, thothEnvironment);
 
     contentManager.disableAutoRefresh();

@@ -37,7 +37,7 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
     RepositoryDefinition repoDef = new RepositoryDefinition();
     repoDef.setName("global-nop-repository");
     repoDef.setType("nop");
-    global = new ContextDefinition(repoDef, "*global*", null, 0);
+    global = new ContextDefinition(repoDef, "*global*", null, null, 0);
   }
 
   public Configuration clone() {
@@ -116,6 +116,7 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
 
         String repository = getValue("context." + idx + ".repository");
         String branch = getValue("context." + idx + ".branch", null);
+        String library = getValue("context." + idx + ".library", null);
         String refreshSeconds = getValue("context." + idx + ".refreshseconds", "60");
         long refreshMs = Long.parseLong(refreshSeconds) * 1000;
 
@@ -125,7 +126,7 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
         RepositoryDefinition repositoryDefinition = repositoryDefinitions.get(repository.toLowerCase());
         if (repositoryDefinition == null)
           throw new ConfigurationException("Context " + contextName + " references undefined Repository '" + repository + "'");
-        ContextDefinition contextdef = new ContextDefinition(repositoryDefinition, contextName, branch, refreshMs);
+        ContextDefinition contextdef = new ContextDefinition(repositoryDefinition, contextName, branch, library, refreshMs);
 
         String key = contextdef.getName().toLowerCase();
         if (contextDefinitions.containsKey(key)) {
