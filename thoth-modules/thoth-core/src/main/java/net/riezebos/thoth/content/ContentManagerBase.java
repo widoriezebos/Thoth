@@ -200,11 +200,11 @@ public abstract class ContentManagerBase implements ContentManager {
     String rootFolder = documentPath.indexOf('/') == -1 ? "" : ThothUtil.getFolder(documentPath);
 
     ContextDefinition contextDefinition = getContextDefinition();
-    String library = contextDefinition.getLibrary();
+    String libraryRoot = contextDefinition.getLibraryRoot();
     Configuration configuration = getConfiguration();
     IncludeProcessor processor = new IncludeProcessor();
     processor.setFileSystem(getFileSystem());
-    processor.setLibrary(library);
+    processor.setLibrary(libraryRoot);
     processor.setRootFolder(rootFolder);
     processor.setCriticProcessingMode(criticProcessingMode);
     processor.setMaxNumberingLevel(configuration.getMaxHeaderNumberingLevel());
@@ -275,14 +275,20 @@ public abstract class ContentManagerBase implements ContentManager {
     CacheManager cacheManager = getCacheManager();
     List<Book> books = cacheManager.getBooks();
     if (books == null) {
-      FileHandle folder = getFileHandle("/");
+      FileHandle contextRootfolder = getFileHandle("/");
+      FileHandle libraryfolder = getFileHandle(getLibraryRoot());
       books = new ArrayList<>();
-      collectBooks(folder.getCanonicalPath(), folder, books, getConfiguration().getBookExtensions());
+      collectBooks(contextRootfolder.getCanonicalPath(), libraryfolder, books, getConfiguration().getBookExtensions());
       Collections.sort(books);
       cacheManager.setBooks(books);
     }
 
     return books;
+  }
+
+  @Override
+  public String getLibraryRoot() {
+    return getContextDefinition().getLibraryRoot();
   }
 
   protected void collectBooks(String contextFolder, FileHandle folder, List<Book> result, List<String> bookExtensions)
@@ -362,8 +368,10 @@ public abstract class ContentManagerBase implements ContentManager {
     if (fileSpec.indexOf('/') == -1)
       folder = "/";
 
+    String searchRoot = ThothUtil.suffix(getLibraryRoot(), "/") + ThothUtil.stripPrefix(folder, "/");
+
     Pattern pattern = Pattern.compile(ThothUtil.fileSpec2regExp(spec));
-    traverseFolders(result, value -> pattern.matcher(ThothUtil.getFileName(value)).matches(), getFileHandle(folder), recursive);
+    traverseFolders(result, value -> pattern.matcher(ThothUtil.getFileName(value)).matches(), getFileHandle(searchRoot), recursive);
     Collections.sort(result);
     return result;
   }

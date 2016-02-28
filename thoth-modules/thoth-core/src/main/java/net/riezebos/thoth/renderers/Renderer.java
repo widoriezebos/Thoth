@@ -30,6 +30,7 @@ public interface Renderer {
   String BODY_PARAMETER = "body";
   String SKINBASE_PARAMETER = "skinbase";
   String REFRESH_PARAMETER = "refresh";
+  String LIBRARY_ROOT = "libraryroot";
   String SKIN = "skin";
   String TODAY = "today";
   String NOW = "now";

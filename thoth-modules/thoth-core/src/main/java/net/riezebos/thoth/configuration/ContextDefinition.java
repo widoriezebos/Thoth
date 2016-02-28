@@ -16,23 +16,25 @@ package net.riezebos.thoth.configuration;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.riezebos.thoth.util.ThothUtil;
+
 public class ContextDefinition implements Cloneable {
 
   private RepositoryDefinition repositoryDefinition;
   private String name;
   private String branch;
-  private String library;
+  private String libraryRoot;
   private long refreshIntervalMS;
 
-  public ContextDefinition(RepositoryDefinition repositoryDefinition, String name, String branch, String library, long refreshIntervalMS) {
+  public ContextDefinition(RepositoryDefinition repositoryDefinition, String name, String branch, String libraryRoot, long refreshIntervalMS) {
     super();
     this.repositoryDefinition = repositoryDefinition;
     this.name = name;
     this.branch = branch;
     this.refreshIntervalMS = refreshIntervalMS;
-    if (StringUtils.isBlank(library))
-      library = "";
-    this.library = library;
+    if (StringUtils.isBlank(libraryRoot))
+      libraryRoot = "/";
+    this.libraryRoot = ThothUtil.prefix(ThothUtil.stripSuffix(libraryRoot, "/"), "/");
   }
 
   public RepositoryDefinition getRepositoryDefinition() {
@@ -47,8 +49,8 @@ public class ContextDefinition implements Cloneable {
     return branch;
   }
 
-  public String getLibrary() {
-    return library;
+  public String getLibraryRoot() {
+    return libraryRoot;
   }
 
   public long getRefreshIntervalMS() {
@@ -71,7 +73,7 @@ public class ContextDefinition implements Cloneable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((branch == null) ? 0 : branch.hashCode());
-    result = prime * result + ((library == null) ? 0 : library.hashCode());
+    result = prime * result + ((libraryRoot == null) ? 0 : libraryRoot.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     result = prime * result + (int) (refreshIntervalMS ^ (refreshIntervalMS >>> 32));
     result = prime * result + ((repositoryDefinition == null) ? 0 : repositoryDefinition.hashCode());
@@ -92,10 +94,10 @@ public class ContextDefinition implements Cloneable {
         return false;
     } else if (!branch.equals(other.branch))
       return false;
-    if (library == null) {
-      if (other.library != null)
+    if (libraryRoot == null) {
+      if (other.libraryRoot != null)
         return false;
-    } else if (!library.equals(other.library))
+    } else if (!libraryRoot.equals(other.libraryRoot))
       return false;
     if (name == null) {
       if (other.name != null)

@@ -97,4 +97,6 @@ public interface ContentManager {
 
   void expireCache();
 
+  String getLibraryRoot();
+
 }

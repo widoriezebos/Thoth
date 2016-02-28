@@ -105,13 +105,17 @@ public abstract class RendererBase implements Renderer {
       throws ContentManagerException, IOException, UnsupportedEncodingException {
 
     try (PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8")), true)) {
+      ContentManager contentManager = getContentManager(context);
+      String libraryRoot = contentManager.getLibraryRoot();
+      variables.put(Renderer.LIBRARY_ROOT, libraryRoot);
+
       VelocityContext velocityContext = new VelocityContext(variables);
       velocityContext.put(VELOCITY_HELPER, new ThothCoreUtil(getConfiguration()));
       VelocityEngine engine = new VelocityEngine();
       Properties properties = new Properties();
       properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(VELOCITY_PROPERTIES));
       engine.init(properties);
-      TemplateResourceLoader.setContentManager(getContentManager(context));
+      TemplateResourceLoader.setContentManager(contentManager);
       engine.getTemplate(template).merge(velocityContext, writer);
     } catch (Exception e) {
       throw new RenderException(e);
