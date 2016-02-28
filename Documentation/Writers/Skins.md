@@ -93,6 +93,7 @@ The following variables are defined for all templates
 - **now** is the current timestamp. Formatted according to the format mask specified by the Configuration. Type: String
 - **refresh** is the timestamp of the latest successful refresh (for version control based repositories). Formatted according to the format mask specified by the Configuration.  Type: String
 - **outputFormats** is the list of supported output formats (html, raw and any custom renderers that are defined in the configuration) Type: List\<String\>
+- **permissions** contains a list of permissions the current user is granted. Valid permissions: ACCESS, READ\_BOOKS, READ\_FRAGMENTS, READ\_RESOURCE, BROWSE, DIFF, META, PULL, REINDEX, REVISION, SEARCH, VALIDATE. Type: Set\<String\>
 
 #### Types used for variables
 Most types are basic / simple types like String, List and Integer. The exception to the rule are beans Book, Diff etc. The following beans are defined as types and used below:

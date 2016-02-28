@@ -37,6 +37,7 @@ public interface Renderer {
   String TODAY = "today";
   String NOW = "now";
   String OUTPUT_FORMATS = "outputFormats";
+  String PERMISSIONS = "permissions";
 
   public enum RenderResult {
     OK, NOT_FOUND, FORBIDDEN

@@ -17,8 +17,12 @@
     <br/><br/>
     Latest successfull Pull request was at ${refresh}
     <br/>
-    To update the site to the latest version right now; you can <a href=".?cmd=pull">Pull manually</a> 
-    or click <a href=".?cmd=reindex">here</a> to force a reindex<br/>
+    #if(${permissions.contains("PULL")})
+      To update the site to the latest version right now; you can <a href=".?cmd=pull">Pull manually</a><br/>
+    #end   
+    #if(${permissions.contains("REINDEX")})
+    Click <a href=".?cmd=reindex">here</a> to force a reindex<br/>
+    #end
     <br/>
     <sub>Powered by Thoth core version ${thothutil.getVersion()}</sub>
   </body>

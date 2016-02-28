@@ -43,6 +43,9 @@ context.1.refreshseconds
 
 ## Optional settings
 
+defaultuser
+: The name of the default user. Any user of Thoth will fallback to this user since there is no user management yet. In a future version of Thoth there will be support for users, groups and permissions. Right now the only way to restrict access to Thoth is to set the value of this property to one of “reader”, “writer”, “administrator”. Readers can only read books and search books. Writers have full access except for administrative functions like Pull and Reindex. Note: the default value is currently “administrator”; this property will no doubt be removed in a next release of Thoth.
+
 config.autorefresh
 : When true the configuration will automatically (hot) reload if changes to it are detected (based on comparing file modification timestamps)
 
@@ -213,5 +216,4 @@ parsetimeout
 
 ## Sample configuration file
 \includecode{sample.configuration.properties}
-
 

@@ -11,16 +11,22 @@
     
     <h1>${context}</h1>
     
+    #if(${permissions.contains("SEARCH")})
     <form action="${contexturl}?cmd=search" method="get">
       Search all of ${context}: <input type="text" name="query" size="40"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
     </form>
+    #end
     
-    #if($versioncontrolled)
+    #if($versioncontrolled && ${permissions.contains("REVISION")})
       Click <a href="${contexturl}${libraryroot}?cmd=revisions">here</a> for the latest changes, or click on a meta link below to zoom in on a document.<br/>
     #end
     
+    #if(${permissions.contains("VALIDATE")})
     Click <a href="${contexturl}${libraryroot}?cmd=validationreport">here</a> for the validation report of this entire context<br/>
+    #end
+    #if(${permissions.contains("BROWSE")})
     Click <a href="${contexturl}${libraryroot}?cmd=browse">here</a> to browse the library
+    #end
     
     <h2>Books by Category</h2>
     <table>

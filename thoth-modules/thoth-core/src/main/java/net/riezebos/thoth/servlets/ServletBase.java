@@ -19,7 +19,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -38,6 +40,7 @@ import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.Renderer;
+import net.riezebos.thoth.user.Permission;
 import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.user.UserManager;
 import net.riezebos.thoth.util.ThothUtil;
@@ -217,6 +220,15 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.NOW, configuration.getTimestampFormat().format(now));
     result.put(Renderer.OUTPUT_FORMATS, configuration.getOutputFormats());
     result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(contextName));
+
+    Set<String> permissions = new HashSet<>();
+    User currentUser = getCurrentUser();
+    if (currentUser != null) {
+      for (Permission permission : currentUser.getPermissions())
+        permissions.add(String.valueOf(permission));
+    }
+    result.put(Renderer.PERMISSIONS, permissions);
+
     return result;
   }
 
