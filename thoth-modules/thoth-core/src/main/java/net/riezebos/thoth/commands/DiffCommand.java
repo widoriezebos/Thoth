@@ -29,6 +29,8 @@ import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.util.diff_match_patch.Diff;
 
 public class DiffCommand extends RendererBase implements Command {
@@ -42,10 +44,14 @@ public class DiffCommand extends RendererBase implements Command {
     return "diff";
   }
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException {
     try {
-      RenderResult result = RenderResult.OK;
       ContentManager contentManager = getContentManager(context);
+      if (!contentManager.getAccessManager().hasPermission(user, path, Permission.DIFF))
+        return RenderResult.FORBIDDEN;
+
+      RenderResult result = RenderResult.OK;
       Configuration configuration = getThothEnvironment().getConfiguration();
       SimpleDateFormat dateFormat = configuration.getTimestampFormat();
       String commitId = getString(arguments, "commitId");

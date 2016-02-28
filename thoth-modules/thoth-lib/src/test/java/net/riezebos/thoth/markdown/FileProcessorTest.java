@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,7 +32,6 @@ import org.junit.Test;
 
 import net.riezebos.thoth.beans.Bookmark;
 import net.riezebos.thoth.beans.BookmarkUsage;
-import net.riezebos.thoth.markdown.filehandle.BasicFileSystem;
 
 public class FileProcessorTest {
 
@@ -307,25 +305,6 @@ public class FileProcessorTest {
     assertFalse(processor.hasErrors());
     processor.registerBookMarkUsage(new BookmarkUsage("wrongheader"));
     processor.validate();
-    assertTrue(processor.hasErrors());
-  }
-
-  @Test
-  public void testMakeRelativeToLibrary() throws IOException {
-
-    FileProcessor processor = new FileProcessor();
-    File libPath = File.createTempFile("lib", "");
-    libPath.deleteOnExit();
-    String libraryPath = processor.getFolderName(libPath.getAbsolutePath());
-    File libFolder = new File(libraryPath);
-    String someFile = libraryPath + "/some/other/path/file.md";
-
-    BasicFileSystem fs = new BasicFileSystem();
-    processor.setLibrary(libFolder.getAbsolutePath());
-    String relative = processor.makeRelativeToLibrary(fs.getFileHandle(someFile));
-    assertEquals("some/other/path/file.md", relative);
-    assertFalse(processor.hasErrors());
-    processor.makeRelativeToLibrary(fs.getFileHandle("/outside/the/library"));
     assertTrue(processor.hasErrors());
   }
 

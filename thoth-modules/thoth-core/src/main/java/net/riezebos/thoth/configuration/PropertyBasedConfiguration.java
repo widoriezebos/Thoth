@@ -515,4 +515,9 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   public int getAutoReloadInterval() {
     return Integer.parseInt(getValue("config.autorefreshinterval", "30"));
   }
+
+  @Override
+  public String getDefaultUser() {
+    return getValue("defaultuser", "administrator");
+  }
 }

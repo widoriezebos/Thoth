@@ -24,6 +24,7 @@ import net.riezebos.thoth.testutil.ThothTestBase;
 public class CommandTest extends ThothTestBase implements RendererProvider {
 
   private ContentManager contentManager;
+  private ThothEnvironment thothEnvironment;
   private String contextName = "TestContext";
 
   protected void testCommand(Command command, String path, String code, String[] htmlExists, String[] jsonExists)
@@ -42,15 +43,19 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
     Map<String, Object> arguments = getParameters(contentManager, path);
     if (args != null)
       arguments.putAll(args);
-    command.execute(contextName, path, arguments, skin, outputStream);
+    command.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, skin, outputStream);
     String result = outputStream.toString("UTF-8").trim();
-    for (String check : htmlExists)
-      assertTrue(check, result.indexOf(check) != -1);
+    for (String check : htmlExists) {
+      boolean condition = result.indexOf(check) != -1;
+      if (!condition)
+        System.out.println(result + "\ndoes not contain\n" + check);
+      assertTrue(check, condition);
+    }
 
     if (jsonExists != null) {
       arguments.put("mode", "json");
       outputStream = new ByteArrayOutputStream();
-      command.execute(contextName, path, arguments, skin, outputStream);
+      command.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, skin, outputStream);
       result = outputStream.toString("UTF-8").trim();
       assertTrue(result, result.startsWith("{\"") && result.endsWith("}"));
 
@@ -60,7 +65,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
   }
 
   protected ThothEnvironment setupContentManager() throws ContextNotFoundException, ContentManagerException, IOException {
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    thothEnvironment = createThothContext(contextName);
     contentManager = createTestContentManager(thothEnvironment, contextName);
     thothEnvironment.registerContentManager(contentManager);
     return thothEnvironment;

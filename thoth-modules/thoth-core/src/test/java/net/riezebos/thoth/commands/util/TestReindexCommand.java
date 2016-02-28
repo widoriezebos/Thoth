@@ -2,7 +2,7 @@ package net.riezebos.thoth.commands.util;
 
 import net.riezebos.thoth.commands.ReindexCommand;
 import net.riezebos.thoth.configuration.ThothEnvironment;
-import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.renderers.RendererProvider;
 
 public class TestReindexCommand extends ReindexCommand {
@@ -12,7 +12,7 @@ public class TestReindexCommand extends ReindexCommand {
   }
 
   @Override
-  protected void reindex(String context) throws ContentManagerException {
+  protected void reindex(ContentManager contentManager) {
     // Do nothing
   }
 

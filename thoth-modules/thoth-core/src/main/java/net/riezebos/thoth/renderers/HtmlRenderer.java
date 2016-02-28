@@ -32,6 +32,8 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.renderers.util.CustomHtmlSerializer;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class HtmlRenderer extends RendererBase implements Renderer {
@@ -49,15 +51,21 @@ public class HtmlRenderer extends RendererBase implements Renderer {
     return "text/html;charset=UTF-8";
   }
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException {
     try {
-      RenderResult result = RenderResult.OK;
 
+      Configuration configuration = getConfiguration();
       ContentManager contentManager = getContentManager(context);
+      boolean isBook = configuration.isBook(path);
+      Permission permission = isBook ? Permission.READ_BOOKS : Permission.READ_FRAGMENTS;
+
+      if (!contentManager.getAccessManager().hasPermission(user, path, permission))
+        return RenderResult.FORBIDDEN;
+
+      RenderResult result = RenderResult.OK;
       FileHandle fileHandle = contentManager.getFileHandle(path);
       if (fileHandle.isFile()) {
-
-        Configuration configuration = getConfiguration();
 
         MarkDownDocument markdown = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));
         String markdownSource = markdown.getMarkdown();

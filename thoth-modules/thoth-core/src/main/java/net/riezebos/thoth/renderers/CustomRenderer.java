@@ -35,9 +35,12 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class CustomRenderer extends RendererBase implements Renderer {
@@ -91,8 +94,16 @@ public class CustomRenderer extends RendererBase implements Renderer {
     this.commandLine = commandLine;
   }
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException {
     try {
+      Configuration configuration = getConfiguration();
+      ContentManager contentManager = getContentManager(context);
+
+      boolean isBook = configuration.isBook(path);
+      Permission permission = isBook ? Permission.READ_BOOKS : Permission.READ_FRAGMENTS;
+      if (!contentManager.getAccessManager().hasPermission(user, path, permission))
+        return RenderResult.FORBIDDEN;
 
       ByteArrayOutputStream sourceBytes = new ByteArrayOutputStream();
       RendererProvider rendererProvider = getRendererProvider();
@@ -101,7 +112,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
       if (renderer == this)
         throw new IllegalArgumentException("Cannot have the source of a custom renderer pointing to itself");
 
-      RenderResult rawRenderResult = renderer.execute(context, path, arguments, skin, sourceBytes);
+      RenderResult rawRenderResult = renderer.execute(user, context, path, arguments, skin, sourceBytes);
       if (rawRenderResult != RenderResult.OK)
         return rawRenderResult;
 
@@ -111,7 +122,6 @@ public class CustomRenderer extends RendererBase implements Renderer {
       try {
         IOUtils.copy(new ByteArrayInputStream(sourceBytes.toByteArray()), new FileOutputStream(tempInput));
 
-        Configuration configuration = getConfiguration();
         String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
 
         arguments.put("input", tempInput.getAbsolutePath());

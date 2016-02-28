@@ -28,9 +28,8 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
-import net.riezebos.thoth.testutil.ThothTestBase;
 
-public class CustomRendererTest extends ThothTestBase {
+public class CustomRendererTest extends RendererTest {
 
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
@@ -51,7 +50,7 @@ public class CustomRendererTest extends ThothTestBase {
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Map<String, Object> arguments = getParameters(contentManager, path);
-    renderer.execute(contextName, path, arguments, getSkin(contentManager), outputStream);
+    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, getSkin(contentManager), outputStream);
     String result = outputStream.toString("UTF-8").trim();
     assertEquals("rendered", result);
     assertEquals(contentType, renderer.getContentType(new HashMap<String, Object>()));

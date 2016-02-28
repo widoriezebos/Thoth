@@ -94,15 +94,15 @@ public class CommitTest {
     commit2.setId("0987654321asdfgh/some/other/path.md");
     commit2.setMessage("Deleted something");
     commit2.setShortMessage("Deleted");
-    commit2.setTimestamp(new Date(now+1000));
+    commit2.setTimestamp(new Date(now + 1000));
 
     Commit commit3 = new Commit();
     commit3.setAuthor("Wido Riezebos");
     commit3.setId("asdfghjkl34567cvbn/some/other/path.md");
     commit3.setMessage("Updated something");
     commit3.setShortMessage("Updated");
-    commit3.setTimestamp(new Date(now+2000));
-    
+    commit3.setTimestamp(new Date(now + 2000));
+
     List<Commit> lst = new ArrayList<>();
     lst.add(commit3);
     lst.add(commit1);

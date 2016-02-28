@@ -322,4 +322,11 @@ public interface Configuration extends Cloneable {
    */
   int getAutoReloadInterval();
 
+  /**
+   * Returns the name of the (anonymous) user. Will be replaced by proper user management in a future release
+   * 
+   * @return
+   */
+  String getDefaultUser();
+
 }

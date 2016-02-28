@@ -31,6 +31,9 @@ import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class MetaCommand extends RendererBase implements Command {
 
@@ -43,11 +46,15 @@ public class MetaCommand extends RendererBase implements Command {
     return "meta";
   }
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException {
 
     try {
       RenderResult result = RenderResult.OK;
       ContentManager contentManager = getContentManager(context);
+      if (!contentManager.getAccessManager().hasPermission(user, path, Permission.META))
+        return RenderResult.FORBIDDEN;
+
       MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));
 
       DocumentNode root = markDownDocument.getDocumentStructure();
@@ -65,8 +72,9 @@ public class MetaCommand extends RendererBase implements Command {
 
       Map<String, List<String>> reverseIndex = contentManager.getReverseIndex(false);
       Map<String, List<String>> reverseIndexIndirect = contentManager.getReverseIndex(true);
-      List<String> usedBy = reverseIndex.get("/" + path);
-      List<String> usedByIndirect = reverseIndexIndirect.get("/" + path);
+      String key = ThothUtil.prefix(path, "/");
+      List<String> usedBy = reverseIndex.get(key);
+      List<String> usedByIndirect = reverseIndexIndirect.get(key);
       Map<String, String> metatags = markDownDocument.getMetatags();
       List<String> metaTagKeys = new ArrayList<>(metatags.keySet());
       Collections.sort(metaTagKeys);

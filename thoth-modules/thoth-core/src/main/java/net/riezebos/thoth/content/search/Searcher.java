@@ -41,12 +41,15 @@ import org.apache.lucene.store.FSDirectory;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.content.AccessManager;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.SearchException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.DocumentNode;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.util.PagedList;
 import net.riezebos.thoth.util.ThothCoreUtil;
 import net.riezebos.thoth.util.ThothUtil;
@@ -59,11 +62,18 @@ public class Searcher {
     this.contentManager = contentManager;
   }
 
-  public PagedList<SearchResult> search(String queryExpression, int pageNumber, int pageSize) throws SearchException {
+  public PagedList<SearchResult> search(User user, String queryExpression, int pageNumber, int pageSize) throws SearchException {
     try {
       IndexReader reader = getIndexReader(contentManager);
       IndexSearcher searcher = getIndexSearcher(reader);
       Analyzer analyzer = new StandardAnalyzer();
+
+      // We might need to restrict the results to books of the user does not have access to fragments:
+      AccessManager accessManager = contentManager.getAccessManager();
+      boolean booksOnly = !accessManager.hasPermission(user, "", Permission.READ_FRAGMENTS);
+      if (booksOnly) {
+        queryExpression = Indexer.INDEX_TYPE + ":" + Indexer.TYPE_DOCUMENT + " AND (" + queryExpression + ")";
+      }
 
       QueryParser parser = new QueryParser(Indexer.INDEX_CONTENTS, analyzer);
       Query query = parser.parse(queryExpression);
@@ -90,7 +100,7 @@ public class Searcher {
           searchResult.setDocument(documentPath);
 
           String type = document.get(Indexer.INDEX_TYPE);
-          if (Indexer.TYPE_DOCUMENT.equals(type)) {
+          if (Indexer.TYPE_DOCUMENT.equals(type) || Indexer.TYPE_FRAGMENT.equals(type)) {
             searchResult.setResource(false);
             MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(documentPath, true, CriticProcessingMode.DO_NOTHING);
             String contents = markDownDocument.getMarkdown();

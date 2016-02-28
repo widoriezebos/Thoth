@@ -666,24 +666,6 @@ public class FileProcessor {
     this.stripTrailingWhitespace = stripTrailingWhitespace;
   }
 
-  protected String makeRelativeToLibrary(FileHandle fileHandle) throws IOException {
-    String canonicalFile = ThothUtil.normalSlashes(fileHandle.getCanonicalPath());
-    String library = getLibrary();
-    String result;
-
-    // Special case for root path itself
-    if (ThothUtil.suffix(canonicalFile, "/").equals(library))
-      return "";
-
-    if (!canonicalFile.startsWith(library)) {
-      error("Path " + canonicalFile + " is not located in library " + library);
-      result = fileHandle.getAbsolutePath();
-    } else {
-      result = canonicalFile.substring(library.length());
-    }
-    return result;
-  }
-
   protected boolean inCodeBlock(String line) {
     return line.startsWith("\t") || line.startsWith("    ");
   }

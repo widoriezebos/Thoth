@@ -34,6 +34,8 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.testutil.ThothTestBase;
+import net.riezebos.thoth.user.User;
+import net.riezebos.thoth.user.UserManager;
 import net.riezebos.thoth.util.PagedList;
 
 /*
@@ -49,10 +51,13 @@ public class SearcherTest extends ThothTestBase {
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
     String contextName = "searchtest";
     ThothEnvironment thothEnvironment = createThothContext(contextName);
+    UserManager userManager = thothEnvironment.getUserManager();
+    User user = userManager.getUser("administrator");
+
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
     Searcher searcher = new TestSearcher(contentManager);
-    
-    PagedList<SearchResult> search = searcher.search("Main.md", 0, 25);
+
+    PagedList<SearchResult> search = searcher.search(user, "Main.md", 0, 25);
     List<SearchResult> list = search.getList();
     assertEquals(1, list.size());
     SearchResult searchResult = list.get(0);
@@ -65,7 +70,7 @@ public class SearcherTest extends ThothTestBase {
     Fragment fragment = searchResult.getFragments().get(0);
     assertTrue(fragment.getText().indexOf("Main.md") != -1);
 
-    search = searcher.search("tip.png", 0, 25);
+    search = searcher.search(user, "tip.png", 0, 25);
     list = search.getList();
     assertEquals(1, list.size());
     searchResult = list.get(0);

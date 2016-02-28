@@ -50,6 +50,7 @@ import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RendererChangeListener;
 import net.riezebos.thoth.configuration.ThothEnvironment;
+import net.riezebos.thoth.content.AccessManager;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -62,6 +63,7 @@ import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.renderers.Renderer.RenderResult;
 import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
+import net.riezebos.thoth.user.Permission;
 import net.riezebos.thoth.util.MimeTypeUtil;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -139,7 +141,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     }
     try {
       response.setContentType(errorPageCommand.getContentType(getParameters(request)));
-      errorPageCommand.execute(context, path, parameters, skin, response.getOutputStream());
+      errorPageCommand.execute(getCurrentUser(), context, path, parameters, skin, response.getOutputStream());
     } catch (RenderException e1) {
       // Well if this fails; we leave it up to the container. Let's throw new original exception
       // But we still want to know what failed on the error page; so:
@@ -229,7 +231,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       long ms = System.currentTimeMillis();
       Renderer renderer = getRenderer(request.getParameter("output"));
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      RenderResult renderResult = renderer.execute(getContext(request), getPath(request), getParameters(request), getSkin(request), bos);
+      RenderResult renderResult = renderer.execute(getCurrentUser(), getContext(request), getPath(request), getParameters(request), getSkin(request), bos);
       String requestURI = request.getRequestURI();
       switch (renderResult) {
       case NOT_FOUND:
@@ -273,12 +275,23 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     if (StringUtils.isBlank(context) || getConfiguration().isValidContext(context)) {
       Map<String, Object> parameters = getParameters(request);
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      command.execute(context, getPath(request), parameters, getSkin(request), bos);
-      // Only now will we touch the response; this to avoid sending stuff out already and then
-      // encountering an error. This might complicate error handling (rendering an error page)
-      // otherwise
-      response.setContentType(command.getContentType(parameters));
-      IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
+      RenderResult renderResult = command.execute(getCurrentUser(), context, getPath(request), parameters, getSkin(request), bos);
+
+      switch (renderResult) {
+      case OK:
+        // Only now will we touch the response; this to avoid sending stuff out already and then
+        // encountering an error. This might complicate error handling (rendering an error page)
+        // otherwise
+        response.setContentType(command.getContentType(parameters));
+        IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
+        break;
+      case FORBIDDEN:
+        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        break;
+      default:
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      }
+
     } else
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
@@ -290,14 +303,19 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     String contextName = getContext(request);
     if (getConfiguration().isValidContext(contextName)) {
       ContentManager contentManager = getThothEnvironment().getContentManager(contextName);
-
-      InputStream is = contentManager.getInputStream(path);
-      if (is != null) {
-        setMimeType(getRequestPath(request), response);
-        IOUtils.copy(is, response.getOutputStream());
+      AccessManager accessManager = contentManager.getAccessManager();
+      boolean hasPermission = accessManager.hasPermission(getCurrentUser(), path, Permission.READ_RESOURCE);
+      if (!hasPermission) {
+        response.sendError(HttpServletResponse.SC_FORBIDDEN);
       } else {
-        LOG.warn("404 on request " + request.getRequestURI());
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        InputStream is = contentManager.getInputStream(path);
+        if (is != null) {
+          setMimeType(getRequestPath(request), response);
+          IOUtils.copy(is, response.getOutputStream());
+        } else {
+          LOG.warn("404 on request " + request.getRequestURI());
+          response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
       }
     } else {
       LOG.warn("404 on context of request " + request.getRequestURI());

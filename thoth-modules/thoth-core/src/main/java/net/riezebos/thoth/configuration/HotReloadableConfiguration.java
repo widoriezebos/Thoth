@@ -100,7 +100,7 @@ public class HotReloadableConfiguration implements Configuration {
       configureAutoReload();
     else
       autoRefresh = activeConfiguration.isAutoReload();
-    
+
     configFileModified = getModificationTime(activeConfiguration);
   }
 
@@ -327,6 +327,11 @@ public class HotReloadableConfiguration implements Configuration {
   @Override
   public int getAutoReloadInterval() {
     return activeConfiguration.getAutoReloadInterval();
+  }
+
+  @Override
+  public String getDefaultUser() {
+    return activeConfiguration.getDefaultUser();
   }
 
 }

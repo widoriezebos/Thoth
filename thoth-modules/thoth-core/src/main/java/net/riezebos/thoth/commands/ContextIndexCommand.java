@@ -28,6 +28,8 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.util.Classifier;
 
 public class ContextIndexCommand extends RendererBase implements Command {
@@ -42,9 +44,13 @@ public class ContextIndexCommand extends RendererBase implements Command {
     return TYPE;
   }
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException {
     try {
       ContentManager contentManager = getContentManager(context);
+      if (!contentManager.getAccessManager().hasPermission(user, path, Permission.ACCESS))
+        return RenderResult.FORBIDDEN;
+
       Classifier classifier = new Classifier();
 
       List<Book> books = contentManager.getBooks();

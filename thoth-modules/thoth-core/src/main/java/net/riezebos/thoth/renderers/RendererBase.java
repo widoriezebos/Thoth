@@ -40,6 +40,7 @@ import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.util.TemplateResourceLoader;
 import net.riezebos.thoth.util.ThothCoreUtil;
+import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class RendererBase implements Renderer {
 
@@ -118,6 +119,9 @@ public abstract class RendererBase implements Renderer {
       ContentManager contentManager = getContentManager(context);
       String libraryRoot = contentManager.getLibraryRoot();
       variables.put(Renderer.LIBRARY_ROOT, libraryRoot);
+      String contextUrl = (String) variables.get(Renderer.CONTEXTURL_PARAMETER);
+      String libraryUrl = ThothUtil.suffix(contextUrl + libraryRoot, "/");
+      variables.put(Renderer.LIBRARY_URL, libraryUrl);
 
       VelocityContext velocityContext = new VelocityContext(variables);
       velocityContext.put(VELOCITY_HELPER, new ThothCoreUtil(getConfiguration()));

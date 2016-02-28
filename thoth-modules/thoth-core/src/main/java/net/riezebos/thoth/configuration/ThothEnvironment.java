@@ -19,6 +19,8 @@ import net.riezebos.thoth.content.impl.NopContentManager;
 import net.riezebos.thoth.content.impl.ZipContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.user.BasicUserManager;
+import net.riezebos.thoth.user.UserManager;
 
 public class ThothEnvironment implements ConfigurationChangeListener {
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
@@ -30,9 +32,16 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   private Map<String, ContentManager> managers = new HashMap<>();
   private Configuration configuration = null;
   private List<RendererChangeListener> rendererChangeListeners = new ArrayList<>();
+  private UserManager userManager = null;
 
   public ContentManager getContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
     return getContentManager(contextDefinition.getName());
+  }
+
+  public UserManager getUserManager() {
+    if (userManager == null)
+      userManager = new BasicUserManager();
+    return userManager;
   }
 
   public ContentManager getContentManager(String contextName) throws ContentManagerException {

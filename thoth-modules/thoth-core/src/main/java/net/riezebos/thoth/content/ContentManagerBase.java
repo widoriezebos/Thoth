@@ -68,6 +68,7 @@ public abstract class ContentManagerBase implements ContentManager {
   private FileSystem fileSystem;
   private ThothEnvironment thothEnvironment;
   private CacheManager cacheManager = null;
+  private AccessManager accessManager = null;
 
   protected abstract String cloneOrPull() throws ContentManagerException;
 
@@ -479,4 +480,13 @@ public abstract class ContentManagerBase implements ContentManager {
 
   }
 
+  public AccessManager getAccessManager() {
+    if (accessManager == null)
+      accessManager = new AccessManager(this);
+    return accessManager;
+  }
+
+  public void setAccessManager(AccessManager accessManager) {
+    this.accessManager = accessManager;
+  }
 }

@@ -14,7 +14,8 @@
  */
 package net.riezebos.thoth.content.versioncontrol;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,13 +46,13 @@ public class SourceDiffTest {
     assertEquals(author, diff.getAuthor());
     assertEquals(commitMessage, diff.getCommitMessage());
     assertEquals("01-01-2016 13:14:00: Wido Riezebos", diff.toString());
-    
+
     List<Diff> diffs = diff.getDiffs();
     String log = String.valueOf(diffs);
-    assertTrue(log.indexOf("Diff(DELETE,\"A\")")!=-1);
-    assertTrue(log.indexOf("Diff(INSERT,\"2\")")!=-1);
-    assertTrue(log.indexOf("Diff(EQUAL,\"¶line3\")")!=-1);
-    assertTrue(log.indexOf("Diff(INSERT,\"¶line4\")")!=-1);
+    assertTrue(log.indexOf("Diff(DELETE,\"A\")") != -1);
+    assertTrue(log.indexOf("Diff(INSERT,\"2\")") != -1);
+    assertTrue(log.indexOf("Diff(EQUAL,\"¶line3\")") != -1);
+    assertTrue(log.indexOf("Diff(INSERT,\"¶line4\")") != -1);
   }
 
 }

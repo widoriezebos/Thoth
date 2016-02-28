@@ -72,7 +72,9 @@ public class Indexer {
   public static final String INDEX_USED = "used";
   public static final String INDEX_EXTENSION = "ext";
   public static final String INDEX_MODIFIED = "modified";
+
   public static final String TYPE_DOCUMENT = "document";
+  public static final String TYPE_FRAGMENT = "fragment";
   public static final String TYPE_OTHER = "other";
 
   private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
@@ -212,7 +214,8 @@ public class Indexer {
         // Also index non-documents if referenced and stored locally
         for (DocumentNode node : markDownDocument.getDocumentStructure().flatten(true)) {
           String path = node.getPath();
-          if (ignore(path) && !indexingContext.getReferencedLocalResources().contains(path)) {
+          boolean ignore = ignore(path);
+          if (ignore && !indexingContext.getReferencedLocalResources().contains(path)) {
             indexingContext.getReferencedLocalResources().add(path);
             String body = node.getDescription().trim();
             String tokenized = body.replaceAll("\\W", " ").replaceAll("  ", "");
@@ -225,7 +228,11 @@ public class Indexer {
         updateReverseIndex(indexingContext.getIndirectReverseIndex(), true, markDownDocument);
         updateReverseIndex(indexingContext.getDirectReverseIndex(), false, markDownDocument);
 
-        addToIndex(writer, resourcePath, TYPE_DOCUMENT, markDownDocument.getTitle(), markDownDocument.getMarkdown(), markDownDocument.getMetatags());
+        boolean isBook = getConfiguration().isBook(resourcePath);
+        boolean isFragment = getConfiguration().isFragment(resourcePath);
+
+        String resourceType = isBook ? TYPE_DOCUMENT : isFragment ? TYPE_FRAGMENT : TYPE_OTHER;
+        addToIndex(writer, resourcePath, resourceType, markDownDocument.getTitle(), markDownDocument.getMarkdown(), markDownDocument.getMetatags());
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }
@@ -313,7 +320,8 @@ public class Indexer {
     if (idx == -1)
       return false;
 
-    return !extensions.contains(pathName.substring(idx + 1).toLowerCase());
+    String extension = pathName.substring(idx + 1).toLowerCase();
+    return !extensions.contains(extension);
   }
 
   /**

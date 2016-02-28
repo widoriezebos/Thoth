@@ -17,7 +17,7 @@ public class ContextIndexCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"Books by Category", "TestContext/books/Main.book"};
     String[] jsonExists = new String[] {"\"name\":\"Second.book\""};
 
-    testCommand(new ContextIndexCommand(setupContentManager(), this),  "/", "contextindex", htmlExists, jsonExists);
+    testCommand(new ContextIndexCommand(setupContentManager(), this), "/", "contextindex", htmlExists, jsonExists);
   }
 
 }

@@ -225,7 +225,7 @@ public class IncludeProcessor extends FileProcessor {
             }
 
             if (embed)
-              createDocumentNode(makeRelativeToLibrary(createFileHandle(pathname)), description, includeStack);
+              createDocumentNode(pathname, description, includeStack);
 
             String newLink = "[" + description + "](" + actualLocation + (afterPath != null ? " " + afterPath : "") + ")";
             line = line.substring(0, start) + newLink + line.substring(end);
@@ -345,7 +345,7 @@ public class IncludeProcessor extends FileProcessor {
         newFolder = newFolder.substring(0, lastIdx + 1);
 
       DocumentNode includeUsage =
-          new DocumentNode(makeRelativeToLibrary(file), ThothUtil.getNameOnly(fileToInclude), getCurrentLineInfo().getLine(), includeStack.size());
+          new DocumentNode(file.getAbsolutePath(), ThothUtil.getNameOnly(fileToInclude), getCurrentLineInfo().getLine(), includeStack.size());
       includeStack.peek().addChild(includeUsage);
       includeStack.push(includeUsage);
       startNewFile(pathname);

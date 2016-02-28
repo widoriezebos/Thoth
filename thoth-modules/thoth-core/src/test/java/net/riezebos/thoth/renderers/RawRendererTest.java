@@ -43,14 +43,15 @@ public class RawRendererTest extends RendererTest {
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Map<String, Object> arguments = getParameters(contentManager, path);
-    renderer.execute(contextName, path, arguments, getSkin(contentManager), outputStream);
+    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, getSkin(contentManager), outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Fourth.expected.md");
     assertEquals(expected, result);
     assertEquals("text/plain;charset=UTF-8", renderer.getContentType(new HashMap<String, Object>()));
     assertEquals(RawRenderer.TYPE, renderer.getTypeCode());
 
-    RenderResult renderResult = renderer.execute(contextName, "/wrong/path.md", arguments, getSkin(contentManager), outputStream);
+    RenderResult renderResult =
+        renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", arguments, getSkin(contentManager), outputStream);
     assertEquals(RenderResult.NOT_FOUND, renderResult);
   }
 

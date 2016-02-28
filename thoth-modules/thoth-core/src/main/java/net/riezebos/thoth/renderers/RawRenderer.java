@@ -22,11 +22,14 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 
 public class RawRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "raw";
@@ -43,11 +46,20 @@ public class RawRenderer extends RendererBase implements Renderer {
     return "text/plain;charset=UTF-8";
   }
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException {
     try {
-      RenderResult result = RenderResult.OK;
 
+      Configuration configuration = getConfiguration();
       ContentManager contentManager = getContentManager(context);
+
+      boolean isBook = configuration.isBook(path);
+      Permission permission = isBook ? Permission.READ_BOOKS : Permission.READ_FRAGMENTS;
+
+      if (!contentManager.getAccessManager().hasPermission(user, path, permission))
+        return RenderResult.FORBIDDEN;
+
+      RenderResult result = RenderResult.OK;
       FileHandle fileHandle = contentManager.getFileHandle(path);
       if (fileHandle.isFile()) {
         MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));

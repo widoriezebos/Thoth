@@ -38,6 +38,8 @@ import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.Renderer;
+import net.riezebos.thoth.user.User;
+import net.riezebos.thoth.user.UserManager;
 import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class ServletBase extends HttpServlet {
@@ -55,6 +57,24 @@ public abstract class ServletBase extends HttpServlet {
     super.init();
     if (thothEnvironment == null)
       thothEnvironment = ThothEnvironment.getSharedThothContext();
+  }
+
+  /**
+   * Will be replaced by proper user management in a future release
+   * 
+   * @return
+   */
+  public User getCurrentUser() {
+    UserManager userManager = getThothEnvironment().getUserManager();
+    String identifier = getConfiguration().getDefaultUser();
+    return userManager.getUser(identifier);
+  }
+
+  protected boolean accessAllowed(Renderer renderer, User currentUser) {
+    if (currentUser == null)
+      return false;
+
+    return false;
   }
 
   public ThothEnvironment getThothEnvironment() {

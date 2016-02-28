@@ -44,14 +44,14 @@ public class HtmlRendererTest extends RendererTest {
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Map<String, Object> arguments = getParameters(contentManager, path);
-    renderer.execute(contextName, path, arguments, testSkin, outputStream);
+    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, testSkin, outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Fourth.expected.html");
     assertEquals(expected, result);
     assertEquals("text/html;charset=UTF-8", renderer.getContentType(new HashMap<String, Object>()));
     assertEquals(HtmlRenderer.TYPE, renderer.getTypeCode());
 
-    RenderResult renderResult = renderer.execute(contextName, "/wrong/path.md", arguments, testSkin, outputStream);
+    RenderResult renderResult = renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", arguments, testSkin, outputStream);
     assertEquals(RenderResult.NOT_FOUND, renderResult);
   }
 
@@ -67,7 +67,7 @@ public class HtmlRendererTest extends RendererTest {
     String path = "/main/Table.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Map<String, Object> arguments = getParameters(contentManager, path);
-    renderer.execute(contextName, path, arguments, getSkin(contentManager), outputStream);
+    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, getSkin(contentManager), outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Table.expected.html");
     assertEquals(expected, result);

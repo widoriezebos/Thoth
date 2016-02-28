@@ -24,10 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
-import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 
 public class ReindexCommand extends RendererBase implements Command {
 
@@ -45,13 +46,17 @@ public class ReindexCommand extends RendererBase implements Command {
     return "text/plain;charset=UTF-8";
   }
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException {
     try {
+      ContentManager contentManager = getContentManager(context);
+      if (!contentManager.getAccessManager().hasPermission(user, path, Permission.REINDEX))
+        return RenderResult.FORBIDDEN;
 
       if (StringUtils.isBlank(context))
         getThothEnvironment().reindexAll();
       else {
-        reindex(context);
+        reindex(contentManager);
       }
       Map<String, Object> variables = new HashMap<>(arguments);
       String log = "Reindex reuested. Running in the background";
@@ -71,8 +76,8 @@ public class ReindexCommand extends RendererBase implements Command {
     }
   }
 
-  protected void reindex(String context) throws ContentManagerException {
-    ContentManager contentManager = getContentManager(context);
+  protected void reindex(ContentManager contentManager) {
     contentManager.reindex();
   }
+
 }

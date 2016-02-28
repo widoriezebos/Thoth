@@ -20,10 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.riezebos.thoth.configuration.ThothEnvironment;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 
 public class IndexCommand extends RendererBase implements Command {
 
@@ -36,8 +39,13 @@ public class IndexCommand extends RendererBase implements Command {
     return "index";
   }
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException {
     try {
+      ContentManager contentManager = getContentManager(null);
+      if (!contentManager.getAccessManager().hasPermission(user, path, Permission.ACCESS))
+        return RenderResult.FORBIDDEN;
+
       RenderResult result = RenderResult.OK;
       List<String> contexts = getThothEnvironment().getConfiguration().getContexts();
 

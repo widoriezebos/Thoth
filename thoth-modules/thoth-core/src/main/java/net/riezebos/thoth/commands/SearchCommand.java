@@ -23,6 +23,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.configuration.ThothEnvironment;
+import net.riezebos.thoth.content.AccessManager;
+import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.search.SearchResult;
 import net.riezebos.thoth.content.search.Searcher;
 import net.riezebos.thoth.content.skinning.Skin;
@@ -31,6 +33,8 @@ import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.exceptions.SearchException;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
+import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.util.PagedList;
 
 public class SearchCommand extends RendererBase implements Command {
@@ -44,8 +48,15 @@ public class SearchCommand extends RendererBase implements Command {
     return "search";
   }
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException {
     try {
+
+      ContentManager contentManager = getContentManager(context);
+      AccessManager accessManager = contentManager.getAccessManager();
+      if (!accessManager.hasPermission(user, path, Permission.SEARCH))
+        return RenderResult.FORBIDDEN;
+
       List<SearchResult> searchResults = new ArrayList<>();
       String errorMessage = null;
       String query = getString(arguments, "query");
@@ -59,7 +70,7 @@ public class SearchCommand extends RendererBase implements Command {
           errorMessage = "Do you feel lucky?";
         else {
           int pageSize = getThothEnvironment().getConfiguration().getMaxSearchResults();
-          PagedList<SearchResult> pagedList = search(context, query, pageNumber, pageSize);
+          PagedList<SearchResult> pagedList = search(user, context, query, pageNumber, pageSize);
           searchResults.addAll(pagedList.getList());
           hasMore = pagedList.hasMore();
         }
@@ -90,9 +101,9 @@ public class SearchCommand extends RendererBase implements Command {
     }
   }
 
-  protected PagedList<SearchResult> search(String context, String query, Integer pageNumber, int pageSize) throws ContentManagerException, SearchException {
+  protected PagedList<SearchResult> search(User user, String context, String query, Integer pageNumber, int pageSize) throws ContentManagerException, SearchException {
     Searcher searcher = new Searcher(getContentManager(context));
-    PagedList<SearchResult> pagedList = searcher.search(query, pageNumber, pageSize);
+    PagedList<SearchResult> pagedList = searcher.search(user, query, pageNumber, pageSize); 
     return pagedList;
   }
 

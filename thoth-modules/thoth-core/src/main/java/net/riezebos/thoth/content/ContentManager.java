@@ -99,4 +99,6 @@ public interface ContentManager {
 
   String getLibraryRoot();
 
+  AccessManager getAccessManager();
+
 }

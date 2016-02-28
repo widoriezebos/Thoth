@@ -19,6 +19,7 @@ import java.util.Map;
 
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.user.User;
 
 public interface Renderer {
 
@@ -31,6 +32,7 @@ public interface Renderer {
   String SKINBASE_PARAMETER = "skinbase";
   String REFRESH_PARAMETER = "refresh";
   String LIBRARY_ROOT = "libraryroot";
+  String LIBRARY_URL = "libraryurl";
   String SKIN = "skin";
   String TODAY = "today";
   String NOW = "now";
@@ -44,5 +46,7 @@ public interface Renderer {
 
   public String getContentType(Map<String, Object> arguments);
 
-  public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException;
+  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      throws RenderException;
+
 }
