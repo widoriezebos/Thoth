@@ -30,11 +30,12 @@ import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.renderers.RendererProvider;
 
 public class MetaCommand extends RendererBase implements Command {
 
-  public MetaCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public MetaCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override

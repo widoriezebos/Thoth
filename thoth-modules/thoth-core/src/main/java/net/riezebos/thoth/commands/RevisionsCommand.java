@@ -27,12 +27,13 @@ import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.util.PagedList;
 
 public class RevisionsCommand extends RendererBase implements Command {
 
-  public RevisionsCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public RevisionsCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override

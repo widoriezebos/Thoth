@@ -28,12 +28,13 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.util.diff_match_patch.Diff;
 
 public class DiffCommand extends RendererBase implements Command {
 
-  public DiffCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public DiffCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override

@@ -26,11 +26,12 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.renderers.RendererProvider;
 
 public class BrowseCommand extends RendererBase implements Command {
 
-  public BrowseCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public BrowseCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override

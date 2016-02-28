@@ -670,6 +670,11 @@ public class FileProcessor {
     String canonicalFile = ThothUtil.normalSlashes(fileHandle.getCanonicalPath());
     String library = getLibrary();
     String result;
+
+    // Special case for root path itself
+    if (ThothUtil.suffix(canonicalFile, "/").equals(library))
+      return "";
+
     if (!canonicalFile.startsWith(library)) {
       error("Path " + canonicalFile + " is not located in library " + library);
       result = fileHandle.getAbsolutePath();

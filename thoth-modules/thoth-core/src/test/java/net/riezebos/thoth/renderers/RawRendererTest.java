@@ -28,9 +28,8 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.Renderer.RenderResult;
-import net.riezebos.thoth.testutil.ThothTestBase;
 
-public class RawRendererTest extends ThothTestBase {
+public class RawRendererTest extends RendererTest {
 
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
@@ -39,7 +38,7 @@ public class RawRendererTest extends ThothTestBase {
     ThothEnvironment thothEnvironment = createThothContext(contextName);
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
 
-    RawRenderer renderer = new RawRenderer(thothEnvironment);
+    RawRenderer renderer = new RawRenderer(thothEnvironment, this);
 
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -59,7 +58,7 @@ public class RawRendererTest extends ThothTestBase {
   public void testBase() throws ContextNotFoundException, ContentManagerException, IOException {
 
     ThothEnvironment thothEnvironment = createThothContext("TestContext");
-    RawRenderer renderer = new RawRenderer(thothEnvironment);
+    RawRenderer renderer = new RawRenderer(thothEnvironment, this);
     Map<String, Object> map = new HashMap<>();
     map.put("num", "123");
     assertEquals(new Integer(123), renderer.getInteger(map, "num"));

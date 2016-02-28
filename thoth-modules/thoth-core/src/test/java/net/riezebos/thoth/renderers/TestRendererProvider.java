@@ -12,7 +12,7 @@ public class TestRendererProvider implements RendererProvider {
 
   @Override
   public Renderer getRenderer(String typeCode) {
-    return new HtmlRenderer(thothEnvironment);
+    return new HtmlRenderer(thothEnvironment, this);
   }
 
 }

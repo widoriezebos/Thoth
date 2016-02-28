@@ -7,12 +7,13 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.search.SearchResult;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.SearchException;
+import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.util.PagedList;
 
 public class TestSearchCommand extends SearchCommand {
 
-  public TestSearchCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public TestSearchCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override

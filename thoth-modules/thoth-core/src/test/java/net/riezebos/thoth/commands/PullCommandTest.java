@@ -16,6 +16,6 @@ public class PullCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"TestContext: classpath based. Will do nothing"};
     String[] jsonExists = new String[] {"\"log\":\"TestContext: classpath based. Will do nothing"};
 
-    testCommand(new PullCommand(setupContentManager()), "/main/Main.md", "pull", htmlExists, jsonExists);
+    testCommand(new PullCommand(setupContentManager(), this), "/main/Main.md", "pull", htmlExists, jsonExists);
   }
 }

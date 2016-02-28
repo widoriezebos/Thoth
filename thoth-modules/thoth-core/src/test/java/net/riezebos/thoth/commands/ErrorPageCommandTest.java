@@ -16,7 +16,7 @@ public class ErrorPageCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"Thoth is very sorry about this"};
     String[] jsonExists = null;
 
-    testCommand(new ErrorPageCommand(setupContentManager()), "/main/Main.md", "error", htmlExists, jsonExists);
+    testCommand(new ErrorPageCommand(setupContentManager(), this), "/main/Main.md", "error", htmlExists, jsonExists);
   }
 
 }

@@ -48,9 +48,19 @@ public abstract class RendererBase implements Renderer {
   private static final String VELOCITY_HELPER = "thothutil";
   private static final String VELOCITY_PROPERTIES = "net/riezebos/thoth/velocity.properties";
   private ThothEnvironment thothEnvironment = null;
+  private RendererProvider rendererProvider;
 
-  public RendererBase(ThothEnvironment thothEnvironment) {
+  public RendererBase(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
     this.thothEnvironment = thothEnvironment;
+    this.rendererProvider = rendererProvider;
+  }
+
+  public void setRendererProvider(RendererProvider rendererProvider) {
+    this.rendererProvider = rendererProvider;
+  }
+
+  public RendererProvider getRendererProvider() {
+    return rendererProvider;
   }
 
   @Override

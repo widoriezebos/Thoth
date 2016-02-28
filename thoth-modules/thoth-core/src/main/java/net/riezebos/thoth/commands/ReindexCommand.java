@@ -27,11 +27,12 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.renderers.RendererProvider;
 
 public class ReindexCommand extends RendererBase implements Command {
 
-  public ReindexCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public ReindexCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override

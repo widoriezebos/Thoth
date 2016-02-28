@@ -47,6 +47,7 @@ import net.riezebos.thoth.commands.RevisionsCommand;
 import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RendererChangeListener;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
@@ -97,7 +98,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
         if (("/" + context).equalsIgnoreCase(ContentManager.NATIVERESOURCES))
           streamClassPathResource(path, request, response);
         else if (StringUtils.isBlank(context) && StringUtils.isBlank(path))
-          executeCommand(indexCommand, request, response);
+          handleMainIndex(request, response);
         else if (StringUtils.isBlank(path))
           executeCommand(contextIndexCommand, request, response);
         else {
@@ -111,11 +112,21 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     }
   }
 
+  protected void handleMainIndex(HttpServletRequest request, HttpServletResponse response) throws RenderException, ServletException, IOException {
+    Map<String, ContextDefinition> contextDefinitions = getConfiguration().getContextDefinitions();
+    if (contextDefinitions.size() == 1) {
+      ContextDefinition oneAndOnly = contextDefinitions.values().iterator().next();
+      String contextName = oneAndOnly.getName();
+      response.sendRedirect("/" + contextName);
+    } else
+      executeCommand(indexCommand, request, response);
+  }
+
   @Override
   protected void handleError(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
     Command errorPageCommand = getCommand(ErrorPageCommand.COMMAND);
     if (errorPageCommand == null)
-      errorPageCommand = new ErrorPageCommand(getThothEnvironment()); // Fallback; we should not fail here
+      errorPageCommand = new ErrorPageCommand(getThothEnvironment(), this); // Fallback; we should not fail here
 
     String context = getContextNoFail(request);
     String path = getPathNoFail(request);
@@ -144,29 +155,29 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
 
   protected void setupCommands() {
     ThothEnvironment thothEnvironment = getThothEnvironment();
-    indexCommand = new IndexCommand(thothEnvironment);
-    contextIndexCommand = new ContextIndexCommand(thothEnvironment);
+    indexCommand = new IndexCommand(thothEnvironment, this);
+    contextIndexCommand = new ContextIndexCommand(thothEnvironment, this);
 
     registerCommand(contextIndexCommand);
-    registerCommand(new DiffCommand(thothEnvironment));
+    registerCommand(new DiffCommand(thothEnvironment, this));
     registerCommand(indexCommand);
-    registerCommand(new MetaCommand(thothEnvironment));
-    registerCommand(new PullCommand(thothEnvironment));
-    registerCommand(new ReindexCommand(thothEnvironment));
-    registerCommand(new RevisionsCommand(thothEnvironment));
-    registerCommand(new SearchCommand(thothEnvironment));
-    registerCommand(new ValidationReportCommand(thothEnvironment));
-    registerCommand(new BrowseCommand(thothEnvironment));
-    registerCommand(new ErrorPageCommand(thothEnvironment));
+    registerCommand(new MetaCommand(thothEnvironment, this));
+    registerCommand(new PullCommand(thothEnvironment, this));
+    registerCommand(new ReindexCommand(thothEnvironment, this));
+    registerCommand(new RevisionsCommand(thothEnvironment, this));
+    registerCommand(new SearchCommand(thothEnvironment, this));
+    registerCommand(new ValidationReportCommand(thothEnvironment, this));
+    registerCommand(new BrowseCommand(thothEnvironment, this));
+    registerCommand(new ErrorPageCommand(thothEnvironment, this));
   }
 
   protected void setupRenderers() {
 
     Map<String, Renderer> rendererMap = new HashMap<>();
 
-    defaultRenderer = new HtmlRenderer(getThothEnvironment());
+    defaultRenderer = new HtmlRenderer(getThothEnvironment(), this);
     registerRenderer(rendererMap, defaultRenderer);
-    registerRenderer(rendererMap, new RawRenderer(getThothEnvironment()));
+    registerRenderer(rendererMap, new RawRenderer(getThothEnvironment(), this));
 
     // Setup any custom renderers
     List<CustomRendererDefinition> customRendererDefinitions = getConfiguration().getCustomRenderers();
@@ -194,8 +205,12 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
 
   public Renderer getRenderer(String typeCode) {
     Renderer renderer = null;
-    if (typeCode != null)
-      renderer = renderers.get(typeCode.toLowerCase());
+    if (typeCode != null) {
+      String key = typeCode.toLowerCase();
+      renderer = renderers.get(key);
+      if (renderer == null)
+        renderer = commands.get(key);
+    }
     if (renderer == null)
       renderer = defaultRenderer;
     return renderer;

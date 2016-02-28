@@ -78,7 +78,7 @@ public class Indexer {
   private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
   private String indexFolder;
-  private FileHandle contextFolder;
+  private FileHandle libraryFolder;
   private boolean recreate = true;
   private ContentManager contentManager;
   private Set<String> extensions = new HashSet<>();
@@ -87,7 +87,7 @@ public class Indexer {
   public Indexer(ContentManager contentManager) throws ContextNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
     this.indexFolder = contentManager.getIndexFolder();
-    this.contextFolder = contentManager.getFileHandle("/");
+    this.libraryFolder = contentManager.getFileHandle(contentManager.getLibraryRoot());
     this.setIndexExtensions(getConfiguration().getIndexExtensions());
   }
 
@@ -108,7 +108,7 @@ public class Indexer {
 
       IndexWriter writer = getWriter(recreate);
       IndexingContext indexingContext = new IndexingContext();
-      indexDirectory(writer, contextFolder, indexingContext);
+      indexDirectory(writer, libraryFolder, indexingContext);
 
       sortIndexLists(indexingContext.getIndirectReverseIndex());
       sortIndexLists(indexingContext.getDirectReverseIndex());
@@ -174,7 +174,7 @@ public class Indexer {
   }
 
   protected CacheManager getCacheManager() {
-    return contentManager.getCacheManager(); 
+    return contentManager.getCacheManager();
   }
 
   protected Configuration getConfiguration() {
@@ -189,11 +189,11 @@ public class Indexer {
   protected void indexDirectory(IndexWriter writer, FileHandle fileHandle, IndexingContext context) throws IOException, ContextNotFoundException {
 
     if (fileHandle.isDirectory()) {
-      for (FileHandle children : fileHandle.listFiles()) {
-        if (children.isFile())
-          indexFile(writer, children, context);
+      for (FileHandle child : fileHandle.listFiles()) {
+        if (child.isFile())
+          indexFile(writer, child, context);
         else
-          indexDirectory(writer, children, context);
+          indexDirectory(writer, child, context);
       }
     } else {
       indexFile(writer, fileHandle, context);

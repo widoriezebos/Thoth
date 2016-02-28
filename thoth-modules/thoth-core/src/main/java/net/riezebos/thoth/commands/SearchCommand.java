@@ -30,12 +30,13 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.exceptions.SearchException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.util.PagedList;
 
 public class SearchCommand extends RendererBase implements Command {
 
-  public SearchCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public SearchCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override

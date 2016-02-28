@@ -16,7 +16,7 @@ public class ValidationReportCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"Very good, there are currently no validation errors"};
     String[] jsonExists = new String[] {"\"errors\":[]"};
 
-    testCommand(new ValidationReportCommand(setupContentManager()), "/main/Main.md", "validationreport", htmlExists, jsonExists);
+    testCommand(new ValidationReportCommand(setupContentManager(), this), "/main/Main.md", "validationreport", htmlExists, jsonExists);
   }
 
 }

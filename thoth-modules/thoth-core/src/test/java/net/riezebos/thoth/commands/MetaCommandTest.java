@@ -16,7 +16,7 @@ public class MetaCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"Document Structure", "/TestContext//main/subs/SubOne.md"};
     String[] jsonExists = new String[] {"\"file\":\"/main/subs/SubOne.md\""};
 
-    testCommand(new MetaCommand(setupContentManager()), "/main/Main.md", "meta", htmlExists, jsonExists);
+    testCommand(new MetaCommand(setupContentManager(), this), "/main/Main.md", "meta", htmlExists, jsonExists);
   }
 
 }

@@ -25,11 +25,12 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.renderers.RendererProvider;
 
 public class ValidationReportCommand extends RendererBase implements Command {
 
-  public ValidationReportCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public ValidationReportCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override

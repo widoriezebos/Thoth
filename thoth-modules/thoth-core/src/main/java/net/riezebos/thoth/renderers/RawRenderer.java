@@ -31,8 +31,8 @@ import net.riezebos.thoth.markdown.filehandle.FileHandle;
 public class RawRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "raw";
 
-  public RawRenderer(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public RawRenderer(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   public String getTypeCode() {

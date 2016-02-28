@@ -23,11 +23,12 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.renderers.RendererProvider;
 
 public class IndexCommand extends RendererBase implements Command {
 
-  public IndexCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public IndexCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override
@@ -37,7 +38,9 @@ public class IndexCommand extends RendererBase implements Command {
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {
     try {
+      RenderResult result = RenderResult.OK;
       List<String> contexts = getThothEnvironment().getConfiguration().getContexts();
+
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("contexts", contexts);
 
@@ -47,8 +50,7 @@ public class IndexCommand extends RendererBase implements Command {
         String indexTemplate = skin.getIndexTemplate();
         renderTemplate(indexTemplate, contexts.get(0), variables, outputStream);
       }
-
-      return RenderResult.OK;
+      return result;
     } catch (Exception e) {
       throw new RenderException(e);
     }

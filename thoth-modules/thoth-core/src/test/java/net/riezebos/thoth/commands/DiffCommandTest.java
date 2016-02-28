@@ -16,7 +16,7 @@ public class DiffCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"Changes to Main"};
     String[] jsonExists = new String[] {"\"path\":\"/main/Main.md\""};
 
-    testCommand(new DiffCommand(setupContentManager()), "/main/Main.md", "diff", htmlExists, jsonExists);
+    testCommand(new DiffCommand(setupContentManager(), this), "/main/Main.md", "diff", htmlExists, jsonExists);
   }
 
 }

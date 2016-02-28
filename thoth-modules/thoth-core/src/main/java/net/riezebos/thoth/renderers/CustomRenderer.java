@@ -43,27 +43,17 @@ import net.riezebos.thoth.util.ThothUtil;
 public class CustomRenderer extends RendererBase implements Renderer {
   private static final Logger LOG = LoggerFactory.getLogger(CustomRenderer.class);
 
-  private RendererProvider rendererProvider;
   private String typeCode;
   private String contentType;
   private String source;
   private String commandLine;
 
   public CustomRenderer(ThothEnvironment thothEnvironment, CustomRendererDefinition definition, RendererProvider rendererProvider) {
-    super(thothEnvironment);
-    setRendererProvider(rendererProvider);
+    super(thothEnvironment, rendererProvider);
     setTypeCode(definition.getExtension());
     setContentType(definition.getContentType());
     setCommandLine(definition.getCommandLine());
     setSource(definition.getSourceRenderer());
-  }
-
-  public void setRendererProvider(RendererProvider rendererProvider) {
-    this.rendererProvider = rendererProvider;
-  }
-
-  public RendererProvider getRendererProvider() {
-    return rendererProvider;
   }
 
   public String getSource() {

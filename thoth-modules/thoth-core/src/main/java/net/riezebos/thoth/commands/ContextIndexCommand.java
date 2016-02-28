@@ -27,17 +27,19 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
+import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.util.Classifier;
 
 public class ContextIndexCommand extends RendererBase implements Command {
+  public static final String TYPE = "contextindex";
 
-  public ContextIndexCommand(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public ContextIndexCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   @Override
   public String getTypeCode() {
-    return "contextindex";
+    return TYPE;
   }
 
   public RenderResult execute(String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws RenderException {

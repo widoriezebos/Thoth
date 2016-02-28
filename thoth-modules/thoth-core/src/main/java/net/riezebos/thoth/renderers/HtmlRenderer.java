@@ -37,8 +37,8 @@ import net.riezebos.thoth.util.ThothUtil;
 public class HtmlRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "html";
 
-  public HtmlRenderer(ThothEnvironment thothEnvironment) {
-    super(thothEnvironment);
+  public HtmlRenderer(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+    super(thothEnvironment, rendererProvider);
   }
 
   public String getTypeCode() {

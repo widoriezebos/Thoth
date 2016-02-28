@@ -16,7 +16,7 @@ public class IndexCommandTest extends CommandTest {
     String[] htmlExists = new String[] {"Documentation Index", "TestContext"};
     String[] jsonExists = new String[] {"\"context\":\"TestContext\""};
 
-    testCommand(new IndexCommand(setupContentManager()), "/", "index", htmlExists, jsonExists);
+    testCommand(new IndexCommand(setupContentManager(), this), "/", "index", htmlExists, jsonExists);
   }
 
 }

@@ -16,9 +16,12 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.exceptions.SkinManagerException;
+import net.riezebos.thoth.renderers.HtmlRenderer;
+import net.riezebos.thoth.renderers.Renderer;
+import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.testutil.ThothTestBase;
 
-public class CommandTest extends ThothTestBase {
+public class CommandTest extends ThothTestBase implements RendererProvider {
 
   private ContentManager contentManager;
   private String contextName = "TestContext";
@@ -61,5 +64,14 @@ public class CommandTest extends ThothTestBase {
     contentManager = createTestContentManager(thothEnvironment, contextName);
     thothEnvironment.registerContentManager(contentManager);
     return thothEnvironment;
+  }
+
+  @Override
+  public Renderer getRenderer(String typeCode) {
+    try {
+      return new HtmlRenderer(createThothContext("dummy"), this);
+    } catch (ContentManagerException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 }
