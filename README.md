@@ -41,8 +41,8 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 6. Your branches pulled to to local Git repositories in your workspace and they will be indexed automatically. When this is done you can connect  
 	with your browser and get going!
 
-## Not in a hurry? There’s proper documentation
-Then why don't you head on to [the full documentation of Thoth][1]?
+## Not in a hurry? 
+**There is actually proper documentation** so why don't you head on to [the full documentation of Thoth][1]?
 
 ## Copyright
 Copyright (c) 2016 W.T.J. Riezebos
