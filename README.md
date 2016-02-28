@@ -41,8 +41,9 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 6. Your branches pulled to to local Git repositories in your workspace and they will be indexed automatically. When this is done you can connect  
 	with your browser and get going!
 
-## Not in a hurry?
-Then why don't you head on to [the full documentation of Thoth](Documentation/Thoth Documentation.md)!
+## Not in a hurry? There’s proper documentation
+Then why don't you head on to [the full documentation of Thoth][1]?
+
 ## Copyright
 Copyright (c) 2016 W.T.J. Riezebos
 
@@ -50,7 +51,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-[http://www.apache.org/licenses/LICENSE-2.0][1]
+[http://www.apache.org/licenses/LICENSE-2.0][2]
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -61,16 +62,17 @@ limitations under the License.
 ## Acknowledgements
 Thoth would not have been possible without the great help of the following projects (in arbitrary order):
 
-- Markdown, [https://daringfireball.net/projects/markdown/][2]
-- Pegdown Markdown parser, [https://github.com/sirthias/pegdown][3]
-- JGit, [http://www.eclipse.org/jgit/][4]
-- Diff-match-patch, [https://code.google.com/archive/p/google-diff-match-patch/][5]
-- Apache Lucene, [https://lucene.apache.org/core/][6]
+- Markdown, [https://daringfireball.net/projects/markdown/][3]
+- Pegdown Markdown parser, [https://github.com/sirthias/pegdown][4]
+- JGit, [http://www.eclipse.org/jgit/][5]
+- Diff-match-patch, [https://code.google.com/archive/p/google-diff-match-patch/][6]
+- Apache Lucene, [https://lucene.apache.org/core/][7]
 - And of course many many other open source projects. Check the pom.xml for a complete list. 
 
-[1]:	http://www.apache.org/licenses/LICENSE-2.0
-[2]:	https://daringfireball.net/projects/markdown/
-[3]:	https://github.com/sirthias/pegdown
-[4]:	http://www.eclipse.org/jgit/
-[5]:	https://code.google.com/archive/p/google-diff-match-patch/
-[6]:	https://lucene.apache.org/core/
+[1]:	http://thoth.riezebos.net/Thoth
+[2]:	http://www.apache.org/licenses/LICENSE-2.0
+[3]:	https://daringfireball.net/projects/markdown/
+[4]:	https://github.com/sirthias/pegdown
+[5]:	http://www.eclipse.org/jgit/
+[6]:	https://code.google.com/archive/p/google-diff-match-patch/
+[7]:	https://lucene.apache.org/core/
