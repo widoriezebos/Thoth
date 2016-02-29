@@ -38,6 +38,8 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class PropertyBasedConfiguration extends ConfigurationBase implements Configuration {
 
+  private static final String CLASSPATH_PREFIX = "classpath:";
+
   private static final String DEFAULT_DATE_FMT = "dd-MM-yyyy";
 
   private static final Logger LOG = LoggerFactory.getLogger(PropertyBasedConfiguration.class);
@@ -502,7 +504,15 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
 
   public void reload() throws FileNotFoundException, ConfigurationException {
     clear();
-    FileInputStream inStream = new FileInputStream(getPropertyFileName());
+    String propertyFileName = getPropertyFileName();
+    InputStream inStream;
+    if (propertyFileName.startsWith(CLASSPATH_PREFIX))
+      inStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(propertyFileName.substring(CLASSPATH_PREFIX.length()));
+    else
+      inStream = new FileInputStream(propertyFileName);
+
+    if (inStream == null)
+      throw new FileNotFoundException(propertyFileName);
     load(inStream);
   }
 

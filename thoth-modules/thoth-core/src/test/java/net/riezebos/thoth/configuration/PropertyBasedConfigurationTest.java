@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -35,6 +36,7 @@ import org.junit.Test;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.util.LineInfo;
 import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.testutil.ThothTestBase;
@@ -108,6 +110,34 @@ public class PropertyBasedConfigurationTest extends ThothTestBase {
     } catch (Exception e) {
       // expected
     }
+  }
+
+  @Test
+  public void testClone() throws ConfigurationException, ContentManagerException, IOException {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    InputStream is = contextClassLoader.getResourceAsStream("net/riezebos/thoth/configuration/test.configuration.properties");
+    PropertyBasedConfiguration config = new PropertyBasedConfiguration();
+    config.load(is);
+    config.validate();
+    List<String> outputFormats = config.getOutputFormats();
+    assertTrue(compareSet("html, raw, pdf", outputFormats));
+    PropertyBasedConfiguration clone = (PropertyBasedConfiguration) config.clone();
+
+    clone.isValidContext("Context1");
+    assertTrue(config.getRepositoryDefinitions().equals(clone.getRepositoryDefinitions()));
+    assertTrue(config.getRepositoryDefinitions() != clone.getRepositoryDefinitions());
+    clone.clear();
+    assertFalse(config.equals(clone));
+
+  }
+
+  @Test(expected = ContextNotFoundException.class)
+  public void testContextNotFoundException() throws ConfigurationException, ContentManagerException, IOException {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    InputStream is = contextClassLoader.getResourceAsStream("net/riezebos/thoth/configuration/test.configuration.properties");
+    PropertyBasedConfiguration config = new PropertyBasedConfiguration();
+    config.load(is);
+    config.getContextDefinition("NoThere");
   }
 
   private boolean compareSet(String spec, Collection<String> list) {

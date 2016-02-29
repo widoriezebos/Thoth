@@ -55,8 +55,13 @@ public class HotReloadableConfiguration implements Configuration {
     return new File(configuration.getPropertyFileName()).lastModified();
   }
 
+  protected Configuration getActiveConfiguration() {
+    return activeConfiguration;
+  }
+
   @Override
   public void discard() {
+    autoRefresh = false;
     activeConfiguration.discard();
   }
 
