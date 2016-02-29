@@ -105,6 +105,14 @@ An few examples of custom renderers (note the use of ${url} and ${input}):
 	renderer.4.contenttype=application/rtf
 	renderer.4.command=/usr/local/bin/pandoc -s -r html -t rtf ${input} -o ${output}
 
+Note: on Windows the command for Prince is different:
+
+	renderer.1.command=/Program Files/Prince/engine/bin/prince.exe ${url}?suppresserrors=true -o ${output} --javascript --media=print --page-size=A4 --page-margin=20mm 
+
+And for Pandoc it will be like (note the user name in the path):
+
+	renderer.2.command=C:/Users/Wido/AppData/Local/Pandoc/pandoc.exe -s -r html -t docx ${input} -o ${output} --variable=geometry:a4paper
+
 ### Using Pandoc as the HTML rendering engine
 Note that it is possible to replace the default Markdown rendering engine (based on PegDown) with any other. Just define a custom renderer with the extension ‘html’ to override the built in HTML renderer and make sure you use ‘raw’ as the source input like so:
 
@@ -216,4 +224,3 @@ parsetimeout
 
 ## Sample configuration file
 \includecode{sample.configuration.properties}
-
