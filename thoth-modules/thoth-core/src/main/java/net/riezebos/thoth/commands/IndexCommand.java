@@ -39,7 +39,7 @@ public class IndexCommand extends RendererBase implements Command {
     return "index";
   }
 
-  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(User user, String contextName, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException {
     try {
       ContentManager contentManager = getContentManager(null);
@@ -56,7 +56,8 @@ public class IndexCommand extends RendererBase implements Command {
         executeJson(variables, outputStream);
       else {
         String indexTemplate = skin.getIndexTemplate();
-        renderTemplate(indexTemplate, contexts.get(0), variables, outputStream);
+        String context = contexts.isEmpty() ? null : contexts.get(0);
+        renderTemplate(indexTemplate, context, variables, outputStream);
       }
       return result;
     } catch (Exception e) {

@@ -15,6 +15,7 @@
 package net.riezebos.thoth.renderers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class HtmlRendererTest extends RendererTest {
     renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, testSkin, outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Fourth.expected.html");
-    assertEquals(expected, result);
+    assertTrue(stringsEqual(expected, result));
     assertEquals("text/html;charset=UTF-8", renderer.getContentType(new HashMap<String, Object>()));
     assertEquals(HtmlRenderer.TYPE, renderer.getTypeCode());
 
@@ -70,8 +71,7 @@ public class HtmlRendererTest extends RendererTest {
     renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, getSkin(contentManager), outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Table.expected.html");
-    assertEquals(expected, result);
-
+    assertTrue(stringsEqual(expected, result));
   }
 
 }

@@ -124,9 +124,9 @@ public class CustomRenderer extends RendererBase implements Renderer {
 
         String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
 
-        arguments.put("input", tempInput.getAbsolutePath());
+        arguments.put("input", ThothUtil.normalSlashes(tempInput.getAbsolutePath()));
         arguments.put("url", url);
-        arguments.put("output", tempOutput.getAbsolutePath());
+        arguments.put("output", ThothUtil.normalSlashes(tempOutput.getAbsolutePath()));
         String command = ThothUtil.replaceKeywords(getCommandLine(configuration), arguments);
 
         String workingFolder = getConfiguration().getWorkspaceLocation() + context + ThothUtil.prefix(ThothUtil.getFolder(path), "/");

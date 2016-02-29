@@ -68,12 +68,12 @@ public class ContentManagerBaseTest extends ThothTestBase {
     MarkDownDocument markDownDocument = contentManager.getMarkDownDocument("/books/Main.book", false, CriticProcessingMode.PROCESS);
     String markdown = markDownDocument.getMarkdown().replaceAll("\t", "    ");
     String expected = getExpected("Main.book.expected.md");
-    assertEquals(expected.trim(), markdown.trim());
+    assertTrue(stringsEqual(expected.trim(), markdown.trim()));
 
     markDownDocument = contentManager.getMarkDownDocument("/books/Second.book", false, CriticProcessingMode.PROCESS);
     markdown = markDownDocument.getMarkdown().replaceAll("\t", "    ");
     expected = getExpected("Second.book.expected.md");
-    assertEquals(expected.trim(), markdown.trim());
+    assertTrue(stringsEqual(expected.trim(), markdown.trim()));
     assertEquals(39022364121L, contentManager.getContextChecksum());
     assertEquals(2, contentManager.list("/books").size());
     assertEquals(1, contentManager.list("/images").size());
@@ -84,7 +84,7 @@ public class ContentManagerBaseTest extends ThothTestBase {
     assertTrue(containsNode(unusedFragments, "/main/NotReferenced.md"));
   }
 
-  protected boolean containsNode(List<ContentNode> nodes, String path) {
+protected boolean containsNode(List<ContentNode> nodes, String path) {
     for (ContentNode node : nodes)
       if (node.getPath().equals(path))
         return true;

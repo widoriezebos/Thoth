@@ -104,7 +104,7 @@ public class BasicFileSystem implements FileSystem {
       return null;
     FileHandle[] result = new FileHandle[listFiles.length];
     for (int i = 0; i < listFiles.length; i++) {
-      String canonicalPath = ThothUtil.getCanonicalPath(listFiles[i]);
+      String canonicalPath = ThothUtil.getCanonicalPath(ThothUtil.normalSlashes(listFiles[i].getAbsolutePath()));
       if (!canonicalPath.startsWith(fileSystemRoot))
         throw new IllegalArgumentException(fileHandle + " is not located under " + fileSystemRoot);
 

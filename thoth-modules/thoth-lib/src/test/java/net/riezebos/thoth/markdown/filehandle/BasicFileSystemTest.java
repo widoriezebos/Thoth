@@ -65,7 +65,8 @@ public class BasicFileSystemTest {
     assertTrue(timeOfStart/1000 <= lastModified/1000);
     assertEquals(fileHandler.getName(), fileHandler2.getName());
     assertEquals("/IncludeProcessor.md", fileHandler2.toString());
-    assertEquals(459, fileHandler2.length());
+    long length = fileHandler2.length();
+    assertTrue(length == 459 || length == 482); // Either Linux or Windows with extra CR
     assertTrue(fileHandler.exists());
     assertFalse(fileHandler.isDirectory());
     assertTrue(fileHandler.isFile());
