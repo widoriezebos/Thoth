@@ -231,8 +231,11 @@ public class Indexer {
         boolean isBook = getConfiguration().isBook(resourcePath);
         boolean isFragment = getConfiguration().isFragment(resourcePath);
 
+        // To avoid finding fragments that do not really contain the search criteria, do not index included content.
+        // The only exception is the book. That one we fully index
         String resourceType = isBook ? TYPE_DOCUMENT : isFragment ? TYPE_FRAGMENT : TYPE_OTHER;
-        addToIndex(writer, resourcePath, resourceType, markDownDocument.getTitle(), markDownDocument.getMarkdown(), markDownDocument.getMetatags());
+        String body = isBook ? markDownDocument.getMarkdown() : ThothUtil.readInputStream(fileHandle.getInputStream());
+        addToIndex(writer, resourcePath, resourceType, markDownDocument.getTitle(), body, markDownDocument.getMetatags());
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }
