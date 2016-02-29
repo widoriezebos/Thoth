@@ -403,9 +403,8 @@ public abstract class ContentManagerBase implements ContentManager {
   public List<ContentNode> getUnusedFragments() throws IOException, ContentManagerException {
     List<ContentNode> result = new ArrayList<>();
 
-    Path root = Paths.get("/");
     Map<String, List<String>> reverseIndex = getReverseIndex(false);
-    traverseFolders(result, value -> isFragment(value) && !reverseIndex.containsKey(value), getFileHandle(root.toString()), true);
+    traverseFolders(result, value -> isFragment(value) && !reverseIndex.containsKey(value), getFileHandle("/"), true);
     Collections.sort(result);
     return result;
   }

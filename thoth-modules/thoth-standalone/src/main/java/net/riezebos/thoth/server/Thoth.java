@@ -66,10 +66,9 @@ public class Thoth {
     println("Server is firing up. Please hang on...");
 
     Configuration configuration = thothEnvironment.getConfiguration();
-    Server server = new Server(8080);
+    Server server = new Server(configuration.getEmbeddedServerPort());
     ServerConnector httpConnector = new ServerConnector(server);
     httpConnector.setHost(configuration.getEmbeddedServerName());
-    httpConnector.setPort(configuration.getEmbeddedServerPort());
     httpConnector.setIdleTimeout(configuration.getEmbeddedIdleTimeout() * 1000);
     server.addConnector(httpConnector);
 

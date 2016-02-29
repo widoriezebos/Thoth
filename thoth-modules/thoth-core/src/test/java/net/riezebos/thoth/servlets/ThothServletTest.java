@@ -62,7 +62,7 @@ public class ThothServletTest extends ThothTestBase {
     MockServletOutputStream sos = (MockServletOutputStream) response.getOutputStream();
     String actual = sos.getContentsAsString().trim();
     String expected = getExpected("Fourth.expected.md");
-    assertEquals(expected, actual);
+    assertTrue(stringsEqual(expected, actual));
     assertEquals("text/plain;charset=UTF-8", getLatestContentType());
     assertNull(getLatestError());
 

@@ -32,8 +32,10 @@ import org.junit.Test;
 
 import net.riezebos.thoth.beans.Bookmark;
 import net.riezebos.thoth.beans.BookmarkUsage;
+import net.riezebos.thoth.util.LibraryTestBase;
 
-public class FileProcessorTest {
+public class FileProcessorTest extends LibraryTestBase 
+{
 
   @Test
   public void testGetMetaTagsInputStream() throws IOException {
@@ -229,7 +231,9 @@ public class FileProcessorTest {
     processor.comment(pw, "Test");
     pw.flush();
 
-    assertEquals("\n[//]: # \"Test\"\n", new String(bos.toByteArray(), "UTF-8"));
+    String expected = "\n[//]: # \"Test\"\n";
+    String actual = new String(bos.toByteArray(), "UTF-8");
+    assertTrue(stringsEqual(expected, actual));
   }
 
   @Test
