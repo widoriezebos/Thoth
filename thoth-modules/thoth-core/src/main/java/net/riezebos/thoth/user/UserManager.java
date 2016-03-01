@@ -28,10 +28,14 @@ public interface UserManager {
 
   List<Group> listGroups() throws UserManagerException;
 
-  void createuser(User user) throws UserManagerException;
+  void createUser(User user) throws UserManagerException;
 
   boolean deleteUser(User user) throws UserManagerException;
 
   boolean updateUser(User user) throws UserManagerException;
+
+  void createGroup(Group group) throws UserManagerException;
+
+  boolean deleteGroup(Group group) throws UserManagerException;
 
 }

@@ -83,7 +83,7 @@ public class ThothDBTest extends ThothTestBase {
     assertFalse(readers.getPermissions().contains(Permission.META));
 
     User someUser = new User("wido");
-    userManager.createuser(someUser);
+    userManager.createUser(someUser);
     List<User> newList = userManager.listUsers();
     List<User> collected = newList.stream().filter(p -> p.getIdentifier().equals("wido")).collect(Collectors.toList());
     assertTrue(collected.size() == 1);

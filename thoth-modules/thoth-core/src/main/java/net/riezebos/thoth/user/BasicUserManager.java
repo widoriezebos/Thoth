@@ -74,7 +74,7 @@ public class BasicUserManager implements UserManager {
   }
 
   @Override
-  public void createuser(User user) throws UserManagerException {
+  public void createUser(User user) throws UserManagerException {
     identityDao.createUser(user);
   }
 
@@ -87,4 +87,15 @@ public class BasicUserManager implements UserManager {
   public boolean updateUser(User user) throws UserManagerException {
     return identityDao.updateUser(user);
   }
+
+  @Override
+  public void createGroup(Group group) throws UserManagerException {
+    identityDao.createGroup(group);
+  }
+
+  @Override
+  public boolean deleteGroup(Group group) throws UserManagerException {
+    return identityDao.deleteGroup(group);
+  }
+
 }

@@ -73,11 +73,21 @@ public class UserDao extends BaseDao {
 
   public boolean deleteUser(User user) throws UserManagerException {
     try (Connection connection = thothDB.getConnection()) {
+      
+      SqlStatement memberStmt = new SqlStatement(connection, "delete from thoth_memberships\n" + //
+          "where iden_id = :id");
+      memberStmt.setLong("id", user.getId());
+      memberStmt.executeUpdate();
+      
       SqlStatement userStmt = new SqlStatement(connection, "delete from thoth_users\n" + //
           "where id = :id");
       userStmt.setLong("id", user.getId());
-
-      int count = userStmt.executeUpdate();
+      userStmt.executeUpdate();
+      
+      SqlStatement identityStmt = new SqlStatement(connection, "delete from thoth_identities\n" + //
+          "where id = :id");
+      identityStmt.setLong("id", user.getId());
+      int count = identityStmt.executeUpdate();
       connection.commit();
       reloadCaches();
       return count == 1;

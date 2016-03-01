@@ -112,5 +112,13 @@ public class IdentityDao implements CacheListener {
   public boolean deleteUser(User user) throws UserManagerException {
     return userDao.deleteUser(user);
   }
-  
+
+  public void createGroup(Group group) throws UserManagerException {
+    groupDao.createGroup(group);
+  }
+
+  public boolean deleteGroup(Group group) throws UserManagerException {
+    return groupDao.deleteGroup(group);
+  }
+
 }
