@@ -24,7 +24,8 @@ public class User extends Identity {
   private String firstname;
   private String lastname;
 
-  public User() {
+  public User(String identifier) {
+    super(identifier);
   }
 
   public User(long id, String identifier) {

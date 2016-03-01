@@ -22,7 +22,8 @@ public class Identity {
   private String identifier;
   private Set<Group> memberships = new HashSet<>();
 
-  public Identity() {
+  public Identity(String identifier) {
+    this.identifier = identifier;
   }
 
   public Identity(long id, String identifier) {

@@ -33,6 +33,7 @@ public class UserDao extends BaseDao {
 
       SqlStatement identityStmt = new SqlStatement(connection, "insert into thoth_identities(id, identifier) values (:id, :identifier)");
       identityStmt.setLong("id", id);
+      identityStmt.setString("identifier", user.getIdentifier());
       identityStmt.executeUpdate();
 
       SqlStatement userStmt = new SqlStatement(connection, "insert into thoth_users(id, passwordhash, emailaddress, firstname, lastname)\n" + //

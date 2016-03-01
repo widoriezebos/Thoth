@@ -14,6 +14,8 @@
  */
 package net.riezebos.thoth.user;
 
+import java.util.List;
+
 import net.riezebos.thoth.exceptions.UserManagerException;
 
 public interface UserManager {
@@ -21,5 +23,15 @@ public interface UserManager {
   User getUser(String identifier) throws UserManagerException;
 
   Group getGroup(String identifier) throws UserManagerException;
+
+  List<User> listUsers() throws UserManagerException;
+
+  List<Group> listGroups() throws UserManagerException;
+
+  void createuser(User user) throws UserManagerException;
+
+  boolean deleteUser(User user) throws UserManagerException;
+
+  boolean updateUser(User user) throws UserManagerException;
 
 }

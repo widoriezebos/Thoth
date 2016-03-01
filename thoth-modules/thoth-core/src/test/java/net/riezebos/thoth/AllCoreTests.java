@@ -32,6 +32,7 @@ import net.riezebos.thoth.commands.ValidationReportCommandTest;
 import net.riezebos.thoth.configuration.CacheManagerTest;
 import net.riezebos.thoth.configuration.HotReloadableConfigurationTest;
 import net.riezebos.thoth.configuration.PropertyBasedConfigurationTest;
+import net.riezebos.thoth.configuration.persistence.ThothDBTest;
 import net.riezebos.thoth.content.AutoRefresherTest;
 import net.riezebos.thoth.content.ContentManagerBaseTest;
 import net.riezebos.thoth.content.ThothContextTest;
@@ -62,7 +63,8 @@ import net.riezebos.thoth.util.diff_match_patchTest;
     DiffCommandTest.class, ErrorPageCommandTest.class, IndexCommandTest.class, MetaCommandTest.class, //
     PullCommandTest.class, ReindexCommandTest.class, RevisionsCommandTest.class, SearchCommandTest.class, //
     ValidationReportCommandTest.class, GitContentManagerTest.class, FSContentManagerTest.class, //
-    ZipContentManagerTest.class, ThothCoreUtilTest.class, diff_match_patchTest.class, HotReloadableConfigurationTest.class})
+    ZipContentManagerTest.class, ThothCoreUtilTest.class, diff_match_patchTest.class, //
+    HotReloadableConfigurationTest.class, ThothDBTest.class})
 
 public class AllCoreTests {
 

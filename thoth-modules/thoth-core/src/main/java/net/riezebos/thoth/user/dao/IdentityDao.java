@@ -16,6 +16,7 @@ import net.riezebos.thoth.configuration.persistence.dbs.SqlStatement;
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.Group;
 import net.riezebos.thoth.user.Identity;
+import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.util.FinalWrapper;
 
 public class IdentityDao implements CacheListener {
@@ -99,4 +100,17 @@ public class IdentityDao implements CacheListener {
       LOG.error(e.getMessage(), e);
     }
   }
+
+  public void createUser(User user) throws UserManagerException {
+    userDao.createUser(user);
+  }
+
+  public boolean updateUser(User user) throws UserManagerException {
+    return userDao.updateUser(user);
+  }
+
+  public boolean deleteUser(User user) throws UserManagerException {
+    return userDao.deleteUser(user);
+  }
+  
 }

@@ -14,6 +14,11 @@
  */
 package net.riezebos.thoth.user;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.exceptions.UserManagerException;
@@ -48,5 +53,38 @@ public class BasicUserManager implements UserManager {
     if (identity instanceof Group)
       return (Group) identity;
     return null;
+  }
+
+  @Override
+  public List<User> listUsers() throws UserManagerException {
+    Collection<Identity> identities = identityDao.getIdentities().values();
+    Stream<User> filter = identities.stream()//
+        .filter(usr -> usr instanceof User)//
+        .map(u -> (User) u);
+    return filter.collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Group> listGroups() throws UserManagerException {
+    Collection<Identity> identities = identityDao.getIdentities().values();
+    Stream<Group> filter = identities.stream()//
+        .filter(grp -> grp instanceof Group)//
+        .map(g -> (Group) g);
+    return filter.collect(Collectors.toList());
+  }
+
+  @Override
+  public void createuser(User user) throws UserManagerException {
+    identityDao.createUser(user);
+  }
+
+  @Override
+  public boolean deleteUser(User user) throws UserManagerException {
+    return identityDao.deleteUser(user);
+  }
+
+  @Override
+  public boolean updateUser(User user) throws UserManagerException {
+    return identityDao.updateUser(user);
   }
 }
