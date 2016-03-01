@@ -1,6 +1,7 @@
 package net.riezebos.thoth.configuration;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.configuration.persistence.ThothDB;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
 import net.riezebos.thoth.content.impl.FSContentManager;
@@ -19,29 +21,27 @@ import net.riezebos.thoth.content.impl.NopContentManager;
 import net.riezebos.thoth.content.impl.ZipContentManager;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.DatabaseException;
+import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.BasicUserManager;
 import net.riezebos.thoth.user.UserManager;
+import net.riezebos.thoth.util.FinalWrapper;
 
 public class ThothEnvironment implements ConfigurationChangeListener {
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
   public static final String CONFIGKEY_DEPRECATED = "configuration";
   public static final String CONFIGKEY = "thoth_configuration";
   private static final String GLOBAL_SITE = "*global_site*";
-  private static ThothEnvironment sharedThothContext = null;
+  private static FinalWrapper<ThothEnvironment> sharedThothContextWrapper = null;
 
   private Map<String, ContentManager> managers = new HashMap<>();
   private Configuration configuration = null;
   private List<RendererChangeListener> rendererChangeListeners = new ArrayList<>();
-  private UserManager userManager = null;
+  private FinalWrapper<ThothDB> thothDbWrapper = null;
+  private FinalWrapper<UserManager> userManagerWrapper = null;
 
   public ContentManager getContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
     return getContentManager(contextDefinition.getName());
-  }
-
-  public UserManager getUserManager() {
-    if (userManager == null)
-      userManager = new BasicUserManager();
-    return userManager;
   }
 
   public ContentManager getContentManager(String contextName) throws ContentManagerException {
@@ -206,18 +206,6 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     return contextKey;
   }
 
-  public static void registerSharedContext(ThothEnvironment thothEnvironment) {
-    sharedThothContext = thothEnvironment;
-  }
-
-  public static ThothEnvironment getSharedThothContext() {
-    synchronized (ThothEnvironment.class) {
-      if (sharedThothContext == null)
-        sharedThothContext = new ThothEnvironment();
-      return sharedThothContext;
-    }
-  }
-
   public void addRendererChangedListener(RendererChangeListener listener) {
     rendererChangeListeners.add(listener);
   }
@@ -225,4 +213,75 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   public void removeRendererChangedListener(RendererChangeListener listener) {
     rendererChangeListeners.remove(listener);
   }
+
+  public static void registerSharedContext(ThothEnvironment thothEnvironment) {
+    sharedThothContextWrapper = new FinalWrapper<ThothEnvironment>(thothEnvironment);
+  }
+
+  /**
+   * This method is synchronized to make sure there will ever only be one shared ThothEnvironment
+   * 
+   * @return
+   */
+  public static ThothEnvironment getSharedThothContext() {
+    FinalWrapper<ThothEnvironment> wrapper = sharedThothContextWrapper;
+    if (wrapper == null) {
+      synchronized (ThothEnvironment.class) {
+        if (sharedThothContextWrapper == null) {
+          sharedThothContextWrapper = new FinalWrapper<ThothEnvironment>(new ThothEnvironment());
+        }
+        wrapper = sharedThothContextWrapper;
+      }
+    }
+    return wrapper.value;
+  }
+
+  /**
+   * This method is synchronized to make sure there will ever only be one ThothDB for this environment.
+   * 
+   * @return
+   * @throws SQLException
+   */
+  public ThothDB getThothDB() throws DatabaseException {
+    FinalWrapper<ThothDB> wrapper = thothDbWrapper;
+    if (wrapper == null) {
+      synchronized (this) {
+        if (thothDbWrapper == null) {
+          thothDbWrapper = new FinalWrapper<ThothDB>(createThothDB());
+        }
+        wrapper = thothDbWrapper;
+      }
+    }
+    return wrapper.value;
+  }
+
+  protected ThothDB createThothDB() throws DatabaseException {
+    ThothDB thothDB = new ThothDB(this);
+    thothDB.init();
+    return thothDB;
+  }
+
+  /**
+   * This method is synchronized to make sure there will ever only be one UserManager for this environment.
+   * 
+   * @return
+   * @throws SQLException
+   */
+  public UserManager getUserManager() throws UserManagerException {
+    FinalWrapper<UserManager> wrapper = userManagerWrapper;
+    if (wrapper == null) {
+      synchronized (this) {
+        if (userManagerWrapper == null) {
+          userManagerWrapper = new FinalWrapper<UserManager>(createUserManager());
+        }
+        wrapper = userManagerWrapper;
+      }
+    }
+    return wrapper.value;
+  }
+
+  protected UserManager createUserManager() throws UserManagerException {
+    return new BasicUserManager(this);
+  }
+
 }

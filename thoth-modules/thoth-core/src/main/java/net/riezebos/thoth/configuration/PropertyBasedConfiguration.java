@@ -530,4 +530,24 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   public String getDefaultUser() {
     return getValue("defaultuser", "administrator");
   }
+
+  @Override
+  public String getDatabaseType() {
+    return getValue("database.type", "embedded");
+  }
+
+  @Override
+  public String getDatabaseUrl() {
+    return getValue("database.url", getWorkspaceLocation()+"thoth-database");
+  }
+
+  @Override
+  public String getDatabaseUser() {
+    return getValue("database.user", "thoth");
+  }
+
+  @Override
+  public String getDatabasePassword() {
+    return getValue("database.password", "thoth");
+  }
 }

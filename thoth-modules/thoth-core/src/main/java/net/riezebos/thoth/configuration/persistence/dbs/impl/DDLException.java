@@ -12,27 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.user;
+package net.riezebos.thoth.configuration.persistence.dbs.impl;
 
-public enum Permission {
+public class DDLException extends Exception {
+  private static final long serialVersionUID = 1L;
 
-  ACCESS(1), READ_BOOKS(2), READ_FRAGMENTS(3), READ_RESOURCE(4), BROWSE(5), DIFF(6), META(7), PULL(8), REINDEX(9), REVISION(10), SEARCH(11), VALIDATE(12);
-
-  private int value;
-
-  private Permission(int value) {
-    this.value = value;
+  public DDLException() {
+    super();
   }
 
-  public int getValue() {
-    return value;
+  public DDLException(String message) {
+    super(message);
   }
 
-  public static Permission convert(int intValue) {
-
-    for (Permission permission : Permission.values())
-      if (permission.value == intValue)
-        return permission;
-    throw new IllegalArgumentException("Cannot convert " + intValue);
+  public DDLException(Throwable chainThis) {
+    super(chainThis);
   }
+
 }

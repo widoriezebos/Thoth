@@ -39,10 +39,10 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 
-import net.riezebos.thoth.configuration.IndexingContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.search.DocumentContainer;
 import net.riezebos.thoth.content.search.Indexer;
+import net.riezebos.thoth.content.search.IndexingContext;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.util.ProcessorError;

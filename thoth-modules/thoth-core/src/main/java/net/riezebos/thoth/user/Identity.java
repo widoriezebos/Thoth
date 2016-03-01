@@ -18,11 +18,26 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Identity {
+  private Long id = null;
   private String identifier;
   private Set<Group> memberships = new HashSet<>();
 
-  public Identity(String identifier) {
+  public Identity() {
+  }
+
+  public Identity(long id, String identifier) {
+    this.id = id;
     this.identifier = identifier;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    if (this.id != null)
+      throw new IllegalArgumentException("Update of a persisted identity's id not allowed");
+    this.id = id;
   }
 
   public String getIdentifier() {
@@ -30,6 +45,8 @@ public class Identity {
   }
 
   public void setIdentifier(String name) {
+    if (this.identifier != null)
+      throw new IllegalArgumentException("Update of a persisted identity's identifier not allowed");
     this.identifier = name;
   }
 
@@ -44,4 +61,10 @@ public class Identity {
   public Set<Group> getMemberships() {
     return memberships;
   }
+
+  @Override
+  public String toString() {
+    return getIdentifier();
+  }
+
 }

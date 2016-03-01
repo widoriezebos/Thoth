@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.search.IndexingContext;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.util.LineInfo;

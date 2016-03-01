@@ -54,7 +54,6 @@ import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.CacheManager;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.IndexingContext;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.CachemanagerException;
 import net.riezebos.thoth.exceptions.ContentManagerException;

@@ -450,4 +450,66 @@ public class ThothUtil {
     return arguments;
   }
 
+  public static String replaceWord(String value, String word, String replacement, String separators) {
+    StringBuffer sepSpec;
+    if (separators == null || separators.length() == 0)
+      throw new IllegalArgumentException("No separators specified");
+    else {
+      sepSpec = new StringBuffer("[");
+      for (int i = 0; i < separators.length(); i++)
+        sepSpec.append((i > 0 ? "," : "") + escape(separators.charAt(i)));
+      sepSpec.append("]");
+    }
+
+    int idx = 0;
+    String regex = sepSpec + escape(word) + sepSpec;
+    Pattern p = Pattern.compile(regex, Pattern.MULTILINE);
+
+    Matcher matcher = p.matcher(value);
+    while (idx < value.length() && matcher.find(idx)) {
+      int start = matcher.start() + 1;
+      int end = matcher.end() - 1;
+      value = value.substring(0, start) + replacement + value.substring(end);
+      idx = matcher.start() + replacement.length() + 2;
+      matcher = p.matcher(value);
+    }
+    return value;
+  }
+
+  public static String escape(String value) {
+    StringBuffer sb = new StringBuffer(value.length() + DEFAULT_ADDITIONAL_BUFFERSIZE);
+    for (int i = 0; i < value.length(); i++)
+      sb.append(escape(value.charAt(i)));
+
+    return sb.toString();
+  }
+
+  public static String escape(char c) {
+    switch (c) {
+    case '\t':
+      return "\\t";
+    case '\r':
+      return "\\r";
+    case '\n':
+      return "\\n";
+    case ',':
+    case '*':
+    case '+':
+    case '?':
+    case '{':
+    case '}':
+    case '$':
+    case '.':
+    case '^':
+    case '(':
+    case '[':
+    case ']':
+    case '|':
+    case ')':
+      return "\\" + c;
+    default:
+      return String.valueOf(c);
+    }
+  }
+
 }

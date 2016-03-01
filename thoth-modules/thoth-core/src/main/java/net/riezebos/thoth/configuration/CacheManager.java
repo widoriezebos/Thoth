@@ -30,6 +30,7 @@ import java.util.Map;
 
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.search.IndexingContext;
 import net.riezebos.thoth.exceptions.CachemanagerException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;

@@ -22,8 +22,8 @@ public class Group extends Identity {
   private Set<Identity> members = new HashSet<>();
   private Set<Permission> permissions = new HashSet<>();
 
-  public Group(String identifier) {
-    super(identifier);
+  public Group(long id, String identifier) {
+    super(id, identifier);
   }
 
   public Set<Identity> getMembers() {
@@ -51,4 +51,5 @@ public class Group extends Identity {
     members.remove(identity);
     identity.unregisterMembership(this);
   }
+  
 }

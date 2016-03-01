@@ -339,4 +339,24 @@ public class HotReloadableConfiguration implements Configuration {
     return activeConfiguration.getDefaultUser();
   }
 
+  @Override
+  public String getDatabaseType() {
+    return activeConfiguration.getDatabaseType();
+  }
+
+  @Override
+  public String getDatabaseUrl() {
+    return activeConfiguration.getDatabaseUrl();
+  }
+
+  @Override
+  public String getDatabaseUser() {
+    return activeConfiguration.getDatabaseUser();
+  }
+
+  @Override
+  public String getDatabasePassword() {
+    return activeConfiguration.getDatabasePassword();
+  }
+
 }

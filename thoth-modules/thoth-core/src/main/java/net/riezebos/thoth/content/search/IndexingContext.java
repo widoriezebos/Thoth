@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.configuration;
+package net.riezebos.thoth.content.search;
 
 import java.util.ArrayList;
 import java.util.HashMap;

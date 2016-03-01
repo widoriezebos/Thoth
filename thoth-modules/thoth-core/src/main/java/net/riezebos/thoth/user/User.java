@@ -19,8 +19,16 @@ import java.util.Set;
 
 public class User extends Identity {
 
-  public User(String identifier) {
-    super(identifier);
+  private String passwordhash;
+  private String emailaddress;
+  private String firstname;
+  private String lastname;
+
+  public User() {
+  }
+
+  public User(long id, String identifier) {
+    super(id, identifier);
   }
 
   public Set<Permission> getPermissions() {
@@ -33,4 +41,37 @@ public class User extends Identity {
   public boolean isAllowed(Permission permission) {
     return getPermissions().contains(permission);
   }
+
+  public void setPasswordhash(String passwordhash) {
+    this.passwordhash = passwordhash;
+  }
+
+  public void setEmailaddress(String emailaddress) {
+    this.emailaddress = emailaddress;
+  }
+
+  public void setFirstname(String firstname) {
+    this.firstname = firstname;
+  }
+
+  public void setLastname(String lastname) {
+    this.lastname = lastname;
+  }
+
+  public String getPasswordhash() {
+    return passwordhash;
+  }
+
+  public String getEmailaddress() {
+    return emailaddress;
+  }
+
+  public String getFirstname() {
+    return firstname;
+  }
+
+  public String getLastname() {
+    return lastname;
+  }
+
 }

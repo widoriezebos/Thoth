@@ -39,6 +39,7 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
+import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.user.Permission;
 import net.riezebos.thoth.user.User;
@@ -68,9 +69,14 @@ public abstract class ServletBase extends HttpServlet {
    * @return
    */
   public User getCurrentUser() {
-    UserManager userManager = getThothEnvironment().getUserManager();
-    String identifier = getConfiguration().getDefaultUser();
-    return userManager.getUser(identifier);
+    try {
+      UserManager userManager = getThothEnvironment().getUserManager();
+      String identifier = getConfiguration().getDefaultUser();
+      return userManager.getUser(identifier);
+    } catch (UserManagerException e) {
+      LOG.error(e.getMessage(), e);
+      return null;
+    }
   }
 
   protected boolean accessAllowed(Renderer renderer, User currentUser) {

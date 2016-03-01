@@ -328,5 +328,34 @@ public interface Configuration extends Cloneable {
    * @return
    */
   String getDefaultUser();
+  
+  /**
+   * Returns the type of database to use for persistent storage. Use 'embedded' if you want to use the built-in database.
+   * Supported types are 'embedded', 'oracle' and 'postgres' although others might work depending on the URL used.
+   * @return
+   */
+  public String getDatabaseType();
+
+  /**
+   * Returns the JDBC URL of database to use for persistent storage. When the database type is set to embedded then
+   * just enter the path (directory) where you want the database files to be created/stored.
+   * When using other database types make sure the driver is on the classpath so that the DriverManager can find
+   * the correct JDBC driver.
+   * @return
+   */
+  public String getDatabaseUrl();
+  
+  /**
+   * Returns the database user for persistent storage
+   * @return
+   */
+  public String getDatabaseUser();
+
+  /**
+   * Returns the database password for persistent storage
+   * @return
+   */
+  public String getDatabasePassword();
+
 
 }

@@ -61,6 +61,7 @@ import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.SkinManagerException;
+import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.renderers.Renderer;
@@ -334,7 +335,7 @@ public class ThothTestBase {
     parameters.put(name, value);
   }
 
-  protected User getCurrentUser(ThothEnvironment thothEnvironment) {
+  protected User getCurrentUser(ThothEnvironment thothEnvironment) throws UserManagerException {
     UserManager userManager = thothEnvironment.getUserManager();
     return userManager.getUser("administrator");
   }
@@ -347,6 +348,25 @@ public class ThothTestBase {
     str1 = str1.replaceAll("\r", "");
     str2 = str2.replaceAll("\r", "");
     return str1.equals(str2);
+  }
+
+  protected void cleanupTempFolder(File dbDir) throws IOException {
+    File tempFile = File.createTempFile("safe", "check");
+    if (!tempFile.getParentFile().getAbsolutePath().equals(dbDir.getParentFile().getAbsolutePath())) {
+      tempFile.delete();
+      throw new IllegalArgumentException("Refuse to clean anything outside the tempfolder");
+    }
+    tempFile.delete();
+    unsafeCleanupTempFolder(dbDir);
+  }
+
+  private void unsafeCleanupTempFolder(File dbDir) {
+    if (dbDir.isDirectory()) {
+      for (File child : dbDir.listFiles())
+        unsafeCleanupTempFolder(child);
+      dbDir.delete();
+    } else if (dbDir.isFile())
+      dbDir.delete();
   }
 
 }

@@ -14,14 +14,12 @@
  */
 package net.riezebos.thoth.user;
 
+import net.riezebos.thoth.exceptions.UserManagerException;
+
 public interface UserManager {
 
-  User getUser(String identifier);
+  User getUser(String identifier) throws UserManagerException;
 
-  void registerUser(User user);
-
-  Group getGroup(String identifier);
-
-  void registerGroup(Group group);
+  Group getGroup(String identifier) throws UserManagerException;
 
 }

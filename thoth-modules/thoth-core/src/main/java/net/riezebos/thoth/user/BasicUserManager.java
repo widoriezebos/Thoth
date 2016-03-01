@@ -14,76 +14,39 @@
  */
 package net.riezebos.thoth.user;
 
-import java.util.HashMap;
-import java.util.Map;
+import net.riezebos.thoth.configuration.ThothEnvironment;
+import net.riezebos.thoth.exceptions.DatabaseException;
+import net.riezebos.thoth.exceptions.UserManagerException;
+import net.riezebos.thoth.user.dao.IdentityDao;
 
 /**
- * This will be replaced by proper user management in a future release. For now everything is hardcoded.
- * 
  * @author wido
  */
 public class BasicUserManager implements UserManager {
 
-  private Map<String, User> users = new HashMap<>();
-  private Map<String, Group> groups = new HashMap<>();
+  IdentityDao identityDao;
 
-  public BasicUserManager() {
-    Group administrators = new Group("administrators");
-    administrators.addPermission(Permission.PULL);
-    administrators.addPermission(Permission.REINDEX);
-    registerGroup(administrators);
-
-    Group writers = new Group("writers");
-    writers.addPermission(Permission.BROWSE);
-    writers.addPermission(Permission.DIFF);
-    writers.addPermission(Permission.META);
-    writers.addPermission(Permission.READ_FRAGMENTS);
-    writers.addPermission(Permission.REVISION);
-    writers.addPermission(Permission.VALIDATE);
-    registerGroup(writers);
-
-    Group readers = new Group("readers");
-    readers.addPermission(Permission.ACCESS);
-    readers.addPermission(Permission.READ_RESOURCE);
-    readers.addPermission(Permission.READ_BOOKS);
-    readers.addPermission(Permission.SEARCH);
-    registerGroup(readers);
-
-    User administrator = new User("administrator");
-    administrators.addMember(administrator);
-
-    User writer = new User("writer");
-    writers.addMember(writer);
-    writers.addMember(administrator);
-
-    User reader = new User("reader");
-    readers.addMember(reader);
-    readers.addMember(writer);
-    readers.addMember(administrator);
-
-    registerUser(reader);
-    registerUser(writer);
-    registerUser(administrator);
+  public BasicUserManager(ThothEnvironment thothEnvironment) throws UserManagerException {
+    try {
+      identityDao = new IdentityDao(thothEnvironment.getThothDB());
+    } catch (DatabaseException e) {
+      throw new UserManagerException(e);
+    }
   }
 
   @Override
-  public User getUser(String identifier) {
-    return users.get(identifier);
+  public User getUser(String identifier) throws UserManagerException {
+    Identity identity = identityDao.getIdentities().get(identifier);
+    if (identity instanceof User)
+      return (User) identity;
+    return null;
   }
 
   @Override
-  public void registerUser(User user) {
-    users.put(user.getIdentifier(), user);
+  public Group getGroup(String identifier) throws UserManagerException {
+    Identity identity = identityDao.getIdentities().get(identifier);
+    if (identity instanceof Group)
+      return (Group) identity;
+    return null;
   }
-
-  @Override
-  public Group getGroup(String identifier) {
-    return groups.get(identifier);
-  }
-
-  @Override
-  public void registerGroup(Group group) {
-    groups.put(group.getIdentifier(), group);
-  }
-
 }
