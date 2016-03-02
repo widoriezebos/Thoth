@@ -272,7 +272,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     if (wrapper == null) {
       synchronized (this) {
         if (userManagerWrapper == null) {
-          userManagerWrapper = new FinalWrapper<UserManager>(createUserManager());
+          setUserManager(createUserManager());
         }
         wrapper = userManagerWrapper;
       }
@@ -282,6 +282,10 @@ public class ThothEnvironment implements ConfigurationChangeListener {
 
   protected UserManager createUserManager() throws UserManagerException {
     return new BasicUserManager(this);
+  }
+
+  public void setUserManager(UserManager userManager) {
+    userManagerWrapper = new FinalWrapper<UserManager>(userManager);
   }
 
 }

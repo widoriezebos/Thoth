@@ -18,7 +18,11 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
@@ -27,10 +31,13 @@ import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiom;
 import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiomFactory;
 import net.riezebos.thoth.configuration.persistence.dbs.impl.DDLException;
 import net.riezebos.thoth.exceptions.DatabaseException;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class ThothDB {
 
   private ThothEnvironment thothEnvironment;
+
+  private Map<String, String> queries = null;
 
   public ThothDB(ThothEnvironment thothEnvironment)
 
@@ -79,6 +86,38 @@ public class ThothDB {
 
   protected Configuration getConfiguration() {
     return thothEnvironment.getConfiguration();
+  }
+
+  public String getQuery(String queryName) {
+    if (queries == null) {
+      queries = loadQueries();
+    }
+    String query = queries.get(queryName.toLowerCase());
+    if (query == null)
+      throw new IllegalArgumentException("Query " + queryName + " not defined");
+    return query;
+  }
+
+  protected Map<String, String> loadQueries() {
+    try {
+      Map<String, String> map = new HashMap<>();
+      String body = ThothUtil.readInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream("net/riezebos/thoth/db/queries.txt"));
+      for (String line : body.split(";")) {
+        if (!StringUtils.isBlank(line)) {
+          int idx = line.indexOf('=');
+          if (idx == -1)
+            throw new IllegalArgumentException("Line " + line + " does not contain the '=' character");
+          String name = line.substring(0, idx).trim();
+          String query = line.substring(idx + 1).trim();
+          if (map.containsKey(name))
+            throw new IllegalArgumentException("Query named " + name + " not unique");
+          map.put(name.toLowerCase(), query);
+        }
+      }
+      return map;
+    } catch (IOException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
 }

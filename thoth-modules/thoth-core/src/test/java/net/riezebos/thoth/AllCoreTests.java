@@ -33,6 +33,8 @@ import net.riezebos.thoth.configuration.CacheManagerTest;
 import net.riezebos.thoth.configuration.HotReloadableConfigurationTest;
 import net.riezebos.thoth.configuration.PropertyBasedConfigurationTest;
 import net.riezebos.thoth.configuration.persistence.ThothDBTest;
+import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiomFactoryTest;
+import net.riezebos.thoth.configuration.persistence.dbs.SqlStatementTest;
 import net.riezebos.thoth.content.AutoRefresherTest;
 import net.riezebos.thoth.content.ContentManagerBaseTest;
 import net.riezebos.thoth.content.ThothContextTest;
@@ -50,6 +52,7 @@ import net.riezebos.thoth.renderers.CustomRendererTest;
 import net.riezebos.thoth.renderers.HtmlRendererTest;
 import net.riezebos.thoth.renderers.RawRendererTest;
 import net.riezebos.thoth.servlets.ThothServletTest;
+import net.riezebos.thoth.user.PasswordUtilTest;
 import net.riezebos.thoth.util.DiscardingListTest;
 import net.riezebos.thoth.util.ThothCoreUtilTest;
 import net.riezebos.thoth.util.diff_match_patchTest;
@@ -64,7 +67,8 @@ import net.riezebos.thoth.util.diff_match_patchTest;
     PullCommandTest.class, ReindexCommandTest.class, RevisionsCommandTest.class, SearchCommandTest.class, //
     ValidationReportCommandTest.class, GitContentManagerTest.class, FSContentManagerTest.class, //
     ZipContentManagerTest.class, ThothCoreUtilTest.class, diff_match_patchTest.class, //
-    HotReloadableConfigurationTest.class, ThothDBTest.class})
+    HotReloadableConfigurationTest.class, ThothDBTest.class, PasswordUtilTest.class, DatabaseIdiomFactoryTest.class, //
+    SqlStatementTest.class})
 
 public class AllCoreTests {
 

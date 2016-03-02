@@ -527,8 +527,8 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   }
 
   @Override
-  public String getDefaultUser() {
-    return getValue("defaultuser", "administrator");
+  public String getDefaultGroup() {
+    return getValue("defaultgroup", "administrators");
   }
 
   @Override
@@ -538,7 +538,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
 
   @Override
   public String getDatabaseUrl() {
-    return getValue("database.url", getWorkspaceLocation()+"thoth-database");
+    return getValue("database.url", getWorkspaceLocation() + "thoth-database");
   }
 
   @Override

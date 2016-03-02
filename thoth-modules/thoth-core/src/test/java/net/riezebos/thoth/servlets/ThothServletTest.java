@@ -37,7 +37,7 @@ import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.testutil.MockServletOutputStream;
 import net.riezebos.thoth.testutil.ThothTestBase;
-import net.riezebos.thoth.user.User;
+import net.riezebos.thoth.user.Identity;
 
 public class ThothServletTest extends ThothTestBase {
 
@@ -199,7 +199,7 @@ public class ThothServletTest extends ThothTestBase {
       }
 
       @Override
-      public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
           throws RenderException {
         throw new RenderException("I was only meant to fail so don't blame me");
       }

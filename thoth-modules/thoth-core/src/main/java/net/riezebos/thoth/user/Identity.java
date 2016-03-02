@@ -14,13 +14,17 @@
  */
 package net.riezebos.thoth.user;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Identity {
+public abstract class Identity implements Cloneable, Serializable {
+  private static final long serialVersionUID = 1L;
   private Long id = null;
   private String identifier;
   private Set<Group> memberships = new HashSet<>();
+
+  abstract public Set<Permission> getEffectivePermissions();
 
   public Identity(String identifier) {
     this.identifier = identifier;
@@ -29,6 +33,17 @@ public class Identity {
   public Identity(long id, String identifier) {
     this.id = id;
     this.identifier = identifier;
+  }
+
+  @Override
+  public Identity clone() {
+    try {
+      Identity result = (Identity) super.clone();
+      result.memberships = new HashSet<>(memberships);
+      return result;
+    } catch (CloneNotSupportedException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
   public Long getId() {

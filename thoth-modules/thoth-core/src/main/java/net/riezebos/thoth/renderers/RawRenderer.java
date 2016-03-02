@@ -28,8 +28,8 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
+import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
-import net.riezebos.thoth.user.User;
 
 public class RawRenderer extends RendererBase implements Renderer {
   public static final String TYPE = "raw";
@@ -46,7 +46,7 @@ public class RawRenderer extends RendererBase implements Renderer {
     return "text/plain;charset=UTF-8";
   }
 
-  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException {
     try {
 
@@ -56,7 +56,7 @@ public class RawRenderer extends RendererBase implements Renderer {
       boolean isBook = configuration.isBook(path);
       Permission permission = isBook ? Permission.READ_BOOKS : Permission.READ_FRAGMENTS;
 
-      if (!contentManager.getAccessManager().hasPermission(user, path, permission))
+      if (!contentManager.getAccessManager().hasPermission(identity, path, permission))
         return RenderResult.FORBIDDEN;
 
       RenderResult result = RenderResult.OK;

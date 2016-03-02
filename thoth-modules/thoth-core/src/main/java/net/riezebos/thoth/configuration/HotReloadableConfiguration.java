@@ -335,8 +335,8 @@ public class HotReloadableConfiguration implements Configuration {
   }
 
   @Override
-  public String getDefaultUser() {
-    return activeConfiguration.getDefaultUser();
+  public String getDefaultGroup() {
+    return activeConfiguration.getDefaultGroup();
   }
 
   @Override

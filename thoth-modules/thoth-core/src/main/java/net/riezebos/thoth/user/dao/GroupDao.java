@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.riezebos.thoth.configuration.persistence.ThothDB;
 import net.riezebos.thoth.configuration.persistence.dbs.SequenceGenerator;
@@ -12,6 +14,7 @@ import net.riezebos.thoth.configuration.persistence.dbs.SqlStatement;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.Group;
+import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
 
 public class GroupDao extends BaseDao {
@@ -28,22 +31,20 @@ public class GroupDao extends BaseDao {
   }
 
   public void createGroup(Group group) throws UserManagerException {
-    try (Connection connection = thothDB.getConnection()) {
-      SequenceGenerator sequenceGenerator = new SequenceGenerator(connection, "thoth_identities");
+    try (Connection connection = thothDB.getConnection();
+        SqlStatement identityStmt = new SqlStatement(connection, thothDB.getQuery("insert_identity")); //
+        SqlStatement groupStmt = new SqlStatement(connection, thothDB.getQuery("insert_group"))) {
+
+      SequenceGenerator sequenceGenerator = new SequenceGenerator(connection, Tables.THOTH_IDENTITIES);
       long id = sequenceGenerator.getNextValue();
 
-      SqlStatement identityStmt = new SqlStatement(connection, "insert into thoth_identities(id, identifier) values (:id, :identifier)");
       identityStmt.setLong("id", id);
       identityStmt.setString("identifier", group.getIdentifier());
       identityStmt.executeUpdate();
 
-      SqlStatement groupStmt = new SqlStatement(connection, "insert into thoth_groups(id)\n" + //
-          "values (:id)");
       groupStmt.setLong("id", id);
-
       groupStmt.executeUpdate();
-      connection.commit();
-      reloadCaches();
+      commitReload(connection);
     } catch (SQLException | DatabaseException e) {
       throw new UserManagerException(e);
     }
@@ -56,25 +57,34 @@ public class GroupDao extends BaseDao {
    * @return
    * @throws UserManagerException
    */
-  public boolean updateGroup(Group group) throws UserManagerException {
-    try (Connection connection = thothDB.getConnection()) {
-      SqlStatement delPermissionStmt = new SqlStatement(connection, "delete from thoth_permissions\n" + //
-          "where grou_id = :id");
-      delPermissionStmt.setLong("id", group.getId());
-      int count = delPermissionStmt.executeUpdate();
+  public boolean updatePermissions(Group group) throws UserManagerException {
+    try (Connection connection = thothDB.getConnection(); //
+        SqlStatement delPermissionStmt = new SqlStatement(connection, thothDB.getQuery("delete_permission"));
+        SqlStatement insPermissionStmt = new SqlStatement(connection, thothDB.getQuery("insert_permission"))) {
 
-      SequenceGenerator sequenceGenerator = new SequenceGenerator(connection, "thoth_permissions");
-      for (Permission permission : group.getPermissions()) {
+      Set<Permission> current = getPermissions(connection, group);
+      Set<Permission> toBeRemoved = new HashSet<>(current);
+      toBeRemoved.removeAll(group.getPermissions());
+
+      Set<Permission> toBeAdded = new HashSet<>(group.getPermissions());
+      toBeAdded.removeAll(current);
+
+      int count = 0;
+      for (Permission remove : toBeRemoved) {
+        delPermissionStmt.setLong("id", group.getId());
+        delPermissionStmt.setInt("permission", remove.getValue());
+        count += delPermissionStmt.executeUpdate();
+      }
+
+      SequenceGenerator sequenceGenerator = new SequenceGenerator(connection, Tables.THOTH_PERMISSIONS);
+      for (Permission permission : toBeAdded) {
         long id = sequenceGenerator.getNextValue();
-        SqlStatement insPermissionStmt =
-            new SqlStatement(connection, "insert into from thoth_permissions(id, grou_id, permission) values(:id, :grou_id, :permission)");
         insPermissionStmt.setLong("id", id);
         insPermissionStmt.setLong("grou_id", group.getId());
         insPermissionStmt.setInt("permission", permission.getValue());
         count += insPermissionStmt.executeUpdate();
       }
-
-      connection.commit();
+      commitReload(connection);
       return count != 0;
     } catch (SQLException | DatabaseException e) {
       throw new UserManagerException(e);
@@ -82,35 +92,58 @@ public class GroupDao extends BaseDao {
   }
 
   public boolean deleteGroup(Group group) throws UserManagerException {
-    try (Connection connection = thothDB.getConnection()) {
+    try (Connection connection = thothDB.getConnection(); //
+        SqlStatement memberStmtIden = new SqlStatement(connection, thothDB.getQuery("delete_membership_iden")); //
+        SqlStatement identityStmt = new SqlStatement(connection, thothDB.getQuery("delete_identity")); //
+        SqlStatement memberStmtGrou = new SqlStatement(connection, thothDB.getQuery("delete_memberships_grou")); //
+        SqlStatement userStmt = new SqlStatement(connection, thothDB.getQuery("delete_group")); //
+        SqlStatement deletePermissionsStmt = new SqlStatement(connection, thothDB.getQuery("delete_permissions"))) {
 
-      SqlStatement deletePermissionsStmt = new SqlStatement(connection, "delete from thoth_permissions\n" + //
-          "where grou_id = :id");
       deletePermissionsStmt.setLong("id", group.getId());
       deletePermissionsStmt.executeUpdate();
 
-      SqlStatement memberStmt = new SqlStatement(connection, "delete from thoth_memberships\n" + //
-          "where iden_id = :id");
-      memberStmt.setLong("id", group.getId());
-      memberStmt.executeUpdate();
+      memberStmtIden.setLong("iden_id", group.getId());
+      memberStmtIden.executeUpdate();
 
-      memberStmt = new SqlStatement(connection, "delete from thoth_memberships\n" + //
-          "where grou_id = :id");
-      memberStmt.setLong("id", group.getId());
-      memberStmt.executeUpdate();
+      memberStmtGrou.setLong("grou_id", group.getId());
+      memberStmtGrou.executeUpdate();
 
-      SqlStatement userStmt = new SqlStatement(connection, "delete from thoth_groups\n" + //
-          "where id = :id");
       userStmt.setLong("id", group.getId());
       userStmt.executeUpdate();
 
-      SqlStatement identityStmt = new SqlStatement(connection, "delete from thoth_identities\n" + //
-          "where id = :id");
+      int count;
       identityStmt.setLong("id", group.getId());
-      int count = identityStmt.executeUpdate();
-      connection.commit();
-      reloadCaches();
+      count = identityStmt.executeUpdate();
+      commitReload(connection);
       return count == 1;
+    } catch (SQLException e) {
+      throw new UserManagerException(e);
+    }
+  }
+
+  public void createMembership(Group group, Identity identity) throws UserManagerException {
+    try (Connection connection = thothDB.getConnection(); //
+        SqlStatement memberStmt = new SqlStatement(connection, thothDB.getQuery("insert_membership"))) {
+
+      SequenceGenerator sequenceGenerator = new SequenceGenerator(connection, Tables.THOTH_MEMBERSHIPS);
+      long id = sequenceGenerator.getNextValue();
+      memberStmt.setLong("id", id);
+      memberStmt.setLong("grou_id", group.getId());
+      memberStmt.setLong("iden_id", identity.getId());
+      memberStmt.executeUpdate();
+      commitReload(connection);
+    } catch (SQLException | DatabaseException e) {
+      throw new UserManagerException(e);
+    }
+  }
+
+  public void deleteMembership(Group group, Identity identity) throws UserManagerException {
+    try (Connection connection = thothDB.getConnection(); //
+        SqlStatement memberStmt = new SqlStatement(connection, thothDB.getQuery("delete_membership_grou_iden"))) {
+      memberStmt.setLong("grou_id", group.getId());
+      memberStmt.setLong("iden_id", identity.getId());
+      memberStmt.executeUpdate();
+      commitReload(connection);
     } catch (SQLException e) {
       throw new UserManagerException(e);
     }
@@ -120,36 +153,33 @@ public class GroupDao extends BaseDao {
 
     List<Group> result = new ArrayList<>();
 
-    try (Connection connection = thothDB.getConnection()) {
-      SqlStatement groupStmt = new SqlStatement(connection,
-          "select iden.id, iden.identifier " + //
-              "from thoth_identities as iden, thoth_groups as grou " + //
-              "where iden.id = grou.id");
-      try (ResultSet rs = groupStmt.executeQuery()) {
-        while (rs.next()) {
-          long id = rs.getLong(1);
-          String identifier = rs.getString(2);
-          Group group = new Group(id, identifier);
-          result.add(group);
-          loadPermissions(connection, group);
-        }
+    try (Connection connection = thothDB.getConnection(); //
+        SqlStatement groupStmt = new SqlStatement(connection, thothDB.getQuery("select_groups")); //
+        ResultSet rs = groupStmt.executeQuery()) {
+      while (rs.next()) {
+        long id = rs.getLong(1);
+        String identifier = rs.getString(2);
+        Group group = new Group(id, identifier);
+        result.add(group);
+        Set<Permission> permissions = getPermissions(connection, group);
+        group.addPermissions(permissions);
       }
     }
 
     return result;
   }
 
-  protected void loadPermissions(Connection connection, Group group) throws SQLException {
-    SqlStatement permissionStmt = new SqlStatement(connection,
-        "select perm.permission " + //
-            "from thoth_permissions as perm " + //
-            "where perm.grou_id = :groupId");
-    permissionStmt.set("groupId", group.getId());
-    try (ResultSet permRs = permissionStmt.executeQuery()) {
-      while (permRs.next()) {
-        int permission = permRs.getInt(1);
-        group.addPermission(Permission.convert(permission));
+  protected Set<Permission> getPermissions(Connection connection, Group group) throws SQLException {
+    try (SqlStatement permissionStmt = new SqlStatement(connection, thothDB.getQuery("select_permissions"))) {
+      permissionStmt.set("grou_id", group.getId());
+      Set<Permission> result = new HashSet<>();
+      try (ResultSet permRs = permissionStmt.executeQuery()) {
+        while (permRs.next()) {
+          int permission = permRs.getInt(1);
+          result.add(Permission.convert(permission));
+        }
       }
+      return result;
     }
   }
 }

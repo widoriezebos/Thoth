@@ -17,10 +17,11 @@ package net.riezebos.thoth.user;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Group extends Identity {
-
+public class Group extends Identity implements Cloneable {
+  private static final long serialVersionUID = 1L;
   private Set<Identity> members = new HashSet<>();
   private Set<Permission> permissions = new HashSet<>();
+  private Set<Permission> cachedEffectivePermissions = null;
 
   public Group(String identifier) {
     super(identifier);
@@ -28,6 +29,14 @@ public class Group extends Identity {
 
   public Group(long id, String identifier) {
     super(id, identifier);
+  }
+
+  @Override
+  public Group clone() {
+    Group result = (Group) super.clone();
+    result.members = new HashSet<>(members);
+    result.permissions = new HashSet<>(permissions);
+    return result;
   }
 
   public Set<Identity> getMembers() {
@@ -54,6 +63,25 @@ public class Group extends Identity {
   public void removeMember(Identity identity) {
     members.remove(identity);
     identity.unregisterMembership(this);
+  }
+
+  public void clearPermissions() {
+    permissions.clear();
+  }
+
+  public void addPermissions(Set<Permission> permissions) {
+    this.permissions.addAll(permissions);
+  }
+
+  @Override
+  public Set<Permission> getEffectivePermissions() {
+    if (cachedEffectivePermissions == null) {
+      Set<Permission> permissions = new HashSet<>(getPermissions());
+      for (Group group : getMemberships())
+        permissions.addAll(group.getEffectivePermissions());
+      cachedEffectivePermissions = permissions;
+    }
+    return cachedEffectivePermissions;
   }
 
 }

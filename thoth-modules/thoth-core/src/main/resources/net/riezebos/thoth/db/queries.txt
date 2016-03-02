@@ -1,0 +1,106 @@
+insert_identity =
+    insert into thoth_identities(id, identifier) 
+    values (:id, :identifier)
+;
+
+delete_identity =
+    delete from thoth_identities
+    where  id = :id
+;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+insert_group =
+    insert into thoth_groups(id)
+    values (:id)
+;
+
+select_groups =
+    select iden.id, iden.identifier
+    from   thoth_identities as iden, 
+           thoth_groups as grou
+    where  iden.id = grou.id
+;
+
+delete_group =
+    delete from thoth_groups
+    where  id = :id
+;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+insert_user =
+    insert into thoth_users(id, passwordhash, emailaddress, firstname, lastname, blocked)
+    values (:id, :passwordhash, :emailaddress, :firstname, :lastname, :blocked)
+;
+
+select_users =
+    select iden.id, iden.identifier, usr.passwordhash, usr.emailaddress,
+           usr.firstname, usr.lastname, usr.blocked
+    from   thoth_identities as iden, 
+           thoth_users as usr
+    where  iden.id = usr.id
+;
+
+update_user =
+    update thoth_users
+    set    passwordhash = :passwordhash,
+           emailaddress = :emailaddress,
+           firstname    = :firstname,
+           lastname     = :lastname,
+           blocked      = :blocked
+    where  id = :id
+;
+
+delete_user =
+    delete from thoth_users
+    where id = :id
+;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+insert_membership =
+    insert into thoth_memberships(id, grou_id, iden_id) 
+    values (:id, :grou_id, :iden_id)
+;
+
+delete_membership_grou =
+    delete from thoth_memberships
+    where  grou_id = :grou_id
+;
+
+delete_membership_iden =
+    delete from thoth_memberships
+    where  iden_id = :iden_id
+;
+
+delete_membership_grou_iden =
+    delete from thoth_memberships
+    where  grou_id = :grou_id
+    and    iden_id = :iden_id
+;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+insert_permission =
+    insert into from thoth_permissions(id, grou_id, permission)
+    values (:id, :grou_id, :permission)
+;
+
+select_permissions =
+    select perm.permission
+    from   thoth_permissions as perm
+    where  perm.grou_id = :grou_id
+;
+
+delete_permissions =
+    delete from thoth_permissions
+    where  grou_id = :id
+;
+
+delete_permission =
+    delete from thoth_permissions
+    where  grou_id = :id
+    and    permission = :permission
+;
+  

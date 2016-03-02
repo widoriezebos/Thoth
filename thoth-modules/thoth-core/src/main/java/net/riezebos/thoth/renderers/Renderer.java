@@ -19,7 +19,7 @@ import java.util.Map;
 
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.user.User;
+import net.riezebos.thoth.user.Identity;
 
 public interface Renderer {
 
@@ -47,7 +47,7 @@ public interface Renderer {
 
   public String getContentType(Map<String, Object> arguments);
 
-  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException;
 
 }

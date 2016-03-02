@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.exceptions.UserManagerException;
@@ -41,6 +43,9 @@ public class BasicUserManager implements UserManager {
 
   @Override
   public User getUser(String identifier) throws UserManagerException {
+    if (StringUtils.isBlank(identifier))
+      return null;
+
     Identity identity = identityDao.getIdentities().get(identifier);
     if (identity instanceof User)
       return (User) identity;
@@ -49,6 +54,9 @@ public class BasicUserManager implements UserManager {
 
   @Override
   public Group getGroup(String identifier) throws UserManagerException {
+    if (StringUtils.isBlank(identifier))
+      return null;
+
     Identity identity = identityDao.getIdentities().get(identifier);
     if (identity instanceof Group)
       return (Group) identity;
@@ -74,8 +82,8 @@ public class BasicUserManager implements UserManager {
   }
 
   @Override
-  public void createUser(User user) throws UserManagerException {
-    identityDao.createUser(user);
+  public User createUser(User user) throws UserManagerException {
+    return identityDao.createUser(user);
   }
 
   @Override
@@ -89,13 +97,34 @@ public class BasicUserManager implements UserManager {
   }
 
   @Override
-  public void createGroup(Group group) throws UserManagerException {
+  public Group createGroup(Group group) throws UserManagerException {
     identityDao.createGroup(group);
+    return merge(group);
   }
 
   @Override
   public boolean deleteGroup(Group group) throws UserManagerException {
     return identityDao.deleteGroup(group);
+  }
+
+  @Override
+  public boolean updatePermissions(Group group) throws UserManagerException {
+    return identityDao.updatePermissions(group);
+  }
+
+  @Override
+  public void createMembership(Group group, Identity identity) throws UserManagerException {
+    identityDao.createMembership(group, identity);
+  }
+
+  @Override
+  public void deleteMembership(Group group, Identity identity) throws UserManagerException {
+    identityDao.deleteMembership(group, identity);
+  }
+
+  @Override
+  public <T extends Identity> T merge(T identity) {
+    return identityDao.merge(identity);
   }
 
 }

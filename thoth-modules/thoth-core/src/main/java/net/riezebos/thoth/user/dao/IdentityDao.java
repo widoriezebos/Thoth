@@ -61,12 +61,12 @@ public class IdentityDao implements CacheListener {
       for (Identity identity : allIdentities)
         identityMap.put(identity.getId(), identity);
 
-      try (Connection connection = thothDB.getConnection()) {
-        for (Group group : groups) {
+      try (Connection connection = thothDB.getConnection();
           SqlStatement permissionStmt = new SqlStatement(connection,
               "select memb.iden_id " + //
                   "from thoth_memberships memb " + //
-                  "where memb.grou_id = :groupId");
+                  "where memb.grou_id = :groupId")) {
+        for (Group group : groups) {
           permissionStmt.set("groupId", group.getId());
           try (ResultSet permRs = permissionStmt.executeQuery()) {
             while (permRs.next()) {
@@ -101,8 +101,9 @@ public class IdentityDao implements CacheListener {
     }
   }
 
-  public void createUser(User user) throws UserManagerException {
+  public User createUser(User user) throws UserManagerException {
     userDao.createUser(user);
+    return merge(user);
   }
 
   public boolean updateUser(User user) throws UserManagerException {
@@ -113,12 +114,30 @@ public class IdentityDao implements CacheListener {
     return userDao.deleteUser(user);
   }
 
-  public void createGroup(Group group) throws UserManagerException {
+  public Group createGroup(Group group) throws UserManagerException {
     groupDao.createGroup(group);
+    return merge(group);
   }
 
   public boolean deleteGroup(Group group) throws UserManagerException {
     return groupDao.deleteGroup(group);
+  }
+
+  public boolean updatePermissions(Group group) throws UserManagerException {
+    return groupDao.updatePermissions(group);
+  }
+
+  public void createMembership(Group group, Identity identity) throws UserManagerException {
+    groupDao.createMembership(group, identity);
+  }
+
+  public void deleteMembership(Group group, Identity identity) throws UserManagerException {
+    groupDao.deleteMembership(group, identity);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Identity> T merge(T identity) {
+    return (T) identitiesWrapper.value.get(identity.getIdentifier());
   }
 
 }

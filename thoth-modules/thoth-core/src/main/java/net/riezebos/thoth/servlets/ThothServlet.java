@@ -141,7 +141,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     }
     try {
       response.setContentType(errorPageCommand.getContentType(getParameters(request)));
-      errorPageCommand.execute(getCurrentUser(), context, path, parameters, skin, response.getOutputStream());
+      errorPageCommand.execute(getCurrentIdentity(), context, path, parameters, skin, response.getOutputStream());
     } catch (RenderException e1) {
       // Well if this fails; we leave it up to the container. Let's throw new original exception
       // But we still want to know what failed on the error page; so:
@@ -231,7 +231,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       long ms = System.currentTimeMillis();
       Renderer renderer = getRenderer(request.getParameter("output"));
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      RenderResult renderResult = renderer.execute(getCurrentUser(), getContext(request), getPath(request), getParameters(request), getSkin(request), bos);
+      RenderResult renderResult = renderer.execute(getCurrentIdentity(), getContext(request), getPath(request), getParameters(request), getSkin(request), bos);
       String requestURI = request.getRequestURI();
       switch (renderResult) {
       case NOT_FOUND:
@@ -275,7 +275,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     if (StringUtils.isBlank(context) || getConfiguration().isValidContext(context)) {
       Map<String, Object> parameters = getParameters(request);
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      RenderResult renderResult = command.execute(getCurrentUser(), context, getPath(request), parameters, getSkin(request), bos);
+      RenderResult renderResult = command.execute(getCurrentIdentity(), context, getPath(request), parameters, getSkin(request), bos);
 
       switch (renderResult) {
       case OK:
@@ -304,7 +304,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     if (getConfiguration().isValidContext(contextName)) {
       ContentManager contentManager = getThothEnvironment().getContentManager(contextName);
       AccessManager accessManager = contentManager.getAccessManager();
-      boolean hasPermission = accessManager.hasPermission(getCurrentUser(), path, Permission.READ_RESOURCE);
+      boolean hasPermission = accessManager.hasPermission(getCurrentIdentity(), path, Permission.READ_RESOURCE);
       if (!hasPermission) {
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
       } else {

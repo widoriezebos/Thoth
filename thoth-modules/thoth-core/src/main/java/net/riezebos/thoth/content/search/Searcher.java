@@ -48,8 +48,8 @@ import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.SearchException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.util.DocumentNode;
+import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
-import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.util.PagedList;
 import net.riezebos.thoth.util.ThothCoreUtil;
 import net.riezebos.thoth.util.ThothUtil;
@@ -62,7 +62,7 @@ public class Searcher {
     this.contentManager = contentManager;
   }
 
-  public PagedList<SearchResult> search(User user, String queryExpression, int pageNumber, int pageSize) throws SearchException {
+  public PagedList<SearchResult> search(Identity identity, String queryExpression, int pageNumber, int pageSize) throws SearchException {
     try {
       IndexReader reader = getIndexReader(contentManager);
       IndexSearcher searcher = getIndexSearcher(reader);
@@ -70,7 +70,7 @@ public class Searcher {
 
       // We might need to restrict the results to books of the user does not have access to fragments:
       AccessManager accessManager = contentManager.getAccessManager();
-      boolean booksOnly = !accessManager.hasPermission(user, "", Permission.READ_FRAGMENTS);
+      boolean booksOnly = !accessManager.hasPermission(identity, "", Permission.READ_FRAGMENTS);
       if (booksOnly) {
         queryExpression = Indexer.INDEX_TYPE + ":" + Indexer.TYPE_DOCUMENT + " AND (" + queryExpression + ")";
       }

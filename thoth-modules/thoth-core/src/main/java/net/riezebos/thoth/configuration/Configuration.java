@@ -323,11 +323,11 @@ public interface Configuration extends Cloneable {
   int getAutoReloadInterval();
 
   /**
-   * Returns the name of the (anonymous) user. Will be replaced by proper user management in a future release
+   * Returns the name of the group for the anonymous user.
    * 
    * @return
    */
-  String getDefaultUser();
+  String getDefaultGroup();
   
   /**
    * Returns the type of database to use for persistent storage. Use 'embedded' if you want to use the built-in database.

@@ -1,6 +1,6 @@
 -- Create the tables
 create table thoth_identities (id bigint not null, identifier varchar(80) not null, primary key (id));
-create table thoth_users (id bigint not null, passwordhash varchar(200), emailaddress varchar(80), firstname varchar(80), lastname varchar(80), primary key (id));
+create table thoth_users (id bigint not null, passwordhash varchar(200), emailaddress varchar(80), firstname varchar(80), lastname varchar(80), blocked int not null, primary key (id));
 create table thoth_groups (id bigint not null, primary key (id));
 create table thoth_memberships (id bigint not null, grou_id bigint not null, iden_id bigint not null, primary key (id));
 create table thoth_permissions (id bigint not null, grou_id bigint not null, permission int not null, primary key (id));
@@ -41,7 +41,7 @@ insert into thoth_groups(id) values (3);
 
 -- Create administrator user
 insert into thoth_identities(id, identifier) values (4, 'administrator');
-insert into thoth_users(id, passwordhash) values (4, null);
+insert into thoth_users(id, passwordhash, blocked) values (4, 'VjSeugliQN3mnYmSOJ95RAgE2Mz4g8JcRbK6QbeTxSdM+rD20rP5FhUf0OJdgYQ/', 0);
 
 -- Make administrator member of administrators
 insert into thoth_memberships(id, grou_id, iden_id) values (1, 1, 4);

@@ -65,6 +65,7 @@ import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.renderers.Renderer;
+import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.user.UserManager;
 import net.riezebos.thoth.util.ThothUtil;
@@ -79,7 +80,12 @@ public class ThothTestBase {
     ThothEnvironment thothEnvironment = new ThothEnvironment();
     Configuration mockedConfiguration = mockConfiguration(contextName);
     thothEnvironment.setConfiguration(mockedConfiguration);
+    thothEnvironment.setUserManager(getTestUserManager());
     return thothEnvironment;
+  }
+
+  protected UserManager getTestUserManager() {
+    return new TestUserManager();
   }
 
   protected ContentManager createTestContentManager(ThothEnvironment thothEnvironment, String contextName) throws IOException, ContentManagerException {
@@ -89,7 +95,8 @@ public class ThothTestBase {
     thothEnvironment.registerContentManager(contentManager);
     contentManager.setCacheManager(new TestCacheManager(contentManager));
     AccessManager lenientAccessManager = new AccessManager(contentManager) {
-      public boolean hasPermission(User user, String path, net.riezebos.thoth.user.Permission requestedPermission) {
+      @Override
+      public boolean hasPermission(Identity identity, String path, net.riezebos.thoth.user.Permission requestedPermission) {
         return true;
       };
     };
@@ -155,7 +162,11 @@ public class ThothTestBase {
     when(mockedConfiguration.getMainIndexSkinContext()).thenReturn(contextName);
     when(mockedConfiguration.getContexts()).thenReturn(Arrays.asList(contextName));
     when(mockedConfiguration.addNewlineBeforeheader()).thenReturn(true);
-    when(mockedConfiguration.getDefaultUser()).thenReturn("administrator");
+    when(mockedConfiguration.getDefaultGroup()).thenReturn("administrators");
+    when(mockedConfiguration.getDatabaseUser()).thenReturn("thoth");
+    when(mockedConfiguration.getDatabasePassword()).thenReturn("thoth");
+    when(mockedConfiguration.getDatabaseUrl()).thenReturn("/some/workspace/db");
+    when(mockedConfiguration.getDatabaseType()).thenReturn("embedded");
     return mockedConfiguration;
   }
 

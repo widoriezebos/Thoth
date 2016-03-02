@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.util.ThothUtil;
 
-public class SqlStatement {
+public class SqlStatement implements AutoCloseable {
   final static String seps = ",<>%* ()-+=[]{};:'\"/|\t\r\n";
   private static final Logger LOG = LoggerFactory.getLogger(SqlStatement.class);
 
@@ -53,11 +53,6 @@ public class SqlStatement {
   private ResultSetMetaData metaData = null;
   private ResultSet resultSet = null;
   private HashMap<String, Object> parameterValues = new HashMap<String, Object>();
-  private int timeOutTime = 0;
-  private boolean commitAllowed = true;
-  private boolean batchupdateEnabled = false;
-  private int maxBatchSize = 0;
-  private int currentBatchSize = 0;
 
   public SqlStatement(Connection connection, String stmt) throws SQLException {
     setConnection(connection);
@@ -161,8 +156,8 @@ public class SqlStatement {
       if (getStatement() != null) {
         try {
           getStatement().close();
-        } catch (SQLException sss) {
-          sss.printStackTrace();
+        } catch (SQLException e) {
+          LOG.error(e.getMessage(), e);
         }
       }
       setStatement(getConnection().prepareStatement(getParsedSql()));
@@ -173,14 +168,6 @@ public class SqlStatement {
 
     setMetaData(null);
     setResultSet(null);
-  }
-
-  public void setCommitAllowed(boolean b) {
-    commitAllowed = b;
-  }
-
-  public boolean isCommitAllowed() {
-    return commitAllowed;
   }
 
   public String fancyStmt() {
@@ -214,20 +201,6 @@ public class SqlStatement {
     return (stmt.trim());
   }
 
-  public int[] executeBatch() throws SQLException {
-    return getStatement().executeBatch();
-  }
-
-  public int flushBatch() throws SQLException {
-    if (isBatchupdateEnabled()) {
-      if (getCurrentBatchSize() > 0) {
-        setCurrentBatchSize(getMaxBatchSize() + 1);
-        return executeUpdate();
-      }
-    }
-    return 0;
-  }
-
   public int executeUpdate() throws SQLException {
     LOG.debug("Execute:\n" + getOriginalStmt());
 
@@ -237,36 +210,8 @@ public class SqlStatement {
       test = getSql().substring(0, 20).trim().toLowerCase();
     }
 
-    if (test.startsWith("commit")) {
-      if (!isCommitAllowed())
-        throw new SQLException("Commit not allowed");
-      getStatement().executeBatch();
-      getConnection().commit();
-      return 0;
-    }
-    if (test.startsWith("rollback")) {
-      getConnection().rollback();
-      return 0;
-    }
-
     try {
-      if (isBatchupdateEnabled()) {
-        if (getCurrentBatchSize() >= getMaxBatchSize()) {
-          int c[] = getStatement().executeBatch();
-          setCurrentBatchSize(0);
-          int total = 0;
-          for (int i = 0; i < c.length; i++) {
-            total += c[i];
-          }
-          return total;
-        } else {
-          getStatement().addBatch();
-          setCurrentBatchSize(getCurrentBatchSize() + 1);
-          return 1;
-        }
-      } else {
-        return getStatement().executeUpdate();
-      }
+      return getStatement().executeUpdate();
     } catch (SQLException x) {
       // This might be just a warning: no records hit.
       // In this case ignore the exception and return 0
@@ -297,8 +242,6 @@ public class SqlStatement {
     getStatement().close();
   }
 
-  // void setAsciiStream(int parameterIndex, java.io.InputStream x, int length)
-  // throws SQLException;
   public void setAsciiStream(String paramName, InputStream ips, int len) throws SQLException {
     storeParameterValue(paramName, ips);
     int i = 1;
@@ -348,40 +291,6 @@ public class SqlStatement {
       throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
   }
 
-  public void setBoolean(String paramName, boolean b) throws SQLException {
-    storeParameterValue(paramName, new Boolean(b));
-    LOG.debug(paramName + "=" + b);
-    int i = 1;
-    boolean doneOne = false;
-    Iterator<String> it = getParameters().iterator();
-    while (it.hasNext()) {
-      if (it.next().equalsIgnoreCase(paramName)) {
-        getStatement().setBoolean(i, b);
-        doneOne = true;
-      }
-      i++;
-    }
-    if (!doneOne)
-      throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
-  }
-
-  public void setByte(String paramName, byte b) throws SQLException {
-    storeParameterValue(paramName, new Byte(b));
-    LOG.debug(paramName + "=" + b);
-    int i = 1;
-    boolean doneOne = false;
-    Iterator<String> it = getParameters().iterator();
-    while (it.hasNext()) {
-      if (it.next().equalsIgnoreCase(paramName)) {
-        getStatement().setByte(i, b);
-        doneOne = true;
-      }
-      i++;
-    }
-    if (!doneOne)
-      throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
-  }
-
   public void setBytes(String paramName, byte[] b) throws SQLException {
     storeParameterValue(paramName, b);
     LOG.debug(paramName + "=" + b);
@@ -416,40 +325,6 @@ public class SqlStatement {
     while (it.hasNext()) {
       if (it.next().equalsIgnoreCase(paramName)) {
         getStatement().setDate(i, d);
-        doneOne = true;
-      }
-      i++;
-    }
-    if (!doneOne)
-      throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
-  }
-
-  public void setDouble(String paramName, double d) throws SQLException {
-    storeParameterValue(paramName, new Double(d));
-    LOG.debug(paramName + "=" + d);
-    int i = 1;
-    boolean doneOne = false;
-    Iterator<String> it = getParameters().iterator();
-    while (it.hasNext()) {
-      if (it.next().equalsIgnoreCase(paramName)) {
-        getStatement().setDouble(i, d);
-        doneOne = true;
-      }
-      i++;
-    }
-    if (!doneOne)
-      throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
-  }
-
-  public void setFloat(String paramName, float f) throws SQLException {
-    storeParameterValue(paramName, new Float(f));
-    LOG.debug(paramName + "=" + f);
-    int i = 1;
-    boolean doneOne = false;
-    Iterator<String> it = getParameters().iterator();
-    while (it.hasNext()) {
-      if (it.next().equalsIgnoreCase(paramName)) {
-        getStatement().setFloat(i, f);
         doneOne = true;
       }
       i++;
@@ -509,74 +384,6 @@ public class SqlStatement {
       throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
   }
 
-  public void setObject(String paramName, Object o) throws SQLException {
-    storeParameterValue(paramName, o);
-    LOG.debug(paramName + "=(Object)" + o);
-    int i = 1;
-    boolean doneOne = false;
-    Iterator<String> it = getParameters().iterator();
-    while (it.hasNext()) {
-      if (it.next().equalsIgnoreCase(paramName)) {
-        getStatement().setObject(i, o);
-        doneOne = true;
-      }
-      i++;
-    }
-    if (!doneOne)
-      throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
-  }
-
-  public void setObject(String paramName, Object o, int targetSQLType) throws SQLException {
-    storeParameterValue(paramName, o);
-    LOG.debug(paramName + "=(Object)" + o);
-    int i = 1;
-    boolean doneOne = false;
-    Iterator<String> it = getParameters().iterator();
-    while (it.hasNext()) {
-      if (it.next().equalsIgnoreCase(paramName)) {
-        getStatement().setObject(i, o, targetSQLType);
-        doneOne = true;
-      }
-      i++;
-    }
-    if (!doneOne)
-      throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
-  }
-
-  public void setObject(String paramName, Object o, int targetSQLType, int scale) throws SQLException {
-    storeParameterValue(paramName, o);
-    LOG.debug(paramName + "=(Object)" + o);
-    int i = 1;
-    boolean doneOne = false;
-    Iterator<String> it = getParameters().iterator();
-    while (it.hasNext()) {
-      if (it.next().equalsIgnoreCase(paramName)) {
-        getStatement().setObject(i, o, targetSQLType, scale);
-        doneOne = true;
-      }
-      i++;
-    }
-    if (!doneOne)
-      throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
-  }
-
-  public void setShort(String paramName, short s) throws SQLException {
-    storeParameterValue(paramName, new Short(s));
-    LOG.debug(paramName + "=" + s);
-    int i = 1;
-    boolean doneOne = false;
-    Iterator<String> it = getParameters().iterator();
-    while (it.hasNext()) {
-      if (it.next().equalsIgnoreCase(paramName)) {
-        getStatement().setShort(i, s);
-        doneOne = true;
-      }
-      i++;
-    }
-    if (!doneOne)
-      throw new SQLException("Parameter " + paramName + " not found in " + fancyStmt());
-  }
-
   public void set(String paramName, Object v) throws SQLException {
     if (v == null)
       setString(paramName, null);
@@ -588,14 +395,6 @@ public class SqlStatement {
       setLong(paramName, ((Long) v).longValue());
     else if (v instanceof BigDecimal)
       setBigDecimal(paramName, (BigDecimal) v);
-    else if (v instanceof Double)
-      setDouble(paramName, ((Double) v).doubleValue());
-    else if (v instanceof Short)
-      setDouble(paramName, ((Short) v).shortValue());
-    else if (v instanceof Float)
-      setFloat(paramName, ((Float) v).floatValue());
-    else if (v instanceof Boolean)
-      setBoolean(paramName, ((Boolean) v).booleanValue());
     else if (v instanceof Date)
       setDate(paramName, (Date) v);
     else if (v instanceof Time)
@@ -799,38 +598,6 @@ public class SqlStatement {
 
   public Object getParamValue(String paramName) {
     return getParameterValues().get(paramName.toLowerCase());
-  }
-
-  public boolean isBatchupdateEnabled() {
-    return batchupdateEnabled;
-  }
-
-  public void setBatchupdateEnabled(boolean batchupdateEnabled) {
-    this.batchupdateEnabled = batchupdateEnabled;
-  }
-
-  public int getMaxBatchSize() {
-    return maxBatchSize;
-  }
-
-  public void setMaxBatchSize(int maxBatchSize) {
-    this.maxBatchSize = maxBatchSize;
-  }
-
-  private int getCurrentBatchSize() {
-    return currentBatchSize;
-  }
-
-  private void setCurrentBatchSize(int currentBatchSize) {
-    this.currentBatchSize = currentBatchSize;
-  }
-
-  protected int getTimeOutTime() {
-    return timeOutTime;
-  }
-
-  protected void setTimeOutTime(int timeOutTime) {
-    this.timeOutTime = timeOutTime;
   }
 
   protected String getParsedSql() {

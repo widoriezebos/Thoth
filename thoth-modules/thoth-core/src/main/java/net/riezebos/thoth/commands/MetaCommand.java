@@ -31,8 +31,8 @@ import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.markdown.util.DocumentNode;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
+import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
-import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class MetaCommand extends RendererBase implements Command {
@@ -46,13 +46,13 @@ public class MetaCommand extends RendererBase implements Command {
     return "meta";
   }
 
-  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException {
 
     try {
       RenderResult result = RenderResult.OK;
       ContentManager contentManager = getContentManager(context);
-      if (!contentManager.getAccessManager().hasPermission(user, path, Permission.META))
+      if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.META))
         return RenderResult.FORBIDDEN;
 
       MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));

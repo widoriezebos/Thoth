@@ -14,15 +14,19 @@
  */
 package net.riezebos.thoth.user;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class User extends Identity {
-
+public class User extends Identity implements Cloneable {
+  private static final long serialVersionUID = 1L;
+  public static final String ADMINISTRATOR = "administrator";
   private String passwordhash;
   private String emailaddress;
   private String firstname;
   private String lastname;
+  private boolean blocked;
+  private Set<Permission> cachedEffectivePermissions = null;
 
   public User(String identifier) {
     super(identifier);
@@ -32,19 +36,27 @@ public class User extends Identity {
     super(id, identifier);
   }
 
-  public Set<Permission> getPermissions() {
-    Set<Permission> result = new HashSet<>();
-    for (Group group : getMemberships())
-      result.addAll(group.getPermissions());
+  @Override
+  public User clone() {
+    User result = (User) super.clone();
     return result;
+  }
+
+  public Set<Permission> getPermissions() {
+    if (cachedEffectivePermissions == null) {
+      Set<Permission> permissions = new HashSet<>();
+      if (ADMINISTRATOR.equals(getIdentifier()))
+        permissions.addAll(Arrays.asList(Permission.values()));
+      else
+        for (Group group : getMemberships())
+          permissions.addAll(group.getPermissions());
+      cachedEffectivePermissions = permissions;
+    }
+    return cachedEffectivePermissions;
   }
 
   public boolean isAllowed(Permission permission) {
     return getPermissions().contains(permission);
-  }
-
-  public void setPasswordhash(String passwordhash) {
-    this.passwordhash = passwordhash;
   }
 
   public void setEmailaddress(String emailaddress) {
@@ -63,6 +75,15 @@ public class User extends Identity {
     return passwordhash;
   }
 
+  public void setPasswordhash(String passwordhash) {
+    this.passwordhash = passwordhash;
+  }
+
+  public void setPassword(String clearTextPassword) {
+    PasswordUtil util = new PasswordUtil();
+    this.passwordhash = util.encodePassword(clearTextPassword);
+  }
+
   public String getEmailaddress() {
     return emailaddress;
   }
@@ -75,4 +96,15 @@ public class User extends Identity {
     return lastname;
   }
 
+  public boolean isBlocked() {
+    return blocked;
+  }
+
+  public void setBlocked(boolean blocked) {
+    this.blocked = blocked;
+  }
+
+  public Set<Permission> getEffectivePermissions() {
+    return getPermissions();
+  }
 }

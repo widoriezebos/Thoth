@@ -1,7 +1,7 @@
 package net.riezebos.thoth.content;
 
+import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
-import net.riezebos.thoth.user.User;
 
 public class AccessManager {
 
@@ -15,10 +15,10 @@ public class AccessManager {
     return contentManager;
   }
 
-  public boolean hasPermission(User user, String path, Permission requestedPermission) {
-    if (user == null)
+  public boolean hasPermission(Identity identity, String path, Permission requestedPermission) {
+    if (identity == null)
       return false;
 
-    return user.getPermissions().contains(requestedPermission);
+    return identity.getEffectivePermissions().contains(requestedPermission);
   }
 }

@@ -28,8 +28,8 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
+import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
-import net.riezebos.thoth.user.User;
 
 public class BrowseCommand extends RendererBase implements Command {
 
@@ -42,12 +42,12 @@ public class BrowseCommand extends RendererBase implements Command {
     return "browse";
   }
 
-  public RenderResult execute(User user, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException {
 
     try {
       ContentManager contentManager = getContentManager(context);
-      if (!contentManager.getAccessManager().hasPermission(user, path, Permission.BROWSE))
+      if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.BROWSE))
         return RenderResult.FORBIDDEN;
       RenderResult result = RenderResult.OK;
       List<ContentNode> contentNodes = contentManager.list(path);

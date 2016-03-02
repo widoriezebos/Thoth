@@ -41,6 +41,8 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.renderers.Renderer;
+import net.riezebos.thoth.user.Group;
+import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
 import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.user.UserManager;
@@ -68,11 +70,14 @@ public abstract class ServletBase extends HttpServlet {
    * 
    * @return
    */
-  public User getCurrentUser() {
+  public Identity getCurrentIdentity() {
+    return getDefaultGroup();
+  }
+
+  protected Group getDefaultGroup() {
     try {
       UserManager userManager = getThothEnvironment().getUserManager();
-      String identifier = getConfiguration().getDefaultUser();
-      return userManager.getUser(identifier);
+      return userManager.getGroup(getConfiguration().getDefaultGroup());
     } catch (UserManagerException e) {
       LOG.error(e.getMessage(), e);
       return null;
@@ -228,9 +233,9 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(contextName));
 
     Set<String> permissions = new HashSet<>();
-    User currentUser = getCurrentUser();
-    if (currentUser != null) {
-      for (Permission permission : currentUser.getPermissions())
+    Identity identity = getCurrentIdentity();
+    if (identity != null) {
+      for (Permission permission : identity.getEffectivePermissions())
         permissions.add(String.valueOf(permission));
     }
     result.put(Renderer.PERMISSIONS, permissions);
