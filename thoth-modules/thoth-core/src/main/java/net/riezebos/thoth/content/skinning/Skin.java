@@ -114,6 +114,10 @@ public class Skin extends PropertyLoader {
     return getPathProperty("template.contextindex");
   }
 
+  public String getLoginTemplate() {
+    return getPathProperty("template.login");
+  }
+
   public String getMetaInformationTemplate() {
     return getPathProperty("template.meta");
   }
@@ -132,6 +136,10 @@ public class Skin extends PropertyLoader {
 
   public String getBrowseTemplate() {
     return getPathProperty("template.browse");
+  }
+
+  public String getManageUsersTemplate() {
+    return getPathProperty("template.manageusers");
   }
 
   public String getErrorTemplate() {

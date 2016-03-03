@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
@@ -94,7 +95,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
     this.commandLine = commandLine;
   }
 
-  public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException {
     try {
       Configuration configuration = getConfiguration();
@@ -112,7 +113,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
       if (renderer == this)
         throw new IllegalArgumentException("Cannot have the source of a custom renderer pointing to itself");
 
-      RenderResult rawRenderResult = renderer.execute(identity, context, path, arguments, skin, sourceBytes);
+      RenderResult rawRenderResult = renderer.execute(identity, context, path, operation, arguments, skin, sourceBytes);
       if (rawRenderResult != RenderResult.OK)
         return rawRenderResult;
 

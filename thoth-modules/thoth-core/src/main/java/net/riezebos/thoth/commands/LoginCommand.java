@@ -15,56 +15,67 @@
 package net.riezebos.thoth.commands;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.riezebos.thoth.configuration.ThothEnvironment;
-import net.riezebos.thoth.content.AccessManager;
-import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RenderResult;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.user.Identity;
-import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
 
-public class IndexCommand extends RendererBase implements Command {
+public class LoginCommand extends RendererBase implements Command {
 
-  public IndexCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+  public static final String USER_ARGUMENT = "user";
+
+  public LoginCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
     super(thothEnvironment, rendererProvider);
   }
 
   @Override
   public String getTypeCode() {
-    return "index";
+    return "login";
   }
 
   public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {
-      RenderResult result = RenderResult.OK;
-      List<String> contexts = new ArrayList<String>();
-
-      for (String ctxt : getThothEnvironment().getConfiguration().getContexts()) {
-        ContentManager contentManager = getThothEnvironment().getContentManager(ctxt);
-        AccessManager accessManager = contentManager.getAccessManager();
-        if (accessManager.hasPermission(identity, "/", Permission.ACCESS))
-          contexts.add(ctxt);
-      }
 
       Map<String, Object> variables = new HashMap<>(arguments);
-      variables.put("contexts", contexts);
+      User user = null;
 
-      if (asJson(arguments))
-        executeJson(variables, outputStream);
-      else {
-        String indexTemplate = skin.getIndexTemplate();
-        String context = contexts.isEmpty() ? null : contexts.get(0);
-        renderTemplate(indexTemplate, context, variables, outputStream);
+      RenderResult result = RenderResult.OK;
+      String message = null;
+      boolean loggedin = false;
+      if (operation.equals(CommandOperation.POST)) {
+
+        String username = (String) arguments.get("username");
+        String password = (String) arguments.get("password");
+
+        user = getThothEnvironment().getUserManager().getUser(username);
+        if (user != null) {
+          loggedin = user.isValidPassword(password);
+        }
+        if (!loggedin)
+          message = "Invalid username and/or password.";
       }
+      variables.put("message", message);
+      if (!loggedin) {
+        if (asJson(arguments))
+          executeJson(variables, outputStream);
+        else {
+          String loginTemplate = skin.getLoginTemplate();
+          renderTemplate(loginTemplate, null, variables, outputStream);
+        }
+      } else {
+        Map<String, Object> args = new HashMap<>();
+        args.put(USER_ARGUMENT, user);
+        result = RenderResult.LOGGED_IN(args);
+      }
+
       return result;
     } catch (Exception e) {
       throw new RenderException(e);

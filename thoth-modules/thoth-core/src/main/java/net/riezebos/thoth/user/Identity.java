@@ -83,4 +83,8 @@ public abstract class Identity implements Cloneable, Serializable {
     return getIdentifier();
   }
 
+  public String getDescription() {
+    return getIdentifier();
+  }
+
 }

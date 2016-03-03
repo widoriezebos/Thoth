@@ -15,6 +15,7 @@
 package net.riezebos.thoth.commands;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,43 +24,54 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
-import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.renderers.RenderResult;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
+import net.riezebos.thoth.user.Group;
 import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
+import net.riezebos.thoth.user.UserManager;
 
-public class ValidationReportCommand extends RendererBase implements Command {
+public class ManageUsersCommand extends RendererBase implements Command {
 
-  public ValidationReportCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+  public ManageUsersCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
     super(thothEnvironment, rendererProvider);
   }
 
   @Override
   public String getTypeCode() {
-    return "validationreport";
+    return "manageusers";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
     try {
-      ContentManager contentManager = getContentManager(context);
-      if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.VALIDATE))
+      RenderResult result = RenderResult.OK;
+      ContentManager contentManager = getContentManager(contextName);
+      if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.MANAGE_USERS))
         return RenderResult.FORBIDDEN;
-      List<ProcessorError> errors = contentManager.getValidationErrors();
 
       Map<String, Object> variables = new HashMap<>(arguments);
-      variables.put("errors", errors);
+
+      UserManager userManager = getThothEnvironment().getUserManager();
+      List<User> users = userManager.listUsers();
+      List<Group> groups = userManager.listGroups();
+      List<Identity> identities = new ArrayList<Identity>();
+      identities.addAll(users);
+      identities.addAll(groups);
+
+      variables.put("users", users);
+      variables.put("groups", groups);
+      variables.put("identities", identities);
 
       if (asJson(arguments))
         executeJson(variables, outputStream);
       else {
-        String validationTemplate = skin.getValidationTemplate();
-        renderTemplate(validationTemplate, context, variables, outputStream);
+        String manageUsersTemplate = skin.getManageUsersTemplate();
+        renderTemplate(manageUsersTemplate, null, variables, outputStream);
       }
-
-      return RenderResult.OK;
+      return result;
     } catch (Exception e) {
       throw new RenderException(e);
     }

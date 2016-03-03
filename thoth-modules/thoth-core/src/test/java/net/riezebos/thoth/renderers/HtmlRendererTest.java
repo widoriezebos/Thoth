@@ -24,12 +24,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.renderers.Renderer.RenderResult;
 
 public class HtmlRendererTest extends RendererTest {
 
@@ -45,14 +45,14 @@ public class HtmlRendererTest extends RendererTest {
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Map<String, Object> arguments = getParameters(contentManager, path);
-    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, testSkin, outputStream);
+    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, CommandOperation.GET, arguments, testSkin, outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Fourth.expected.html");
     assertTrue(stringsEqual(expected, result));
     assertEquals("text/html;charset=UTF-8", renderer.getContentType(new HashMap<String, Object>()));
     assertEquals(HtmlRenderer.TYPE, renderer.getTypeCode());
 
-    RenderResult renderResult = renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", arguments, testSkin, outputStream);
+    RenderResult renderResult = renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", CommandOperation.GET, arguments, testSkin, outputStream);
     assertEquals(RenderResult.NOT_FOUND, renderResult);
   }
 
@@ -68,7 +68,7 @@ public class HtmlRendererTest extends RendererTest {
     String path = "/main/Table.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Map<String, Object> arguments = getParameters(contentManager, path);
-    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, getSkin(contentManager), outputStream);
+    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, CommandOperation.GET, arguments, getSkin(contentManager), outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Table.expected.html");
     assertTrue(stringsEqual(expected, result));

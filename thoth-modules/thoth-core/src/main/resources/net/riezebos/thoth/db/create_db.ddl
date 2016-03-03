@@ -32,19 +32,21 @@ create index ix_thoth_memb_iden on thoth_memberships (iden_id);
 create index ix_thoth_memb_grou on thoth_memberships (grou_id);
 
 -- Create groups administators, writers, readers
-insert into thoth_identities(id, identifier) values (1, 'administrators');
+insert into thoth_identities(id, identifier) values (1, 'thoth_administrators');
 insert into thoth_groups(id) values (1);
-insert into thoth_identities(id, identifier) values (2, 'writers');
+insert into thoth_identities(id, identifier) values (2, 'thoth_writers');
 insert into thoth_groups(id) values (2);
-insert into thoth_identities(id, identifier) values (3, 'readers');
+insert into thoth_identities(id, identifier) values (3, 'thoth_readers');
 insert into thoth_groups(id) values (3);
+insert into thoth_identities(id, identifier) values (4, 'thoth_anonymous');
+insert into thoth_groups(id) values (4);
 
 -- Create administrator user
-insert into thoth_identities(id, identifier) values (4, 'administrator');
-insert into thoth_users(id, passwordhash, blocked) values (4, 'VjSeugliQN3mnYmSOJ95RAgE2Mz4g8JcRbK6QbeTxSdM+rD20rP5FhUf0OJdgYQ/', 0);
+insert into thoth_identities(id, identifier) values (10, 'administrator');
+insert into thoth_users(id, passwordhash, blocked) values (10, 'VjSeugliQN3mnYmSOJ95RAgE2Mz4g8JcRbK6QbeTxSdM+rD20rP5FhUf0OJdgYQ/', 0);
 
 -- Make administrator member of administrators
-insert into thoth_memberships(id, grou_id, iden_id) values (1, 1, 4);
+insert into thoth_memberships(id, grou_id, iden_id) values (1, 1, 10);
 
 -- Grant rights to administrators group
 insert into thoth_permissions(id, grou_id, permission) values (1, 1, 1);
@@ -59,6 +61,7 @@ insert into thoth_permissions(id, grou_id, permission) values (9, 1, 9);
 insert into thoth_permissions(id, grou_id, permission) values (10, 1, 10);
 insert into thoth_permissions(id, grou_id, permission) values (11, 1, 11);
 insert into thoth_permissions(id, grou_id, permission) values (12, 1, 12);
+insert into thoth_permissions(id, grou_id, permission) values (13, 1, 13);
 
 -- Grant rights to writers group
 insert into thoth_permissions(id, grou_id, permission) values (30, 2, 1);
@@ -78,8 +81,8 @@ insert into thoth_permissions(id, grou_id, permission) values (51, 3, 2);
 insert into thoth_permissions(id, grou_id, permission) values (52, 3, 4);
 
 -- Set the sequences to the correct value
-insert into thoth_sequences (sequence_name, next_val) values ('thoth_identities', 10);
-insert into thoth_sequences (sequence_name, next_val) values ('thoth_memberships', 10);
+insert into thoth_sequences (sequence_name, next_val) values ('thoth_identities', 20);
+insert into thoth_sequences (sequence_name, next_val) values ('thoth_memberships', 20);
 insert into thoth_sequences (sequence_name, next_val) values ('thoth_permissions', 100);
 insert into thoth_sequences (sequence_name, next_val) values ('thoth_repositories', 1);
 insert into thoth_sequences (sequence_name, next_val) values ('thoth_contexts', 1);

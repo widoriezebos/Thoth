@@ -28,6 +28,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.session.HashSessionIdManager;
+import org.eclipse.jetty.server.session.HashSessionManager;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 
@@ -80,7 +83,15 @@ public class Thoth {
     context.setContextPath("/");
     context.setHandler(handler);
 
-    server.setHandler(context);
+    HashSessionIdManager sessionIdManager = new HashSessionIdManager();
+    server.setSessionIdManager(sessionIdManager);
+
+    HashSessionManager sessionManager = new HashSessionManager();
+    SessionHandler sessionHandler = new SessionHandler(sessionManager);
+    
+    sessionHandler.setHandler(context);
+    
+    server.setHandler(sessionHandler);
 
     println("Setting up content managers...");
     // Warm up the server

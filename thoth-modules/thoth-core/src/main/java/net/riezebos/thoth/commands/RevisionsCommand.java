@@ -26,6 +26,7 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.CommitComparator;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.renderers.RenderResult;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.user.Identity;
@@ -43,7 +44,7 @@ public class RevisionsCommand extends RendererBase implements Command {
     return "revisions";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException {
     try {
       ContentManager contentManager = getContentManager(context);

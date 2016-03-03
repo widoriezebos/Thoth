@@ -69,7 +69,15 @@
     </table>
     
     <br/><br/>
+    #if(${permissions.contains("MANAGE_USERS")})
+      <a href=".?cmd=manageusers">Manage users</a><br/>
+    #end   
     Latest successfull Pull request was at ${refresh}<br/> 
     Currently using skin: ${skin}<br>
+    #if($loggedin)
+      Logged in as $identity. <a href=".?cmd=logout">Log out</a><br/>
+    #else
+      <a href=".?cmd=login">Login</a> <br/>
+    #end
   </body>
 </html>

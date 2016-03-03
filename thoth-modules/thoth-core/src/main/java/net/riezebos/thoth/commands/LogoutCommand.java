@@ -15,7 +15,6 @@
 package net.riezebos.thoth.commands;
 
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 import net.riezebos.thoth.configuration.ThothEnvironment;
@@ -26,29 +25,22 @@ import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.user.Identity;
 
-public class ErrorPageCommand extends RendererBase implements Command {
+public class LogoutCommand extends RendererBase implements Command {
 
-  public ErrorPageCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
+  public static final String USER_ARGUMENT = "user";
+
+  public LogoutCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
     super(thothEnvironment, rendererProvider);
   }
 
-  public static final String COMMAND = "error";
-
   @Override
   public String getTypeCode() {
-    return COMMAND;
+    return "logout";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
 
-    try {
-      RenderResult result = RenderResult.OK;
-      Map<String, Object> variables = new HashMap<>(arguments);
-      renderTemplate(skin.getErrorTemplate(), context, variables, outputStream);
-      return result;
-    } catch (Exception e) {
-      throw new RenderException(e);
-    }
+    return RenderResult.LOGGED_OUT;
   }
 }

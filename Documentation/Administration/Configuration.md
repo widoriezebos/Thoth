@@ -5,6 +5,9 @@ In this section you will find the settings Thoth supports. The configuration of 
 workspacelocation
 : States where the working files of Thoth will be created. This is where Thoth will checkout branches and create search indexes. In principle it is completely safe to delete the entire contents of the workspace (after shutting down Thoth). When Thoth is launched it will automatically recreate the contents of the workspace.
 
+### defaultgroup
+: When not logged in; this group defines the (default) permissions. By default the following groups are defined by Thoth: thoth\_administrators, thoth\_writers, thoth\_readers, thoth\_anonymous. By default administrators can do anything in Thoth, writers can not pull nor reindex nor do user management but basically anything else. Readers can only access books and anonymous has only access to the main index page (so they can login)
+
 ### Repository settings
 Repositories are the source for content. In the case of a Git repository Thoth will pull a branch as the source of the content. In the case of a FileSystem repository nothing will be pulled; the specified location for the repository is then used as-is.
 

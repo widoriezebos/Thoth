@@ -24,11 +24,11 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.renderers.Renderer.RenderResult;
 
 public class RawRendererTest extends RendererTest {
 
@@ -44,7 +44,7 @@ public class RawRendererTest extends RendererTest {
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Map<String, Object> arguments = getParameters(contentManager, path);
-    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, getSkin(contentManager), outputStream);
+    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, CommandOperation.GET, arguments, getSkin(contentManager), outputStream);
     String result = outputStream.toString("UTF-8").trim();
     String expected = getExpected("Fourth.expected.md");
     assertTrue(stringsEqual(expected, result));
@@ -52,7 +52,7 @@ public class RawRendererTest extends RendererTest {
     assertEquals(RawRenderer.TYPE, renderer.getTypeCode());
 
     RenderResult renderResult =
-        renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", arguments, getSkin(contentManager), outputStream);
+        renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", CommandOperation.GET, arguments, getSkin(contentManager), outputStream);
     assertEquals(RenderResult.NOT_FOUND, renderResult);
   }
 

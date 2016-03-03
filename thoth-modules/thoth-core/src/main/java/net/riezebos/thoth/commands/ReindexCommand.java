@@ -25,6 +25,7 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.renderers.RenderResult;
 import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.user.Identity;
@@ -46,7 +47,7 @@ public class ReindexCommand extends RendererBase implements Command {
     return "text/plain;charset=UTF-8";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException {
     try {
       ContentManager contentManager = getContentManager(context);

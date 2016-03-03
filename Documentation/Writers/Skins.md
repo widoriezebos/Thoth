@@ -38,6 +38,9 @@ Of course it does not make any sense to do this because now there is no differen
 	# The velocity template that is used for the Context index
 	template.contextindex=contextindex.tpl
 	
+	# The velocity template that is used for the login page
+	template.login=login.tpl
+	
 	# Template for Markdown rendered pages
 	template.html=html.tpl
 	
@@ -61,6 +64,9 @@ Of course it does not make any sense to do this because now there is no differen
 	# The velocity template that is used for browsing
 	template.browse=browse.tpl
 	
+	# The velocity template that is used for the user management page
+	template.usermanagement=usermanagement.tpl
+	 
 	# The velocity template that is used to display any error 
 	# that occurred during execution
 	template.error=error.tpl
@@ -93,6 +99,8 @@ The following variables are defined for all templates
 - **now** is the current timestamp. Formatted according to the format mask specified by the Configuration. Type: String
 - **refresh** is the timestamp of the latest successful refresh (for version control based repositories). Formatted according to the format mask specified by the Configuration.  Type: String
 - **outputFormats** is the list of supported output formats (html, raw and any custom renderers that are defined in the configuration) Type: List\<String\>
+- **identity** the identifier of the user or group that is currently logged in
+- **userfullname** the full name (first, last) of the user that is currently logged in
 - **permissions** contains a list of permissions the current user is granted. Valid permissions: ACCESS, READ\_BOOKS, READ\_FRAGMENTS, READ\_RESOURCE, BROWSE, DIFF, META, PULL, REINDEX, REVISION, SEARCH, VALIDATE. Type: Set\<String\>
 
 #### Types used for variables
@@ -172,6 +180,11 @@ The index of the context; this is where you would list all the books that are pr
 - **books** contains a list of all books sorted by path Type: List\<Book\>
 - **versioncontrolled** is a boolean that is true when the underlying repository supports version control. Type: boolean
 
+#### template.login
+The template that provides the login page.
+
+- **message** any error message that applies when login failed.
+
 #### template.html
 The template used to render HTML pages.
 
@@ -225,6 +238,12 @@ The template used for browsing the contents of the entire repository.
 
 - **contentNodes** is the list of content nodes for the current folder (path). Type: List\<ContentNode\>
 - **atRoot** is a boolean that will be true if the current page is representing the root of the repository
+
+#### template.usermanagement
+The template used for user management.
+
+- **users** the list of users. Type: List\<User\>
+- **groups** the list of groups. Type: List\<Group\>
 
 #### template.error
 The template used to display Thoth system errors.

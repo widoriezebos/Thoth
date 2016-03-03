@@ -32,20 +32,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
-import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.renderers.Renderer;
-import net.riezebos.thoth.user.Group;
 import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
 import net.riezebos.thoth.user.User;
-import net.riezebos.thoth.user.UserManager;
 import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class ServletBase extends HttpServlet {
@@ -53,7 +50,10 @@ public abstract class ServletBase extends HttpServlet {
   private static final Logger LOG = LoggerFactory.getLogger(ServletBase.class);
   private ThothEnvironment thothEnvironment = null;
 
-  protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException;
+  protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response, CommandOperation operation)
+      throws ServletException, IOException, ContentManagerException;
+
+  abstract protected Identity getCurrentIdentity(HttpServletRequest request);
 
   public ServletBase() {
   }
@@ -63,32 +63,6 @@ public abstract class ServletBase extends HttpServlet {
     super.init();
     if (thothEnvironment == null)
       thothEnvironment = ThothEnvironment.getSharedThothContext();
-  }
-
-  /**
-   * Will be replaced by proper user management in a future release
-   * 
-   * @return
-   */
-  public Identity getCurrentIdentity() {
-    return getDefaultGroup();
-  }
-
-  protected Group getDefaultGroup() {
-    try {
-      UserManager userManager = getThothEnvironment().getUserManager();
-      return userManager.getGroup(getConfiguration().getDefaultGroup());
-    } catch (UserManagerException e) {
-      LOG.error(e.getMessage(), e);
-      return null;
-    }
-  }
-
-  protected boolean accessAllowed(Renderer renderer, User currentUser) {
-    if (currentUser == null)
-      return false;
-
-    return false;
   }
 
   public ThothEnvironment getThothEnvironment() {
@@ -101,17 +75,18 @@ public abstract class ServletBase extends HttpServlet {
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try {
-      handleRequest(request, response);
-    } catch (ContextNotFoundException e) {
-      LOG.info("404 on context of " + request.getRequestURI());
-      response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      handleRequest(request, response, CommandOperation.GET);
     } catch (ContentManagerException | IOException e) {
       handleError(request, response, e);
     }
   }
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    doGet(request, response);
+    try {
+      handleRequest(request, response, CommandOperation.POST);
+    } catch (ContentManagerException | IOException e) {
+      handleError(request, response, e);
+    }
   }
 
   protected void handleError(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
@@ -233,10 +208,15 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(contextName));
 
     Set<String> permissions = new HashSet<>();
-    Identity identity = getCurrentIdentity();
+    Identity identity = getCurrentIdentity(request);
+    result.put(Renderer.LOGGED_IN, identity instanceof User);
     if (identity != null) {
+      result.put(Renderer.IDENTITY, identity.getIdentifier());
+      result.put(Renderer.USER_FULL_NAME, identity.getDescription());
       for (Permission permission : identity.getEffectivePermissions())
         permissions.add(String.valueOf(permission));
+    } else {
+      result.put(Renderer.IDENTITY, "anonymous");
     }
     result.put(Renderer.PERMISSIONS, permissions);
 

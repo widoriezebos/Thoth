@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,10 +37,14 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.commands.BrowseCommand;
 import net.riezebos.thoth.commands.Command;
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.commands.ContextIndexCommand;
 import net.riezebos.thoth.commands.DiffCommand;
 import net.riezebos.thoth.commands.ErrorPageCommand;
 import net.riezebos.thoth.commands.IndexCommand;
+import net.riezebos.thoth.commands.LoginCommand;
+import net.riezebos.thoth.commands.LogoutCommand;
+import net.riezebos.thoth.commands.ManageUsersCommand;
 import net.riezebos.thoth.commands.MetaCommand;
 import net.riezebos.thoth.commands.PullCommand;
 import net.riezebos.thoth.commands.ReindexCommand;
@@ -56,18 +61,25 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.renderers.CustomRenderer;
 import net.riezebos.thoth.renderers.HtmlRenderer;
 import net.riezebos.thoth.renderers.RawRenderer;
+import net.riezebos.thoth.renderers.RenderResult;
 import net.riezebos.thoth.renderers.Renderer;
-import net.riezebos.thoth.renderers.Renderer.RenderResult;
 import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
+import net.riezebos.thoth.user.Group;
+import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.User;
+import net.riezebos.thoth.user.UserManager;
 import net.riezebos.thoth.util.MimeTypeUtil;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class ThothServlet extends ServletBase implements RendererProvider, RendererChangeListener {
+  private static final String SESSION_USER_KEY = "user";
+
   private static final Logger LOG = LoggerFactory.getLogger(ThothServlet.class);
 
   private static final long serialVersionUID = 1L;
@@ -90,19 +102,20 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
   }
 
   @Override
-  protected void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException {
+  protected void handleRequest(HttpServletRequest request, HttpServletResponse response, CommandOperation operation)
+      throws ServletException, IOException, ContentManagerException {
 
     try {
-      if (!handleCommand(request, response)) {
+      if (!handleCommand(request, response, operation)) {
 
         String context = getContext(request);
         String path = getPath(request);
         if (("/" + context).equalsIgnoreCase(ContentManager.NATIVERESOURCES))
           streamClassPathResource(path, request, response);
         else if (StringUtils.isBlank(context) && StringUtils.isBlank(path))
-          handleMainIndex(request, response);
+          handleMainIndex(request, response, operation);
         else if (StringUtils.isBlank(path))
-          executeCommand(contextIndexCommand, request, response);
+          executeCommand(contextIndexCommand, request, response, operation);
         else {
           if (!renderDocument(request, response))
             streamResource(request, response);
@@ -114,14 +127,25 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     }
   }
 
-  protected void handleMainIndex(HttpServletRequest request, HttpServletResponse response) throws RenderException, ServletException, IOException {
+  protected void handleMainIndex(HttpServletRequest request, HttpServletResponse response, CommandOperation operation)
+      throws ServletException, IOException, ContentManagerException {
     Map<String, ContextDefinition> contextDefinitions = getConfiguration().getContextDefinitions();
+    boolean redirected = false;
     if (contextDefinitions.size() == 1) {
+      // Before we get smart and redirect to the one and only context; we should check whether we have access
+      // Because otherwise we will loose any way to log in
+
       ContextDefinition oneAndOnly = contextDefinitions.values().iterator().next();
       String contextName = oneAndOnly.getName();
-      response.sendRedirect("/" + contextName);
-    } else
-      executeCommand(indexCommand, request, response);
+      ContentManager contentManager = getThothEnvironment().getContentManager(contextName);
+      boolean hasPermission = contentManager.getAccessManager().hasPermission(getCurrentIdentity(request), "/", Permission.ACCESS);
+      if (hasPermission) {
+        response.sendRedirect("/" + contextName);
+        redirected = true;
+      }
+    }
+    if (!redirected)
+      executeCommand(indexCommand, request, response, operation);
   }
 
   @Override
@@ -141,7 +165,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     }
     try {
       response.setContentType(errorPageCommand.getContentType(getParameters(request)));
-      errorPageCommand.execute(getCurrentIdentity(), context, path, parameters, skin, response.getOutputStream());
+      errorPageCommand.execute(getCurrentIdentity(request), context, path, CommandOperation.GET, parameters, skin, response.getOutputStream());
     } catch (RenderException e1) {
       // Well if this fails; we leave it up to the container. Let's throw new original exception
       // But we still want to know what failed on the error page; so:
@@ -164,9 +188,12 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     registerCommand(new DiffCommand(thothEnvironment, this));
     registerCommand(indexCommand);
     registerCommand(new MetaCommand(thothEnvironment, this));
+    registerCommand(new LoginCommand(thothEnvironment, this));
+    registerCommand(new LogoutCommand(thothEnvironment, this));
     registerCommand(new PullCommand(thothEnvironment, this));
     registerCommand(new ReindexCommand(thothEnvironment, this));
     registerCommand(new RevisionsCommand(thothEnvironment, this));
+    registerCommand(new ManageUsersCommand(thothEnvironment, this));
     registerCommand(new SearchCommand(thothEnvironment, this));
     registerCommand(new ValidationReportCommand(thothEnvironment, this));
     registerCommand(new BrowseCommand(thothEnvironment, this));
@@ -231,9 +258,10 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       long ms = System.currentTimeMillis();
       Renderer renderer = getRenderer(request.getParameter("output"));
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      RenderResult renderResult = renderer.execute(getCurrentIdentity(), getContext(request), getPath(request), getParameters(request), getSkin(request), bos);
+      RenderResult renderResult = renderer.execute(getCurrentIdentity(request), getContext(request), getPath(request), CommandOperation.GET,
+          getParameters(request), getSkin(request), bos);
       String requestURI = request.getRequestURI();
-      switch (renderResult) {
+      switch (renderResult.getCode()) {
       case NOT_FOUND:
         LOG.info("404 on request " + requestURI);
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -259,25 +287,26 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     return result;
   }
 
-  protected boolean handleCommand(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, ContentManagerException {
+  protected boolean handleCommand(HttpServletRequest request, HttpServletResponse response, CommandOperation operation)
+      throws IOException, ServletException, ContentManagerException {
     Command command = getCommand(request.getParameter("cmd"));
     boolean result = false;
     if (command != null) {
-      executeCommand(command, request, response);
+      executeCommand(command, request, response, operation);
       result = true;
     }
     return result;
   }
 
-  protected void executeCommand(Command command, HttpServletRequest request, HttpServletResponse response)
+  protected void executeCommand(Command command, HttpServletRequest request, HttpServletResponse response, CommandOperation operation)
       throws RenderException, ServletException, IOException {
     String context = getContext(request);
     if (StringUtils.isBlank(context) || getConfiguration().isValidContext(context)) {
       Map<String, Object> parameters = getParameters(request);
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      RenderResult renderResult = command.execute(getCurrentIdentity(), context, getPath(request), parameters, getSkin(request), bos);
+      RenderResult renderResult = command.execute(getCurrentIdentity(request), context, getPath(request), operation, parameters, getSkin(request), bos);
 
-      switch (renderResult) {
+      switch (renderResult.getCode()) {
       case OK:
         // Only now will we touch the response; this to avoid sending stuff out already and then
         // encountering an error. This might complicate error handling (rendering an error page)
@@ -287,6 +316,19 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
         break;
       case FORBIDDEN:
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        break;
+      case LOGGED_OUT:
+        setCurrentUser(request, null);
+        request.getSession().invalidate();
+        response.sendRedirect(request.getContextPath());
+        break;
+      case LOGGED_IN:
+        User user = renderResult.getArgument(LoginCommand.USER_ARGUMENT);
+        setCurrentUser(request, user);
+        if (StringUtils.isBlank(context))
+          response.sendRedirect(request.getContextPath());
+        else
+          response.sendRedirect(getContextUrl(request));
         break;
       default:
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -304,7 +346,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     if (getConfiguration().isValidContext(contextName)) {
       ContentManager contentManager = getThothEnvironment().getContentManager(contextName);
       AccessManager accessManager = contentManager.getAccessManager();
-      boolean hasPermission = accessManager.hasPermission(getCurrentIdentity(), path, Permission.READ_RESOURCE);
+      boolean hasPermission = accessManager.hasPermission(getCurrentIdentity(request), path, Permission.READ_RESOURCE);
       if (!hasPermission) {
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
       } else {
@@ -347,4 +389,34 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     if (mimeType != null)
       response.setContentType(mimeType);
   }
+
+  public Identity getCurrentIdentity(HttpServletRequest request) {
+    HttpSession session = request.getSession(false);
+    Identity result = null;
+    if (session != null)
+      result = (Identity) session.getAttribute(SESSION_USER_KEY);
+    if (result == null)
+      result = getDefaultGroup();
+    return result;
+  }
+
+  public void setCurrentUser(HttpServletRequest request, User user) {
+    HttpSession session = request.getSession(true);
+    session.setAttribute(SESSION_USER_KEY, user);
+  }
+
+  protected Group getDefaultGroup() {
+    try {
+      UserManager userManager = getThothEnvironment().getUserManager();
+      String defaultGroup = getConfiguration().getDefaultGroup();
+      Group group = userManager.getGroup(defaultGroup);
+      if (group == null)
+        LOG.warn("Default group " + defaultGroup + " is not defined.");
+      return group;
+    } catch (UserManagerException e) {
+      LOG.error(e.getMessage(), e);
+      return null;
+    }
+  }
+
 }

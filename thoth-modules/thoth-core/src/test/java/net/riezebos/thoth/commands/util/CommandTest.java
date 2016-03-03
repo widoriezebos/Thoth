@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import net.riezebos.thoth.commands.Command;
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
@@ -43,7 +44,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
     Map<String, Object> arguments = getParameters(contentManager, path);
     if (args != null)
       arguments.putAll(args);
-    command.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, skin, outputStream);
+    command.execute(getCurrentUser(thothEnvironment), contextName, path, CommandOperation.GET, arguments, skin, outputStream);
     String result = outputStream.toString("UTF-8").trim();
     for (String check : htmlExists) {
       boolean condition = result.indexOf(check) != -1;
@@ -55,7 +56,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
     if (jsonExists != null) {
       arguments.put("mode", "json");
       outputStream = new ByteArrayOutputStream();
-      command.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, skin, outputStream);
+      command.execute(getCurrentUser(thothEnvironment), contextName, path, CommandOperation.GET, arguments, skin, outputStream);
       result = outputStream.toString("UTF-8").trim();
       assertTrue(result, result.startsWith("{\"") && result.endsWith("}"));
 

@@ -528,7 +528,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
 
   @Override
   public String getDefaultGroup() {
-    return getValue("defaultgroup", "administrators");
+    return getValue("defaultgroup", "readers");
   }
 
   @Override

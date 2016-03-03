@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -50,7 +51,7 @@ public class CustomRendererTest extends RendererTest {
     String path = "/main/Fourth.md";
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Map<String, Object> arguments = getParameters(contentManager, path);
-    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, arguments, getSkin(contentManager), outputStream);
+    renderer.execute(getCurrentUser(thothEnvironment), contextName, path, CommandOperation.GET, arguments, getSkin(contentManager), outputStream);
     String result = outputStream.toString("UTF-8").trim();
     assertEquals("rendered", result);
     assertEquals(contentType, renderer.getContentType(new HashMap<String, Object>()));

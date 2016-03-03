@@ -25,6 +25,7 @@ import org.pegdown.ast.RootNode;
 import org.pegdown.plugins.PegDownPlugins;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
@@ -51,7 +52,7 @@ public class HtmlRenderer extends RendererBase implements Renderer {
     return "text/html;charset=UTF-8";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException {
     try {
 

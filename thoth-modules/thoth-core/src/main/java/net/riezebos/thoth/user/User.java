@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class User extends Identity implements Cloneable {
   private static final long serialVersionUID = 1L;
   public static final String ADMINISTRATOR = "administrator";
@@ -84,6 +86,11 @@ public class User extends Identity implements Cloneable {
     this.passwordhash = util.encodePassword(clearTextPassword);
   }
 
+  public boolean isValidPassword(String clearTextPassword) {
+    PasswordUtil util = new PasswordUtil();
+    return util.isValidPassword(clearTextPassword, getPasswordhash());
+  }
+
   public String getEmailaddress() {
     return emailaddress;
   }
@@ -106,5 +113,15 @@ public class User extends Identity implements Cloneable {
 
   public Set<Permission> getEffectivePermissions() {
     return getPermissions();
+  }
+
+  @Override
+  public String getDescription() {
+    String result = StringUtils.isBlank(getFirstname()) ? "" : getFirstname() + " ";
+    result += StringUtils.isBlank(getLastname()) ? "" : getLastname();
+    result = result.trim();
+    if (StringUtils.isBlank(result))
+      result = getIdentifier();
+    return result;
   }
 }

@@ -44,9 +44,9 @@ public class ThothDBTest extends DatabaseTest {
       List<User> users = userManager.listUsers();
 
       User administrator = userManager.getUser("administrator");
-      Group administrators = userManager.getGroup("administrators");
-      Group writers = userManager.getGroup("writers");
-      Group readers = userManager.getGroup("readers");
+      Group administrators = userManager.getGroup("thoth_administrators");
+      Group writers = userManager.getGroup("thoth_writers");
+      Group readers = userManager.getGroup("thoth_readers");
 
       assertTrue(groups.contains(administrators));
       assertTrue(groups.contains(writers));

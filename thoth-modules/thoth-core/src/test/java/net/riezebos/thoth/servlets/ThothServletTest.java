@@ -30,11 +30,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Test;
 
 import net.riezebos.thoth.commands.Command;
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
+import net.riezebos.thoth.renderers.RenderResult;
 import net.riezebos.thoth.testutil.MockServletOutputStream;
 import net.riezebos.thoth.testutil.ThothTestBase;
 import net.riezebos.thoth.user.Identity;
@@ -199,7 +201,7 @@ public class ThothServletTest extends ThothTestBase {
       }
 
       @Override
-      public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+      public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
           throws RenderException {
         throw new RenderException("I was only meant to fail so don't blame me");
       }

@@ -17,6 +17,7 @@ package net.riezebos.thoth.renderers;
 import java.io.OutputStream;
 import java.util.Map;
 
+import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.user.Identity;
@@ -30,6 +31,9 @@ public interface Renderer {
   String TITLE_PARAMETER = "title";
   String BODY_PARAMETER = "body";
   String SKINBASE_PARAMETER = "skinbase";
+  String IDENTITY = "identity";
+  String USER_FULL_NAME = "userfullname";
+  String LOGGED_IN = "loggedin";
   String REFRESH_PARAMETER = "refresh";
   String LIBRARY_ROOT = "libraryroot";
   String LIBRARY_URL = "libraryurl";
@@ -39,15 +43,11 @@ public interface Renderer {
   String OUTPUT_FORMATS = "outputFormats";
   String PERMISSIONS = "permissions";
 
-  public enum RenderResult {
-    OK, NOT_FOUND, FORBIDDEN
-  };
-
   public String getTypeCode();
 
   public String getContentType(Map<String, Object> arguments);
 
-  public RenderResult execute(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
       throws RenderException;
 
 }

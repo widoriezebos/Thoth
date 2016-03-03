@@ -8,8 +8,15 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
   </head>
   <body>
-    <h3>Please select one of the contexts below</h3>
-
+    #if(!$$contexts.isEmpty())
+      <h3>Please select one of the contexts below</h3>
+    #else  
+      #if(!$loggedin)
+        <h3>Welcome to Thoth</h3>
+        Please <a href=".?cmd=login">Login</a> to gain access <br/>
+      #end  
+    #end
+    
     #foreach($context in $contexts)
       <a href="${context}">${context}</a><br/>
     #end	
@@ -23,7 +30,17 @@
     #if(${permissions.contains("REINDEX")})
     Click <a href=".?cmd=reindex">here</a> to force a reindex<br/>
     #end
+    #if(${permissions.contains("MANAGE_USERS")})
+      <a href=".?cmd=manageusers">Manage users</a><br/>
+    #end   
     <br/>
+    #if($loggedin)
+      Logged in as $identity. <a href=".?cmd=logout">Log out</a><br/>
+    #else
+      #if(!$$contexts.isEmpty())
+        <a href=".?cmd=login">Login</a> <br/>
+      #end  
+    #end
     <sub>Powered by Thoth core version ${thothutil.getVersion()}</sub>
   </body>
 </html>

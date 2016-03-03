@@ -14,11 +14,18 @@
  */
 package net.riezebos.thoth.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
 import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.user.Permission;
 
 public class ThothCoreUtil extends ThothUtil {
 
@@ -93,4 +100,19 @@ public class ThothCoreUtil extends ThothUtil {
     return charCount;
   }
 
+  public static List<Permission> sortPermissions(Collection<Permission> unsorted) {
+    List<Permission> result = new ArrayList<>(unsorted);
+    Collections.sort(result, new Comparator<Permission>() {
+
+      @Override
+      public int compare(Permission o1, Permission o2) {
+        return o1.toString().compareTo(o2.toString());
+      }
+    });
+    return result;
+  }
+
+  public static List<Permission> getAllPermissions() {
+    return sortPermissions(Arrays.asList(Permission.values()));
+  }
 }
