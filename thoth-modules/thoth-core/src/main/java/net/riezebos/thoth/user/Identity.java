@@ -29,6 +29,7 @@ public abstract class Identity implements Cloneable, Serializable {
 
   abstract public Set<Permission> getEffectivePermissions();
 
+  @JsonIgnore
   abstract public String getTypeName();
 
   @JsonIgnore

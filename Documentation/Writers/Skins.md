@@ -170,6 +170,19 @@ Most types are basic / simple types like String, List and Integer. The exception
 > long **size**
 > List\<ContentNode\> **children**
 
+##### User
+> String **identifier**
+> String **firstname**
+> String **lastname**
+> Date **blockedUntil**
+> List\<String\> **permissions**
+> List\<String\> **memberOf**
+
+##### Group
+> String **identifier**
+> List\<String\> **permissions**
+> List\<String\> **memberOf**
+
 #### template.index
 The main index template is a special one, because the template itself belongs to a specific repository (context) by it is used for the main index that is not specific to a certain context. The following variables are available:
 

@@ -89,6 +89,7 @@ public class Group extends Identity implements Cloneable {
     return cachedEffectivePermissions;
   }
 
+  @JsonIgnore
   @Override
   public String getTypeName() {
     return "group";
