@@ -30,13 +30,13 @@ delete_group =
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 insert_user =
-    insert into thoth_users(id, passwordhash, emailaddress, firstname, lastname, blocked)
-    values (:id, :passwordhash, :emailaddress, :firstname, :lastname, :blocked)
+    insert into thoth_users(id, passwordhash, emailaddress, firstname, lastname, blockeduntil)
+    values (:id, :passwordhash, :emailaddress, :firstname, :lastname, :blockeduntil)
 ;
 
 select_users =
     select iden.id, iden.identifier, usr.passwordhash, usr.emailaddress,
-           usr.firstname, usr.lastname, usr.blocked
+           usr.firstname, usr.lastname, usr.blockeduntil
     from   thoth_identities as iden, 
            thoth_users as usr
     where  iden.id = usr.id
@@ -48,7 +48,7 @@ update_user =
            emailaddress = :emailaddress,
            firstname    = :firstname,
            lastname     = :lastname,
-           blocked      = :blocked
+           blockeduntil = :blockeduntil
     where  id = :id
 ;
 
@@ -83,7 +83,7 @@ delete_membership_grou_iden =
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 insert_permission =
-    insert into from thoth_permissions(id, grou_id, permission)
+    insert into thoth_permissions(id, grou_id, permission)
     values (:id, :grou_id, :permission)
 ;
 
@@ -95,12 +95,12 @@ select_permissions =
 
 delete_permissions =
     delete from thoth_permissions
-    where  grou_id = :id
+    where  grou_id = :grou_id
 ;
 
 delete_permission =
     delete from thoth_permissions
-    where  grou_id = :id
+    where  grou_id = :grou_id
     and    permission = :permission
 ;
   

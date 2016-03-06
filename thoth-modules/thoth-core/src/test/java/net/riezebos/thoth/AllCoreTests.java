@@ -23,6 +23,7 @@ import net.riezebos.thoth.commands.ContextIndexCommandTest;
 import net.riezebos.thoth.commands.DiffCommandTest;
 import net.riezebos.thoth.commands.ErrorPageCommandTest;
 import net.riezebos.thoth.commands.IndexCommandTest;
+import net.riezebos.thoth.commands.LoginCommandTest;
 import net.riezebos.thoth.commands.MetaCommandTest;
 import net.riezebos.thoth.commands.PullCommandTest;
 import net.riezebos.thoth.commands.ReindexCommandTest;
@@ -68,7 +69,7 @@ import net.riezebos.thoth.util.diff_match_patchTest;
     ValidationReportCommandTest.class, GitContentManagerTest.class, FSContentManagerTest.class, //
     ZipContentManagerTest.class, ThothCoreUtilTest.class, diff_match_patchTest.class, //
     HotReloadableConfigurationTest.class, ThothDBTest.class, PasswordUtilTest.class, DatabaseIdiomFactoryTest.class, //
-    SqlStatementTest.class})
+    SqlStatementTest.class, LoginCommandTest.class})
 
 public class AllCoreTests {
 

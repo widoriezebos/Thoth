@@ -42,6 +42,14 @@ public class BasicUserManager implements UserManager {
   }
 
   @Override
+  public Identity getIdentity(String identifier) throws UserManagerException {
+    if (StringUtils.isBlank(identifier))
+      return null;
+
+    return identityDao.getIdentities().get(identifier);
+  }
+
+  @Override
   public User getUser(String identifier) throws UserManagerException {
     if (StringUtils.isBlank(identifier))
       return null;
@@ -87,8 +95,14 @@ public class BasicUserManager implements UserManager {
   }
 
   @Override
-  public boolean deleteUser(User user) throws UserManagerException {
-    return identityDao.deleteUser(user);
+  public boolean deleteIdentity(Identity identity) throws UserManagerException {
+    if (identity == null)
+      return false;
+    if (identity instanceof User)
+      return identityDao.deleteUser((User) identity);
+    if (identity instanceof Group)
+      return identityDao.deleteGroup((Group) identity);
+    throw new IllegalArgumentException("Unsupported identity type: " + identity.getTypeName());
   }
 
   @Override
@@ -100,11 +114,6 @@ public class BasicUserManager implements UserManager {
   public Group createGroup(Group group) throws UserManagerException {
     identityDao.createGroup(group);
     return merge(group);
-  }
-
-  @Override
-  public boolean deleteGroup(Group group) throws UserManagerException {
-    return identityDao.deleteGroup(group);
   }
 
   @Override
@@ -123,8 +132,7 @@ public class BasicUserManager implements UserManager {
   }
 
   @Override
-  public <T extends Identity> T merge(T identity) {
+  public <T extends Identity> T merge(T identity) throws UserManagerException {
     return identityDao.merge(identity);
   }
-
 }

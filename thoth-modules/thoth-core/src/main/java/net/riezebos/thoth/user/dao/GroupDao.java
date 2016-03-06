@@ -1,3 +1,17 @@
+/* Copyright (c) 2016 W.T.J. Riezebos
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.riezebos.thoth.user.dao;
 
 import java.sql.Connection;
@@ -71,7 +85,7 @@ public class GroupDao extends BaseDao {
 
       int count = 0;
       for (Permission remove : toBeRemoved) {
-        delPermissionStmt.setLong("id", group.getId());
+        delPermissionStmt.setLong("grou_id", group.getId());
         delPermissionStmt.setInt("permission", remove.getValue());
         count += delPermissionStmt.executeUpdate();
       }
@@ -94,13 +108,10 @@ public class GroupDao extends BaseDao {
   public boolean deleteGroup(Group group) throws UserManagerException {
     try (Connection connection = thothDB.getConnection(); //
         SqlStatement memberStmtIden = new SqlStatement(connection, thothDB.getQuery("delete_membership_iden")); //
-        SqlStatement identityStmt = new SqlStatement(connection, thothDB.getQuery("delete_identity")); //
-        SqlStatement memberStmtGrou = new SqlStatement(connection, thothDB.getQuery("delete_memberships_grou")); //
-        SqlStatement userStmt = new SqlStatement(connection, thothDB.getQuery("delete_group")); //
-        SqlStatement deletePermissionsStmt = new SqlStatement(connection, thothDB.getQuery("delete_permissions"))) {
-
-      deletePermissionsStmt.setLong("id", group.getId());
-      deletePermissionsStmt.executeUpdate();
+        SqlStatement memberStmtGrou = new SqlStatement(connection, thothDB.getQuery("delete_membership_grou")); //
+        SqlStatement deletePermissionsStmt = new SqlStatement(connection, thothDB.getQuery("delete_permissions"));
+        SqlStatement groupStmt = new SqlStatement(connection, thothDB.getQuery("delete_group")); //
+        SqlStatement identityStmt = new SqlStatement(connection, thothDB.getQuery("delete_identity"))) {
 
       memberStmtIden.setLong("iden_id", group.getId());
       memberStmtIden.executeUpdate();
@@ -108,8 +119,11 @@ public class GroupDao extends BaseDao {
       memberStmtGrou.setLong("grou_id", group.getId());
       memberStmtGrou.executeUpdate();
 
-      userStmt.setLong("id", group.getId());
-      userStmt.executeUpdate();
+      deletePermissionsStmt.setLong("grou_id", group.getId());
+      deletePermissionsStmt.executeUpdate();
+
+      groupStmt.setLong("id", group.getId());
+      groupStmt.executeUpdate();
 
       int count;
       identityStmt.setLong("id", group.getId());

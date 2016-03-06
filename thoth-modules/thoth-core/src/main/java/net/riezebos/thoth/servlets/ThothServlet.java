@@ -150,6 +150,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
 
   @Override
   protected void handleError(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
+    LOG.error(e.getMessage(), e);
     Command errorPageCommand = getCommand(ErrorPageCommand.COMMAND);
     if (errorPageCommand == null)
       errorPageCommand = new ErrorPageCommand(getThothEnvironment(), this); // Fallback; we should not fail here

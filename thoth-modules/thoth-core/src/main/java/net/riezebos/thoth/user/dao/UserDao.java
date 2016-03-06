@@ -1,9 +1,24 @@
+/* Copyright (c) 2016 W.T.J. Riezebos
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.riezebos.thoth.user.dao;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.riezebos.thoth.configuration.persistence.ThothDB;
@@ -43,7 +58,7 @@ public class UserDao extends BaseDao {
       userStmt.setString("emailaddress", user.getEmailaddress());
       userStmt.setString("firstname", user.getFirstname());
       userStmt.setString("lastname", user.getLastname());
-      userStmt.setInt("blocked", user.isBlocked() ? 1 : 0);
+      userStmt.setTimestamp("blockeduntil", user.getBlockedUntil());
 
       userStmt.executeUpdate();
       commitReload(connection);
@@ -61,7 +76,7 @@ public class UserDao extends BaseDao {
       userStmt.setString("emailaddress", user.getEmailaddress());
       userStmt.setString("firstname", user.getFirstname());
       userStmt.setString("lastname", user.getLastname());
-      userStmt.setInt("blocked", user.isBlocked() ? 1 : 0);
+      userStmt.setTimestamp("blockeduntil", user.getBlockedUntil());
 
       int count = userStmt.executeUpdate();
       commitOnly(connection);
@@ -72,7 +87,7 @@ public class UserDao extends BaseDao {
   }
 
   public boolean deleteUser(User user) throws UserManagerException {
-    if (User.ADMINISTRATOR.equals(user.getIdentifier()))
+    if (user.isAdministrator())
       throw new UserManagerException("Cannot delete the administrator user");
 
     try (Connection connection = thothDB.getConnection(); //
@@ -116,13 +131,13 @@ public class UserDao extends BaseDao {
         String emailaddress = rs.getString(idx++);
         String firstname = rs.getString(idx++);
         String lastname = rs.getString(idx++);
-        int blocked = rs.getInt(idx++);
+        Date blockedUntil = rs.getTimestamp(idx++);
         User user = new User(id, identifier);
         user.setPasswordhash(passwordhash);
         user.setEmailaddress(emailaddress);
         user.setFirstname(firstname);
         user.setLastname(lastname);
-        user.setBlocked(blocked != 0);
+        user.setBlockedUntil(blockedUntil);
 
         result.add(user);
       }

@@ -47,11 +47,11 @@ public class Group extends Identity implements Cloneable {
     return permissions;
   }
 
-  public void addPermission(Permission permission) {
+  public void grantPermission(Permission permission) {
     permissions.add(permission);
   }
 
-  public void removePermission(Permission permission) {
+  public void revokePermission(Permission permission) {
     permissions.remove(permission);
   }
 
@@ -82,6 +82,16 @@ public class Group extends Identity implements Cloneable {
       cachedEffectivePermissions = permissions;
     }
     return cachedEffectivePermissions;
+  }
+
+  @Override
+  public String getTypeName() {
+    return "group";
+  }
+
+  @Override
+  public boolean isAdministrator() {
+    return false;
   }
 
 }

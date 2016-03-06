@@ -18,6 +18,7 @@ import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.exceptions.SkinManagerException;
 import net.riezebos.thoth.renderers.HtmlRenderer;
+import net.riezebos.thoth.renderers.RenderResult;
 import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.testutil.ThothTestBase;
@@ -30,11 +31,12 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
 
   protected void testCommand(Command command, String path, String code, String[] htmlExists, String[] jsonExists)
       throws ContextNotFoundException, ContentManagerException, IOException, SkinManagerException, RenderException, UnsupportedEncodingException {
-    testCommand(command, path, code, htmlExists, jsonExists, null);
+    testCommand(command, path, CommandOperation.GET, code, htmlExists, jsonExists, null);
   }
 
-  protected void testCommand(Command command, String path, String code, String[] htmlExists, String[] jsonExists, Map<String, String> args)
-      throws ContextNotFoundException, ContentManagerException, IOException, SkinManagerException, RenderException, UnsupportedEncodingException {
+  protected RenderResult testCommand(Command command, String path, CommandOperation commandOperation, String code, String[] htmlExists, String[] jsonExists,
+      Map<String, String> args)
+          throws ContextNotFoundException, ContentManagerException, IOException, SkinManagerException, RenderException, UnsupportedEncodingException {
 
     Skin skin = getSkin(contentManager);
 
@@ -44,7 +46,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
     Map<String, Object> arguments = getParameters(contentManager, path);
     if (args != null)
       arguments.putAll(args);
-    command.execute(getCurrentUser(thothEnvironment), contextName, path, CommandOperation.GET, arguments, skin, outputStream);
+    RenderResult renderResult = command.execute(getCurrentUser(thothEnvironment), contextName, path, commandOperation, arguments, skin, outputStream);
     String result = outputStream.toString("UTF-8").trim();
     for (String check : htmlExists) {
       boolean condition = result.indexOf(check) != -1;
@@ -63,6 +65,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
       for (String check : jsonExists)
         assertTrue(check, result.indexOf(check) != -1);
     }
+    return renderResult;
   }
 
   protected ThothEnvironment setupContentManager() throws ContextNotFoundException, ContentManagerException, IOException {
@@ -79,5 +82,9 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
     } catch (ContentManagerException e) {
       throw new IllegalArgumentException(e);
     }
+  }
+  
+  protected ThothEnvironment getThothEnvironment() {
+    return thothEnvironment;
   }
 }

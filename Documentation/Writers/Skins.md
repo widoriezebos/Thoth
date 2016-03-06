@@ -66,7 +66,7 @@ Of course it does not make any sense to do this because now there is no differen
 	
 	# The velocity template that is used for the user management page
 	template.usermanagement=usermanagement.tpl
-	 
+	
 	# The velocity template that is used to display any error 
 	# that occurred during execution
 	template.error=error.tpl
@@ -183,7 +183,8 @@ The index of the context; this is where you would list all the books that are pr
 #### template.login
 The template that provides the login page.
 
-- **message** any error message that applies when login failed.
+- **message** any error message that applies when login failed. Type: String
+- **loggedin** flag to indicate whether currently logged in. Type: boolean
 
 #### template.html
 The template used to render HTML pages.

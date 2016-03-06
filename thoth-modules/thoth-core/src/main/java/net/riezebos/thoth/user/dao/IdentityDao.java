@@ -1,3 +1,17 @@
+/* Copyright (c) 2016 W.T.J. Riezebos
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.riezebos.thoth.user.dao;
 
 import java.sql.Connection;
@@ -17,12 +31,11 @@ import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.Group;
 import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.User;
-import net.riezebos.thoth.util.FinalWrapper;
 
 public class IdentityDao implements CacheListener {
   private static final Logger LOG = LoggerFactory.getLogger(IdentityDao.class);
 
-  private FinalWrapper<Map<String, Identity>> identitiesWrapper = null;
+  private Map<String, Identity> identities = null;
   private ThothDB thothDB;
   private UserDao userDao;
   private GroupDao groupDao;
@@ -38,16 +51,9 @@ public class IdentityDao implements CacheListener {
   }
 
   public Map<String, Identity> getIdentities() throws UserManagerException {
-    FinalWrapper<Map<String, Identity>> wrapper = identitiesWrapper;
-    if (wrapper == null) {
-      synchronized (this) {
-        if (identitiesWrapper == null) {
-          identitiesWrapper = new FinalWrapper<>(doGetIdentities());
-        }
-        wrapper = identitiesWrapper;
-      }
-    }
-    return wrapper.value;
+    if (identities == null)
+      identities = doGetIdentities();
+    return identities;
   }
 
   protected Map<String, Identity> doGetIdentities() throws UserManagerException {
@@ -89,7 +95,7 @@ public class IdentityDao implements CacheListener {
   }
 
   public void reloadCaches() throws UserManagerException {
-    identitiesWrapper = new FinalWrapper<>(doGetIdentities());
+    identities = null;
   }
 
   @Override
@@ -136,8 +142,8 @@ public class IdentityDao implements CacheListener {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Identity> T merge(T identity) {
-    return (T) identitiesWrapper.value.get(identity.getIdentifier());
+  public <T extends Identity> T merge(T identity) throws UserManagerException {
+    return (T) getIdentities().get(identity.getIdentifier());
   }
 
 }

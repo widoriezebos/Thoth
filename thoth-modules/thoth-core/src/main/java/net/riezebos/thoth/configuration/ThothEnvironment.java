@@ -25,9 +25,11 @@ import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.BasicUserManager;
 import net.riezebos.thoth.user.UserManager;
+import net.riezebos.thoth.util.ExpiringCache;
 import net.riezebos.thoth.util.FinalWrapper;
 
 public class ThothEnvironment implements ConfigurationChangeListener {
+  private static final int FIVE_MINUTES = 5 * 60 * 1000;
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
   public static final String CONFIGKEY_DEPRECATED = "configuration";
   public static final String CONFIGKEY = "thoth_configuration";
@@ -39,6 +41,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   private List<RendererChangeListener> rendererChangeListeners = new ArrayList<>();
   private FinalWrapper<ThothDB> thothDbWrapper = null;
   private FinalWrapper<UserManager> userManagerWrapper = null;
+  private FinalWrapper<ExpiringCache<String, Integer>> expiringCacheWrapper = null;
 
   public ContentManager getContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
     return getContentManager(contextDefinition.getName());
@@ -250,6 +253,25 @@ public class ThothEnvironment implements ConfigurationChangeListener {
           thothDbWrapper = new FinalWrapper<ThothDB>(createThothDB());
         }
         wrapper = thothDbWrapper;
+      }
+    }
+    return wrapper.value;
+  }
+
+  /**
+   * This method is synchronized to make sure there will ever only be one ThothDB for this environment.
+   * 
+   * @return
+   * @throws SQLException
+   */
+  public ExpiringCache<String, Integer> getLoginFailCounters() throws DatabaseException {
+    FinalWrapper<ExpiringCache<String, Integer>> wrapper = expiringCacheWrapper;
+    if (wrapper == null) {
+      synchronized (this) {
+        if (expiringCacheWrapper == null) {
+          expiringCacheWrapper = new FinalWrapper<ExpiringCache<String, Integer>>(new ExpiringCache<>(FIVE_MINUTES));
+        }
+        wrapper = expiringCacheWrapper;
       }
     }
     return wrapper.value;

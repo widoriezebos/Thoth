@@ -82,7 +82,7 @@ public class ThothDBTest extends DatabaseTest {
       someUser = userManager.merge(someUser);
       assertFalse(readers.getPermissions().contains(Permission.META));
 
-      userManager.deleteUser(user);
+      userManager.deleteIdentity(user);
       newList = userManager.listUsers();
       collected = newList.stream().filter(p -> p.getIdentifier().equals("wido")).collect(Collectors.toList());
       assertTrue(collected.size() == 0);

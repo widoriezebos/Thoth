@@ -26,6 +26,10 @@ public abstract class Identity implements Cloneable, Serializable {
 
   abstract public Set<Permission> getEffectivePermissions();
 
+  abstract public String getTypeName();
+
+  abstract public boolean isAdministrator();
+
   public Identity(String identifier) {
     this.identifier = identifier;
   }

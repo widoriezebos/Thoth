@@ -31,32 +31,34 @@ import net.riezebos.thoth.user.UserManager;
  */
 public class TestUserManager implements UserManager {
 
+  public static final String ADMINISTRATORPW = "administratorpw";
   private Map<String, User> users = new HashMap<>();
   private Map<String, Group> groups = new HashMap<>();
 
   public TestUserManager() {
     Group administrators = new Group("administrators");
-    administrators.addPermission(Permission.PULL);
-    administrators.addPermission(Permission.REINDEX);
+    administrators.grantPermission(Permission.PULL);
+    administrators.grantPermission(Permission.REINDEX);
     registerGroup(administrators);
 
     Group writers = new Group("writers");
-    writers.addPermission(Permission.BROWSE);
-    writers.addPermission(Permission.DIFF);
-    writers.addPermission(Permission.META);
-    writers.addPermission(Permission.READ_FRAGMENTS);
-    writers.addPermission(Permission.REVISION);
-    writers.addPermission(Permission.VALIDATE);
+    writers.grantPermission(Permission.BROWSE);
+    writers.grantPermission(Permission.DIFF);
+    writers.grantPermission(Permission.META);
+    writers.grantPermission(Permission.READ_FRAGMENTS);
+    writers.grantPermission(Permission.REVISION);
+    writers.grantPermission(Permission.VALIDATE);
     registerGroup(writers);
 
     Group readers = new Group("readers");
-    readers.addPermission(Permission.ACCESS);
-    readers.addPermission(Permission.READ_RESOURCE);
-    readers.addPermission(Permission.READ_BOOKS);
-    readers.addPermission(Permission.SEARCH);
+    readers.grantPermission(Permission.ACCESS);
+    readers.grantPermission(Permission.READ_RESOURCE);
+    readers.grantPermission(Permission.READ_BOOKS);
+    readers.grantPermission(Permission.SEARCH);
     registerGroup(readers);
 
     User administrator = new User("administrator");
+    administrator.setPassword(ADMINISTRATORPW);
     administrators.addMember(administrator);
 
     User writer = new User("writer");
@@ -108,11 +110,6 @@ public class TestUserManager implements UserManager {
   }
 
   @Override
-  public boolean deleteUser(User user) throws UserManagerException {
-    return users.remove(user.getIdentifier()) != null;
-  }
-
-  @Override
   public boolean updateUser(User user) throws UserManagerException {
     users.put(user.getIdentifier(), user);
     return true;
@@ -125,8 +122,10 @@ public class TestUserManager implements UserManager {
   }
 
   @Override
-  public boolean deleteGroup(Group group) throws UserManagerException {
-    return groups.remove(group.getIdentifier()) != null;
+  public boolean deleteIdentity(Identity identity) throws UserManagerException {
+    boolean doneOne = groups.remove(identity.getIdentifier()) != null;
+    doneOne |= users.remove(identity.getIdentifier()) != null;
+    return doneOne;
   }
 
   @Override
@@ -147,6 +146,14 @@ public class TestUserManager implements UserManager {
   @Override
   public <T extends Identity> T merge(T identity) {
     return identity;
+  }
+
+  @Override
+  public Identity getIdentity(String identifier) throws UserManagerException {
+    User user = getUser(identifier);
+    if (user != null)
+      return user;
+    return getGroup(identifier);
   }
 
 }

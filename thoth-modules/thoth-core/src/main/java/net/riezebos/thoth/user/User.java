@@ -15,6 +15,7 @@
 package net.riezebos.thoth.user;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,12 +23,12 @@ import org.apache.commons.lang3.StringUtils;
 
 public class User extends Identity implements Cloneable {
   private static final long serialVersionUID = 1L;
-  public static final String ADMINISTRATOR = "administrator";
+  private static final String ADMINISTRATOR = "administrator";
   private String passwordhash;
   private String emailaddress;
   private String firstname;
   private String lastname;
-  private boolean blocked;
+  private Date blockedUntil;
   private Set<Permission> cachedEffectivePermissions = null;
 
   public User(String identifier) {
@@ -47,7 +48,7 @@ public class User extends Identity implements Cloneable {
   public Set<Permission> getPermissions() {
     if (cachedEffectivePermissions == null) {
       Set<Permission> permissions = new HashSet<>();
-      if (ADMINISTRATOR.equals(getIdentifier()))
+      if (isAdministrator())
         permissions.addAll(Arrays.asList(Permission.values()));
       else
         for (Group group : getMemberships())
@@ -103,12 +104,12 @@ public class User extends Identity implements Cloneable {
     return lastname;
   }
 
-  public boolean isBlocked() {
-    return blocked;
+  public Date getBlockedUntil() {
+    return blockedUntil;
   }
 
-  public void setBlocked(boolean blocked) {
-    this.blocked = blocked;
+  public void setBlockedUntil(Date blockedUntil) {
+    this.blockedUntil = blockedUntil;
   }
 
   public Set<Permission> getEffectivePermissions() {
@@ -123,5 +124,15 @@ public class User extends Identity implements Cloneable {
     if (StringUtils.isBlank(result))
       result = getIdentifier();
     return result;
+  }
+
+  @Override
+  public String getTypeName() {
+    return "user";
+  }
+
+  @Override
+  public boolean isAdministrator() {
+    return ADMINISTRATOR.equals(getIdentifier());
   }
 }

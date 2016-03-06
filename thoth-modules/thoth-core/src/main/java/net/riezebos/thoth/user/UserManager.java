@@ -30,13 +30,11 @@ public interface UserManager {
 
   User createUser(User user) throws UserManagerException;
 
-  boolean deleteUser(User user) throws UserManagerException;
+  boolean deleteIdentity(Identity identity) throws UserManagerException;
 
   boolean updateUser(User user) throws UserManagerException;
 
   Group createGroup(Group group) throws UserManagerException;
-
-  boolean deleteGroup(Group group) throws UserManagerException;
 
   boolean updatePermissions(Group group) throws UserManagerException;
 
@@ -44,6 +42,8 @@ public interface UserManager {
 
   void deleteMembership(Group group, Identity identity) throws UserManagerException;
 
-  <T extends Identity> T merge(T identity);
+  <T extends Identity> T merge(T identity) throws UserManagerException;
+
+  Identity getIdentity(String identifier) throws UserManagerException;
 
 }

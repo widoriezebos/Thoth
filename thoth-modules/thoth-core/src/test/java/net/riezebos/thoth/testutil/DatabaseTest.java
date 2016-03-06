@@ -45,8 +45,9 @@ public class DatabaseTest extends ThothTestBase {
     return thothEnvironment;
   }
 
-  protected void cleanupTempFolder() throws IOException {
-    cleanupTempFolder(dbDir);
+  public void cleanupTempFolder() throws IOException {
+    if (dbDir != null)
+      cleanupTempFolder(dbDir);
   }
 
 }

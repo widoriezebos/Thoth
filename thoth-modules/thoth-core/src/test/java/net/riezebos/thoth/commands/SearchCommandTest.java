@@ -22,7 +22,7 @@ public class SearchCommandTest extends CommandTest {
     Map<String, String> args = new HashMap<>();
     args.put("query", "Main.md");
 
-    testCommand(new TestSearchCommand(setupContentManager(), this), "/main/Main.md", "search", htmlExists, jsonExists, args);
+    testCommand(new TestSearchCommand(setupContentManager(), this), "/main/Main.md", CommandOperation.GET, "search", htmlExists, jsonExists, args);
   }
 
 }
