@@ -206,3 +206,8 @@ del {
     float: right;
     background: #fff0e0
 }
+
+.logo {
+	height: 80px;
+    float: right;
+}

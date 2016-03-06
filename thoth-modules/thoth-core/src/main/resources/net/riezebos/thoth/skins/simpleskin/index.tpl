@@ -8,11 +8,11 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
   </head>
   <body>
-    #if(!$$contexts.isEmpty())
+        <h1>Welcome to Thoth<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
+    #if(!$contexts.isEmpty())
       <h3>Please select one of the contexts below</h3>
     #else  
       #if(!$loggedin)
-        <h3>Welcome to Thoth</h3>
         Please <a href=".?cmd=login">Login</a> to gain access <br/>
       #end  
     #end
@@ -35,9 +35,13 @@
     #end   
     <br/>
     #if($loggedin)
-      Logged in as $identity. <a href=".?cmd=logout">Log out</a><br/>
+      Logged in as ${identity}.
+      <br/>
+      <a href=".?cmd=userprofile">Edit profile</a>
+      <br/>
+      <a href=".?cmd=logout">Log out</a><br/>
     #else
-      #if(!$$contexts.isEmpty())
+      #if(!$$contexts.isEmpty()) ##If the contexts are empty; a login link is rendered already header (see above)
         <a href=".?cmd=login">Login</a> <br/>
       #end  
     #end

@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
   </head>
   <body>
-    <h1>Latest changes</h1>
+    <h1>Latest changes<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
     Showing page ${page}<br/>
     #set($prevpage=${page}+-1)
     #if($prevpage > 0)

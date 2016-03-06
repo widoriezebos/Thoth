@@ -142,6 +142,10 @@ public class Skin extends PropertyLoader {
     return getPathProperty("template.manageusers");
   }
 
+  public String getUserProfileTemplate() {
+    return getPathProperty("template.userprofile");
+  }
+
   public String getErrorTemplate() {
     return getPathProperty("template.error");
   }

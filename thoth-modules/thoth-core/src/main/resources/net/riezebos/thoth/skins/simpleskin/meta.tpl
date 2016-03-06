@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
   <head>
   <body>
-    <h1>${document.name}</h1>
+    <h1>${document.name}<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
     Full path: $path<br/>
     Latest modification: ${thothutil.formatTimestamp($document.lastModified)}
 

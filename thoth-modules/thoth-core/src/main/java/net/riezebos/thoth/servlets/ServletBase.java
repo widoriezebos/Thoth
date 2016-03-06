@@ -216,7 +216,7 @@ public abstract class ServletBase extends HttpServlet {
       for (Permission permission : identity.getEffectivePermissions())
         permissions.add(String.valueOf(permission));
     } else {
-      result.put(Renderer.IDENTITY, "anonymous");
+      result.put(Renderer.IDENTITY, null);
     }
     result.put(Renderer.PERMISSIONS, permissions);
 

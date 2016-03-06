@@ -8,11 +8,11 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
   </head>
   <body>
-    <h3>Please enter your credentials to login</h3>
+    <h3>Please enter your credentials to login<img class="logo" src="${skinbase}/Webresources/logo.png"/></h3>
 
     <form action="./?cmd=login" method="post">
       User name: <input type="text" name="username" value="" size="40"/><br/>
-      Passord: <input type="password" name="password" value=""/><br/>
+      Password: <input type="password" name="password" value=""/><br/>
       <input type="submit" value="Login"/> 
     </form>
     #if($message)

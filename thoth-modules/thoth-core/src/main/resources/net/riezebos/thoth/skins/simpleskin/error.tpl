@@ -9,7 +9,7 @@
   </head>
   <body>
   	
-    <h1>Thoth is very sorry about this</h1>
+    <h1>Thoth is very sorry about this<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
     Something happened that Thoth did not expect (and was not prepared for).<br/>
     If this happens again, do let his creators know.
     

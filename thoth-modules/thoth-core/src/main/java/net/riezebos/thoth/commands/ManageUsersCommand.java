@@ -236,7 +236,7 @@ public class ManageUsersCommand extends RendererBase implements Command {
         if (!user.isAdministrator())
           user.setBlockedUntil(getConfiguration().getDateFormat().parse("01-01-2200"));
         else {
-          LOG.warn("Refuse to block administrator because could potentially lead to total lockdown of Thoth");
+          LOG.warn("Refused to block administrator because that could potentially lead to a total lockdown of Thoth");
         }
       }
       user.setPassword(password);

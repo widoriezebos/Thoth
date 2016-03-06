@@ -67,6 +67,9 @@ Of course it does not make any sense to do this because now there is no differen
 	# The velocity template that is used for the user management page
 	template.usermanagement=usermanagement.tpl
 	
+	# The velocity template that is used for the user profile
+	template.userprofile=userprofile.tpl
+	
 	# The velocity template that is used to display any error 
 	# that occurred during execution
 	template.error=error.tpl
@@ -245,6 +248,11 @@ The template used for user management.
 
 - **users** the list of users. Type: List\<User\>
 - **groups** the list of groups. Type: List\<Group\>
+
+#### template.userprofile
+The template used for editing the user profile.
+
+- **user** the user currently logged in. Type: User
 
 #### template.error
 The template used to display Thoth system errors.

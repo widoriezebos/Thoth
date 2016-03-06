@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
   </head>
   <body>
+    <h1>Search results<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
     <a href="${contexturl}">Back to Index</a>
     <form action="${contexturl}" method="get">
       Search all of ${context}: <input type="text" name="query" value="${thothutil.escapeHtml($query)}" size="40"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />

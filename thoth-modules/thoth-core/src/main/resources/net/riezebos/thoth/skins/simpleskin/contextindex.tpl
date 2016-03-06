@@ -9,11 +9,11 @@
   </head>
   <body>
     
-    <h1>${context}</h1>
+    <h1>${context}<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
     
     #if(${permissions.contains("SEARCH")})
     <form action="${contexturl}?cmd=search" method="get">
-      Search all of ${context}: <input type="text" name="query" size="40"/> <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
+      Search all of ${context}: <input type="text" name="query" size="40"/> <input type="submit" value="Search"/> <input type="hidden" name="cmd" value="search" />
     </form>
     #end
     
@@ -47,27 +47,7 @@
           </tr>
       #end  
     </table>
-    
-    <h2>Books by folder</h2>
-    <table>
-      <tr><th>Folder</th><th>Books</th></tr>
-      #foreach($folder in $$classification_folder)
-        <tr>
-          <td>${folder.name}</td>
-          <td>
-            #foreach($book in $folder.books)
-               <a href="${context}${book.path}">${book.title}</a> 
-              (
-               #foreach($outputFormat in $outputFormats)                   
-                 <a href="${context}${book.path}?output=$outputFormat">$outputFormat</a>
-               #end
-               <a href="${context}${book.path}?cmd=meta">meta</a> )<br/>
-            #end
-          </td>
-        </tr>
-      #end  
-    </table>
-    
+        
     <br/><br/>
     #if(${permissions.contains("MANAGE_USERS")})
       <a href=".?cmd=manageusers">Manage users</a><br/>
@@ -75,7 +55,11 @@
     Latest successfull Pull request was at ${refresh}<br/> 
     Currently using skin: ${skin}<br>
     #if($loggedin)
-      Logged in as $identity. <a href=".?cmd=logout">Log out</a><br/>
+      Logged in as ${identity}.
+      <br/>
+      <a href=".?cmd=userprofile">Edit profile</a>
+      <br/>
+      <a href=".?cmd=logout">Log out</a><br/>
     #else
       <a href=".?cmd=login">Login</a> <br/>
     #end

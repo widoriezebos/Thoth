@@ -8,13 +8,12 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css"/>
   </head>
   <body>
+    <h1>User Management<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
     <a href="${contexturl}">Back to Index</a>
     
     #if($message)
       <pre>$message</pre>
     #end
-    
-    <h1>User Management</h1>
     
     <h2>Create user</h2> 
     <form action="./?cmd=manageusers&operation=createuser" method="post">
