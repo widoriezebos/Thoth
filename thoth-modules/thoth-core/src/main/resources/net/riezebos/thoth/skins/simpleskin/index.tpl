@@ -28,7 +28,7 @@
       To update the site to the latest version right now; you can <a href=".?cmd=pull">Pull manually</a><br/>
     #end   
     #if(${permissions.contains("REINDEX")})
-    Click <a href=".?cmd=reindex">here</a> to force a reindex<br/>
+    Click <a href=".?cmd=reindex">here</a> to force a reindex of all contexts<br/>
     #end
     #if(${permissions.contains("MANAGE_USERS")})
       <a href=".?cmd=manageusers">Manage users</a><br/>
