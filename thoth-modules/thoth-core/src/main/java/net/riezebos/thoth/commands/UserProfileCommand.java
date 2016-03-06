@@ -33,6 +33,11 @@ import net.riezebos.thoth.user.UserManager;
 
 public class UserProfileCommand extends RendererBase implements Command {
 
+  public static final String ARG_FIRSTNAME = "firstname";
+  public static final String ARG_LASTNAME = "lastname";
+  public static final String ARG_PASSWORD = "password";
+  public static final String ARG_PASSWORD2 = "password2";
+
   public UserProfileCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
     super(thothEnvironment, rendererProvider);
   }
@@ -68,10 +73,10 @@ public class UserProfileCommand extends RendererBase implements Command {
       Skin skin, OutputStream outputStream) throws Exception {
 
     String identifier = (String) arguments.get(Renderer.IDENTITY);
-    String firstname = (String) arguments.get("firstname");
-    String lastname = (String) arguments.get("lastname");
-    String password = (String) arguments.get("password");
-    String password2 = (String) arguments.get("password2");
+    String firstname = (String) arguments.get(ARG_FIRSTNAME);
+    String lastname = (String) arguments.get(ARG_LASTNAME);
+    String password = (String) arguments.get(ARG_PASSWORD);
+    String password2 = (String) arguments.get(ARG_PASSWORD2);
 
     UserManager userManager = getThothEnvironment().getUserManager();
     User user = userManager.getUser(identifier);

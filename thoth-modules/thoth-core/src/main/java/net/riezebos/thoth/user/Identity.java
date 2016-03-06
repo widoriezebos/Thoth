@@ -17,6 +17,9 @@ package net.riezebos.thoth.user;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class Identity implements Cloneable, Serializable {
   private static final long serialVersionUID = 1L;
@@ -28,6 +31,7 @@ public abstract class Identity implements Cloneable, Serializable {
 
   abstract public String getTypeName();
 
+  @JsonIgnore
   abstract public boolean isAdministrator();
 
   public Identity(String identifier) {
@@ -78,8 +82,13 @@ public abstract class Identity implements Cloneable, Serializable {
     memberships.remove(group);
   }
 
+  @JsonIgnore
   public Set<Group> getMemberships() {
     return memberships;
+  }
+
+  public Set<String> getMemberOf() {
+    return memberships.stream().map(g -> g.getIdentifier()).collect(Collectors.toSet());
   }
 
   @Override
@@ -87,6 +96,7 @@ public abstract class Identity implements Cloneable, Serializable {
     return getIdentifier();
   }
 
+  @JsonIgnore
   public String getDescription() {
     return getIdentifier();
   }

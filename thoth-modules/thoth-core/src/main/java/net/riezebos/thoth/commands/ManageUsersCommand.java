@@ -40,8 +40,27 @@ import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.user.UserManager;
 
 public class ManageUsersCommand extends RendererBase implements Command {
-  private static final String OPERATION_ARGUMENT = "operation";
   private static final Logger LOG = LoggerFactory.getLogger(ManageUsersCommand.class);
+
+  public static final String OPERATION_ARGUMENT = "operation";
+  public static final String REMOVEMEMBER = "removemember";
+  public static final String ADDMEMBER = "addmember";
+  public static final String REVOKEPERMISSION = "revokepermission";
+  public static final String GRANTPERMISSION = "grantpermission";
+  public static final String DELETEIDENTITY = "deleteidentity";
+  public static final String CREATEGROUP = "creategroup";
+  public static final String UPDATEUSER = "updateuser";
+  public static final String CREATEUSER = "createuser";
+
+  public static final String ARG_BLOCKED = "blocked";
+  public static final String ARG_PASSWORD = "password";
+  public static final String ARG_LASTNAME = "lastname";
+  public static final String ARG_FIRSTNAME = "firstname";
+  public static final String ARG_IDENTIFIER = "identifier";
+  public static final String ARG_PERMISSION = "permission";
+  public static final String ARG_MESSAGE = "message";
+  public static final String ARG_MEMBER = "member";
+  public static final String ARG_GROUP = "group";
 
   public ManageUsersCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
     super(thothEnvironment, rendererProvider);
@@ -76,28 +95,28 @@ public class ManageUsersCommand extends RendererBase implements Command {
       Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws Exception {
     if (operationCode != null) {
       switch (operationCode) {
-      case "createuser":
+      case CREATEUSER:
         createUser(arguments);
         break;
-      case "updateuser":
+      case UPDATEUSER:
         updateUser(arguments);
         break;
-      case "creategroup":
+      case CREATEGROUP:
         createGroup(arguments);
         break;
-      case "deleteidentity":
+      case DELETEIDENTITY:
         deleteIdentity(arguments);
         break;
-      case "grantpermission":
+      case GRANTPERMISSION:
         grantPermission(arguments);
         break;
-      case "revokepermission":
+      case REVOKEPERMISSION:
         revokePermission(arguments);
         break;
-      case "addmember":
+      case ADDMEMBER:
         addMember(arguments);
         break;
-      case "removemember":
+      case REMOVEMEMBER:
         removeMember(arguments);
         break;
       default:
@@ -108,42 +127,42 @@ public class ManageUsersCommand extends RendererBase implements Command {
   }
 
   protected void addMember(Map<String, Object> arguments) throws UserManagerException {
-    String groupIdentifier = (String) arguments.get("group");
-    String memberIdentifier = (String) arguments.get("member");
+    String groupIdentifier = (String) arguments.get(ARG_GROUP);
+    String memberIdentifier = (String) arguments.get(ARG_MEMBER);
 
     UserManager userManager = getThothEnvironment().getUserManager();
     Group group = userManager.getGroup(groupIdentifier);
     Identity member = userManager.getIdentity(memberIdentifier);
     if (group == null) {
-      arguments.put("message", "Group with identifier '" + groupIdentifier + "' not found");
+      arguments.put(ARG_MESSAGE, "Group with identifier '" + groupIdentifier + "' not found");
     } else if (member == null) {
-      arguments.put("message", "Member with identifier '" + memberIdentifier + "' not found");
+      arguments.put(ARG_MESSAGE, "Member with identifier '" + memberIdentifier + "' not found");
     } else {
       userManager.createMembership(group, member);
-      arguments.put("message", "Member '" + memberIdentifier + "' added to group " + groupIdentifier);
+      arguments.put(ARG_MESSAGE, "Member '" + memberIdentifier + "' added to group " + groupIdentifier);
     }
   }
 
   protected void removeMember(Map<String, Object> arguments) throws UserManagerException {
-    String groupIdentifier = (String) arguments.get("group");
-    String memberIdentifier = (String) arguments.get("member");
+    String groupIdentifier = (String) arguments.get(ARG_GROUP);
+    String memberIdentifier = (String) arguments.get(ARG_MEMBER);
 
     UserManager userManager = getThothEnvironment().getUserManager();
     Group group = userManager.getGroup(groupIdentifier);
     Identity member = userManager.getIdentity(memberIdentifier);
     if (group == null) {
-      arguments.put("message", "Group with identifier '" + groupIdentifier + "' not found");
+      arguments.put(ARG_MESSAGE, "Group with identifier '" + groupIdentifier + "' not found");
     } else if (member == null) {
-      arguments.put("message", "Member with identifier '" + memberIdentifier + "' not found");
+      arguments.put(ARG_MESSAGE, "Member with identifier '" + memberIdentifier + "' not found");
     } else {
       userManager.deleteMembership(group, member);
-      arguments.put("message", "Member '" + memberIdentifier + "' removed from group " + groupIdentifier);
+      arguments.put(ARG_MESSAGE, "Member '" + memberIdentifier + "' removed from group " + groupIdentifier);
     }
   }
 
   protected void revokePermission(Map<String, Object> arguments) throws UserManagerException {
-    String identifier = (String) arguments.get("group");
-    String permission = (String) arguments.get("permission");
+    String identifier = (String) arguments.get(ARG_GROUP);
+    String permission = (String) arguments.get(ARG_PERMISSION);
 
     UserManager userManager = getThothEnvironment().getUserManager();
     Identity identity = userManager.getIdentity(identifier);
@@ -152,15 +171,15 @@ public class ManageUsersCommand extends RendererBase implements Command {
       Permission perm = Permission.valueOf(permission);
       group.revokePermission(perm);
       userManager.updatePermissions(group);
-      arguments.put("message", "Permissions updated. Revoked " + perm + " from " + identifier);
+      arguments.put(ARG_MESSAGE, "Permissions updated. Revoked " + perm + " from " + identifier);
     } else
-      arguments.put("message", "Group with identifier '" + identifier + "' not found");
+      arguments.put(ARG_MESSAGE, "Group with identifier '" + identifier + "' not found");
 
   }
 
   protected void grantPermission(Map<String, Object> arguments) throws UserManagerException {
-    String identifier = (String) arguments.get("group");
-    String permission = (String) arguments.get("permission");
+    String identifier = (String) arguments.get(ARG_GROUP);
+    String permission = (String) arguments.get(ARG_PERMISSION);
 
     UserManager userManager = getThothEnvironment().getUserManager();
     Identity identity = userManager.getIdentity(identifier);
@@ -169,37 +188,37 @@ public class ManageUsersCommand extends RendererBase implements Command {
       Permission perm = Permission.valueOf(permission);
       group.grantPermission(perm);
       userManager.updatePermissions(group);
-      arguments.put("message", "Permissions updated. Granted " + perm + " to " + identifier);
+      arguments.put(ARG_MESSAGE, "Permissions updated. Granted " + perm + " to " + identifier);
     } else
-      arguments.put("message", "Group with identifier '" + identifier + "' not found");
+      arguments.put(ARG_MESSAGE, "Group with identifier '" + identifier + "' not found");
   }
 
   protected void deleteIdentity(Map<String, Object> arguments) throws UserManagerException {
-    String identifier = (String) arguments.get("identifier");
+    String identifier = (String) arguments.get(ARG_IDENTIFIER);
 
     UserManager userManager = getThothEnvironment().getUserManager();
     Identity identity = userManager.getIdentity(identifier);
     if (identity != null) {
       if (identity.isAdministrator()) {
-        arguments.put("message", "Cannot delete the administrator");
+        arguments.put(ARG_MESSAGE, "Cannot delete the administrator");
       } else {
         userManager.deleteIdentity(identity);
-        arguments.put("message", "Deleted " + identity.getTypeName() + " " + identity.getIdentifier());
+        arguments.put(ARG_MESSAGE, "Deleted " + identity.getTypeName() + " " + identity.getIdentifier());
       }
     } else {
-      arguments.put("message", "Identity with identifier '" + identifier + "' not found");
+      arguments.put(ARG_MESSAGE, "Identity with identifier '" + identifier + "' not found");
     }
   }
 
   protected void createUser(Map<String, Object> arguments) throws UserManagerException {
-    String identifier = (String) arguments.get("identifier");
-    String firstname = (String) arguments.get("firstname");
-    String lastname = (String) arguments.get("lastname");
-    String password = (String) arguments.get("password");
+    String identifier = (String) arguments.get(ARG_IDENTIFIER);
+    String firstname = (String) arguments.get(ARG_FIRSTNAME);
+    String lastname = (String) arguments.get(ARG_LASTNAME);
+    String password = (String) arguments.get(ARG_PASSWORD);
 
     boolean valid = validateIdentity(identifier, arguments);
     if (StringUtils.isBlank(password)) {
-      arguments.put("message", "Password cannot be blank");
+      arguments.put(ARG_MESSAGE, "Password cannot be blank");
       valid = false;
     }
 
@@ -210,21 +229,21 @@ public class ManageUsersCommand extends RendererBase implements Command {
       user.setLastname(lastname);
       user.setPassword(password);
       userManager.createUser(user);
-      arguments.put("message", "User " + identifier + " created");
+      arguments.put(ARG_MESSAGE, "User " + identifier + " created");
     }
   }
 
   protected void updateUser(Map<String, Object> arguments) throws UserManagerException, ParseException {
-    String identifier = (String) arguments.get("identifier");
-    String firstname = (String) arguments.get("firstname");
-    String lastname = (String) arguments.get("lastname");
-    String password = (String) arguments.get("password");
-    String blocked = (String) arguments.get("blocked");
+    String identifier = (String) arguments.get(ARG_IDENTIFIER);
+    String firstname = (String) arguments.get(ARG_FIRSTNAME);
+    String lastname = (String) arguments.get(ARG_LASTNAME);
+    String password = (String) arguments.get(ARG_PASSWORD);
+    String blocked = (String) arguments.get(ARG_BLOCKED);
 
     UserManager userManager = getThothEnvironment().getUserManager();
     User user = userManager.getUser(identifier);
     if (user == null) {
-      arguments.put("message", "User with identifier " + identifier + " not found");
+      arguments.put(ARG_MESSAGE, "User with identifier " + identifier + " not found");
     } else {
       user.setFirstname(firstname);
       user.setLastname(lastname);
@@ -241,32 +260,32 @@ public class ManageUsersCommand extends RendererBase implements Command {
       }
       user.setPassword(password);
       userManager.updateUser(user);
-      arguments.put("message", "User " + identifier + " updated");
+      arguments.put(ARG_MESSAGE, "User " + identifier + " updated");
     }
   }
 
   protected void createGroup(Map<String, Object> arguments) throws UserManagerException {
-    String identifier = (String) arguments.get("identifier");
+    String identifier = (String) arguments.get(ARG_IDENTIFIER);
     boolean valid = validateIdentity(identifier, arguments);
 
     if (valid) {
       UserManager userManager = getThothEnvironment().getUserManager();
       Group group = new Group(identifier);
       userManager.createGroup(group);
-      arguments.put("message", "Group " + identifier + " created");
+      arguments.put(ARG_MESSAGE, "Group " + identifier + " created");
     }
   }
 
   protected boolean validateIdentity(String identifier, Map<String, Object> arguments) throws UserManagerException {
     boolean valid = true;
     if (StringUtils.isBlank(identifier)) {
-      arguments.put("message", "Identifier cannot be blank");
+      arguments.put(ARG_MESSAGE, "Identifier cannot be blank");
       valid = false;
     }
     UserManager userManager = getThothEnvironment().getUserManager();
     Identity identity = userManager.getIdentity(identifier);
     if (identity != null) {
-      arguments.put("message", "There is already a " + identity.getTypeName() + " with identifier " + identifier);
+      arguments.put(ARG_MESSAGE, "There is already a " + identity.getTypeName() + " with identifier " + identifier);
       valid = false;
     }
     return valid;

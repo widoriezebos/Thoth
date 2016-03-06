@@ -118,7 +118,7 @@ public abstract class RendererBase implements Renderer {
     try (PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8")), true)) {
       ContentManager contentManager = getContentManager(context);
       String libraryRoot = contentManager.getLibraryRoot();
-      variables.put(Renderer.LIBRARY_ROOT, libraryRoot);
+      variables.put(Renderer.LIBRARY_ROOT, libraryRoot == null ? "" : libraryRoot);
       String contextUrl = (String) variables.get(Renderer.CONTEXTURL_PARAMETER);
       String libraryUrl = ThothUtil.suffix(contextUrl + libraryRoot, "/");
       variables.put(Renderer.LIBRARY_URL, libraryUrl);

@@ -17,10 +17,14 @@ package net.riezebos.thoth.user;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Group extends Identity implements Cloneable {
   private static final long serialVersionUID = 1L;
-  private Set<Identity> members = new HashSet<>();
   private Set<Permission> permissions = new HashSet<>();
+  @JsonIgnore
+  private Set<Identity> members = new HashSet<>();
+  @JsonIgnore
   private Set<Permission> cachedEffectivePermissions = null;
 
   public Group(String identifier) {
@@ -73,6 +77,7 @@ public class Group extends Identity implements Cloneable {
     this.permissions.addAll(permissions);
   }
 
+  @JsonIgnore
   @Override
   public Set<Permission> getEffectivePermissions() {
     if (cachedEffectivePermissions == null) {

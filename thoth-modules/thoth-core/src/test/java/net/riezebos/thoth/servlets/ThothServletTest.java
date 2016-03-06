@@ -112,21 +112,12 @@ public class ThothServletTest extends ThothTestBase {
     thothServlet.doGet(request, response);
     assertEquals(new Integer(HttpServletResponse.SC_NOT_FOUND), getLatestError());
 
-    request = createHttpRequest(contextName, "");
-    response = createHttpResponse();
-    thothServlet.doGet(request, response);
-    assertNull(getLatestError());
-    sos = (MockServletOutputStream) response.getOutputStream();
-    String result = sos.getContentsAsString();
-    assertTrue(result.indexOf("Books by folder") != -1);
-    assertTrue(result.indexOf("TestContext/books/Main.book") != -1);
-
     request = createHttpRequest("", "");
     response = createHttpResponse();
     thothServlet.doGet(request, response);
     assertNull(getLatestError());
     sos = (MockServletOutputStream) response.getOutputStream();
-    result = sos.getContentsAsString();
+    String result = sos.getContentsAsString();
     assertTrue(result.indexOf("Please select one of the contexts") != -1);
     assertTrue(result.indexOf("TestContext</a>") != -1);
 
@@ -201,8 +192,8 @@ public class ThothServletTest extends ThothTestBase {
       }
 
       @Override
-      public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-          throws RenderException {
+      public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+          OutputStream outputStream) throws RenderException {
         throw new RenderException("I was only meant to fail so don't blame me");
       }
     };

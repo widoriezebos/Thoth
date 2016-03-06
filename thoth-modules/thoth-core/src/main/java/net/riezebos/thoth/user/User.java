@@ -21,9 +21,12 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class User extends Identity implements Cloneable {
   private static final long serialVersionUID = 1L;
   private static final String ADMINISTRATOR = "administrator";
+  @JsonIgnore
   private String passwordhash;
   private String emailaddress;
   private String firstname;
@@ -74,14 +77,17 @@ public class User extends Identity implements Cloneable {
     this.lastname = lastname;
   }
 
+  @JsonIgnore
   public String getPasswordhash() {
     return passwordhash;
   }
 
+  @JsonIgnore
   public void setPasswordhash(String passwordhash) {
     this.passwordhash = passwordhash;
   }
 
+  @JsonIgnore
   public void setPassword(String clearTextPassword) {
     PasswordUtil util = new PasswordUtil();
     this.passwordhash = util.encodePassword(clearTextPassword);
@@ -112,10 +118,12 @@ public class User extends Identity implements Cloneable {
     this.blockedUntil = blockedUntil;
   }
 
+  @JsonIgnore
   public Set<Permission> getEffectivePermissions() {
     return getPermissions();
   }
 
+  @JsonIgnore
   @Override
   public String getDescription() {
     String result = StringUtils.isBlank(getFirstname()) ? "" : getFirstname() + " ";
@@ -126,11 +134,13 @@ public class User extends Identity implements Cloneable {
     return result;
   }
 
+  @JsonIgnore
   @Override
   public String getTypeName() {
     return "user";
   }
 
+  @JsonIgnore
   @Override
   public boolean isAdministrator() {
     return ADMINISTRATOR.equals(getIdentifier());

@@ -46,20 +46,23 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
     Map<String, Object> arguments = getParameters(contentManager, path);
     if (args != null)
       arguments.putAll(args);
-    RenderResult renderResult = command.execute(getCurrentUser(thothEnvironment), contextName, path, commandOperation, arguments, skin, outputStream);
-    String result = outputStream.toString("UTF-8").trim();
-    for (String check : htmlExists) {
-      boolean condition = result.indexOf(check) != -1;
-      if (!condition)
-        System.out.println(result + "\ndoes not contain\n" + check);
-      assertTrue(check, condition);
-    }
 
+    RenderResult renderResult = RenderResult.OK;
+    if (htmlExists != null) {
+      renderResult = command.execute(getCurrentUser(thothEnvironment), contextName, path, commandOperation, arguments, skin, outputStream);
+      String result = outputStream.toString("UTF-8").trim();
+      for (String check : htmlExists) {
+        boolean condition = result.indexOf(check) != -1;
+        if (!condition)
+          System.out.println(result + "\ndoes not contain\n" + check);
+        assertTrue(check, condition);
+      }
+    }
     if (jsonExists != null) {
       arguments.put("mode", "json");
       outputStream = new ByteArrayOutputStream();
-      command.execute(getCurrentUser(thothEnvironment), contextName, path, CommandOperation.GET, arguments, skin, outputStream);
-      result = outputStream.toString("UTF-8").trim();
+      renderResult = command.execute(getCurrentUser(thothEnvironment), contextName, path, commandOperation, arguments, skin, outputStream);
+      String result = outputStream.toString("UTF-8").trim();
       assertTrue(result, result.startsWith("{\"") && result.endsWith("}"));
 
       for (String check : jsonExists)
@@ -83,7 +86,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
       throw new IllegalArgumentException(e);
     }
   }
-  
+
   protected ThothEnvironment getThothEnvironment() {
     return thothEnvironment;
   }

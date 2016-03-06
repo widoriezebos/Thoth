@@ -14,7 +14,7 @@ public class ContextIndexCommandTest extends CommandTest {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
 
-    String[] htmlExists = new String[] {"Books by Category", "TestContext/books/Main.book"};
+    String[] htmlExists = new String[] {"Books by Category"};
     String[] jsonExists = new String[] {"\"name\":\"Second.book\""};
 
     testCommand(new ContextIndexCommand(setupContentManager(), this), "/", "contextindex", htmlExists, jsonExists);
