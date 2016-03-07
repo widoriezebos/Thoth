@@ -65,7 +65,8 @@ public class SkinManager {
       List<Skin> allSkins = getBuiltinSkins(contentManager);
       allSkins.addAll(getLocalSkins(contentManager));
       Skin defaultSkin = determineDefaultSkin(allSkins);
-      FileHandle skinMappingFile = contentManager.getFileHandle(ThothUtil.suffix(contentManager.getLibraryRoot(), "/") + SKINS_PROPERTIES);
+      String skinFileName = ThothUtil.suffix(contentManager.getLibraryRoot(), "/") + SKINS_PROPERTIES;
+      FileHandle skinMappingFile = contentManager.getFileHandle(skinFileName);
       if (!skinMappingFile.isFile()) {
         if (!StringUtils.isBlank(contextName))
           LOG.info(

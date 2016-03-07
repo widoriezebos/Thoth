@@ -52,7 +52,7 @@ public class SkinManagerTest {
 
     ContentManager mockedContentManager = mock(ContentManager.class);
     when(mockedContentManager.getContextName()).thenReturn("testcontext");
-    when(mockedContentManager.getFileHandle("skins.properties")).thenReturn(skinsHandle);
+    when(mockedContentManager.getFileHandle("/skins.properties")).thenReturn(skinsHandle);
     when(mockedContentManager.getFileHandle(skin1)).thenReturn(skinHandle1);
     when(mockedContentManager.getFileHandle(skin2)).thenReturn(skinHandle2);
     when(mockedContentManager.find("skin.properties", true)).thenReturn(getNodes(factory, skin1, skin2));
@@ -106,7 +106,7 @@ public class SkinManagerTest {
     assertEquals(testSkin, skinManager.determineSkin("/a/c/something"));
     assertEquals(testSkin2, skinManager.determineSkin("/a/b/something"));
 
-    when(mockedContentManager.getFileHandle("skins.properties")).thenReturn(factory.getFileHandle("wrong"));
+    when(mockedContentManager.getFileHandle("/skins.properties")).thenReturn(factory.getFileHandle("wrong"));
     skinManager = new SkinManager(mockedContentManager, SkinManager.SKIN_PARENT_OF_ALL);
     skinMappings = skinManager.getSkinMappings();
     assertEquals(1, skinMappings.size());
