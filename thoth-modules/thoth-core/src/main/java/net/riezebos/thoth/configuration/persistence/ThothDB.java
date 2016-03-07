@@ -16,10 +16,12 @@ package net.riezebos.thoth.configuration.persistence;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +31,7 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.configuration.persistence.dbs.DDLExecuter;
 import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiom;
 import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiomFactory;
+import net.riezebos.thoth.configuration.persistence.dbs.impl.ConnectionWrapper;
 import net.riezebos.thoth.configuration.persistence.dbs.impl.DDLException;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.util.ThothUtil;
@@ -38,19 +41,38 @@ public class ThothDB {
   private ThothEnvironment thothEnvironment;
 
   private Map<String, String> queries = null;
+  private Map<String, String> drivers = null;
 
   public ThothDB(ThothEnvironment thothEnvironment)
-
   {
     this.thothEnvironment = thothEnvironment;
+    setupDriverClass();
   }
 
   public void init() throws DatabaseException {
 
     try {
+      String databaseType = getConfiguration().getDatabaseType();
+
+      // The following is required to make sure the DriverManager can find the Derby Embedded driver on the classpath
+      // even when using a Web Context classloader provided by (for instance) Tomcat
+      for (Entry<String, String> entry : drivers.entrySet())
+        if (databaseType.toLowerCase().indexOf(entry.getKey()) != -1)
+          registerDriver(entry.getValue());
+
       setupServer();
     } catch (Exception e) {
       throw new DatabaseException(e);
+    }
+  }
+
+  protected void registerDriver(String driverClassName) throws DatabaseException {
+
+    try {
+      Class<?> driverClass = Thread.currentThread().getContextClassLoader().loadClass(driverClassName);
+      DriverManager.registerDriver((Driver) driverClass.newInstance());
+    } catch (Exception e) {
+      throw new DatabaseException(e.getMessage(), e);
     }
   }
 
@@ -71,7 +93,9 @@ public class ThothDB {
     properties.put("user", getConfiguration().getDatabaseUser());
     properties.put("password", getConfiguration().getDatabasePassword());
 
-    return DriverManager.getConnection(databaseUrl, properties);
+    Connection connection = DriverManager.getConnection(databaseUrl, properties);
+    connection.setAutoCommit(false);
+    return new ConnectionWrapper(connection);
   }
 
   protected void initializeSchema(Connection connection) throws SQLException, DDLException, IOException {
@@ -120,4 +144,15 @@ public class ThothDB {
     }
   }
 
+  protected void setupDriverClass() {
+    this.drivers = new HashMap<>();
+
+    drivers.put("embedded", "org.apache.derby.jdbc.EmbeddedDriver");
+    drivers.put("derby", "org.apache.derby.jdbc.ClientDriver");
+    drivers.put("oracle", "oracle.jdbc.OracleDriver");
+    drivers.put("postgr", "org.postgresql.Driver");
+    drivers.put("h2", "org.h2.Driver");
+    drivers.put("hsql", "org.hsqldb.jdbc.JDBCDriver");
+    drivers.put("mysql", "com.mysql.jdbc.Driver");
+  }
 }

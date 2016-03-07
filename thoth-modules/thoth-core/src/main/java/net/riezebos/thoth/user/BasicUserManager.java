@@ -15,6 +15,7 @@
 package net.riezebos.thoth.user;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -77,7 +78,9 @@ public class BasicUserManager implements UserManager {
     Stream<User> filter = identities.stream()//
         .filter(usr -> usr instanceof User)//
         .map(u -> (User) u);
-    return filter.collect(Collectors.toList());
+    List<User> users = filter.collect(Collectors.toList());
+    Collections.sort(users);
+    return users;
   }
 
   @Override
@@ -86,7 +89,9 @@ public class BasicUserManager implements UserManager {
     Stream<Group> filter = identities.stream()//
         .filter(grp -> grp instanceof Group)//
         .map(g -> (Group) g);
-    return filter.collect(Collectors.toList());
+    List<Group> groups = filter.collect(Collectors.toList());
+    Collections.sort(groups);
+    return groups;
   }
 
   @Override

@@ -3,10 +3,10 @@ In this section you will find the settings Thoth supports. The configuration of 
 
 ## Required settings
 workspacelocation
-: States where the working files of Thoth will be created. This is where Thoth will checkout branches and create search indexes. In principle it is completely safe to delete the entire contents of the workspace (after shutting down Thoth). When Thoth is launched it will automatically recreate the contents of the workspace.
+: States where the working files of Thoth will be created. This is where Thoth will checkout branches and create search indexes. In principle it is completely safe to delete the entire contents of the workspace (after shutting down Thoth). When Thoth is launched it will automatically recreate the contents of the workspace, including any embedded database. But NOTE: If you delete the ‘thoth-database’ folder in your workspace you will *also have deleted the embedded Thoth database*. Although the embedded database will be recreated automatically on startup, you will have lost all your users and groups as a result.
 
 ### defaultgroup
-: When not logged in; this group defines the (default) permissions. By default the following groups are defined by Thoth: thoth\_administrators, thoth\_writers, thoth\_readers, thoth\_anonymous. By default administrators can do anything in Thoth, writers can not pull nor reindex nor do user management but basically anything else. Readers can only access books and anonymous has only access to the main index page (so they can login)
+: When not logged in; this group defines the (default) permissions. By default the following groups are defined by Thoth: thoth\_administrators, thoth\_writers, thoth\_readers, thoth\_anonymous. Administrators can do anything in Thoth, writers can not pull nor reindex nor do user management but basically anything else. Readers can only access books and anonymous has only access to the main index page (so they can login from there)
 
 ### Repository settings
 Repositories are the source for content. In the case of a Git repository Thoth will pull a branch as the source of the content. In the case of a FileSystem repository nothing will be pulled; the specified location for the repository is then used as-is.
@@ -25,6 +25,21 @@ repository.1.username
 
 repository.1.password
 : The password for logging in to the repository. In the case of a FS or Zip repository this can be left blank.
+
+### Database settings
+Thoth uses a database to store it’s users and groups (among others). If you use the defaults ‘as-is’ then the database will be a Derby embedded one that needs no additional setup (will be automatically created on startup, default location will be a subfolder ‘thoth-database’ in your workspace. If you require a different database, or if you want your derby embedded database files located outside your workspace, then you need to set the properties below. Also note that you need to add the appropriate JDBC driver jar on the classpath. The tables will be automatically created (and filled with initial values) regardless the type of database.
+
+database.type
+: The type of database (driver) to use. Supported are ‘embedded’, ‘derby’, ’oracle’ and ‘postgresql’. Unsupported but available are also ‘h2’, ‘hsqldb’ and ‘mysql’. The default is ‘embedded’.
+
+database.url
+: The JDBC url for the database. If you use the embedded database this can be just a folder relative to your workspace or an absolute folder if you want the database files to be stored outside your workspace. In all other cases the JDBC url depends on the driver chosen. For Postgresql you would have something like jdbc:postgresql://localhost:5432/thoth
+
+database.user
+: The username to connect with to the database. Can leave empty for embedded.
+
+database.password
+: The password to connect with to the database. Can leave empty for embedded.
 
 ### Context settings
 A context if the root of a library, and corresponds to a branch in Git. For FileSystem  repositories there is not branch, but the name of the context is used in Thoth to refer to the contents. Note the numeric index in the name (1) which enumerates the context definition. You can define as many contexts as long as you number them sequentially leaving no gaps. Thoth will stop at the first context.*n*.name that does not have it’s value set.

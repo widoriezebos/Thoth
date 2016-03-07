@@ -404,7 +404,11 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
   }
 
   public void setCurrentUser(HttpServletRequest request, User user) {
-    HttpSession session = request.getSession(true);
+    // Invalidate any current session before we start a fresh one with a logged in user
+    HttpSession session = request.getSession(false);
+    if (session != null)
+      session.invalidate();
+    session = request.getSession(true);
     session.setAttribute(SESSION_USER_KEY, user);
   }
 

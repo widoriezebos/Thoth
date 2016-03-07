@@ -120,4 +120,8 @@ public class RepositoryDefinition implements Cloneable {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return getName();
+  }
 }

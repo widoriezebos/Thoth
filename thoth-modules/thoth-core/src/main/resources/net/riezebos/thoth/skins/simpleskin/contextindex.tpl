@@ -13,7 +13,10 @@
     
     #if(${permissions.contains("SEARCH")})
     <form action="${contexturl}?cmd=search" method="get">
-      Search all of ${context}: <input type="text" name="query" size="40"/> <input type="submit" value="Search"/> <input type="hidden" name="cmd" value="search" />
+      Search all of ${context}: 
+      <input type="text" name="query" size="40" autofocus="true"/> 
+      <input type="submit" value="Search"/> 
+      <input type="hidden" name="cmd" value="search" />
     </form>
     #end
     
@@ -52,16 +55,23 @@
     #if(${permissions.contains("MANAGE_USERS")})
       <a href=".?cmd=manageusers">Manage users</a><br/>
     #end   
-    Latest successfull Pull request was at ${refresh}<br/> 
-    Currently using skin: ${skin}<br>
+    
     #if($loggedin)
-      Logged in as ${identity}.
-      <br/>
       <a href=".?cmd=userprofile">Edit profile</a>
       <br/>
       <a href=".?cmd=logout">Log out</a><br/>
     #else
       <a href=".?cmd=login">Login</a> <br/>
     #end
+
+    <footer>
+      #if($loggedin)
+        Logged in as ${identity}.
+      #end  
+      Currently using skin: ${skin}<br>
+      Latest successfull Pull request was at ${refresh}.
+      Powered by Thoth core version ${thothutil.getVersion()}
+    </footer>
+    
   </body>
 </html>

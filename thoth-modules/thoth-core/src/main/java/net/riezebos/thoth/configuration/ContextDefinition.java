@@ -113,4 +113,9 @@ public class ContextDefinition implements Cloneable {
       return false;
     return true;
   }
+
+  @Override
+  public String toString() {
+    return getBranch() + "@" + getName();
+  }
 }

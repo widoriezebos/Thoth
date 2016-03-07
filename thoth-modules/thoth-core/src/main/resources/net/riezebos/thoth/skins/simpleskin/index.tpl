@@ -22,7 +22,6 @@
     #end	
 
     <br/><br/>
-    Latest successfull Pull request was at ${refresh}
     <br/>
     #if(${permissions.contains("PULL")})
       To update the site to the latest version right now; you can <a href=".?cmd=pull">Pull manually</a><br/>
@@ -35,8 +34,6 @@
     #end   
     <br/>
     #if($loggedin)
-      Logged in as ${identity}.
-      <br/>
       <a href=".?cmd=userprofile">Edit profile</a>
       <br/>
       <a href=".?cmd=logout">Log out</a><br/>
@@ -45,6 +42,12 @@
         <a href=".?cmd=login">Login</a> <br/>
       #end  
     #end
-    <sub>Powered by Thoth core version ${thothutil.getVersion()}</sub>
+    <footer>
+      #if($loggedin)
+        Logged in as ${identity}.<br/>
+      #end  
+      Latest successfull Pull request was at ${refresh}.
+      Powered by Thoth core version ${thothutil.getVersion()}
+    </footer>
   </body>
 </html>

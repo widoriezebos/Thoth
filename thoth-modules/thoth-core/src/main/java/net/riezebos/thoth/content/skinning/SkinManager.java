@@ -60,18 +60,19 @@ public class SkinManager {
     this.setContentManager(contentManager);
     this.defaultSkinName = defaultSkinName;
     try {
-      String context = contentManager.getContextName();
+      String contextName = contentManager.getContextName();
 
       List<Skin> allSkins = getBuiltinSkins(contentManager);
       allSkins.addAll(getLocalSkins(contentManager));
       Skin defaultSkin = determineDefaultSkin(allSkins);
-      FileHandle skinMappingFile = contentManager.getFileHandle(SKINS_PROPERTIES);
+      FileHandle skinMappingFile = contentManager.getFileHandle(ThothUtil.suffix(contentManager.getLibraryRoot(), "/") + SKINS_PROPERTIES);
       if (!skinMappingFile.isFile()) {
-        LOG.info(
-            "No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFile.getName() + " so falling back to default which is " + defaultSkinName);
+        if (!StringUtils.isBlank(contextName))
+          LOG.info(
+              "No " + SKINS_PROPERTIES + " properties file found at " + skinMappingFile.getName() + " so falling back to default which is " + defaultSkinName);
         skinMappings.add(new SkinMapping("*", defaultSkin));
       } else {
-        skinMappings.addAll(createSkinMappingsFromFile(context, skinMappingFile));
+        skinMappings.addAll(createSkinMappingsFromFile(contextName, skinMappingFile));
       }
       setupInheritance(allSkins);
     } catch (IOException | ContentManagerException e) {

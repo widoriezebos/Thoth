@@ -1,0 +1,57 @@
+.tabs {
+  width: 100%;
+  float: none;
+  list-style: none;
+  position: relative;
+  text-align: left;
+}
+.tabs li {
+  float: left;
+  display: block;
+}
+.tabs input[type="radio"] {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+.tabs label {
+  display: block;
+  padding: 4px 21px;
+  border-radius: 2px 2px 0 0;
+  font-size: 20px;
+  font-weight: normal;
+  background: #d0d0d0;
+  cursor: pointer;
+  position: relative;
+  top: 4px;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+.tabs label:hover {
+  background: #f8f8f8;
+}
+.tabs .tab-content {
+  z-index: 2;
+  display: none;
+  overflow: hidden;
+  width: 100%;
+  font-size: 17px;
+  line-height: 25px;
+  padding: 25px;
+  position: absolute;
+  top: 53px;
+  left: 0;
+  background: #f8f8f8;
+  border-radius:5px;
+}
+.tabs [id^="tab"]:checked + label {
+  top: 0;
+  padding-top: 10px;
+  background: #f8f8f8;
+}
+.tabs [id^="tab"]:checked ~ [id^="tab-content"] {
+  display: block;
+}
+

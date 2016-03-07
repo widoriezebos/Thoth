@@ -90,6 +90,30 @@ public class ManageUsersCommand extends RendererBase implements Command {
       throw new RenderException(e);
     }
   }
+  
+  protected RenderResult handleRender(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws Exception {
+    Map<String, Object> variables = new HashMap<>(arguments);
+
+    UserManager userManager = getThothEnvironment().getUserManager();
+    List<User> users = userManager.listUsers();
+    List<Group> groups = userManager.listGroups();
+    List<Identity> identities = new ArrayList<Identity>();
+    identities.addAll(users);
+    identities.addAll(groups);
+
+    variables.put("users", users);
+    variables.put("groups", groups);
+    variables.put("identities", identities);
+
+    if (asJson(arguments))
+      executeJson(variables, outputStream);
+    else {
+      String manageUsersTemplate = skin.getManageUsersTemplate();
+      renderTemplate(manageUsersTemplate, null, variables, outputStream);
+    }
+    return RenderResult.OK;
+  }
 
   protected RenderResult handleOperation(String operationCode, Identity identity, String contextName, String path, CommandOperation operation,
       Map<String, Object> arguments, Skin skin, OutputStream outputStream) throws Exception {
@@ -289,29 +313,5 @@ public class ManageUsersCommand extends RendererBase implements Command {
       valid = false;
     }
     return valid;
-  }
-
-  protected RenderResult handleRender(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
-      OutputStream outputStream) throws Exception {
-    Map<String, Object> variables = new HashMap<>(arguments);
-
-    UserManager userManager = getThothEnvironment().getUserManager();
-    List<User> users = userManager.listUsers();
-    List<Group> groups = userManager.listGroups();
-    List<Identity> identities = new ArrayList<Identity>();
-    identities.addAll(users);
-    identities.addAll(groups);
-
-    variables.put("users", users);
-    variables.put("groups", groups);
-    variables.put("identities", identities);
-
-    if (asJson(arguments))
-      executeJson(variables, outputStream);
-    else {
-      String manageUsersTemplate = skin.getManageUsersTemplate();
-      renderTemplate(manageUsersTemplate, null, variables, outputStream);
-    }
-    return RenderResult.OK;
   }
 }

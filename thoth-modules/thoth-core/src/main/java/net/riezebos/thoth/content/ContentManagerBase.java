@@ -486,4 +486,9 @@ public abstract class ContentManagerBase implements ContentManager {
   public void setAccessManager(AccessManager accessManager) {
     this.accessManager = accessManager;
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " " + getContextName();
+  }
 }

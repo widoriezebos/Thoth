@@ -18,11 +18,13 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import net.riezebos.thoth.beans.Book;
 import net.riezebos.thoth.beans.BookClassification;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
+import net.riezebos.thoth.content.AccessManager;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -45,16 +47,18 @@ public class ContextIndexCommand extends RendererBase implements Command {
     return TYPE;
   }
 
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
     try {
       ContentManager contentManager = getContentManager(context);
-      if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.ACCESS))
+      AccessManager accessManager = contentManager.getAccessManager();
+      if (!accessManager.hasPermission(identity, path, Permission.ACCESS))
         return RenderResult.FORBIDDEN;
 
       Classifier classifier = new Classifier();
 
-      List<Book> books = contentManager.getBooks();
+      List<Book> books =
+          contentManager.getBooks().stream().filter(p -> accessManager.hasPermission(identity, p.getPath(), Permission.ACCESS)).collect(Collectors.toList());
 
       Configuration configuration = getThothEnvironment().getConfiguration();
       List<String> classificationNames = configuration.getContextIndexClassifications();

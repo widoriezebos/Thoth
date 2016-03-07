@@ -15,4 +15,5 @@ Thoth Administrator's Guide<br/>
 \include{/Administration/Setup by Example.md}
 \include{/Writers/Skins.md}
 \include{/Administration/Configuration.md}
+\include{/Administration/User Management.md}
 \include{/Administration/Server from scratch.md}

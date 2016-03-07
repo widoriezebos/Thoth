@@ -211,3 +211,9 @@ del {
 	height: 80px;
     float: right;
 }
+
+footer {
+    padding-top: 10px;
+	font-size: 10px;	
+}
+}

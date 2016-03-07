@@ -1,3 +1,10 @@
+# Logging in to Thoth
+When Thoth is started for the first time it will create the Thoth database and set it up with the built-in user (administrator) and groups. If you have not changed anything to the database configuration and use the defaults then you will be running a Derby embedded database and the database files will be stored in your workspace in a sub-folder named ‘thoth-database’.
+
+You can log in with `administrator`/`Welcome2Thoth!` and then create your own users (and please do not forget to change the administrator’s password immediately).
+
+Note that you can use a remote database server (Oracle, Postgresql, Derby) if you do not want the embedded database (for instance when clustering multiple Thoth nodes using the same user database).
+
 # Setting up your first library
 Your library is the folder that is the root for all your documents. In the root of your library you will want to place (at least) to files: 
 

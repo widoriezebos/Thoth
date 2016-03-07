@@ -15,13 +15,16 @@
 package net.riezebos.thoth.user;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public abstract class Identity implements Cloneable, Serializable {
+public abstract class Identity implements Cloneable, Serializable, Comparable<Identity> {
   private static final long serialVersionUID = 1L;
   private Long id = null;
   private String identifier;
@@ -84,8 +87,10 @@ public abstract class Identity implements Cloneable, Serializable {
   }
 
   @JsonIgnore
-  public Set<Group> getMemberships() {
-    return memberships;
+  public List<Group> getMemberships() {
+    ArrayList<Group> groups = new ArrayList<>(memberships);
+    Collections.sort(groups);
+    return groups;
   }
 
   public Set<String> getMemberOf() {
@@ -100,6 +105,13 @@ public abstract class Identity implements Cloneable, Serializable {
   @JsonIgnore
   public String getDescription() {
     return getIdentifier();
+  }
+
+  @Override
+  public int compareTo(Identity o) {
+    if (o == null)
+      return -1;
+    return getIdentifier().compareTo(o.getIdentifier());
   }
 
 }
