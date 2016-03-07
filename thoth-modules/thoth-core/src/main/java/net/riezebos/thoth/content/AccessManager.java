@@ -24,9 +24,7 @@ public class AccessManager {
   private List<AccessRule> accessRules = new ArrayList<>();
   private boolean denyall = false;
 
-  public AccessManager(ContentManager contentManager)
-
-  {
+  public AccessManager(ContentManager contentManager) {
     this.contentManager = contentManager;
     FileHandle accessRulesFile = contentManager.getFileHandle(ThothUtil.suffix(contentManager.getLibraryRoot(), "/") + ACCESS_RULES_FILE);
     if (accessRulesFile.exists()) {
@@ -77,7 +75,7 @@ public class AccessManager {
 
     Set<String> memberOf = identity.getMemberOf();
     boolean result = false;
-    
+
     for (AccessRule rule : accessRules) {
       if (rule.applies(path)) {
         result = rule.isAccessAllowed(memberOf);

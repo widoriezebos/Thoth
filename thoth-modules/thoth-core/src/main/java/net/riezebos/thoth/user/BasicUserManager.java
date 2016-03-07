@@ -17,22 +17,30 @@ package net.riezebos.thoth.user;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.dao.IdentityDao;
+import net.riezebos.thoth.util.ExpiringCache;
 
 /**
  * @author wido
  */
 public class BasicUserManager implements UserManager {
+  private static final int THIRTY_SECONDS = 30 * 1000;
+  private static final Logger LOG = LoggerFactory.getLogger(BasicUserManager.class);
 
-  IdentityDao identityDao;
+  private ExpiringCache<String, String> ssoTokenCache = new ExpiringCache<>(THIRTY_SECONDS);
+
+  private IdentityDao identityDao;
 
   public BasicUserManager(ThothEnvironment thothEnvironment) throws UserManagerException {
     try {
@@ -140,4 +148,22 @@ public class BasicUserManager implements UserManager {
   public <T extends Identity> T merge(T identity) throws UserManagerException {
     return identityDao.merge(identity);
   }
+
+  @Override
+  public String generateSSOToken(Identity identity) {
+    String token = UUID.randomUUID().toString();
+    ssoTokenCache.put(token, identity.getIdentifier());
+    return token;
+  }
+
+  @Override
+  public Identity getIdentityForToken(String token) {
+    try {
+      return getIdentity(ssoTokenCache.get(token));
+    } catch (UserManagerException e) {
+      LOG.error(e.getMessage(), e);
+      return null;
+    }
+  }
+
 }

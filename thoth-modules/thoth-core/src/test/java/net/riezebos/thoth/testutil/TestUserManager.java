@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.Group;
@@ -25,6 +29,7 @@ import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
 import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.user.UserManager;
+import net.riezebos.thoth.util.ExpiringCache;
 
 /**
  * @author wido
@@ -32,8 +37,11 @@ import net.riezebos.thoth.user.UserManager;
 public class TestUserManager implements UserManager {
 
   public static final String ADMINISTRATORPW = "administratorpw";
+  private static final Logger LOG = LoggerFactory.getLogger(TestUserManager.class);
+  private static final int THIRTY_SECONDS = 30 * 1000;
   private Map<String, User> users = new HashMap<>();
   private Map<String, Group> groups = new HashMap<>();
+  private ExpiringCache<String, String> ssoTokenCache = new ExpiringCache<>(THIRTY_SECONDS);
 
   public TestUserManager() {
     Group administrators = new Group("administrators");
@@ -154,6 +162,23 @@ public class TestUserManager implements UserManager {
     if (user != null)
       return user;
     return getGroup(identifier);
+  }
+
+  @Override
+  public String generateSSOToken(Identity identity) {
+    String token = UUID.randomUUID().toString();
+    ssoTokenCache.put(token, identity.getIdentifier());
+    return token;
+  }
+
+  @Override
+  public Identity getIdentityForToken(String token) {
+    try {
+      return getIdentity(ssoTokenCache.get(token));
+    } catch (UserManagerException e) {
+      LOG.error(e.getMessage(), e);
+      return null;
+    }
   }
 
 }

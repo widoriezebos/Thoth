@@ -20,6 +20,8 @@ import net.riezebos.thoth.exceptions.UserManagerException;
 
 public interface UserManager {
 
+  public static final String SSO_TOKEN_NAME = "ssotoken";
+
   User getUser(String identifier) throws UserManagerException;
 
   Group getGroup(String identifier) throws UserManagerException;
@@ -45,5 +47,9 @@ public interface UserManager {
   <T extends Identity> T merge(T identity) throws UserManagerException;
 
   Identity getIdentity(String identifier) throws UserManagerException;
+
+  String generateSSOToken(Identity identity);
+
+  Identity getIdentityForToken(String token);
 
 }

@@ -95,7 +95,7 @@ renderer.1.command
 : The OS level command to render the output. The following keywords can be used for substitution in the command:
 
 - input, the file that contains the source document
-- url, the URL where to fetch the contents of the source document from. Note that this is an alternative method of specifying the input (without using the input file directly)
+- url, the URL where to fetch the contents of the source document from. Note that this is an alternative method of specifying the input (without using the input file directly). The URL will contain a token parameter (ssotoken) for single sign on, so if you append any parameters to the URL you should use a ‘&’ and not a ‘?’. (See the example below, renderer.1.command)
 - output, the name of the file to write the rendered contents to
 - context, the name of the context
 - path, the path of the file in the context
@@ -106,7 +106,7 @@ An few examples of custom renderers (note the use of ${url} and ${input}):
 	renderer.1.extension=pdf 
 	renderer.1.source=html 
 	renderer.1.contenttype=application/pdf 
-	renderer.1.command=/usr/local/bin/prince ${url}?suppresserrors=true -o ${output} --javascript --media=print --page-size=A4 --page-margin=20mm 
+	renderer.1.command=/usr/local/bin/prince ${url}&suppresserrors=true -o ${output} --javascript --media=print --page-size=A4 --page-margin=20mm 
 	
 	renderer.2.extension=docx
 	renderer.2.source=html 
@@ -125,7 +125,7 @@ An few examples of custom renderers (note the use of ${url} and ${input}):
 
 Note: on Windows the command for Prince is different:
 
-	renderer.1.command=/Program Files/Prince/engine/bin/prince.exe ${url}?suppresserrors=true -o ${output} --javascript --media=print --page-size=A4 --page-margin=20mm 
+	renderer.1.command=/Program Files/Prince/engine/bin/prince.exe ${url}&suppresserrors=true -o ${output} --javascript --media=print --page-size=A4 --page-margin=20mm 
 
 And for Pandoc it will be like (note the user name in the path):
 

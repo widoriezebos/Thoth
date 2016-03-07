@@ -397,6 +397,18 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
   }
 
   public Identity getCurrentIdentity(HttpServletRequest request) {
+
+    String ssoToken = request.getParameter(UserManager.SSO_TOKEN_NAME);
+    if (ssoToken != null) {
+      try {
+        Identity identity = getThothEnvironment().getUserManager().getIdentityForToken(ssoToken);
+        if (identity != null)
+          return identity;
+      } catch (ContentManagerException e) {
+        LOG.error(e.getMessage());
+      }
+    }
+
     HttpSession session = request.getSession(false);
     Identity result = null;
     if (session != null)

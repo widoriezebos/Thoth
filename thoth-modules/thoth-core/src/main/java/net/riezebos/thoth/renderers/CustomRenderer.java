@@ -36,12 +36,14 @@ import org.slf4j.LoggerFactory;
 import net.riezebos.thoth.commands.CommandOperation;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
+import net.riezebos.thoth.content.AccessManager;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.user.UserManager;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class CustomRenderer extends RendererBase implements Renderer {
@@ -95,15 +97,16 @@ public class CustomRenderer extends RendererBase implements Renderer {
     this.commandLine = commandLine;
   }
 
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
     try {
       Configuration configuration = getConfiguration();
       ContentManager contentManager = getContentManager(context);
 
       boolean isBook = configuration.isBook(path);
       Permission permission = isBook ? Permission.READ_BOOKS : Permission.READ_FRAGMENTS;
-      if (!contentManager.getAccessManager().hasPermission(identity, path, permission))
+      AccessManager accessManager = contentManager.getAccessManager();
+      if (!accessManager.hasPermission(identity, path, permission))
         return RenderResult.FORBIDDEN;
 
       ByteArrayOutputStream sourceBytes = new ByteArrayOutputStream();
@@ -122,11 +125,14 @@ public class CustomRenderer extends RendererBase implements Renderer {
       File tempInput = File.createTempFile("thothhtml", "." + getSource());
       try {
         IOUtils.copy(new ByteArrayInputStream(sourceBytes.toByteArray()), new FileOutputStream(tempInput));
-
-        String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20");
+        UserManager userManager = getThothEnvironment().getUserManager();
+        String ssoToken = userManager.generateSSOToken(identity);
+        String url = (configuration.getLocalHostUrl() + context + "/" + path).replaceAll(" ", "%20") //
+            + "?" + UserManager.SSO_TOKEN_NAME + "=" + ssoToken;
 
         arguments.put("input", ThothUtil.normalSlashes(tempInput.getAbsolutePath()));
         arguments.put("url", url);
+        arguments.put("ssotoken", ssoToken);
         arguments.put("output", ThothUtil.normalSlashes(tempOutput.getAbsolutePath()));
         String command = ThothUtil.replaceKeywords(getCommandLine(configuration), arguments);
 
