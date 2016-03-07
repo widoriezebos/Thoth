@@ -309,6 +309,9 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
       RenderResult renderResult = command.execute(getCurrentIdentity(request), context, getPath(request), operation, parameters, getSkin(request), bos);
 
+      String contextPath = request.getContextPath();
+      if (StringUtils.isBlank(contextPath))
+        contextPath = "/";
       switch (renderResult.getCode()) {
       case OK:
         // Only now will we touch the response; this to avoid sending stuff out already and then
@@ -323,13 +326,13 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       case LOGGED_OUT:
         setCurrentUser(request, null);
         request.getSession().invalidate();
-        response.sendRedirect(request.getContextPath());
+        response.sendRedirect(contextPath);
         break;
       case LOGGED_IN:
         User user = renderResult.getArgument(LoginCommand.USER_ARGUMENT);
         setCurrentUser(request, user);
         if (StringUtils.isBlank(context))
-          response.sendRedirect(request.getContextPath());
+          response.sendRedirect(contextPath);
         else
           response.sendRedirect(getContextUrl(request));
         break;
