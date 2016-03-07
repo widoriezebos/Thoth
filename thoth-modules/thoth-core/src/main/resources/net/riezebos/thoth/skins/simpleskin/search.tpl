@@ -12,8 +12,8 @@
     <a href="${contexturl}">Back to Index</a>
     <form action="${contexturl}" method="get">
       Search all of ${context}: 
-      <input type="text" name="query" value="${thothutil.escapeHtml($query)}" size="40" autofocus="true"/>
-      <input type="submit" value="Query"/> <input type="hidden" name="cmd" value="search" />
+      <input type="text" name="query" value="#if($query)${thothutil.escapeHtml($query)}#end" size="40" autofocus="true"/>
+      <input type="submit" value="Search"/> <input type="hidden" name="cmd" value="search" />
     </form>
     
     Showing page ${page}<br/>
@@ -33,12 +33,14 @@
     #end
     
     &nbsp;
+    #if($query)
     <h1>Search results for '$query'</h1>
+    #end
     
     #if($errorMessage)
       <fragment>
         <pre>
-          There was a problem parsing your query.<br/>
+          Could not understand your query<br/>
           $errorMessage
         </pre>
       </fragment>
@@ -50,7 +52,8 @@
     
     #foreach($searchResult in $searchResults)
       <searchresult>
-        ${searchResult.indexNumber}. Found in <a href="$contexturl${searchResult.document}">${searchResult.document}</a> (<a href="$contexturl${searchResult.document}?cmd=meta">meta</a>)
+        ${searchResult.indexNumber}. Found in <a href="$contexturl${searchResult.document}">${searchResult.document}</a>
+        #if(${permissions.contains("META")})(<a href="$contexturl${searchResult.document}?cmd=meta">meta</a>)#end
         
         #if(!${searchResult.bookReferences.isEmpty()})
           which is part of 

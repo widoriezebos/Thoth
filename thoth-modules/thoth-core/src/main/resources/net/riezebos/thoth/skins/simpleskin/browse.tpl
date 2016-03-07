@@ -28,7 +28,7 @@
           <tr><td>${thothutil.formatDate($contentNode.dateModified)}</td><td>${contentNode.path}</td><td>${contentNode.size}</td>
               <td><a href="${contexturl}${contentNode.path}">html</a> 
                   <a href="${contexturl}${contentNode.path}?output=raw">raw</a>
-                  <a href="${contexturl}${contentNode.path}?cmd=meta">meta</a>
+                  #if(${permissions.contains("META")})<a href="${contexturl}${contentNode.path}?cmd=meta">meta</a>#end
               </td>
           </tr>
         #end

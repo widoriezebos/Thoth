@@ -44,7 +44,8 @@
                     #foreach($outputFormat in $outputFormats)                   
                       <a href="${context}${book.path}?output=$outputFormat">$outputFormat</a>
                     #end
-                    <a href="${context}${book.path}?cmd=meta">meta</a> )<br/>
+                    #if(${permissions.contains("META")})<a href="${context}${book.path}?cmd=meta">meta</a>#end 
+                    )<br/>
                 #end
             </td>
           </tr>
