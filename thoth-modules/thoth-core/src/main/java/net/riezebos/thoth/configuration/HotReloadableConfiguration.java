@@ -26,8 +26,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.context.ContextDefinition;
+import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.exceptions.ConfigurationException;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 
 /**
@@ -78,7 +79,7 @@ public class HotReloadableConfiguration implements Configuration {
    * atomically. Also notify any listeners of changes to contexts.
    */
   synchronized public void reload() throws FileNotFoundException, ConfigurationException {
-    Set<ContextDefinition> originalContextDefinitions = new HashSet<>(activeConfiguration.getContextDefinitions().values());
+    Set<ContextDefinition> originalContextDefinitions = new HashSet<>(activeConfiguration.getConfiguredContextDefinitions().values());
     List<CustomRendererDefinition> originalCustomRenderers = activeConfiguration.getCustomRenderers();
 
     Configuration newOne = activeConfiguration.clone();
@@ -90,7 +91,7 @@ public class HotReloadableConfiguration implements Configuration {
     if (!originalCustomRenderers.equals(newCustomRenderers))
       notifyRendersChanges();
 
-    Set<ContextDefinition> newContextDefinitions = new HashSet<>(activeConfiguration.getContextDefinitions().values());
+    Set<ContextDefinition> newContextDefinitions = new HashSet<>(activeConfiguration.getConfiguredContextDefinitions().values());
 
     for (ContextDefinition original : originalContextDefinitions) {
       if (!newContextDefinitions.contains(original))
@@ -181,10 +182,6 @@ public class HotReloadableConfiguration implements Configuration {
 
   public long getParseTimeOut() {
     return activeConfiguration.getParseTimeOut();
-  }
-
-  public List<String> getContexts() {
-    return activeConfiguration.getContexts();
   }
 
   public void validate() throws ConfigurationException {
@@ -295,16 +292,12 @@ public class HotReloadableConfiguration implements Configuration {
     return activeConfiguration.getValue(key, dflt);
   }
 
-  public Map<String, ContextDefinition> getContextDefinitions() {
-    return activeConfiguration.getContextDefinitions();
+  public Map<String, ContextDefinition> getConfiguredContextDefinitions() {
+    return activeConfiguration.getConfiguredContextDefinitions();
   }
 
-  public Map<String, RepositoryDefinition> getRepositoryDefinitions() {
-    return activeConfiguration.getRepositoryDefinitions();
-  }
-
-  public ContextDefinition getContextDefinition(String name) throws ContextNotFoundException {
-    return activeConfiguration.getContextDefinition(name);
+  public Map<String, RepositoryDefinition> getConfiguredRepositoryDefinitions() {
+    return activeConfiguration.getConfiguredRepositoryDefinitions();
   }
 
   public boolean isValidContext(String name) {
@@ -357,6 +350,11 @@ public class HotReloadableConfiguration implements Configuration {
   @Override
   public String getDatabasePassword() {
     return activeConfiguration.getDatabasePassword();
+  }
+
+  @Override
+  public String getPasswordEncryptionKey() {
+    return activeConfiguration.getPasswordEncryptionKey();
   }
 
 }

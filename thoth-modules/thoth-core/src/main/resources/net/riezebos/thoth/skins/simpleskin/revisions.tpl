@@ -32,7 +32,7 @@
           <td>${commit.author}</td>
           <td>     
             #foreach($revision in $commit.revisions)
-              ${revision.action} ${revision.path} (<a href="${contexturl}${revision.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
+              ${revision.action} ${thothutil.addHtmlBreaks(${revision.path})} (<a href="${contexturl}${revision.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
             #end
           </td>
           <td>${commit.message}</td>

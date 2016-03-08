@@ -5,8 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
+import net.riezebos.thoth.context.ContextDefinition;
+import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.exceptions.ConfigurationException;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
 
 public interface Configuration extends Cloneable {
@@ -39,13 +40,6 @@ public interface Configuration extends Cloneable {
    * @return
    */
   long getParseTimeOut();
-
-  /**
-   * Returns the list of the names of all contexts defined
-   * 
-   * @return
-   */
-  List<String> getContexts();
 
   /**
    * Validates the configuration
@@ -247,23 +241,14 @@ public interface Configuration extends Cloneable {
    * 
    * @return
    */
-  Map<String, ContextDefinition> getContextDefinitions();
+  Map<String, ContextDefinition> getConfiguredContextDefinitions();
 
   /**
    * Returns a map of all defined Repositories. The key is the name (in lowercase) of the repository.
    * 
    * @return
    */
-  Map<String, RepositoryDefinition> getRepositoryDefinitions();
-
-  /**
-   * Returns the ContextDefinition of the specified context. The name is case insensitive
-   * 
-   * @param name
-   * @return
-   * @throws ContextNotFoundException
-   */
-  ContextDefinition getContextDefinition(String name) throws ContextNotFoundException;
+  Map<String, RepositoryDefinition> getConfiguredRepositoryDefinitions();
 
   /**
    * Returns true is the provided name references a known context
@@ -328,34 +313,43 @@ public interface Configuration extends Cloneable {
    * @return
    */
   String getDefaultGroup();
-  
+
   /**
-   * Returns the type of database to use for persistent storage. Use 'embedded' if you want to use the built-in database.
-   * Supported types are 'embedded', 'oracle' and 'postgres' although others might work depending on the URL used.
+   * Returns the type of database to use for persistent storage. Use 'embedded' if you want to use the built-in database. Supported types are 'embedded',
+   * 'oracle' and 'postgres' although others might work depending on the URL used.
+   * 
    * @return
    */
   public String getDatabaseType();
 
   /**
-   * Returns the JDBC URL of database to use for persistent storage. When the database type is set to embedded then
-   * just enter the path (directory) where you want the database files to be created/stored.
-   * When using other database types make sure the driver is on the classpath so that the DriverManager can find
+   * Returns the JDBC URL of database to use for persistent storage. When the database type is set to embedded then just enter the path (directory) where you
+   * want the database files to be created/stored. When using other database types make sure the driver is on the classpath so that the DriverManager can find
    * the correct JDBC driver.
+   * 
    * @return
    */
   public String getDatabaseUrl();
-  
+
   /**
    * Returns the database user for persistent storage
+   * 
    * @return
    */
   public String getDatabaseUser();
 
   /**
    * Returns the database password for persistent storage
+   * 
    * @return
    */
   public String getDatabasePassword();
 
+  /**
+   * The master password to encrypt all stored passwords with. NOTE! If you change the master password all passwords that are stored in the database will become
+   * invalid!
+   * @return 
+   */
+  public String getPasswordEncryptionKey();
 
 }

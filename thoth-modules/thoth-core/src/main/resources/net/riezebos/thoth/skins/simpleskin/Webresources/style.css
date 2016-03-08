@@ -160,7 +160,14 @@ table td.last {
 
 th, td {
     text-align: left;
+}
+
+td {
     vertical-align: top
+}
+
+th {
+    vertical-align: center
 }
 
 table td {
@@ -216,4 +223,4 @@ footer {
     padding-top: 10px;
 	font-size: 10px;	
 }
-}
+

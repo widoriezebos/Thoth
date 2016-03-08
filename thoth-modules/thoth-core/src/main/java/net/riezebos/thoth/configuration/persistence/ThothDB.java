@@ -108,7 +108,7 @@ public class ThothDB {
     }
   }
 
-  protected Configuration getConfiguration() {
+  public Configuration getConfiguration() {
     return thothEnvironment.getConfiguration();
   }
 

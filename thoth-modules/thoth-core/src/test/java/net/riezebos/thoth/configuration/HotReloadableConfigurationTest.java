@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 
 public class HotReloadableConfigurationTest implements ConfigurationChangeListener {

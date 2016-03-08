@@ -46,8 +46,6 @@ import org.mockito.stubbing.Answer;
 
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ContextDefinition;
-import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.configuration.TestCacheManager;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.AccessManager;
@@ -58,6 +56,9 @@ import net.riezebos.thoth.content.impl.FSContentManager;
 import net.riezebos.thoth.content.impl.util.TestFSContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
+import net.riezebos.thoth.context.ContextDefinition;
+import net.riezebos.thoth.context.ContextManager;
+import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.SkinManagerException;
@@ -81,7 +82,12 @@ public class ThothTestBase {
     Configuration mockedConfiguration = mockConfiguration(contextName);
     thothEnvironment.setConfiguration(mockedConfiguration);
     thothEnvironment.setUserManager(getTestUserManager());
+    thothEnvironment.setContextManager(getTestContextManager(thothEnvironment));
     return thothEnvironment;
+  }
+
+  protected ContextManager getTestContextManager(ThothEnvironment thothEnvironment) {
+    return new TestContextManager(thothEnvironment);
   }
 
   protected UserManager getTestUserManager() {
@@ -145,6 +151,11 @@ public class ThothTestBase {
   }
 
   protected Configuration mockConfiguration(String contextName) throws ContextNotFoundException {
+
+    ContextDefinition def = mockContextDefinition(contextName);
+    Map<String, ContextDefinition> map = new HashMap<>();
+    map.put(contextName, def);
+
     Configuration mockedConfiguration = mock(Configuration.class);
     when(mockedConfiguration.getWorkspaceLocation()).thenReturn("/some/workspace/");
     when(mockedConfiguration.getDefaultSkin()).thenReturn("SimpleSkin");
@@ -160,7 +171,7 @@ public class ThothTestBase {
     when(mockedConfiguration.getMarkdownOptions()).thenReturn(2098159);
     when(mockedConfiguration.isValidContext(contextName)).thenReturn(true);
     when(mockedConfiguration.getMainIndexSkinContext()).thenReturn(contextName);
-    when(mockedConfiguration.getContexts()).thenReturn(Arrays.asList(contextName));
+    when(mockedConfiguration.getConfiguredContextDefinitions()).thenReturn(map);
     when(mockedConfiguration.addNewlineBeforeheader()).thenReturn(true);
     when(mockedConfiguration.getDefaultGroup()).thenReturn("administrators");
     when(mockedConfiguration.getDatabaseUser()).thenReturn("thoth");

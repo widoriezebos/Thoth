@@ -12,12 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.exceptions;
+package net.riezebos.thoth.context.dao;
 
-public class ContextNotFoundException extends ContextManagerException {
-  private static final long serialVersionUID = 1L;
-
-  public ContextNotFoundException(String context) {
-    super("Context " + context + " is not defined");
-  }
+public interface Tables {
+  public static String THOTH_REPOSITORIES = "thoth_repositories";
+  public static String THOTH_CONTEXTS = "thoth_contexts";
 }

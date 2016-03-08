@@ -28,6 +28,7 @@ import org.pegdown.ast.SuperNode;
 import org.pegdown.ast.TableNode;
 import org.pegdown.ast.TextNode;
 
+import net.riezebos.thoth.util.ThothCoreUtil;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class CustomHtmlSerializer extends ToHtmlSerializer {
@@ -51,8 +52,7 @@ public class CustomHtmlSerializer extends ToHtmlSerializer {
   @Override
   public void visit(TextNode node) {
     if (currentTableNode != null) {
-      String text = node.getText();
-      text = text.replaceAll("([/\\,\\\\])", "$1<wbr/>");
+      String text = ThothCoreUtil.addHtmlBreaks(node.getText());
       if (abbreviations.isEmpty()) {
         printer.print(text);
       } else {

@@ -15,6 +15,10 @@
 package net.riezebos.thoth.user;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jasypt.encryption.pbe.PBEStringEncryptor;
+import org.jasypt.encryption.pbe.StandardPBEByteEncryptor;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
+import org.jasypt.encryption.pbe.config.SimplePBEConfig;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class PasswordUtil {
   private static final Logger LOG = LoggerFactory.getLogger(User.class);
 
-  public String encodePassword(String clearTextPassword) {
+  public String hashPassword(String clearTextPassword) {
     if (clearTextPassword == null || clearTextPassword.trim().length() == 0)
       return "";
     StrongPasswordEncryptor passwordEncryptor = new StrongPasswordEncryptor();
@@ -44,6 +48,27 @@ public class PasswordUtil {
       LOG.error(x.getMessage(), x);
       return false;
     }
+  }
+
+  public String encrypt(String masterPassword, String clearTextPassword) {
+    PBEStringEncryptor encrypter = getEncryptor(masterPassword);
+    return encrypter.encrypt(clearTextPassword);
+  }
+
+  public String decrypt(String masterPassword, String encryptedPassword) {
+    PBEStringEncryptor encrypter = getEncryptor(masterPassword);
+    return encrypter.decrypt(encryptedPassword);
+  }
+
+  protected PBEStringEncryptor getEncryptor(String masterPassword) {
+    StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+    encryptor.setPassword(masterPassword);
+    SimplePBEConfig config = new SimplePBEConfig();
+    config.setAlgorithm("PBEWithMD5AndDES");
+    config.setKeyObtentionIterations(StandardPBEByteEncryptor.DEFAULT_KEY_OBTENTION_ITERATIONS);
+    config.setPassword(masterPassword);
+    encryptor.setConfig(config);
+    return encryptor;
   }
 
 }

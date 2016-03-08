@@ -6,7 +6,7 @@ create table thoth_memberships (id bigint not null, grou_id bigint not null, ide
 create table thoth_permissions (id bigint not null, grou_id bigint not null, permission int not null, primary key (id));
 
 create table thoth_repositories (id bigint not null, name varchar(200), repotype varchar(30) not null, location varchar(400) not null, username varchar(400), password varchar(400), primary key (id));
-create table thoth_contexts (id bigint not null, name varchar(200), repo_id bigint not null, branch varchar(400), library varchar(400), primary key (id));
+create table thoth_contexts (id bigint not null, name varchar(200), repo_id bigint not null, branch varchar(400), library varchar(400), refreshinterval int, primary key (id));
 create table thoth_version (name varchar(200), version int not null, primary key (name));
 
 create table thoth_sequences (sequence_name varchar(50) not null, next_val bigint not null, primary key (sequence_name));

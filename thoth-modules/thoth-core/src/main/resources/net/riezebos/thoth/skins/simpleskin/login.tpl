@@ -8,7 +8,8 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
   </head>
   <body>
-    <h3>Please enter your credentials to login<img class="logo" src="${skinbase}/Webresources/logo.png"/></h3>
+    <h1>Login<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
+    <h3>Please enter your credentials to login</h3>
 
     <form action="./?cmd=login" method="post">
       User name: <input type="text" name="username" value="" size="40" autofocus="true"/><br/>

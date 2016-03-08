@@ -104,3 +104,65 @@ delete_permission =
     and    permission = :permission
 ;
   
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+select_contexts = 
+    select ctxt.id, ctxt.name, repo.name as repo_name, branch, library, refreshinterval
+    from   thoth_contexts ctxt,
+           thoth_repositories repo
+    where  ctxt.repo_id = repo.id
+;
+    
+insert_context = 
+    insert into thoth_contexts(id, name, repo_id, branch, library, refreshinterval) 
+    values (:id, :name, :repo_id, :branch, :library, :refreshinterval) 
+;
+
+update_context =    
+    update thoth_contexts 
+    set    name            = :name,
+           repo_id         = :repo_id, 
+           branch          = :branch,
+           library         = :library,
+           refreshinterval = :refreshinterval
+    where  id = :id
+;
+    
+delete_context =    
+    delete from thoth_contexts 
+    where  id = :id
+;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+select_repositories = 
+    select id, name, repotype, location, username, password
+    from   thoth_repositories
+;
+    
+select_is_used = 
+    select count(*)
+    from   thoth_contexts
+    where  repo_id = :id
+;
+
+insert_repository =
+    insert into thoth_repositories(id, name, repotype, location, username, password) 
+    values (:id, :name, :repotype, :location, :username, :password) 
+;
+
+update_repository =
+    update thoth_repositories
+    set    name     = :name, 
+           repotype = :repotype, 
+           location = :location, 
+           username = :username, 
+           password = :password
+    where  id = :id
+;
+    
+delete_repository =
+    delete from thoth_repositories
+    where  id = :id
+;
+

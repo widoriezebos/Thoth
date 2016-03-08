@@ -90,7 +90,7 @@ public class User extends Identity implements Cloneable {
   @JsonIgnore
   public void setPassword(String clearTextPassword) {
     PasswordUtil util = new PasswordUtil();
-    this.passwordhash = util.encodePassword(clearTextPassword);
+    this.passwordhash = util.hashPassword(clearTextPassword);
   }
 
   public boolean isValidPassword(String clearTextPassword) {

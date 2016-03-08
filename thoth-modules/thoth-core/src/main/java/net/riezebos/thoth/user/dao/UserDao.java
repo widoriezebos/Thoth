@@ -27,6 +27,7 @@ import net.riezebos.thoth.configuration.persistence.dbs.SqlStatement;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.User;
+import net.riezebos.thoth.util.BaseDao;
 
 public class UserDao extends BaseDao {
 
@@ -105,11 +106,7 @@ public class UserDao extends BaseDao {
       int count = identityStmt.executeUpdate();
       commitReload(connection);
       return count == 1;
-    } catch (
-
-    SQLException e)
-
-    {
+    } catch (SQLException e) {
       throw new UserManagerException(e);
     }
 

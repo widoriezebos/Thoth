@@ -14,30 +14,23 @@
  */
 package net.riezebos.thoth.configuration;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.riezebos.thoth.context.ContextDefinition;
+import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.exceptions.ConfigurationException;
-import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.util.PropertyLoader;
 
 public abstract class ConfigurationBase extends PropertyLoader implements Configuration {
 
   private Map<String, RepositoryDefinition> repositoryDefinitions = new HashMap<>();
   private Map<String, ContextDefinition> contextDefinitions = new HashMap<>();
-  private ContextDefinition global;
 
   public ConfigurationBase() {
-    RepositoryDefinition repoDef = new RepositoryDefinition();
-    repoDef.setName("global-nop-repository");
-    repoDef.setType("nop");
-    global = new ContextDefinition(repoDef, "*global*", null, null, 0);
   }
 
   public Configuration clone() {
@@ -51,7 +44,6 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
       for (Entry<String, ContextDefinition> entry : contextDefinitions.entrySet()) {
         clone.contextDefinitions.put(entry.getKey(), entry.getValue().clone());
       }
-      clone.global = global == null ? null : global.clone();
       return clone;
     } catch (CloneNotSupportedException e) {
       throw new IllegalArgumentException();
@@ -66,43 +58,18 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
   }
 
   @Override
-  public Map<String, ContextDefinition> getContextDefinitions() {
+  public Map<String, ContextDefinition> getConfiguredContextDefinitions() {
     return contextDefinitions;
   }
 
   @Override
-  public Map<String, RepositoryDefinition> getRepositoryDefinitions() {
+  public Map<String, RepositoryDefinition> getConfiguredRepositoryDefinitions() {
     return repositoryDefinitions;
-  }
-
-  @Override
-  public ContextDefinition getContextDefinition(String name) throws ContextNotFoundException {
-    if (name != null) {
-      name = name.toLowerCase();
-      ContextDefinition contextDefinition = contextDefinitions.get(name);
-      if (contextDefinition == null)
-        throw new ContextNotFoundException(name);
-      return contextDefinition;
-    } else
-      return global;
   }
 
   @Override
   public boolean isValidContext(String name) {
     return contextDefinitions.containsKey(name.toLowerCase());
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see net.riezebos.thoth.configuration.ConfigurationT#getContexts()
-   */
-  @Override
-  public List<String> getContexts() {
-    List<String> result = new ArrayList<>();
-    for (ContextDefinition def : getContextDefinitions().values())
-      result.add(def.getName());
-    Collections.sort(result);
-    return result;
   }
 
   protected void loadContextDefinitions() throws ConfigurationException {
@@ -127,7 +94,8 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
         if (repositoryDefinition == null)
           throw new ConfigurationException("Context " + contextName + " references undefined Repository '" + repository + "'");
         ContextDefinition contextdef = new ContextDefinition(repositoryDefinition, contextName, branch, library, refreshMs);
-
+        contextdef.setImmutable(true);
+        
         String key = contextdef.getName().toLowerCase();
         if (contextDefinitions.containsKey(key)) {
           throw new ConfigurationException("Context name not unique (case insensitive by the way): " + key);
@@ -157,6 +125,7 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
         repodef.setUsername(getValue("repository." + idx + ".username", null));
         repodef.setPassword(getValue("repository." + idx + ".password", null));
         repodef.setType(getValue("repository." + idx + ".type"));
+        repodef.setImmutable(true);
         String key = repodef.getName().toLowerCase();
         if (repositoryDefinitions.containsKey(key)) {
           throw new ConfigurationException("Repository name not unique (case insensitive by the way): " + key);

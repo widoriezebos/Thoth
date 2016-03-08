@@ -6,6 +6,7 @@
     <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css"/>
+    <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/menu.css"/>
   </head>
   <body>
     
@@ -18,17 +19,6 @@
       <input type="submit" value="Search"/> 
       <input type="hidden" name="cmd" value="search" />
     </form>
-    #end
-    
-    #if($versioncontrolled && ${permissions.contains("REVISION")})
-      Click <a href="${contexturl}${libraryroot}?cmd=revisions">here</a> for the latest changes, or click on a meta link below to zoom in on a document.<br/>
-    #end
-    
-    #if(${permissions.contains("VALIDATE")})
-    Click <a href="${contexturl}${libraryroot}?cmd=validationreport">here</a> for the validation report of this entire context<br/>
-    #end
-    #if(${permissions.contains("BROWSE")})
-    Click <a href="${contexturl}${libraryroot}?cmd=browse">here</a> to browse the library
     #end
     
     <h2>Books by Category</h2>
@@ -53,17 +43,33 @@
     </table>
         
     <br/><br/>
-    #if(${permissions.contains("MANAGE_USERS")})
-      <a href=".?cmd=manageusers">Manage users</a><br/>
-    #end   
-    
-    #if($loggedin)
-      <a href=".?cmd=userprofile">Edit profile</a>
-      <br/>
-      <a href=".?cmd=logout">Log out</a><br/>
-    #else
-      <a href=".?cmd=login">Login</a> <br/>
-    #end
+
+    <ul>
+      #if($versioncontrolled && ${permissions.contains("REVISION")})
+        <li><a href="${contexturl}${libraryroot}?cmd=revisions">Revisions</a></li>
+      #end
+      #if(${permissions.contains("VALIDATE")})
+        <li><a href="${contexturl}${libraryroot}?cmd=validationreport">Validation report</a></li>
+      #end
+      #if(${permissions.contains("BROWSE")})
+        <li><a href="${contexturl}${libraryroot}?cmd=browse">Browse</a></li>
+      #end
+      #if(${permissions.contains("MANAGE_USERS")})
+        <li><a href=".?cmd=manageusers">Manage users</a></li>
+      #end
+      #if(${permissions.contains("PULL")})
+        <li><a href=".?cmd=pull">Pull</a></li>
+      #end   
+      #if(${permissions.contains("REINDEX")})
+        <li><a href=".?cmd=reindex">Reindex</a></li>
+      #end
+      #if($loggedin)
+        <li><a href=".?cmd=userprofile">Edit profile</a></li>
+        <li class="floatright"><a href=".?cmd=logout">Log out</a></li>
+      #else
+        <li class="floatright"><a href=".?cmd=login">Login</a></li> 
+      #end
+    </ul>
 
     <footer>
       #if($loggedin)

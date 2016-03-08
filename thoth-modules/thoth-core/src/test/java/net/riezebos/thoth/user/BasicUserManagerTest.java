@@ -1,4 +1,4 @@
-package net.riezebos.thoth.configuration.persistence;
+package net.riezebos.thoth.user;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.configuration.persistence.ThothDB;
 import net.riezebos.thoth.configuration.persistence.dbs.DDLExecuter;
 import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiom.DatabaseFlavour;
 import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiomFactory;
@@ -25,7 +26,7 @@ import net.riezebos.thoth.user.Permission;
 import net.riezebos.thoth.user.User;
 import net.riezebos.thoth.user.UserManager;
 
-public class ThothDBTest extends DatabaseTest {
+public class BasicUserManagerTest extends DatabaseTest {
 
   @Test
   public void test() throws ConfigurationException, IOException, DatabaseException, UserManagerException, SQLException {

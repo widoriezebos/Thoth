@@ -12,15 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.configuration;
+package net.riezebos.thoth.context;
 
 public class RepositoryDefinition implements Cloneable {
 
+  private Long id;
   private String name;
   private String location;
   private String username;
   private String password;
   private String type;
+  
+  private boolean immutable = false;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getName() {
     return name;
@@ -63,12 +74,20 @@ public class RepositoryDefinition implements Cloneable {
   }
 
   @Override
-  protected RepositoryDefinition clone() {
+  public RepositoryDefinition clone() {
     try {
       return (RepositoryDefinition) super.clone();
     } catch (CloneNotSupportedException e) {
       throw new IllegalArgumentException(e);
     }
+  }
+
+  public void setImmutable(boolean immutable) {
+    this.immutable = immutable;
+  }
+
+  public boolean isImmutable() {
+    return immutable;
   }
 
   @Override

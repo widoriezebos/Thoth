@@ -35,6 +35,7 @@ import net.riezebos.thoth.util.ExpiringCache;
 public class LoginCommand extends RendererBase implements Command {
   private static final Logger LOG = LoggerFactory.getLogger(LoginCommand.class);
 
+  public static final String TYPE_CODE = "login";
   public static final String SORRY_YOUR_ACCOUNT_IS_LOCKED_UNTIL = "Sorry, your account is locked until ";
   public static final String INVALID_USERNAME_AND_OR_PASSWORD = "Invalid username and/or password.";
   public static final String USER_ARGUMENT = "user";
@@ -48,7 +49,7 @@ public class LoginCommand extends RendererBase implements Command {
 
   @Override
   public String getTypeCode() {
-    return "login";
+    return TYPE_CODE;
   }
 
   public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,

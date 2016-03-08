@@ -6,6 +6,7 @@
     <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
+    <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/menu.css"/>
   </head>
   <body>
         <h1>Welcome to Thoth<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
@@ -21,27 +22,29 @@
       <a href="${context}">${context}</a><br/>
     #end	
 
+
     <br/><br/>
-    <br/>
-    #if(${permissions.contains("PULL")})
-      To update the site to the latest version right now; you can <a href=".?cmd=pull">Pull manually</a><br/>
-    #end   
-    #if(${permissions.contains("REINDEX")})
-    Click <a href=".?cmd=reindex">here</a> to force a reindex of all contexts<br/>
-    #end
-    #if(${permissions.contains("MANAGE_USERS")})
-      <a href=".?cmd=manageusers">Manage users</a><br/>
-    #end   
-    <br/>
-    #if($loggedin)
-      <a href=".?cmd=userprofile">Edit profile</a>
-      <br/>
-      <a href=".?cmd=logout">Log out</a><br/>
-    #else
-      #if(!$$contexts.isEmpty()) ##If the contexts are empty; a login link is rendered already header (see above)
-        <a href=".?cmd=login">Login</a> <br/>
-      #end  
-    #end
+    <ul>
+      #if($versioncontrolled && ${permissions.contains("REVISION")})
+        <li><a href="${contexturl}${libraryroot}?cmd=revisions">Revisions</a></li>
+      #end
+      #if(${permissions.contains("MANAGE_USERS")})
+        <li><a href=".?cmd=manageusers">Manage users</a></li>
+      #end
+      #if(${permissions.contains("PULL")})
+        <li><a href=".?cmd=pull">Pull</a></li>
+      #end   
+      #if(${permissions.contains("REINDEX")})
+        <li><a href=".?cmd=reindex">Reindex</a></li>
+      #end
+      #if($loggedin)
+        <li><a href=".?cmd=userprofile">Edit profile</a></li>
+        <li class="floatright"><a href=".?cmd=logout">Log out</a></li>
+      #else
+        <li class="floatright"><a href=".?cmd=login">Login</a></li> 
+      #end
+    </ul>
+
     <footer>
       #if($loggedin)
         Logged in as ${identity}.<br/>

@@ -1,5 +1,8 @@
+html {
+  overflow-y: scroll;
+}
+
 .tabs {
-  width: 100%;
   float: none;
   list-style: none;
   position: relative;
@@ -36,7 +39,7 @@
   z-index: 2;
   display: none;
   overflow: hidden;
-  width: 100%;
+  width: 95%;
   font-size: 17px;
   line-height: 25px;
   padding: 25px;
@@ -45,6 +48,7 @@
   left: 0;
   background: #f8f8f8;
   border-radius:5px;
+  
 }
 .tabs [id^="tab"]:checked + label {
   top: 0;

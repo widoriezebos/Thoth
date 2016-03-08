@@ -8,10 +8,10 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import net.riezebos.thoth.configuration.ContextDefinition;
-import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.versioncontrol.Commit;
+import net.riezebos.thoth.context.ContextDefinition;
+import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;

@@ -48,7 +48,7 @@ public class IndexCommand extends RendererBase implements Command {
       RenderResult result = RenderResult.OK;
       List<String> contexts = new ArrayList<String>();
 
-      for (String ctxt : getThothEnvironment().getConfiguration().getContexts()) {
+      for (String ctxt : getThothEnvironment().getContextManager().getContexts()) {
         ContentManager contentManager = getThothEnvironment().getContentManager(ctxt);
         AccessManager accessManager = contentManager.getAccessManager();
         if (accessManager.hasPermission(identity, "/", Permission.ACCESS))

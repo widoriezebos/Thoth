@@ -30,6 +30,7 @@ import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.Group;
 import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.util.BaseDao;
 
 public class GroupDao extends BaseDao {
 

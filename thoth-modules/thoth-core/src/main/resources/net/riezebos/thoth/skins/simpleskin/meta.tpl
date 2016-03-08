@@ -71,7 +71,7 @@
             <td>${commit.author}</td>
             <td>     
               #foreach($revision in $commit.revisions)
-                ${revision.path} (<a href="$contexturl/${revision.fileName}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
+                ${thothutil.addHtmlBreaks(${revision.path})} (<a href="$contexturl/${revision.fileName}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
               #end
             </td>
             <td>${commit.message}</td>

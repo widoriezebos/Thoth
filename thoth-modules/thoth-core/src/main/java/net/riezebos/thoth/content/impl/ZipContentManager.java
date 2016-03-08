@@ -20,12 +20,12 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.riezebos.thoth.configuration.ContextDefinition;
-import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
+import net.riezebos.thoth.context.ContextDefinition;
+import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.markdown.filehandle.FileSystem;
 import net.riezebos.thoth.markdown.filehandle.ZipFileSystem;

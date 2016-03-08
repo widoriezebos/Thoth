@@ -22,18 +22,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.riezebos.thoth.configuration.persistence.ThothDB;
 import net.riezebos.thoth.configuration.persistence.dbs.SqlStatement;
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.Group;
 import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.User;
+import net.riezebos.thoth.util.BaseDao;
+import net.riezebos.thoth.util.CacheListener;
 
-public class IdentityDao implements CacheListener {
-  private static final Logger LOG = LoggerFactory.getLogger(IdentityDao.class);
+public class IdentityDao extends BaseDao implements CacheListener {
 
   private Map<String, Identity> identities = null;
   private ThothDB thothDB;
@@ -51,9 +49,12 @@ public class IdentityDao implements CacheListener {
   }
 
   public Map<String, Identity> getIdentities() throws UserManagerException {
-    if (identities == null)
-      identities = doGetIdentities();
-    return identities;
+    Map<String, Identity> result = identities;
+    if (result == null) {
+      result = doGetIdentities();
+      identities = result;
+    }
+    return result;
   }
 
   protected Map<String, Identity> doGetIdentities() throws UserManagerException {
@@ -94,17 +95,9 @@ public class IdentityDao implements CacheListener {
     }
   }
 
-  public void reloadCaches() throws UserManagerException {
-    identities = null;
-  }
-
   @Override
   public void invalidateCache() {
-    try {
-      reloadCaches();
-    } catch (UserManagerException e) {
-      LOG.error(e.getMessage(), e);
-    }
+    identities = null;
   }
 
   public User createUser(User user) throws UserManagerException {

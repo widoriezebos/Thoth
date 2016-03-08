@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.user.dao;
+package net.riezebos.thoth.util;
 
 public interface CacheListener {
   public void invalidateCache();

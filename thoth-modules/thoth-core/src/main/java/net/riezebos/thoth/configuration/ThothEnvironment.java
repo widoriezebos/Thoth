@@ -19,6 +19,10 @@ import net.riezebos.thoth.content.impl.FSContentManager;
 import net.riezebos.thoth.content.impl.GitContentManager;
 import net.riezebos.thoth.content.impl.NopContentManager;
 import net.riezebos.thoth.content.impl.ZipContentManager;
+import net.riezebos.thoth.context.BasicContextManager;
+import net.riezebos.thoth.context.ContextDefinition;
+import net.riezebos.thoth.context.ContextManager;
+import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.DatabaseException;
@@ -41,6 +45,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   private List<RendererChangeListener> rendererChangeListeners = new ArrayList<>();
   private FinalWrapper<ThothDB> thothDbWrapper = null;
   private FinalWrapper<UserManager> userManagerWrapper = null;
+  private FinalWrapper<ContextManager> contextManagerWrapper = null;
   private FinalWrapper<ExpiringCache<String, Integer>> expiringCacheWrapper = null;
 
   public ContentManager getContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
@@ -60,7 +65,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
           repositoryDefinition.setType("nop");
           contentManager = registerContentManager(new NopContentManager(new ContextDefinition(repositoryDefinition, "", "", "", 0), this));
         } else {
-          ContextDefinition contextDefinition = configuration.getContextDefinition(contextName);
+          ContextDefinition contextDefinition = getContextManager().getContextDefinition(contextName);
           RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
 
           String type = repositoryDefinition.getType();
@@ -118,8 +123,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
 
   // Touches all the contexts. Can be used to warm up a server
   public void touch() throws ContentManagerException {
-    Configuration configuration = getConfiguration();
-    for (String context : configuration.getContexts())
+    for (String context : getContextManager().getContexts())
       getContentManager(context);
   }
 
@@ -137,23 +141,20 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   }
 
   public void shutDown() throws ContentManagerException {
-    Configuration configuration = getConfiguration();
-    for (String context : configuration.getContexts())
+    for (String context : getContextManager().getContexts())
       getContentManager(context).disableAutoRefresh();
   }
 
   public String pullAll() throws ContentManagerException {
     StringBuilder report = new StringBuilder();
 
-    Configuration configuration = getConfiguration();
-    for (String context : configuration.getContexts())
+    for (String context : getContextManager().getContexts())
       report.append(getContentManager(context).refresh() + "\n");
     return report.toString();
   }
 
   public void reindexAll() throws ContentManagerException {
-    Configuration configuration = getConfiguration();
-    for (String context : configuration.getContexts())
+    for (String context : getContextManager().getContexts())
       getContentManager(context).reindex();
   }
 
@@ -294,7 +295,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     if (wrapper == null) {
       synchronized (this) {
         if (userManagerWrapper == null) {
-          setUserManager(createUserManager());
+          setUserManager(new BasicUserManager(this));
         }
         wrapper = userManagerWrapper;
       }
@@ -302,12 +303,32 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     return wrapper.value;
   }
 
-  protected UserManager createUserManager() throws UserManagerException {
-    return new BasicUserManager(this);
-  }
-
   public void setUserManager(UserManager userManager) {
     userManagerWrapper = new FinalWrapper<UserManager>(userManager);
+  }
+
+  /**
+   * This method is synchronized to make sure there will ever only be one ContextManager for this environment.
+   * 
+   * @return
+   * @throws DatabaseException 
+   * @throws SQLException
+   */
+  public ContextManager getContextManager() throws DatabaseException {
+    FinalWrapper<ContextManager> wrapper = contextManagerWrapper;
+    if (wrapper == null) {
+      synchronized (this) {
+        if (contextManagerWrapper == null) {
+          setContextManager(new BasicContextManager(this));
+        }
+        wrapper = contextManagerWrapper;
+      }
+    }
+    return wrapper.value;
+  }
+
+  public void setContextManager(ContextManager contextManager) {
+    contextManagerWrapper = new FinalWrapper<ContextManager>(contextManager);
   }
 
 }

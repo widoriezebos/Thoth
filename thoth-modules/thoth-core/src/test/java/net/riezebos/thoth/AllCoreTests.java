@@ -35,7 +35,6 @@ import net.riezebos.thoth.commands.ValidationReportCommandTest;
 import net.riezebos.thoth.configuration.CacheManagerTest;
 import net.riezebos.thoth.configuration.HotReloadableConfigurationTest;
 import net.riezebos.thoth.configuration.PropertyBasedConfigurationTest;
-import net.riezebos.thoth.configuration.persistence.ThothDBTest;
 import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiomFactoryTest;
 import net.riezebos.thoth.configuration.persistence.dbs.SqlStatementTest;
 import net.riezebos.thoth.content.AutoRefresherTest;
@@ -50,12 +49,14 @@ import net.riezebos.thoth.content.search.SearcherTest;
 import net.riezebos.thoth.content.skinning.SkinManagerTest;
 import net.riezebos.thoth.content.versioncontrol.CommitTest;
 import net.riezebos.thoth.content.versioncontrol.SourceDiffTest;
+import net.riezebos.thoth.context.BasicContextManagerTest;
 import net.riezebos.thoth.exceptions.ExceptionTest;
 import net.riezebos.thoth.renderers.CustomRendererTest;
 import net.riezebos.thoth.renderers.HtmlRendererTest;
 import net.riezebos.thoth.renderers.RawRendererTest;
 import net.riezebos.thoth.servlets.ThothServletTest;
 import net.riezebos.thoth.user.PasswordUtilTest;
+import net.riezebos.thoth.user.BasicUserManagerTest;
 import net.riezebos.thoth.util.DiscardingListTest;
 import net.riezebos.thoth.util.ThothCoreUtilTest;
 import net.riezebos.thoth.util.diff_match_patchTest;
@@ -70,8 +71,9 @@ import net.riezebos.thoth.util.diff_match_patchTest;
     PullCommandTest.class, ReindexCommandTest.class, RevisionsCommandTest.class, SearchCommandTest.class, //
     ValidationReportCommandTest.class, GitContentManagerTest.class, FSContentManagerTest.class, //
     ZipContentManagerTest.class, ThothCoreUtilTest.class, diff_match_patchTest.class, //
-    HotReloadableConfigurationTest.class, ThothDBTest.class, PasswordUtilTest.class, DatabaseIdiomFactoryTest.class, //
-    SqlStatementTest.class, LoginCommandTest.class, ManageUsersCommandTest.class, UserProfileCommandTest.class})
+    HotReloadableConfigurationTest.class, BasicUserManagerTest.class, PasswordUtilTest.class, DatabaseIdiomFactoryTest.class, //
+    SqlStatementTest.class, LoginCommandTest.class, ManageUsersCommandTest.class, UserProfileCommandTest.class, //
+    BasicContextManagerTest.class})
 
 public class AllCoreTests {
 

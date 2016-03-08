@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.riezebos.thoth.configuration;
+package net.riezebos.thoth.context;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,11 +20,13 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class ContextDefinition implements Cloneable {
 
+  private Long id;
   private RepositoryDefinition repositoryDefinition;
   private String name;
   private String branch;
   private String libraryRoot;
   private long refreshIntervalMS;
+  private boolean immutable = false;
 
   public ContextDefinition(RepositoryDefinition repositoryDefinition, String name, String branch, String libraryRoot, long refreshIntervalMS) {
     super();
@@ -37,12 +39,40 @@ public class ContextDefinition implements Cloneable {
     this.libraryRoot = ThothUtil.prefix(ThothUtil.stripSuffix(libraryRoot, "/"), "/");
   }
 
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   public RepositoryDefinition getRepositoryDefinition() {
     return repositoryDefinition;
   }
 
   public String getName() {
     return name;
+  }
+
+  public void setRepositoryDefinition(RepositoryDefinition repositoryDefinition) {
+    this.repositoryDefinition = repositoryDefinition;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setBranch(String branch) {
+    this.branch = branch;
+  }
+
+  public void setLibraryRoot(String libraryRoot) {
+    this.libraryRoot = libraryRoot;
+  }
+
+  public void setRefreshIntervalMS(long refreshIntervalMS) {
+    this.refreshIntervalMS = refreshIntervalMS;
   }
 
   public String getBranch() {
@@ -57,8 +87,16 @@ public class ContextDefinition implements Cloneable {
     return refreshIntervalMS;
   }
 
+  public void setImmutable(boolean immutable) {
+    this.immutable = immutable;
+  }
+
+  public boolean isImmutable() {
+    return immutable;
+  }
+
   @Override
-  protected ContextDefinition clone() {
+  public ContextDefinition clone() {
     try {
       ContextDefinition clone = (ContextDefinition) super.clone();
       clone.repositoryDefinition = repositoryDefinition.clone();

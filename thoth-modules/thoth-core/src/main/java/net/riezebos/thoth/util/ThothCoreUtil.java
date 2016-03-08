@@ -115,4 +115,10 @@ public class ThothCoreUtil extends ThothUtil {
   public static List<Permission> getAllPermissions() {
     return sortPermissions(Arrays.asList(Permission.values()));
   }
+
+  public static String addHtmlBreaks(String text) {
+    if (text == null)
+      return null;
+    return text.replaceAll("([/\\,\\\\])", "$1<wbr/>");
+  }
 }

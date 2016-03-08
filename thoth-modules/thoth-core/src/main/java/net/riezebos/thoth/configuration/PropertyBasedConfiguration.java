@@ -550,4 +550,9 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   public String getDatabasePassword() {
     return getValue("database.password", "thoth");
   }
+
+  @Override
+  public String getPasswordEncryptionKey() {
+    return getValue("masterpassword", "InFactYouShouldChangeThisRightAfterSetupAndNot1SecondL8er!");
+  }
 }

@@ -118,8 +118,9 @@ public class ThothServletTest extends ThothTestBase {
     assertNull(getLatestError());
     sos = (MockServletOutputStream) response.getOutputStream();
     String result = sos.getContentsAsString();
-    assertTrue(result.indexOf("Please select one of the contexts") != -1);
-    assertTrue(result.indexOf("TestContext</a>") != -1);
+
+    // Redirected so not rendered. Result should be empty string
+    assertEquals("", result);
 
     setRequestParameter("output", null);
     setRequestParameter("critics", "show");

@@ -53,12 +53,12 @@ import net.riezebos.thoth.commands.SearchCommand;
 import net.riezebos.thoth.commands.UserProfileCommand;
 import net.riezebos.thoth.commands.ValidationReportCommand;
 import net.riezebos.thoth.configuration.Configuration;
-import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.RendererChangeListener;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.AccessManager;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
@@ -130,7 +130,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
 
   protected void handleMainIndex(HttpServletRequest request, HttpServletResponse response, CommandOperation operation)
       throws ServletException, IOException, ContentManagerException {
-    Map<String, ContextDefinition> contextDefinitions = getConfiguration().getContextDefinitions();
+    Map<String, ContextDefinition> contextDefinitions = getContextManager().getContextDefinitions();
     boolean redirected = false;
     if (contextDefinitions.size() == 1) {
       // Before we get smart and redirect to the one and only context; we should check whether we have access
@@ -141,7 +141,8 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       ContentManager contentManager = getThothEnvironment().getContentManager(contextName);
       boolean hasPermission = contentManager.getAccessManager().hasPermission(getCurrentIdentity(request), "/", Permission.ACCESS);
       if (hasPermission) {
-        response.sendRedirect("/" + contextName);
+        String mainRedirect = ThothUtil.suffix(getRootRedirect(request), "/") + contextName;
+        response.sendRedirect(mainRedirect);
         redirected = true;
       }
     }
@@ -270,8 +271,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
         break;
       case FORBIDDEN:
-        LOG.warn("Denied request " + requestURI + " in " + (System.currentTimeMillis() - ms) + " ms");
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        handleForbidden(request, response);
         break;
       default:
         // Only now will we touch the response; this to avoid sending stuff out already and then
@@ -288,6 +288,16 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       result = true;
     }
     return result;
+  }
+
+  protected void handleForbidden(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    if (isLoggedIn(request))
+      response.sendError(HttpServletResponse.SC_FORBIDDEN);
+    else {
+      String loginRedirect = getRootRedirect(request);
+      loginRedirect += "?cmd=" + LoginCommand.TYPE_CODE;
+      response.sendRedirect(loginRedirect);
+    }
   }
 
   protected boolean handleCommand(HttpServletRequest request, HttpServletResponse response, CommandOperation operation)
@@ -309,9 +319,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
       RenderResult renderResult = command.execute(getCurrentIdentity(request), context, getPath(request), operation, parameters, getSkin(request), bos);
 
-      String contextPath = request.getContextPath();
-      if (StringUtils.isBlank(contextPath))
-        contextPath = "/";
+      String rootRedirect = getRootRedirect(request);
       switch (renderResult.getCode()) {
       case OK:
         // Only now will we touch the response; this to avoid sending stuff out already and then
@@ -321,18 +329,18 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
         IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
         break;
       case FORBIDDEN:
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        handleForbidden(request, response);
         break;
       case LOGGED_OUT:
         setCurrentUser(request, null);
         request.getSession().invalidate();
-        response.sendRedirect(contextPath);
+        response.sendRedirect(rootRedirect);
         break;
       case LOGGED_IN:
         User user = renderResult.getArgument(LoginCommand.USER_ARGUMENT);
         setCurrentUser(request, user);
         if (StringUtils.isBlank(context))
-          response.sendRedirect(contextPath);
+          response.sendRedirect(rootRedirect);
         else
           response.sendRedirect(getContextUrl(request));
         break;
@@ -342,6 +350,13 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
 
     } else
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
+  }
+
+  private String getRootRedirect(HttpServletRequest request) {
+    String contextPath = request.getContextPath();
+    if (StringUtils.isBlank(contextPath))
+      contextPath = "/";
+    return contextPath;
   }
 
   protected void streamResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentManagerException {
@@ -354,7 +369,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       AccessManager accessManager = contentManager.getAccessManager();
       boolean hasPermission = accessManager.hasPermission(getCurrentIdentity(request), path, Permission.READ_RESOURCE);
       if (!hasPermission) {
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        handleForbidden(request, response);
       } else {
         InputStream is = contentManager.getInputStream(path);
         if (is != null) {

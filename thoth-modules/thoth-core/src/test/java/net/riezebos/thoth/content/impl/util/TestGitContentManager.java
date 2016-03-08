@@ -1,8 +1,8 @@
 package net.riezebos.thoth.content.impl.util;
 
-import net.riezebos.thoth.configuration.ContextDefinition;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.impl.GitContentManager;
+import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;

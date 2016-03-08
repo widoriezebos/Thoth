@@ -6,11 +6,11 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.junit.Test;
 
-import net.riezebos.thoth.configuration.ContextDefinition;
-import net.riezebos.thoth.configuration.RepositoryDefinition;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.impl.util.TestGitContentManager;
 import net.riezebos.thoth.content.versioncontrol.Revision.Action;
+import net.riezebos.thoth.context.ContextDefinition;
+import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.testutil.ThothTestBase;
 

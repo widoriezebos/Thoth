@@ -38,7 +38,9 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
+import net.riezebos.thoth.context.ContextManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
@@ -172,6 +174,10 @@ public abstract class ServletBase extends HttpServlet {
     return getThothEnvironment().getConfiguration();
   }
 
+  protected ContextManager getContextManager() throws DatabaseException {
+    return getThothEnvironment().getContextManager();
+  }
+
   protected Map<String, Object> getParameters(HttpServletRequest request) throws ServletException {
     Map<String, Object> result = new HashMap<>();
 
@@ -208,8 +214,9 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(contextName));
 
     Set<String> permissions = new HashSet<>();
+    result.put(Renderer.LOGGED_IN, isLoggedIn(request));
+
     Identity identity = getCurrentIdentity(request);
-    result.put(Renderer.LOGGED_IN, identity instanceof User);
     if (identity != null) {
       result.put(Renderer.IDENTITY, identity.getIdentifier());
       result.put(Renderer.USER_FULL_NAME, identity.getDescription());
@@ -221,6 +228,10 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.PERMISSIONS, permissions);
 
     return result;
+  }
+
+  protected boolean isLoggedIn(HttpServletRequest request) {
+    return getCurrentIdentity(request) instanceof User;
   }
 
   private String getRefreshTimestamp(String contextName) {

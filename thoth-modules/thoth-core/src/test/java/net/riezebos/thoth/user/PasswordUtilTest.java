@@ -14,6 +14,7 @@
  */
 package net.riezebos.thoth.user;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,12 +27,17 @@ public class PasswordUtilTest {
   public void test() {
     PasswordUtil util = new PasswordUtil();
     String clearTextPassword = "SomeTestPW!";
-    String encodedPassword = util.encodePassword(clearTextPassword);
-    String encodedPassword2 = util.encodePassword(clearTextPassword);
+    String encodedPassword = util.hashPassword(clearTextPassword);
+    String encodedPassword2 = util.hashPassword(clearTextPassword);
     assertNotEquals(encodedPassword, encodedPassword2);
     assertTrue(util.isValidPassword(clearTextPassword, encodedPassword));
     assertTrue(util.isValidPassword(clearTextPassword, encodedPassword2));
     assertFalse(util.isValidPassword(clearTextPassword + "nope", encodedPassword2));
+    
+    String masterPassword = "secret";
+    String encrypted = util.encrypt(masterPassword, clearTextPassword);
+    
+    assertEquals(clearTextPassword, util.decrypt(masterPassword, encrypted));
   }
 
 }

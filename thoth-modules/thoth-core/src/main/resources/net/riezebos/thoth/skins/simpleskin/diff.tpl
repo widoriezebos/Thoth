@@ -9,7 +9,8 @@
   </head>
   
   <body>
-    <h2>Changes to ${title}<img class="logo" src="${skinbase}/Webresources/logo.png"/></h2>
+    <h1>Changes to ${title}<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
+    <br/>
     <commitmessage>
     <div>${author}, ${timestamp}</div><br/>
     ${commitMessage}
