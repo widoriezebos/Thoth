@@ -31,7 +31,12 @@ public class AccessRule {
   }
 
   public boolean isAccessAllowed(Set<String> userGroups) {
-    return matchAll ? userGroups.containsAll(requires) : userGroups.contains(requires);
+    if (matchAll)
+      return userGroups.containsAll(requires);
+    for (String group : userGroups)
+      if (requires.contains(group))
+        return true;
+    return false;
   }
 
   @Override
