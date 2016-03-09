@@ -47,4 +47,6 @@ public interface ContextManager {
 
   boolean isInUse(RepositoryDefinition repositoryDefinition) throws ContextManagerException;
 
+  public boolean isValidContext(String context) throws ContextManagerException;
+
 }

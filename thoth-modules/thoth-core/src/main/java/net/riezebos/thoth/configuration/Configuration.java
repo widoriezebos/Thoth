@@ -251,14 +251,6 @@ public interface Configuration extends Cloneable {
   Map<String, RepositoryDefinition> getConfiguredRepositoryDefinitions();
 
   /**
-   * Returns true is the provided name references a known context
-   * 
-   * @param name
-   * @return
-   */
-  boolean isValidContext(String name);
-
-  /**
    * @return a list of all supported output formats, including the custom renderers that are configured
    */
   List<String> getOutputFormats();

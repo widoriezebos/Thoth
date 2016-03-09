@@ -133,7 +133,11 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   // Touches all the contexts. Can be used to warm up a server
   public void touch() throws ContentManagerException {
     for (String context : getContextManager().getContexts())
-      getContentManager(context);
+      try {
+        getContentManager(context);
+      } catch (ContentManagerException e) {
+        LOG.error(e.getMessage(), e);
+      }
   }
 
   public Date getRefreshTimestamp(String contextName) throws ContentManagerException {

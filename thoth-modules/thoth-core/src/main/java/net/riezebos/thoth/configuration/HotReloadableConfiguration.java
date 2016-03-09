@@ -300,10 +300,6 @@ public class HotReloadableConfiguration implements Configuration {
     return activeConfiguration.getConfiguredRepositoryDefinitions();
   }
 
-  public boolean isValidContext(String name) {
-    return activeConfiguration.isValidContext(name);
-  }
-
   public List<String> getOutputFormats() {
     return activeConfiguration.getOutputFormats();
   }

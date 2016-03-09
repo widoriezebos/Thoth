@@ -20,10 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.AccessManager;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
+import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.renderers.RenderResult;
 import net.riezebos.thoth.renderers.RendererBase;
@@ -32,6 +36,7 @@ import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
 
 public class IndexCommand extends RendererBase implements Command {
+  private static final Logger LOG = LoggerFactory.getLogger(IndexCommand.class);
 
   public IndexCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
     super(thothEnvironment, rendererProvider);
@@ -47,16 +52,23 @@ public class IndexCommand extends RendererBase implements Command {
     try {
       RenderResult result = RenderResult.OK;
       List<String> contexts = new ArrayList<String>();
+      List<String> problems = new ArrayList<String>();
 
       for (String ctxt : getThothEnvironment().getContextManager().getContexts()) {
-        ContentManager contentManager = getThothEnvironment().getContentManager(ctxt);
-        AccessManager accessManager = contentManager.getAccessManager();
-        if (accessManager.hasPermission(identity, "/", Permission.ACCESS))
-          contexts.add(ctxt);
+        try {
+          ContentManager contentManager = getThothEnvironment().getContentManager(ctxt);
+          AccessManager accessManager = contentManager.getAccessManager();
+          if (accessManager.hasPermission(identity, "/", Permission.ACCESS))
+            contexts.add(ctxt);
+        } catch (ContentManagerException e) {
+          problems.add(ctxt+": "+e.getMessage());
+          LOG.error(e.getMessage(), e);
+        }
       }
 
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("contexts", contexts);
+      variables.put("problems", problems);
 
       if (asJson(arguments))
         executeJson(variables, outputStream);

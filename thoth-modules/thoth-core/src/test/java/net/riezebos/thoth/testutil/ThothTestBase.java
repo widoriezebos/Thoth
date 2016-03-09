@@ -170,7 +170,6 @@ public class ThothTestBase {
     when(mockedConfiguration.getTimestampFormat()).thenReturn(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss"));
     when(mockedConfiguration.getParseTimeOut()).thenReturn(4000L);
     when(mockedConfiguration.getMarkdownOptions()).thenReturn(2098159);
-    when(mockedConfiguration.isValidContext(contextName)).thenReturn(true);
     when(mockedConfiguration.getMainIndexSkinContext()).thenReturn(contextName);
     when(mockedConfiguration.getConfiguredContextDefinitions()).thenReturn(map);
     when(mockedConfiguration.addNewlineBeforeheader()).thenReturn(true);

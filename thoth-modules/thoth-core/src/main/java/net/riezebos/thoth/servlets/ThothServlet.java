@@ -61,6 +61,7 @@ import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.RenderException;
 import net.riezebos.thoth.exceptions.UserManagerException;
@@ -314,9 +315,9 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
   }
 
   protected void executeCommand(Command command, HttpServletRequest request, HttpServletResponse response, CommandOperation operation)
-      throws RenderException, ServletException, IOException {
+      throws RenderException, ServletException, IOException, ContextManagerException {
     String context = getContext(request);
-    if (StringUtils.isBlank(context) || getConfiguration().isValidContext(context)) {
+    if (StringUtils.isBlank(context) || getContextManager().isValidContext(context)) {
       Map<String, Object> parameters = getParameters(request);
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
       RenderResult renderResult = command.execute(getCurrentIdentity(request), context, getPath(request), operation, parameters, getSkin(request), bos);
@@ -366,7 +367,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
 
     String path = getPath(request);
     String contextName = getContext(request);
-    if (getConfiguration().isValidContext(contextName)) {
+    if (getContextManager().isValidContext(contextName)) {
       ContentManager contentManager = getThothEnvironment().getContentManager(contextName);
       AccessManager accessManager = contentManager.getAccessManager();
       boolean hasPermission = accessManager.hasPermission(getCurrentIdentity(request), path, Permission.READ_RESOURCE);

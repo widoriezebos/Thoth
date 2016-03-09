@@ -136,4 +136,9 @@ public class TestContextManager implements ContextManager {
     return names.contains(repositoryDefinition.getName());
   }
 
+  @Override
+  public boolean isValidContext(String context) throws ContextManagerException {
+    return getContextDefinitions().containsKey(context.toLowerCase());
+  }
+
 }

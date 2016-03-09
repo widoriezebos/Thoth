@@ -141,7 +141,7 @@ public abstract class ServletBase extends HttpServlet {
       Configuration configuration = getConfiguration();
 
       String context = getContext(request);
-      if (!StringUtils.isBlank(context) && !configuration.isValidContext(context))
+      if (!StringUtils.isBlank(context) && !getContextManager().isValidContext(context))
         return null;
 
       if (StringUtils.isBlank(context)) {

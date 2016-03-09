@@ -154,6 +154,10 @@ public class Skin extends PropertyLoader {
     return getPathProperty("template.error");
   }
 
+  public String getLogTemplate() {
+    return getPathProperty("template.log");
+  }
+
   protected String getPathProperty(String key) {
     if (shouldGetFromSuper(key))
       return getSuper().getPathProperty(key);

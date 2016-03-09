@@ -372,11 +372,11 @@ public class GitContentManager extends ContentManagerBase {
 
   protected void severe(StringBuilder log, String message) {
     LOG.error(message.trim());
-    log.append("ERROR: " + message + "\n");
+    log.append(getContextName()+ ": ERROR, " + message + "\n");
   }
 
   protected void severe(StringBuilder log, Exception e) {
     LOG.error(e.getMessage(), e);
-    log.append("ERROR: " + e.getMessage() + "\n");
+    log.append(getContextName()+ ": ERROR, " + e.getMessage() + "\n");
   }
 }

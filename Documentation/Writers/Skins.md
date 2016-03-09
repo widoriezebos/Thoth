@@ -187,6 +187,7 @@ Most types are basic / simple types like String, List and Integer. The exception
 The main index template is a special one, because the template itself belongs to a specific repository (context) by it is used for the main index that is not specific to a certain context. The following variables are available:
 
 - **contexts** is the list of contexts that are available. Type: String
+- **problems** not empty when problems occurred during initializing a context. Type: List\<String\>
 
 #### template.contextindex
 The index of the context; this is where you would list all the books that are present in 
@@ -272,6 +273,12 @@ The template used to display Thoth system errors.
 
 - **message** is the (technical) error message. Type: String
 - **stack** is the full stack trace of the error occurring in Thoth. Type: String
+
+#### template.log
+The template used to display logs (Pull and Reindex commands)
+
+- **title** title of the log. Type: String
+- **log** the log to display. Type: String
 
 #### Template helper functions
 There is a special variable called _thothutil_ that you can use to access all the functions defined by the ThothUtil helper class. The following functions are available:

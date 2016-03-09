@@ -2,7 +2,7 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8">
-    <title>${context} Documentation Index</title>
+    <title>${context} Revisions</title>
     <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">

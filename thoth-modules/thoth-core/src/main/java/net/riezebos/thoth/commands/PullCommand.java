@@ -15,7 +15,6 @@
 package net.riezebos.thoth.commands;
 
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,13 +39,8 @@ public class PullCommand extends RendererBase implements Command {
     return "pull";
   }
 
-  @Override
-  public String getContentType(Map<String, Object> arguments) {
-    return "text/plain;charset=UTF-8";
-  }
-
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
     try {
       ContentManager contentManager = getContentManager(context);
       if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.PULL))
@@ -54,14 +48,14 @@ public class PullCommand extends RendererBase implements Command {
 
       String log = getThothEnvironment().pullAll();
       Map<String, Object> variables = new HashMap<>(arguments);
+      variables.put("title", "Pull report");
       variables.put("log", log);
 
       if (asJson(arguments))
         executeJson(variables, outputStream);
       else {
-        try (PrintWriter writer = new PrintWriter(outputStream)) {
-          writer.println(log);
-        }
+        String logTemplate = skin.getLogTemplate();
+        renderTemplate(logTemplate, context, variables, outputStream);
       }
 
       return RenderResult.OK;

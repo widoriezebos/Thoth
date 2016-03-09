@@ -68,11 +68,6 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
     return repositoryDefinitions;
   }
 
-  @Override
-  public boolean isValidContext(String name) {
-    return contextDefinitions.containsKey(name.toLowerCase());
-  }
-
   protected void loadContextDefinitions() throws ConfigurationException {
     int idx = 0;
     boolean doneOne;

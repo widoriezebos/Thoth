@@ -54,6 +54,7 @@ public class ManageContextsCommand extends RendererBase implements Command {
   public static final String OPERATION_ARGUMENT = "operation";
 
   public static final String ARG_NAME = "name";
+  public static final String ARG_NEWNAME = "newname";
   public static final String ARG_TYPE = "type";
   public static final String ARG_BRANCH = "branch";
   public static final String ARG_LOCATION = "location";
@@ -170,6 +171,7 @@ public class ManageContextsCommand extends RendererBase implements Command {
 
   protected void updateRepository(Map<String, Object> arguments) throws ContextManagerException {
     String name = (String) arguments.get(ARG_NAME);
+    String newname = (String) arguments.get(ARG_NEWNAME);
     String type = (String) arguments.get(ARG_TYPE);
     String location = (String) arguments.get(ARG_LOCATION);
     String username = (String) arguments.get(ARG_USERNAME);
@@ -181,11 +183,12 @@ public class ManageContextsCommand extends RendererBase implements Command {
       ContextManager contextManager = getThothEnvironment().getContextManager();
       RepositoryDefinition repositoryDefinition = contextManager.getRepositoryDefinition(name);
       if (repositoryDefinition != null) {
-        repositoryDefinition.setName(name);
+        repositoryDefinition.setName(newname);
         repositoryDefinition.setType(RepositoryType.convert(type));
         repositoryDefinition.setLocation(location);
         repositoryDefinition.setUsername(username);
-        repositoryDefinition.setPassword(password);
+        if (password != null)
+          repositoryDefinition.setPassword(password);
         contextManager.updateRepositoryDefinition(repositoryDefinition);
         arguments.put(ARG_MESSAGE, "Repository definition " + name + " updated");
       }
@@ -198,10 +201,14 @@ public class ManageContextsCommand extends RendererBase implements Command {
     ContextManager contextManager = getThothEnvironment().getContextManager();
     RepositoryDefinition repositoryDefinition = contextManager.getRepositoryDefinition(identifier);
     if (repositoryDefinition != null) {
-      contextManager.deleteRepositoryDefinition(repositoryDefinition);
-      arguments.put(ARG_MESSAGE, "Deleted " + repositoryDefinition.getType() + " repository definition " + repositoryDefinition.getName());
+      if (contextManager.isInUse(repositoryDefinition)) {
+        arguments.put(ARG_MESSAGE, "Cannot delete repository " + repositoryDefinition.getName() + " because it is in use.");
+      } else {
+        contextManager.deleteRepositoryDefinition(repositoryDefinition);
+        arguments.put(ARG_MESSAGE, "Deleted " + repositoryDefinition.getType() + " repository definition " + repositoryDefinition.getName());
+      }
     } else {
-      arguments.put(ARG_MESSAGE, "Repository definition with name '" + identifier + "' not found");
+      arguments.put(ARG_MESSAGE, "Repository with name '" + identifier + "' not found");
     }
   }
 
@@ -222,11 +229,11 @@ public class ManageContextsCommand extends RendererBase implements Command {
       ContextManager contextManager = getThothEnvironment().getContextManager();
       RepositoryDefinition existing = contextManager.getRepositoryDefinition(name);
       if (forCreation && existing != null) {
-        arguments.put(ARG_MESSAGE, "Repository definition with name " + name + " already exists");
+        arguments.put(ARG_MESSAGE, "Repository with name " + name + " already exists");
         valid = false;
       }
       if (!forCreation && existing == null) {
-        arguments.put(ARG_MESSAGE, "Repository definition with name " + name + " not found");
+        arguments.put(ARG_MESSAGE, "Repository with name " + name + " not found");
         valid = false;
       }
     }
@@ -244,7 +251,7 @@ public class ManageContextsCommand extends RendererBase implements Command {
     String refreshInterval = (String) arguments.get(ARG_REFRESHINTERVAL);
     if (StringUtils.isBlank(refreshInterval))
       refreshInterval = "0";
-    
+
     boolean valid = validateContextArguments(arguments, true);
 
     if (valid) {
@@ -253,16 +260,19 @@ public class ManageContextsCommand extends RendererBase implements Command {
       RepositoryDefinition repositoryDefinition = contextManager.getRepositoryDefinition(repositoryName);
       ContextDefinition contextDefinition = new ContextDefinition(repositoryDefinition, contextName, branch, libraryRoot, refreshIntervalSecs);
       contextManager.createContextDefinition(contextDefinition);
-      arguments.put(ARG_MESSAGE, "Repository definition " + contextName + " created");
+      arguments.put(ARG_MESSAGE, "Context " + contextName + " created");
     }
   }
 
   protected void updateContext(Map<String, Object> arguments) throws ContextManagerException {
     String contextName = (String) arguments.get(ARG_NAME);
+    String newContextName = (String) arguments.get(ARG_NEWNAME);
     String repositoryName = (String) arguments.get(ARG_REPOSITORYNAME);
     String branch = (String) arguments.get(ARG_BRANCH);
     String libraryRoot = (String) arguments.get(ARG_LIBRARYROOT);
     String refreshInterval = (String) arguments.get(ARG_REFRESHINTERVAL);
+    if (StringUtils.isBlank(refreshInterval))
+      refreshInterval = "0";
 
     boolean valid = validateContextArguments(arguments, false);
 
@@ -272,14 +282,15 @@ public class ManageContextsCommand extends RendererBase implements Command {
       ContextDefinition contextDefinition = contextManager.getContextDefinition(contextName);
       if (contextDefinition != null) {
         RepositoryDefinition repositoryDefinition = contextManager.getRepositoryDefinition(repositoryName);
+        contextDefinition.setName(newContextName);
         contextDefinition.setBranch(branch);
         contextDefinition.setLibraryRoot(libraryRoot);
         contextDefinition.setRefreshInterval(refreshIntervalSeconds);
         contextDefinition.setRepositoryDefinition(repositoryDefinition);
         contextManager.updateContextDefinition(contextDefinition);
-        arguments.put(ARG_MESSAGE, "Repository definition " + contextName + " updated");
+        arguments.put(ARG_MESSAGE, "Context " + contextName + " updated");
       } else {
-        arguments.put(ARG_MESSAGE, "Could not find context definition named " + contextName);
+        arguments.put(ARG_MESSAGE, "Could not find context named " + contextName);
       }
     }
   }
@@ -291,9 +302,9 @@ public class ManageContextsCommand extends RendererBase implements Command {
     ContextDefinition contextDefinition = contextManager.getContextDefinition(contextName);
     if (contextDefinition != null) {
       contextManager.deleteContextDefinition(contextDefinition);
-      arguments.put(ARG_MESSAGE, "Deleted context definition " + contextName);
+      arguments.put(ARG_MESSAGE, "Deleted context " + contextName);
     } else {
-      arguments.put(ARG_MESSAGE, "Context definition with name '" + contextName + "' not found");
+      arguments.put(ARG_MESSAGE, "Context with name '" + contextName + "' not found");
     }
   }
 
@@ -311,13 +322,13 @@ public class ManageContextsCommand extends RendererBase implements Command {
       valid = false;
     } else {
       ContextManager contextManager = getThothEnvironment().getContextManager();
-      ContextDefinition existing = contextManager.getContextDefinition(contextName);
+      ContextDefinition existing = contextManager.getContextDefinitions().get(contextName.toLowerCase());
       if (forCreation && existing != null) {
-        arguments.put(ARG_MESSAGE, "Context definition with name " + contextName + " already exists");
+        arguments.put(ARG_MESSAGE, "Context with name " + contextName + " already exists");
         valid = false;
       }
       if (!forCreation && existing == null) {
-        arguments.put(ARG_MESSAGE, "Context definition with name " + contextName + " not found");
+        arguments.put(ARG_MESSAGE, "Context with name " + contextName + " not found");
         valid = false;
       }
     }

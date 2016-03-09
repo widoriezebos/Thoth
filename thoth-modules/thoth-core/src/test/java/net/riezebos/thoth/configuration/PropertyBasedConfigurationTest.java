@@ -122,7 +122,6 @@ public class PropertyBasedConfigurationTest extends ThothTestBase {
     assertTrue(compareSet("html, raw, pdf", outputFormats));
     PropertyBasedConfiguration clone = (PropertyBasedConfiguration) config.clone();
 
-    clone.isValidContext("Context1");
     assertTrue(config.getConfiguredRepositoryDefinitions().equals(clone.getConfiguredRepositoryDefinitions()));
     assertTrue(config.getConfiguredRepositoryDefinitions() != clone.getConfiguredRepositoryDefinitions());
     clone.clear();

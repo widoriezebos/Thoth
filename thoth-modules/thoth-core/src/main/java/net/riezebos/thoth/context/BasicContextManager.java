@@ -131,4 +131,9 @@ public class BasicContextManager implements ContextManager {
     return contextDefinitionDao.isInUse(repositoryDefinition);
   }
 
+  @Override
+  public boolean isValidContext(String context) throws ContextManagerException {
+    return getContextDefinitions().containsKey(context.toLowerCase());
+  }
+
 }

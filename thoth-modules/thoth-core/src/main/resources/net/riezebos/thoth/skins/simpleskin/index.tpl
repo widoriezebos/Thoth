@@ -22,7 +22,14 @@
       <a href="${context}">${context}</a><br/>
     #end	
 
-
+    #if(!$problems.isEmpty())
+      <h3>Problems in the configuration</h3>
+      <ul class="problems">
+        #foreach($problem in $problems)
+          <li>$problem</li>
+        #end
+      </ul>  
+    #end
     <br/><br/>
     <ul>
       #if($versioncontrolled && ${permissions.contains("REVISION")})
