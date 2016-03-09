@@ -20,6 +20,8 @@ public class AccessManager {
   private static final String ACCESS_RULES_FILE = "access.rules";
 
   private Pattern requirePattern = Pattern.compile("(.*?)\\s+require\\s+(.*)");
+  private Pattern requireAllPattern = Pattern.compile("(.*?)\\s+requireall\\s+(.*)");
+  private Pattern requireAnyPattern = Pattern.compile("(.*?)\\s+requireany\\s+(.*)");
   private ContentManager contentManager;
   private List<AccessRule> accessRules = new ArrayList<>();
   private boolean denyall = false;
@@ -39,14 +41,21 @@ public class AccessManager {
       String rules = ThothUtil.readInputStream(accessRulesFile.getInputStream());
       for (String rule : rules.split("\n")) {
         if (StringUtils.isNotBlank(rule) && !rule.trim().startsWith("#")) {
+          boolean matched = false;
           Matcher matcher = requirePattern.matcher(rule);
-          if (!matcher.matches()) {
-            LOG.warn("Invalid rule, require keyword is missing in line: " + rule);
-          } else {
-            String path = matcher.group(1).trim();
-            String groups = matcher.group(2).trim();
-            accessRules.add(new AccessRule(path, groups));
+          if (matcher.matches()) {
+            matched = addRule(matcher, true);
           }
+          matcher = requireAllPattern.matcher(rule);
+          if (matcher.matches()) {
+            matched = addRule(matcher, true);
+          }
+          matcher = requireAnyPattern.matcher(rule);
+          if (matcher.matches()) {
+            matched = addRule(matcher, false);
+          }
+          if (!matched)
+            LOG.warn("Invalid rule, require keyword is missing in line: " + rule);
         }
 
       }
@@ -54,6 +63,13 @@ public class AccessManager {
       denyall = true;
       LOG.error("As a consequence all access to " + contentManager.getContextName() + " will be DENIED");
     }
+  }
+
+  private boolean addRule(Matcher matcher, boolean matchAll) {
+    String path = matcher.group(1).trim();
+    String groups = matcher.group(2).trim();
+    accessRules.add(new AccessRule(path, groups, matchAll));
+    return true;
   }
 
   public ContentManager getContentManager() {

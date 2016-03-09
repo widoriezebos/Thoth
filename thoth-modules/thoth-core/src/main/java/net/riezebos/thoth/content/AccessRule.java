@@ -9,9 +9,11 @@ import net.riezebos.thoth.util.ThothUtil;
 public class AccessRule {
   private Pattern pathPattern;
   private Set<String> requires = new HashSet<>();
+  private boolean matchAll;
 
-  public AccessRule(String pathPatternSpec, String groupSpec) {
+  public AccessRule(String pathPatternSpec, String groupSpec, boolean matchAll) {
 
+    this.matchAll = matchAll;
     // let's avoid hassle if somebody specified an absolute path in the rules.
     // Paths we will have to match are relative to the filesystem root i.e. no '/' prefix
     String absPathSpec = ThothUtil.stripPrefix(pathPatternSpec, "/");
@@ -29,7 +31,7 @@ public class AccessRule {
   }
 
   public boolean isAccessAllowed(Set<String> userGroups) {
-    return userGroups.containsAll(requires);
+    return matchAll ? userGroups.containsAll(requires) : userGroups.contains(requires);
   }
 
   @Override
