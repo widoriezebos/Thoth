@@ -36,7 +36,7 @@ public class BasicContextManagerTest extends DatabaseTest {
 
         RepositoryDefinition repoDef = new RepositoryDefinition();
         repoDef.setName("name");
-        repoDef.setType("git");
+        repoDef.setType(RepositoryType.GIT);
         repoDef.setLocation("location");
         repoDef.setUsername("username");
         repoDef.setPassword("password");
@@ -52,12 +52,12 @@ public class BasicContextManagerTest extends DatabaseTest {
         repositoryDefinition2 = contextManager.getRepositoryDefinition("name");
         assertEquals("changed", repositoryDefinition2.getPassword());
 
-        ContextDefinition contextDefinition = new ContextDefinition(repositoryDefinition, "contextname", "branch", "libraryRoot", 30000);
+        ContextDefinition contextDefinition = new ContextDefinition(repositoryDefinition, "contextname", "branch", "libraryRoot", 30);
         contextManager.createContextDefinition(contextDefinition);
 
         ContextDefinition contextDefinition2 = contextManager.getContextDefinition("contextname");
         assertEquals("branch", contextDefinition2.getBranch());
-        assertEquals(30000, contextDefinition2.getRefreshIntervalMS());
+        assertEquals(30, contextDefinition2.getRefreshInterval());
 
         contextDefinition.setBranch("branch2");
         contextManager.updateContextDefinition(contextDefinition);

@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import net.riezebos.thoth.configuration.Configuration;
+import net.riezebos.thoth.context.RepositoryType;
 import net.riezebos.thoth.user.Permission;
 
 public class ThothCoreUtil extends ThothUtil {
@@ -114,6 +115,10 @@ public class ThothCoreUtil extends ThothUtil {
 
   public static List<Permission> getAllPermissions() {
     return sortPermissions(Arrays.asList(Permission.values()));
+  }
+
+  public static List<RepositoryType> getAllRepositoryTypes() {
+    return Arrays.asList(RepositoryType.values());
   }
 
   public static String addHtmlBreaks(String text) {

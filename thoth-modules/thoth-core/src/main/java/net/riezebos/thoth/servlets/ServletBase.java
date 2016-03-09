@@ -40,7 +40,7 @@ import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.context.ContextManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
-import net.riezebos.thoth.exceptions.DatabaseException;
+import net.riezebos.thoth.exceptions.ContextManagerException;
 import net.riezebos.thoth.renderers.Renderer;
 import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
@@ -174,7 +174,7 @@ public abstract class ServletBase extends HttpServlet {
     return getThothEnvironment().getConfiguration();
   }
 
-  protected ContextManager getContextManager() throws DatabaseException {
+  protected ContextManager getContextManager() throws ContextManagerException {
     return getThothEnvironment().getContextManager();
   }
 

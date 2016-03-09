@@ -66,7 +66,7 @@ public class ContextDefinitionDao extends BaseDao implements CacheListener {
       contextStmt.setLong("repo_id", contextDefinition.getRepositoryDefinition().getId());
       contextStmt.setString("branch", contextDefinition.getBranch());
       contextStmt.setString("library", contextDefinition.getLibraryRoot());
-      contextStmt.setInt("refreshinterval", (int) (contextDefinition.getRefreshIntervalMS() / 1000));
+      contextStmt.setInt("refreshinterval", (int) (contextDefinition.getRefreshInterval()));
       contextStmt.executeUpdate();
       contextDefinition.setId(id);
       commitReload(connection);
@@ -88,7 +88,7 @@ public class ContextDefinitionDao extends BaseDao implements CacheListener {
       contextStmt.setLong("repo_id", contextDefinition.getRepositoryDefinition().getId());
       contextStmt.setString("branch", contextDefinition.getBranch());
       contextStmt.setString("library", contextDefinition.getLibraryRoot());
-      contextStmt.setInt("refreshinterval", (int) (contextDefinition.getRefreshIntervalMS() / 1000));
+      contextStmt.setInt("refreshinterval", (int) (contextDefinition.getRefreshInterval()));
       contextStmt.executeUpdate();
 
       int count = contextStmt.executeUpdate();
@@ -146,7 +146,7 @@ public class ContextDefinitionDao extends BaseDao implements CacheListener {
           if (repositoryDefinition == null) {
             LOG.error("Could not find RepositoryDefinition named " + repoName + " so ignoring context " + name);
           } else {
-            ContextDefinition contextDefinition = new ContextDefinition(repositoryDefinition, name, branch, libraryRoot, ((long) refreshInterval) * 1000);
+            ContextDefinition contextDefinition = new ContextDefinition(repositoryDefinition, name, branch, libraryRoot, refreshInterval);
             contextDefinition.setId(id);
             contextDefinition.setImmutable(false);
             result.put(contextDefinition.getName().toLowerCase(), contextDefinition);

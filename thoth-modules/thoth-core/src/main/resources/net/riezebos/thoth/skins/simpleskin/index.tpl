@@ -31,6 +31,9 @@
       #if(${permissions.contains("MANAGE_USERS")})
         <li><a href=".?cmd=manageusers">Manage users</a></li>
       #end
+      #if(${permissions.contains("MANAGE_CONTEXTS")})
+        <li><a href=".?cmd=managecontexts">Manage contexts</a></li>
+      #end
       #if(${permissions.contains("PULL")})
         <li><a href=".?cmd=pull">Pull</a></li>
       #end   

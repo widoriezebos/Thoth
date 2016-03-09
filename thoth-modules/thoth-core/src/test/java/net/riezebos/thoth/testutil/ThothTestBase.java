@@ -59,6 +59,7 @@ import net.riezebos.thoth.content.skinning.SkinManager;
 import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.context.ContextManager;
 import net.riezebos.thoth.context.RepositoryDefinition;
+import net.riezebos.thoth.context.RepositoryType;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.SkinManagerException;
@@ -122,7 +123,7 @@ public class ThothTestBase {
     RepositoryDefinition repodef = new RepositoryDefinition();
     repodef.setLocation(fsroot);
     repodef.setName("testrepos");
-    repodef.setType("filesystem");
+    repodef.setType(RepositoryType.FILESYSTEM);
 
     ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", "", 0);
 
@@ -141,12 +142,12 @@ public class ThothTestBase {
     RepositoryDefinition mockedRepos = mock(RepositoryDefinition.class);
     when(mockedRepos.getLocation()).thenReturn("/");
     when(mockedRepos.getName()).thenReturn("MockedRepos");
-    when(mockedRepos.getType()).thenReturn("nop");
+    when(mockedRepos.getType()).thenReturn(RepositoryType.NOP);
 
     ContextDefinition mockedContext = mock(ContextDefinition.class);
     when(mockedContext.getRepositoryDefinition()).thenReturn(mockedRepos);
     when(mockedContext.getName()).thenReturn(contextName);
-    when(mockedContext.getRefreshIntervalMS()).thenReturn(0L);
+    when(mockedContext.getRefreshInterval()).thenReturn(0L);
     return mockedContext;
   }
 

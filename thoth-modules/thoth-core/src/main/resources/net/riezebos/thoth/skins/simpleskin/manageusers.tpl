@@ -62,7 +62,6 @@
                   </td>
                   <td></td>
               </tr>
-              <tr><td colspan="2">&nbsp;</td></tr>
             #end  
           </table>
         </div>
@@ -117,7 +116,6 @@
                   </td>
                   <td></td>
               </tr>
-              <tr><td colspan="2">&nbsp;</td></tr>
             #end  
           </table>
         </div>

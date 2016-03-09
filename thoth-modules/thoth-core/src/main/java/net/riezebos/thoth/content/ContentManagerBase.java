@@ -231,7 +231,7 @@ public abstract class ContentManagerBase implements ContentManager {
     synchronized (this) {
       if (autoRefresher != null)
         autoRefresher.cancel();
-      long autoRefreshIntervalMs = getContextDefinition().getRefreshIntervalMS();
+      long autoRefreshIntervalMs = getContextDefinition().getRefreshInterval() * 1000;
       boolean disabled = autoRefreshIntervalMs <= 0;
 
       // If we want auto refresh; let's not postpone that and do a hard one right now

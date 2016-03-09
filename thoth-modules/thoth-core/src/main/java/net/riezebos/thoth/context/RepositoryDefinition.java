@@ -14,15 +14,15 @@
  */
 package net.riezebos.thoth.context;
 
-public class RepositoryDefinition implements Cloneable {
+public class RepositoryDefinition implements Cloneable, Comparable<RepositoryDefinition> {
 
   private Long id;
   private String name;
   private String location;
   private String username;
   private String password;
-  private String type;
-  
+  private RepositoryType type;
+
   private boolean immutable = false;
 
   public Long getId() {
@@ -65,11 +65,11 @@ public class RepositoryDefinition implements Cloneable {
     this.password = password;
   }
 
-  public void setType(String type) {
-    this.type = type;
+  public void setType(RepositoryType repositoryType) {
+    this.type = repositoryType;
   }
 
-  public String getType() {
+  public RepositoryType getType() {
     return type;
   }
 
@@ -142,5 +142,10 @@ public class RepositoryDefinition implements Cloneable {
   @Override
   public String toString() {
     return getName();
+  }
+
+  @Override
+  public int compareTo(RepositoryDefinition o) {
+    return getName().compareTo(o.getName());
   }
 }

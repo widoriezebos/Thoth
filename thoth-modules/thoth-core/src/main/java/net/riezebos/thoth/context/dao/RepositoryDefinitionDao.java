@@ -25,6 +25,7 @@ import net.riezebos.thoth.configuration.persistence.ThothDB;
 import net.riezebos.thoth.configuration.persistence.dbs.SequenceGenerator;
 import net.riezebos.thoth.configuration.persistence.dbs.SqlStatement;
 import net.riezebos.thoth.context.RepositoryDefinition;
+import net.riezebos.thoth.context.RepositoryType;
 import net.riezebos.thoth.exceptions.ContextManagerException;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.user.PasswordUtil;
@@ -52,7 +53,7 @@ public class RepositoryDefinitionDao extends BaseDao {
 
       repoStmt.setLong("id", id);
       repoStmt.setString("name", repositoryDefinition.getName());
-      repoStmt.setString("repotype", repositoryDefinition.getType());
+      repoStmt.setString("repotype", repositoryDefinition.getType().getValue());
       repoStmt.setString("location", repositoryDefinition.getLocation());
       repoStmt.setString("username", repositoryDefinition.getUsername());
       repoStmt.setString("password", encrypt(repositoryDefinition.getPassword()));
@@ -71,7 +72,7 @@ public class RepositoryDefinitionDao extends BaseDao {
 
       repoStmt.setLong("id", repositoryDefinition.getId());
       repoStmt.setString("name", repositoryDefinition.getName());
-      repoStmt.setString("repotype", repositoryDefinition.getType());
+      repoStmt.setString("repotype", repositoryDefinition.getType().getValue());
       repoStmt.setString("location", repositoryDefinition.getLocation());
       repoStmt.setString("username", repositoryDefinition.getUsername());
       repoStmt.setString("password", encrypt(repositoryDefinition.getPassword()));
@@ -138,7 +139,7 @@ public class RepositoryDefinitionDao extends BaseDao {
         repositoryDefinition.setId(id);
         repositoryDefinition.setImmutable(false);
         repositoryDefinition.setName(name);
-        repositoryDefinition.setType(repotype);
+        repositoryDefinition.setType(RepositoryType.convert(repotype));
         repositoryDefinition.setLocation(location);
         repositoryDefinition.setUsername(username);
         repositoryDefinition.setPassword(decrypt(password));

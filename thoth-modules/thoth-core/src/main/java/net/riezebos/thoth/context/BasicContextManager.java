@@ -37,7 +37,7 @@ public class BasicContextManager implements ContextManager {
 
     RepositoryDefinition repoDef = new RepositoryDefinition();
     repoDef.setName("global-nop-repository");
-    repoDef.setType("nop");
+    repoDef.setType(RepositoryType.NOP);
     global = new ContextDefinition(repoDef, "*global*", null, null, 0);
     contextDefinitionDao = new ContextDefinitionDao(thothEnvironment.getThothDB());
   }

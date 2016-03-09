@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.context.RepositoryDefinition;
+import net.riezebos.thoth.context.RepositoryType;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.util.PropertyLoader;
 
@@ -85,7 +86,7 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
         String branch = getValue("context." + idx + ".branch", null);
         String library = getValue("context." + idx + ".library", null);
         String refreshSeconds = getValue("context." + idx + ".refreshseconds", "60");
-        long refreshMs = Long.parseLong(refreshSeconds) * 1000;
+        long refreshSecs = Long.parseLong(refreshSeconds);
 
         if (repository == null)
           throw new ConfigurationException("Repository setting not correct for context." + idx + ".repository");
@@ -93,9 +94,9 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
         RepositoryDefinition repositoryDefinition = repositoryDefinitions.get(repository.toLowerCase());
         if (repositoryDefinition == null)
           throw new ConfigurationException("Context " + contextName + " references undefined Repository '" + repository + "'");
-        ContextDefinition contextdef = new ContextDefinition(repositoryDefinition, contextName, branch, library, refreshMs);
+        ContextDefinition contextdef = new ContextDefinition(repositoryDefinition, contextName, branch, library, refreshSecs);
         contextdef.setImmutable(true);
-        
+
         String key = contextdef.getName().toLowerCase();
         if (contextDefinitions.containsKey(key)) {
           throw new ConfigurationException("Context name not unique (case insensitive by the way): " + key);
@@ -124,7 +125,7 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
         repodef.setLocation(location == null ? url : location);
         repodef.setUsername(getValue("repository." + idx + ".username", null));
         repodef.setPassword(getValue("repository." + idx + ".password", null));
-        repodef.setType(getValue("repository." + idx + ".type"));
+        repodef.setType(RepositoryType.convert(getValue("repository." + idx + ".type")));
         repodef.setImmutable(true);
         String key = repodef.getName().toLowerCase();
         if (repositoryDefinitions.containsKey(key)) {

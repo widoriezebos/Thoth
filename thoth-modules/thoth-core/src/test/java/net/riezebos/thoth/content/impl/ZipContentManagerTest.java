@@ -12,6 +12,7 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.context.RepositoryDefinition;
+import net.riezebos.thoth.context.RepositoryType;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
@@ -36,7 +37,7 @@ public class ZipContentManagerTest extends ThothTestBase {
     RepositoryDefinition repodef = new RepositoryDefinition();
     repodef.setLocation("/");
     repodef.setName("testrepos");
-    repodef.setType("filesystem");
+    repodef.setType(RepositoryType.FILESYSTEM);
 
     ContextDefinition contextDef = new ContextDefinition(repodef, "testfs", "branch", "", 0);
 

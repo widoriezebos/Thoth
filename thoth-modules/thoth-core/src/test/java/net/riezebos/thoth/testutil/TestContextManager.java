@@ -26,6 +26,7 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.context.ContextManager;
 import net.riezebos.thoth.context.RepositoryDefinition;
+import net.riezebos.thoth.context.RepositoryType;
 import net.riezebos.thoth.exceptions.ContextManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 
@@ -41,7 +42,7 @@ public class TestContextManager implements ContextManager {
 
     RepositoryDefinition repoDef = new RepositoryDefinition();
     repoDef.setName("global-nop-repository");
-    repoDef.setType("nop");
+    repoDef.setType(RepositoryType.NOP);
     global = new ContextDefinition(repoDef, "*global*", null, null, 0);
   }
 

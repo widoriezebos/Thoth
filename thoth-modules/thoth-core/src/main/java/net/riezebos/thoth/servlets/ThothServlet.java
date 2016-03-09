@@ -44,6 +44,7 @@ import net.riezebos.thoth.commands.ErrorPageCommand;
 import net.riezebos.thoth.commands.IndexCommand;
 import net.riezebos.thoth.commands.LoginCommand;
 import net.riezebos.thoth.commands.LogoutCommand;
+import net.riezebos.thoth.commands.ManageContextsCommand;
 import net.riezebos.thoth.commands.ManageUsersCommand;
 import net.riezebos.thoth.commands.MetaCommand;
 import net.riezebos.thoth.commands.PullCommand;
@@ -197,6 +198,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     registerCommand(new ReindexCommand(thothEnvironment, this));
     registerCommand(new RevisionsCommand(thothEnvironment, this));
     registerCommand(new ManageUsersCommand(thothEnvironment, this));
+    registerCommand(new ManageContextsCommand(thothEnvironment, this));
     registerCommand(new UserProfileCommand(thothEnvironment, this));
     registerCommand(new SearchCommand(thothEnvironment, this));
     registerCommand(new ValidationReportCommand(thothEnvironment, this));

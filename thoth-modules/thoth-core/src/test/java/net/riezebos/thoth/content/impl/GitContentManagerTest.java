@@ -11,6 +11,7 @@ import net.riezebos.thoth.content.impl.util.TestGitContentManager;
 import net.riezebos.thoth.content.versioncontrol.Revision.Action;
 import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.context.RepositoryDefinition;
+import net.riezebos.thoth.context.RepositoryType;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.testutil.ThothTestBase;
 
@@ -26,7 +27,7 @@ public class GitContentManagerTest extends ThothTestBase {
     repodef.setName("testrepos");
     repodef.setUsername("username");
     repodef.setPassword("password");
-    repodef.setType("git");
+    repodef.setType(RepositoryType.GIT);
 
     ContextDefinition contextDef = new ContextDefinition(repodef, "testgit", "branch", "", 0);
     GitContentManager contentManager = new TestGitContentManager(contextDef, thothEnvironment);

@@ -18,22 +18,22 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.riezebos.thoth.util.ThothUtil;
 
-public class ContextDefinition implements Cloneable {
+public class ContextDefinition implements Cloneable, Comparable<ContextDefinition> {
 
   private Long id;
   private RepositoryDefinition repositoryDefinition;
   private String name;
   private String branch;
   private String libraryRoot;
-  private long refreshIntervalMS;
+  private long refreshInterval;
   private boolean immutable = false;
 
-  public ContextDefinition(RepositoryDefinition repositoryDefinition, String name, String branch, String libraryRoot, long refreshIntervalMS) {
+  public ContextDefinition(RepositoryDefinition repositoryDefinition, String name, String branch, String libraryRoot, long refreshInterval) {
     super();
     this.repositoryDefinition = repositoryDefinition;
     this.name = name;
     this.branch = branch;
-    this.refreshIntervalMS = refreshIntervalMS;
+    this.refreshInterval = refreshInterval;
     if (StringUtils.isBlank(libraryRoot))
       libraryRoot = "/";
     this.libraryRoot = ThothUtil.prefix(ThothUtil.stripSuffix(libraryRoot, "/"), "/");
@@ -71,8 +71,8 @@ public class ContextDefinition implements Cloneable {
     this.libraryRoot = libraryRoot;
   }
 
-  public void setRefreshIntervalMS(long refreshIntervalMS) {
-    this.refreshIntervalMS = refreshIntervalMS;
+  public void setRefreshInterval(long refreshInterval) {
+    this.refreshInterval = refreshInterval;
   }
 
   public String getBranch() {
@@ -83,8 +83,8 @@ public class ContextDefinition implements Cloneable {
     return libraryRoot;
   }
 
-  public long getRefreshIntervalMS() {
-    return refreshIntervalMS;
+  public long getRefreshInterval() {
+    return refreshInterval;
   }
 
   public void setImmutable(boolean immutable) {
@@ -113,7 +113,7 @@ public class ContextDefinition implements Cloneable {
     result = prime * result + ((branch == null) ? 0 : branch.hashCode());
     result = prime * result + ((libraryRoot == null) ? 0 : libraryRoot.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + (int) (refreshIntervalMS ^ (refreshIntervalMS >>> 32));
+    result = prime * result + (int) (refreshInterval ^ (refreshInterval >>> 32));
     result = prime * result + ((repositoryDefinition == null) ? 0 : repositoryDefinition.hashCode());
     return result;
   }
@@ -142,7 +142,7 @@ public class ContextDefinition implements Cloneable {
         return false;
     } else if (!name.equals(other.name))
       return false;
-    if (refreshIntervalMS != other.refreshIntervalMS)
+    if (refreshInterval != other.refreshInterval)
       return false;
     if (repositoryDefinition == null) {
       if (other.repositoryDefinition != null)
@@ -155,5 +155,10 @@ public class ContextDefinition implements Cloneable {
   @Override
   public String toString() {
     return getBranch() + "@" + getName();
+  }
+
+  @Override
+  public int compareTo(ContextDefinition o) {
+    return getName().compareTo(o.getName());
   }
 }

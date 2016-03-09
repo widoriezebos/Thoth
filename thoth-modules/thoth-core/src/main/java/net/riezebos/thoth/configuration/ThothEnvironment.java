@@ -23,8 +23,10 @@ import net.riezebos.thoth.context.BasicContextManager;
 import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.context.ContextManager;
 import net.riezebos.thoth.context.RepositoryDefinition;
+import net.riezebos.thoth.context.RepositoryType;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextManagerException;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.user.BasicUserManager;
@@ -62,25 +64,32 @@ public class ThothEnvironment implements ConfigurationChangeListener {
 
         if (StringUtils.isBlank(contextName)) {
           RepositoryDefinition repositoryDefinition = new RepositoryDefinition();
-          repositoryDefinition.setType("nop");
+          repositoryDefinition.setType(RepositoryType.NOP);
           contentManager = registerContentManager(new NopContentManager(new ContextDefinition(repositoryDefinition, "", "", "", 0), this));
         } else {
           ContextDefinition contextDefinition = getContextManager().getContextDefinition(contextName);
           RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
 
-          String type = repositoryDefinition.getType();
-          if ("git".equalsIgnoreCase(type))
+          RepositoryType type = repositoryDefinition.getType();
+          switch (type) {
+          case GIT:
             contentManager = registerContentManager(new GitContentManager(contextDefinition, this));
-          else if ("fs".equalsIgnoreCase(type) || "filesystem".equalsIgnoreCase(type))
+            break;
+          case FILESYSTEM:
             contentManager = registerContentManager(new FSContentManager(contextDefinition, this));
-          else if ("classpath".equalsIgnoreCase(type) || "cp".equalsIgnoreCase(type))
+            break;
+          case CLASSPATH:
             contentManager = registerContentManager(new ClasspathContentManager(contextDefinition, this));
-          else if ("nop".equalsIgnoreCase(type))
+            break;
+          case NOP:
             contentManager = registerContentManager(new NopContentManager(contextDefinition, this));
-          else if ("zip".equalsIgnoreCase(type) || "jar".equalsIgnoreCase(type))
+            break;
+          case ZIP:
             contentManager = registerContentManager(new ZipContentManager(contextDefinition, this));
-          else
+            break;
+          default:
             throw new ContentManagerException("Unsupported version control type: " + type);
+          }
         }
       }
     }
@@ -311,20 +320,24 @@ public class ThothEnvironment implements ConfigurationChangeListener {
    * This method is synchronized to make sure there will ever only be one ContextManager for this environment.
    * 
    * @return
-   * @throws DatabaseException 
+   * @throws DatabaseException
    * @throws SQLException
    */
-  public ContextManager getContextManager() throws DatabaseException {
-    FinalWrapper<ContextManager> wrapper = contextManagerWrapper;
-    if (wrapper == null) {
-      synchronized (this) {
-        if (contextManagerWrapper == null) {
-          setContextManager(new BasicContextManager(this));
+  public ContextManager getContextManager() throws ContextManagerException {
+    try {
+      FinalWrapper<ContextManager> wrapper = contextManagerWrapper;
+      if (wrapper == null) {
+        synchronized (this) {
+          if (contextManagerWrapper == null) {
+            setContextManager(new BasicContextManager(this));
+          }
+          wrapper = contextManagerWrapper;
         }
-        wrapper = contextManagerWrapper;
       }
+      return wrapper.value;
+    } catch (Exception e) {
+      throw new ContextManagerException(e.getMessage(), e);
     }
-    return wrapper.value;
   }
 
   public void setContextManager(ContextManager contextManager) {
