@@ -36,6 +36,7 @@ public class TestContextManager implements ContextManager {
   private ContextDefinition global;
   private Map<String, RepositoryDefinition> repositoryDefinitions = new HashMap<>();
   private Map<String, ContextDefinition> contextDefinitions = new HashMap<>();
+  private boolean allIsValid = false;
 
   public TestContextManager(ThothEnvironment thothEnvironment) {
     this.thothEnvironment = thothEnvironment;
@@ -138,7 +139,10 @@ public class TestContextManager implements ContextManager {
 
   @Override
   public boolean isValidContext(String context) throws ContextManagerException {
-    return getContextDefinitions().containsKey(context.toLowerCase());
+    return allIsValid || getContextDefinitions().containsKey(context.toLowerCase());
   }
 
+  public void allIsValidFromNowOn() {
+    allIsValid = true;
+  }
 }

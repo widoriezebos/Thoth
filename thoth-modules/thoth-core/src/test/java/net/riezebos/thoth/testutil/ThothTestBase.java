@@ -61,6 +61,7 @@ import net.riezebos.thoth.context.ContextManager;
 import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.context.RepositoryType;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.exceptions.SkinManagerException;
 import net.riezebos.thoth.exceptions.UserManagerException;
@@ -88,7 +89,9 @@ public class ThothTestBase {
   }
 
   protected ContextManager getTestContextManager(ThothEnvironment thothEnvironment) {
-    return new TestContextManager(thothEnvironment);
+    TestContextManager testContextManager = new TestContextManager(thothEnvironment);
+    testContextManager.allIsValidFromNowOn();
+    return testContextManager;
   }
 
   protected UserManager getTestUserManager() {
@@ -151,7 +154,7 @@ public class ThothTestBase {
     return mockedContext;
   }
 
-  protected Configuration mockConfiguration(String contextName) throws ContextNotFoundException {
+  protected Configuration mockConfiguration(String contextName) throws ContextManagerException {
 
     ContextDefinition def = mockContextDefinition(contextName);
     Map<String, ContextDefinition> map = new HashMap<>();
