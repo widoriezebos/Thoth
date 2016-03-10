@@ -340,8 +340,16 @@ public interface Configuration extends Cloneable {
   /**
    * The master password to encrypt all stored passwords with. NOTE! If you change the master password all passwords that are stored in the database will become
    * invalid!
-   * @return 
+   * 
+   * @return
    */
   public String getPasswordEncryptionKey();
+
+  /**
+   * The name of the server, used in screens (titles). Available in the templates using $servername
+   * 
+   * @return
+   */
+  public String getServerName();
 
 }

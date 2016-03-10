@@ -59,3 +59,10 @@ html {
   display: block;
 }
 
+.tabdetails {
+  padding: 25px 25px 25px 25px;
+}
+
+.tabaction {
+  float: right;
+}

@@ -183,7 +183,7 @@ public class SkinManager {
       String baseFolder = ThothUtil.stripPrefix(skinInheritance.getChild().getSkinBaseFolder(), "/");
       String remainder = path.substring(baseFolder.length());
       Skin parent = skinInheritance.getParent();
-      result = parent.getSkinBaseFolder() + remainder;
+      result = ThothUtil.suffix(parent.getSkinBaseFolder(), "/") + ThothUtil.stripPrefix(remainder, "/");
     }
     return result;
   }

@@ -58,7 +58,7 @@ public class IndexCommand extends RendererBase implements Command {
         try {
           ContentManager contentManager = getThothEnvironment().getContentManager(ctxt);
           AccessManager accessManager = contentManager.getAccessManager();
-          if (accessManager.hasPermission(identity, "/", Permission.ACCESS))
+          if (accessManager.hasPermission(identity, "/", Permission.BASIC_ACCESS))
             contexts.add(ctxt);
         } catch (ContentManagerException e) {
           problems.add(ctxt+": "+e.getMessage());

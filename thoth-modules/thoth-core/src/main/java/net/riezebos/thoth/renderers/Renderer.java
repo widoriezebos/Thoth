@@ -42,6 +42,7 @@ public interface Renderer {
   String NOW = "now";
   String OUTPUT_FORMATS = "outputFormats";
   String PERMISSIONS = "permissions";
+  String SERVERNAME = "servername";
 
   public String getTypeCode();
 

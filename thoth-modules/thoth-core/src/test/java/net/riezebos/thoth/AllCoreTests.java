@@ -40,6 +40,7 @@ import net.riezebos.thoth.configuration.persistence.dbs.SqlStatementTest;
 import net.riezebos.thoth.content.AutoRefresherTest;
 import net.riezebos.thoth.content.ContentManagerBaseTest;
 import net.riezebos.thoth.content.ThothContextTest;
+import net.riezebos.thoth.content.comments.dao.CommentDaoTest;
 import net.riezebos.thoth.content.impl.FSContentManagerTest;
 import net.riezebos.thoth.content.impl.GitContentManagerTest;
 import net.riezebos.thoth.content.impl.ZipContentManagerTest;
@@ -73,7 +74,7 @@ import net.riezebos.thoth.util.diff_match_patchTest;
     ZipContentManagerTest.class, ThothCoreUtilTest.class, diff_match_patchTest.class, //
     HotReloadableConfigurationTest.class, BasicUserManagerTest.class, PasswordUtilTest.class, DatabaseIdiomFactoryTest.class, //
     SqlStatementTest.class, LoginCommandTest.class, ManageUsersCommandTest.class, UserProfileCommandTest.class, //
-    BasicContextManagerTest.class})
+    BasicContextManagerTest.class, CommentDaoTest.class})
 
 public class AllCoreTests {
 

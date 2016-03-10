@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/menu.css"/>
   </head>
   <body>
-        <h1>Welcome to Thoth<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
+        <h1>Welcome to $servername<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
     #if(!$contexts.isEmpty())
       <h3>Please select one of the contexts below</h3>
     #else  

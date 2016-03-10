@@ -353,4 +353,9 @@ public class HotReloadableConfiguration implements Configuration {
     return activeConfiguration.getPasswordEncryptionKey();
   }
 
+  @Override
+  public String getServerName() {
+    return activeConfiguration.getServerName();
+  }
+
 }

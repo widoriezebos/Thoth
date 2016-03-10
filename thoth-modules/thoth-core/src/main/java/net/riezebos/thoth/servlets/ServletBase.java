@@ -212,6 +212,7 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.NOW, configuration.getTimestampFormat().format(now));
     result.put(Renderer.OUTPUT_FORMATS, configuration.getOutputFormats());
     result.put(Renderer.REFRESH_PARAMETER, getRefreshTimestamp(contextName));
+    result.put(Renderer.SERVERNAME, configuration.getServerName());
 
     Set<String> permissions = new HashSet<>();
     result.put(Renderer.LOGGED_IN, isLoggedIn(request));

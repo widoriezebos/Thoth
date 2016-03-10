@@ -141,7 +141,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       ContextDefinition oneAndOnly = contextDefinitions.values().iterator().next();
       String contextName = oneAndOnly.getName();
       ContentManager contentManager = getThothEnvironment().getContentManager(contextName);
-      boolean hasPermission = contentManager.getAccessManager().hasPermission(getCurrentIdentity(request), "/", Permission.ACCESS);
+      boolean hasPermission = contentManager.getAccessManager().hasPermission(getCurrentIdentity(request), "/", Permission.BASIC_ACCESS);
       if (hasPermission) {
         String mainRedirect = ThothUtil.suffix(getRootRedirect(request), "/") + contextName;
         response.sendRedirect(mainRedirect);

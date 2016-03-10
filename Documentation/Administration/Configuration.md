@@ -74,7 +74,7 @@ skin.default
 : The name of the default skin. When no skin is defined for a specific context this is the skin that will be used. Also used when no skin is defined for the main index page. Default value is ‘SimpleSkin’
 
 skin.mainindexcontext
-: Use the skin associated with the given context for the main index page. If left blank the skin.default property will be used as a fallback. Default value is \<no value\>
+: Use the skin associated with the given context for the main index page. If left blank the skin.default property will be used as a fallback. Default value is \<no value\>. Note that if you set this property to a context that is not publicly available you will need to specify access rules that allow public access to (just) your skin(s).
 
 localhost
 : Custom rendering uses a forked process to render the contents. When this process needs to fetch the contents; this URL is used as the base for the path of the document. Default value is ‘http://localhost:8080/'

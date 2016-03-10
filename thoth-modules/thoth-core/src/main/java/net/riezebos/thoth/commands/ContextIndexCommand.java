@@ -52,13 +52,13 @@ public class ContextIndexCommand extends RendererBase implements Command {
     try {
       ContentManager contentManager = getContentManager(context);
       AccessManager accessManager = contentManager.getAccessManager();
-      if (!accessManager.hasPermission(identity, path, Permission.ACCESS))
+      if (!accessManager.hasPermission(identity, path, Permission.BASIC_ACCESS))
         return RenderResult.FORBIDDEN;
 
       Classifier classifier = new Classifier();
 
       List<Book> books =
-          contentManager.getBooks().stream().filter(p -> accessManager.hasPermission(identity, p.getPath(), Permission.ACCESS)).collect(Collectors.toList());
+          contentManager.getBooks().stream().filter(p -> accessManager.hasPermission(identity, p.getPath(), Permission.BASIC_ACCESS)).collect(Collectors.toList());
 
       Configuration configuration = getThothEnvironment().getConfiguration();
       List<String> classificationNames = configuration.getContextIndexClassifications();

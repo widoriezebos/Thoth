@@ -92,6 +92,7 @@ Templates are written in [Velocity](http://velocity.apache.org) and can use vari
 #### Generic variables for all templates
 The following variables are defined for all templates
 
+- **servername** the name of the server as specified by the configuration. Type: String
 - **context** is the name of the context. Type: String
 - **skinbase** is the absolute path to the root of the active Skin’s resources. Type: String
 - **contexturl** is absolute path to the current context. If Thoth is not located in the root of the web container then this path includes the path into the Thoth web context. Type: String

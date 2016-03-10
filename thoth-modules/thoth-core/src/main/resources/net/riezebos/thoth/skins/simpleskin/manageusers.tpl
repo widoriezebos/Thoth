@@ -25,45 +25,45 @@
         <input type="radio" name="tabs" id="tab1" #if($tab=="tab1")checked="true"#end/>
         <label for="tab1">Users</label>
         <div id="tab-content1" class="tab-content">
-          <table>
+          <div>
             #foreach($identity in $users)
-              <tr>
-                <th><h3>${identity.identifier}</h3></th>
-                <th><a href="./?cmd=manageusers&operation=deleteidentity&identifier=${identity.identifier}&selectedtab=tab1">Delete</a></th>
-              </tr>
-              <tr>
-                  <td>
-                      <form action="./?cmd=manageusers&operation=updateuser&identifier=${identity.identifier}&selectedtab=tab1" method="post">                                 
-                        First name: <input type="text" name="firstname" #if(${identity.firstname})value="${identity.firstname}"#end size="10"/>         
-                        Last name: <input type="text" name="lastname"  #if(${identity.lastname})value="${identity.lastname}"#end size="10"/>            
-                        Password: <input type="password" name="password" value="" size="10"/>                                                           
-                        Blocked: <input type="checkbox" name="blocked" #if(${identity.blockedUntil})checked="true"#end size="10"/>                           
-                        <input type="submit" value="Update"/>
-                      </form>
-                  </td>
-                  <td></td>
-              </tr>
-              <tr><th colspan="2">Group memberships</th></tr>
-              #foreach($group in ${identity.memberships})
-              <tr><td>$group.identifier</td><td><a href="./?cmd=manageusers&operation=removemember&group=${group.identifier}&member=$identity.identifier&selectedtab=tab1">Remove</a></td></tr>
-              #end
-              <tr>
-                  <td>
-                      <form action="./?cmd=manageusers&operation=addmember&member=${identity.identifier}&selectedtab=tab1" method="post">
-                        <select name="group">
-                          #foreach($member in ${groups})
-                            #if(!${identity.memberships.contains($member)})
-                              <option value="$member.identifier">$member.identifier</option>
-                            #end  
+              <details>
+                <summary>
+                  ${identity.identifier}
+                </summary>
+                <div class="tabdetails">
+                  <form action="./?cmd=manageusers&operation=updateuser&identifier=${identity.identifier}&selectedtab=tab1" method="post">                                 
+                    First name: <input type="text" name="firstname" #if(${identity.firstname})value="${identity.firstname}"#end size="10"/>         
+                    Last name: <input type="text" name="lastname"  #if(${identity.lastname})value="${identity.lastname}"#end size="10"/>            
+                    Password: <input type="password" name="password" value="" size="10"/>                                                           
+                    Blocked: <input type="checkbox" name="blocked" #if(${identity.blockedUntil})checked="true"#end size="10"/>                           
+                    <input type="submit" value="Update"/>
+                  </form>
+                 
+                  <h4>Group memberships</h4>
+                  #foreach($group in ${identity.memberships})
+                    <div>
+                      $group.identifier
+                      <a href="./?cmd=manageusers&operation=removemember&group=${group.identifier}&member=$identity.identifier&selectedtab=tab1">Remove</a>
+                    </div>  
+                  #end
+                  <div>
+                    <form action="./?cmd=manageusers&operation=addmember&member=${identity.identifier}&selectedtab=tab1" method="post">
+                      <select name="group">
+                        #foreach($member in ${groups})
+                          #if(!${identity.memberships.contains($member)})
+                            <option value="$member.identifier">$member.identifier</option>
                           #end  
-                        </select>
-                        <input type="submit" value="Add membership"/>
-                      </form>
-                  </td>
-                  <td></td>
-              </tr>
+                        #end  
+                      </select>
+                      <input type="submit" value="Add membership"/>
+                    </form>
+                  </div>
+                  <a class="tabaction" href="./?cmd=manageusers&operation=deleteidentity&identifier=${identity.identifier}&selectedtab=tab1">Delete ${identity.identifier}</a>
+                <div>
+              </details>
             #end  
-          </table>
+          </div>
         </div>
       </li>
       
@@ -72,18 +72,16 @@
         <input type="radio" name="tabs" id="tab2" #if($tab=="tab2")checked="true"#end/>
         <label for="tab2">Groups</label>
         <div id="tab-content2" class="tab-content">
-          <table>
             #foreach($group in $groups)
-              <tr>
-                <th><h3>${group.identifier}</h3></th>
-                <th><a href="./?cmd=manageusers&operation=deleteidentity&identifier=${group.identifier}&selectedtab=tab2">Delete</a></th>
-              </tr>
-              <tr><th>Permissions</th><th>Action</th></tr>
+              <details>
+                <summary>
+                  ${group.identifier}
+                </summary>  
+                <div class="tabdetails">
+              <h3>Permissions</h3>
               #foreach($permission in ${thothutil.sortPermissions($group.permissions)})
-              <tr><td>$permission</td><td><a href="./?cmd=manageusers&operation=revokepermission&group=${group.identifier}&permission=$permission&selectedtab=tab2">Revoke</a></td></tr>
+                <div>$permission <a href="./?cmd=manageusers&operation=revokepermission&group=${group.identifier}&permission=$permission&selectedtab=tab2">Revoke</a></div><br/>
               #end
-              <tr>
-                  <td>
                       <form action="./?cmd=manageusers&operation=grantpermission&group=${group.identifier}&selectedtab=tab2" method="post">
                         <select name="permission">
                           #foreach($perm in ${thothutil.getAllPermissions()})
@@ -94,15 +92,11 @@
                         </select>
                         <input type="submit" value="Add permission"/>
                       </form>
-                  </td>
-                  <td></td>
-              </tr>
-              <tr><th colspan="2">Members</th></tr>
+
+              <h3>Members</h3>
               #foreach($identity in ${group.members})
-              <tr><td>$identity.identifier</td><td><a href="./?cmd=manageusers&operation=removemember&group=${group.identifier}&member=$identity.identifier&selectedtab=tab2">Remove</a></td></tr>
+                <div>$identity.identifier <a href="./?cmd=manageusers&operation=removemember&group=${group.identifier}&member=$identity.identifier&selectedtab=tab2">Remove</a></div><br/>
               #end
-              <tr>
-                  <td>
                       <form action="./?cmd=manageusers&operation=addmember&group=${group.identifier}&selectedtab=tab2" method="post">
                         <select name="member">
                           #foreach($member in ${identities})
@@ -113,11 +107,10 @@
                         </select>
                         <input type="submit" value="Add member"/>
                       </form>
-                  </td>
-                  <td></td>
-              </tr>
+              <a class="tabaction" href="./?cmd=manageusers&operation=deleteidentity&identifier=${group.identifier}&selectedtab=tab2">Delete group ${group.identifier}</a>
+              </div>
+              </details>
             #end  
-          </table>
         </div>
       
       </li>

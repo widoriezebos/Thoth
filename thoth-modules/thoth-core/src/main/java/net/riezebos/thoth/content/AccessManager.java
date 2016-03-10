@@ -19,9 +19,10 @@ public class AccessManager {
   private static final Logger LOG = LoggerFactory.getLogger(AccessManager.class);
   private static final String ACCESS_RULES_FILE = "access.rules";
 
-  private Pattern requirePattern = Pattern.compile("(.*?)\\s+require\\s+(.*)");
-  private Pattern requireAllPattern = Pattern.compile("(.*?)\\s+requireall\\s+(.*)");
-  private Pattern requireAnyPattern = Pattern.compile("(.*?)\\s+requireany\\s+(.*)");
+  private Pattern requireNonePattern = Pattern.compile("(.*?)\\s+requirenone\\s*", Pattern.CASE_INSENSITIVE);
+  private Pattern requirePattern = Pattern.compile("(.*?)\\s+require\\s+(.*)", Pattern.CASE_INSENSITIVE);
+  private Pattern requireAllPattern = Pattern.compile("(.*?)\\s+requireall\\s+(.*)", Pattern.CASE_INSENSITIVE);
+  private Pattern requireAnyPattern = Pattern.compile("(.*?)\\s+requireany\\s+(.*)", Pattern.CASE_INSENSITIVE);
   private ContentManager contentManager;
   private List<AccessRule> accessRules = new ArrayList<>();
   private boolean denyall = false;
@@ -32,7 +33,7 @@ public class AccessManager {
     if (accessRulesFile.exists()) {
       loadAccessRules(accessRulesFile);
     } else {
-      LOG.info("No access rules file found at " + accessRulesFile.getAbsolutePath() + " so only defaults apply");
+      LOG.info("No access.rules file found at " + accessRulesFile.getAbsolutePath() + " so defaults apply");
     }
   }
 
@@ -44,18 +45,22 @@ public class AccessManager {
           boolean matched = false;
           Matcher matcher = requirePattern.matcher(rule);
           if (matcher.matches()) {
-            matched = addRule(matcher, true);
+            matched = addRule(matcher, true, false);
           }
           matcher = requireAllPattern.matcher(rule);
           if (matcher.matches()) {
-            matched = addRule(matcher, true);
+            matched = addRule(matcher, true, false);
           }
           matcher = requireAnyPattern.matcher(rule);
           if (matcher.matches()) {
-            matched = addRule(matcher, false);
+            matched = addRule(matcher, false, false);
+          }
+          matcher = requireNonePattern.matcher(rule);
+          if (matcher.matches()) {
+            matched = addRule(matcher, false, true);
           }
           if (!matched)
-            LOG.warn("Invalid rule, require keyword is missing in line: " + rule);
+            LOG.warn("Invalid rule, require / requireAll / requireAny keyword is missing in line: " + rule);
         }
 
       }
@@ -65,10 +70,12 @@ public class AccessManager {
     }
   }
 
-  private boolean addRule(Matcher matcher, boolean matchAll) {
+  private boolean addRule(Matcher matcher, boolean matchAll, boolean requireNone) {
     String path = matcher.group(1).trim();
-    String groups = matcher.group(2).trim();
-    accessRules.add(new AccessRule(path, groups, matchAll));
+    String groups = "";
+    if (!requireNone)
+      groups = matcher.group(2).trim();
+    accessRules.add(new AccessRule(path, groups, matchAll, requireNone));
     return true;
   }
 
@@ -83,21 +90,24 @@ public class AccessManager {
     if (identity == null)
       return false;
 
+    Set<String> memberOf = identity.getMemberOf();
+    boolean rulesSayYes = false;
+
+    for (AccessRule rule : accessRules) {
+      if (rule.applies(path)) {
+        rulesSayYes = rule.isAccessAllowed(memberOf);
+        break;
+      }
+    }
+    if (rulesSayYes)
+      return true;
+
     if (!identity.getEffectivePermissions().contains(requestedPermission))
       return false;
 
     if (accessRules.isEmpty())
       return true;
 
-    Set<String> memberOf = identity.getMemberOf();
-    boolean result = false;
-
-    for (AccessRule rule : accessRules) {
-      if (rule.applies(path)) {
-        result = rule.isAccessAllowed(memberOf);
-        break;
-      }
-    }
-    return result;
+    return false;
   }
 }

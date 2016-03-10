@@ -9,6 +9,7 @@
   </head>
   <body>
     <h1>Latest changes<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
+    <a href="${contexturl}">Back to Index</a>
     Showing page ${page}<br/>
     #set($prevpage=${page}+-1)
     #if($prevpage > 0)

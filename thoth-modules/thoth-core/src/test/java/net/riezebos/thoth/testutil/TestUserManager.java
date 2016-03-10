@@ -59,7 +59,7 @@ public class TestUserManager implements UserManager {
     registerGroup(writers);
 
     Group readers = new Group("readers");
-    readers.grantPermission(Permission.ACCESS);
+    readers.grantPermission(Permission.BASIC_ACCESS);
     readers.grantPermission(Permission.READ_RESOURCE);
     readers.grantPermission(Permission.READ_BOOKS);
     readers.grantPermission(Permission.SEARCH);

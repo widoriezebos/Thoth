@@ -555,4 +555,9 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   public String getPasswordEncryptionKey() {
     return getValue("masterpassword", "InFactYouShouldChangeThisRightAfterSetupAndNot1SecondL8er!");
   }
+
+  @Override
+  public String getServerName() {
+    return getValue("servername", "Thoth");
+  }
 }

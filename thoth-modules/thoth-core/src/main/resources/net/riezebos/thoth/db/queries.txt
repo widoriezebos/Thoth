@@ -166,3 +166,36 @@ delete_repository =
     where  id = :id
 ;
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+select_comments = 
+    select id, username, documentpath, timecreated, title
+    from   thoth_comments
+;
+    
+insert_comment =
+    insert into thoth_comments(id, username, documentpath, timecreated, title) 
+    values (:id, :username, :documentpath, :timecreated, :title) 
+;
+
+delete_comment =
+    delete from thoth_comments
+    where  id = :id
+;
+
+select_commentbody = 
+    select commentbody
+    from   thoth_commentbodies
+    where  comm_id = :comm_id
+;
+    
+insert_commentbody =
+    insert into thoth_commentbodies(comm_id, commentbody) 
+    values (:comm_id, :commentbody) 
+;
+
+delete_commentbody =
+    delete from thoth_commentbodies
+    where  comm_id = :comm_id
+;
+

@@ -16,7 +16,7 @@ package net.riezebos.thoth.user;
 
 public enum Permission {
 
-  ACCESS(1),
+  BASIC_ACCESS(1),
   READ_BOOKS(2),
   READ_FRAGMENTS(3),
   READ_RESOURCE(4),
