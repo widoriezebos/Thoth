@@ -387,8 +387,10 @@ public class ThothTestBase {
 
   private void unsafeCleanupTempFolder(File dbDir) {
     if (dbDir.isDirectory()) {
-      for (File child : dbDir.listFiles())
-        unsafeCleanupTempFolder(child);
+      File[] listFiles = dbDir.listFiles();
+      if (listFiles != null)
+        for (File child : listFiles)
+          unsafeCleanupTempFolder(child);
       dbDir.delete();
     } else if (dbDir.isFile())
       dbDir.delete();

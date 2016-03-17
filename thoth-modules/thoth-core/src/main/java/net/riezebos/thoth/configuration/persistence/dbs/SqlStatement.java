@@ -293,7 +293,7 @@ public class SqlStatement implements AutoCloseable {
 
   public void setBytes(String paramName, byte[] b) throws SQLException {
     storeParameterValue(paramName, b);
-    LOG.debug(paramName + "=" + b);
+    LOG.debug(paramName + "=" + String.valueOf(b));
     int i = 1;
     boolean doneOne = false;
     Iterator<String> it = getParameters().iterator();

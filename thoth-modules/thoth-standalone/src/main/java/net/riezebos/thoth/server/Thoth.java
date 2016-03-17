@@ -88,9 +88,9 @@ public class Thoth {
 
     HashSessionManager sessionManager = new HashSessionManager();
     SessionHandler sessionHandler = new SessionHandler(sessionManager);
-    
+
     sessionHandler.setHandler(context);
-    
+
     server.setHandler(sessionHandler);
 
     println("Setting up content managers...");
@@ -126,7 +126,8 @@ public class Thoth {
     boolean stop = false;
     try {
       print("Command: ");
-      String line = br.readLine().trim();
+      String line = br.readLine();
+      line = line == null ? "" : line.trim();
 
       if ("reload".equalsIgnoreCase(line)) {
         configuration.reload();

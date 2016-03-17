@@ -220,7 +220,7 @@ public class IncludeProcessorTest {
             , "-library", "/net/riezebos/thoth"//
             , "-softlinkFile", "softlinks.properties"//
             , "-numbering", "0"//
-    });
+        });
     assertTrue(outMessage.indexOf("##Paragraph one of chapter one") != -1);
   }
 
@@ -236,10 +236,10 @@ public class IncludeProcessorTest {
             , "-library", "/net/riezebos/thoth"//
             , "-softlinkFile", "softlinks.properties"//
             , "-target", tempFile.getAbsolutePath()//
-    });
+        });
     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(tempFile), "UTF-8"));
     String line = br.readLine();
-    assertTrue(line.equals("MARKDOWN TESTS"));
+    assertTrue(line != null && line.equals("MARKDOWN TESTS"));
     br.close();
   }
 

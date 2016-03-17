@@ -40,15 +40,17 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   public static final String CONFIGKEY_DEPRECATED = "configuration";
   public static final String CONFIGKEY = "thoth_configuration";
   private static final String GLOBAL_SITE = "*global_site*";
-  private static FinalWrapper<ThothEnvironment> sharedThothContextWrapper = null;
 
   private Map<String, ContentManager> managers = new HashMap<>();
   private Configuration configuration = null;
   private List<RendererChangeListener> rendererChangeListeners = new ArrayList<>();
-  private FinalWrapper<ThothDB> thothDbWrapper = null;
-  private FinalWrapper<UserManager> userManagerWrapper = null;
-  private FinalWrapper<ContextManager> contextManagerWrapper = null;
-  private FinalWrapper<ExpiringCache<String, Integer>> expiringCacheWrapper = null;
+
+  private volatile static FinalWrapper<ThothEnvironment> sharedThothContextWrapper = null;
+
+  private volatile FinalWrapper<ThothDB> thothDbWrapper = null;
+  private volatile FinalWrapper<UserManager> userManagerWrapper = null;
+  private volatile FinalWrapper<ContextManager> contextManagerWrapper = null;
+  private volatile FinalWrapper<ExpiringCache<String, Integer>> expiringCacheWrapper = null;
 
   public ContentManager getContentManager(ContextDefinition contextDefinition) throws ContentManagerException {
     return getContentManager(contextDefinition.getName());
@@ -236,7 +238,8 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   }
 
   /**
-   * This method is synchronized to make sure there will ever only be one shared ThothEnvironment
+   * This method is synchronized to make sure there will ever only be one shared ThothEnvironment See
+   * http://shipilev.net/blog/2014/safe-public-construction/#_singletons_and_singleton_factories
    * 
    * @return
    */
@@ -244,10 +247,10 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     FinalWrapper<ThothEnvironment> wrapper = sharedThothContextWrapper;
     if (wrapper == null) {
       synchronized (ThothEnvironment.class) {
-        if (sharedThothContextWrapper == null) {
-          sharedThothContextWrapper = new FinalWrapper<ThothEnvironment>(new ThothEnvironment());
-        }
         wrapper = sharedThothContextWrapper;
+        if (wrapper == null)
+          wrapper = new FinalWrapper<ThothEnvironment>(new ThothEnvironment());
+        sharedThothContextWrapper = wrapper;
       }
     }
     return wrapper.value;
@@ -263,17 +266,19 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     FinalWrapper<ThothDB> wrapper = thothDbWrapper;
     if (wrapper == null) {
       synchronized (this) {
-        if (thothDbWrapper == null) {
-          thothDbWrapper = new FinalWrapper<ThothDB>(createThothDB());
-        }
         wrapper = thothDbWrapper;
+        if (wrapper == null) {
+          wrapper = new FinalWrapper<ThothDB>(createThothDB());
+        }
+        thothDbWrapper = wrapper;
       }
     }
     return wrapper.value;
   }
 
   /**
-   * This method is synchronized to make sure there will ever only be one ThothDB for this environment.
+   * This method is synchronized to make sure there will ever only be one ThothDB for this environment. See
+   * http://shipilev.net/blog/2014/safe-public-construction/#_singletons_and_singleton_factories
    * 
    * @return
    * @throws SQLException
@@ -282,10 +287,10 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     FinalWrapper<ExpiringCache<String, Integer>> wrapper = expiringCacheWrapper;
     if (wrapper == null) {
       synchronized (this) {
-        if (expiringCacheWrapper == null) {
-          expiringCacheWrapper = new FinalWrapper<ExpiringCache<String, Integer>>(new ExpiringCache<>(FIVE_MINUTES));
-        }
         wrapper = expiringCacheWrapper;
+        if (wrapper == null)
+          wrapper = new FinalWrapper<ExpiringCache<String, Integer>>(new ExpiringCache<>(FIVE_MINUTES));
+        expiringCacheWrapper = wrapper;
       }
     }
     return wrapper.value;
@@ -307,17 +312,19 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     FinalWrapper<UserManager> wrapper = userManagerWrapper;
     if (wrapper == null) {
       synchronized (this) {
-        if (userManagerWrapper == null) {
-          setUserManager(new BasicUserManager(this));
-        }
         wrapper = userManagerWrapper;
+        if (wrapper == null) {
+          wrapper = setUserManager(new BasicUserManager(this));
+        }
       }
     }
     return wrapper.value;
   }
 
-  public void setUserManager(UserManager userManager) {
-    userManagerWrapper = new FinalWrapper<UserManager>(userManager);
+  public FinalWrapper<UserManager> setUserManager(UserManager userManager) {
+    FinalWrapper<UserManager> result = new FinalWrapper<UserManager>(userManager);
+    userManagerWrapper = result;
+    return result;
   }
 
   /**
@@ -332,10 +339,10 @@ public class ThothEnvironment implements ConfigurationChangeListener {
       FinalWrapper<ContextManager> wrapper = contextManagerWrapper;
       if (wrapper == null) {
         synchronized (this) {
-          if (contextManagerWrapper == null) {
-            setContextManager(new BasicContextManager(this));
-          }
           wrapper = contextManagerWrapper;
+          if (wrapper == null) {
+            wrapper = setContextManager(new BasicContextManager(this));
+          }
         }
       }
       return wrapper.value;
@@ -344,8 +351,10 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     }
   }
 
-  public void setContextManager(ContextManager contextManager) {
-    contextManagerWrapper = new FinalWrapper<ContextManager>(contextManager);
+  public FinalWrapper<ContextManager> setContextManager(ContextManager contextManager) {
+    FinalWrapper<ContextManager> result = new FinalWrapper<ContextManager>(contextManager);
+    contextManagerWrapper = result;
+    return result;
   }
 
 }

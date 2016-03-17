@@ -371,14 +371,19 @@ public class ThothUtil {
     switch (version) {
     case LIB:
       type = "lib";
+      break;
     case CORE:
       type = "core";
+      break;
     case SERVER:
       type = "server";
+      break;
     case STANDALONE:
       type = "standalone";
+      break;
     default:
       type = "lib";
+      break;
     }
 
     String versres = "net/riezebos/thoth/" + type + ".version";
