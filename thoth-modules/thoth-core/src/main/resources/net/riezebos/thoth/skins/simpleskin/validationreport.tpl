@@ -10,7 +10,7 @@
   <body>
     <h1>Validation report<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
     <a href="${contexturl}">Back to Index</a>
-    
+    <br/>
     #if(${errors.isEmpty()})
       Very good, there are currently no validation errors in ${context}
     #else
