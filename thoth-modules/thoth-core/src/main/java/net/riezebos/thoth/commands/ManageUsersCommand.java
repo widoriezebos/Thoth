@@ -282,7 +282,6 @@ public class ManageUsersCommand extends RendererBase implements Command {
           LOG.warn("Refused to block administrator because that could potentially lead to a total lockdown of Thoth");
         }
       }
-      user.setPassword(password);
       userManager.updateUser(user);
       arguments.put(ARG_MESSAGE, "User " + identifier + " updated");
     }

@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/tabs.css"/>
   </head>
   <body>
-    <h1>User Management<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
+    <h1>Context Management<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
     <a href="${contexturl}">Back to Index</a>
     
     #if($message)
@@ -26,16 +26,18 @@
         <label for="tab1">Repositories</label>
         <div id="tab-content1" class="tab-content">
           #foreach($repository in $repositories)
-            <details>
+            #set($pointer = "selectedtab=tab1&selectedline=$repository")
+            #set($here = "repository_${repository}")
+            <details #if(${selectedline}=="$repository")open="true"#set($scrollto=$here)#end>
               <summary>
                 ${repository.name}
                 #if($repository.immutable)(Immutable)#end
               </summary>
-              <div class="tabdetails">
+              <div class="tabdetails" id="$here">
               #if($repository.immutable)
                 Cannot change
               #else  
-                <form action="./?cmd=managecontexts&operation=updaterepository&name=${repository.name}&selectedtab=tab1" method="post">                                 
+                <form action="./?cmd=managecontexts&operation=updaterepository&name=${repository.name}&${pointer}" method="post">                                 
                   <div>Name: <input type="text" name="newname" value="${repository.name}" size="30"/></div>         
                   <div>Type: <select name="type">
                     #foreach($type in ${thothutil.getAllRepositoryTypes()})
@@ -47,7 +49,7 @@
                   <div>Password: <input type="password" name="password" size="15"/></div>                                                           
                   <input type="submit" value="Update"/>
                 </form>
-                <a class="tabaction" href="./?cmd=managecontexts&operation=deleterepository&name=${repository.name}&selectedtab=tab1">Delete ${repository.name}</a>
+                <a class="tabaction" href="./?cmd=managecontexts&operation=deleterepository&name=${repository.name}&${pointer}">Delete ${repository.name}</a>
               #end
               </div>
             </details>  
@@ -61,16 +63,18 @@
         <label for="tab2">Contexts</label>
         <div id="tab-content2" class="tab-content">
           #foreach($context in $contexts)
-            <details>
+            #set($pointer = "selectedtab=tab2&selectedline=$context")
+            #set($here = "context_${context}")
+            <details #if(${selectedline}=="$context")open="true"#set($scrollto=$here)#end>
               <summary>
                 ${context.name}
                 #if($context.immutable)(Immutable)#end
               </summary>
-              <div class="tabdetails">
+              <div class="tabdetails" id="$here">
                 #if($context.immutable)
                   Cannot change
                 #else
-                  <form action="./?cmd=managecontexts&operation=updatecontext&name=${context.name}&selectedtab=tab2" method="post">                                 
+                  <form action="./?cmd=managecontexts&operation=updatecontext&name=${context.name}&${pointer}" method="post">                                 
                     <div>Name: <input type="text" name="newname" value="${context.name}" size="30"/></div>      
                     <div>Repository: <select name="repositoryname">
                       #foreach($repository in $repositories)
@@ -84,7 +88,7 @@
                     <div>Refresh interval: <input type="text" name="refreshinterval" #if(${context.refreshInterval}!=0)value="${context.refreshInterval}"#end size="10"/> (seconds)</div>                                                           
                     <input type="submit" value="Update"/>
                   </form>
-                  <a class="tabaction" href="./?cmd=managecontexts&operation=deletecontext&name=${context.name}&selectedtab=tab2">Delete ${context.name}</a>
+                  <a class="tabaction" href="./?cmd=managecontexts&operation=deletecontext&name=${context.name}&${pointer}">Delete ${context.name}</a>
                 #end
               </div>
             </details>    
@@ -137,6 +141,13 @@
     </ul>
     
     <br style="clear: both;" />
-    <br/>
+    
+    #if($scrollto)
+      <script>
+        window.onload = function(){
+            document.getElementById('$scrollto').scrollIntoView(true);
+        };
+      </script>
+    #end
   </body>
 </html>
