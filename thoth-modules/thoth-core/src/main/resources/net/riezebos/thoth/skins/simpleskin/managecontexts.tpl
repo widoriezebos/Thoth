@@ -25,38 +25,33 @@
         <input type="radio" name="tabs" id="tab1" #if($tab=="tab1")checked="true"#end/>
         <label for="tab1">Repositories</label>
         <div id="tab-content1" class="tab-content">
-          <table>
-            #foreach($repository in $repositories)
+          #foreach($repository in $repositories)
+            <details>
+              <summary>
+                ${repository.name}
+                #if($repository.immutable)(Immutable)#end
+              </summary>
+              <div class="tabdetails">
               #if($repository.immutable)
-                <tr>
-                  <th><h3>${repository.name}</h3></th>
-                  <th>Immutable</th>
-                </tr>
-              #else
-                <tr>
-                  <th><h3>${repository.name}</h3></th>
-                  <th><a href="./?cmd=managecontexts&operation=deleterepository&name=${repository.name}&selectedtab=tab1">Delete</a></th>
-                </tr>
-                <tr>
-                    <td>
-                        <form action="./?cmd=managecontexts&operation=updaterepository&name=${repository.name}&selectedtab=tab1" method="post">                                 
-                          <div>Name: <input type="text" name="newname" value="${repository.name}" size="30"/></div>         
-                          <div>Type: <select name="type">
-                            #foreach($type in ${thothutil.getAllRepositoryTypes()})
-                              <option value="$type"#if($type == $repository.type)selected="true"#end>$type</option>
-                            #end  
-                          </select></div>
-                          <div>Location: <input type="text" name="location" #if(${repository.location})value="${repository.location}"#end size="60"/></div>                                                           
-                          <div>Username: <input type="text" name="username" #if(${repository.username})value="${repository.username}"#end size="15"/></div>                                                           
-                          <div>Password: <input type="password" name="password" size="15"/></div>                                                           
-                          <input type="submit" value="Update"/>
-                        </form>
-                    </td>
-                    <td></td>
-                </tr>
+                Cannot change
+              #else  
+                <form action="./?cmd=managecontexts&operation=updaterepository&name=${repository.name}&selectedtab=tab1" method="post">                                 
+                  <div>Name: <input type="text" name="newname" value="${repository.name}" size="30"/></div>         
+                  <div>Type: <select name="type">
+                    #foreach($type in ${thothutil.getAllRepositoryTypes()})
+                      <option value="$type"#if($type == $repository.type)selected="true"#end>$type</option>
+                    #end  
+                  </select></div>
+                  <div>Location: <input type="text" name="location" #if(${repository.location})value="${repository.location}"#end size="60"/></div>                                                           
+                  <div>Username: <input type="text" name="username" #if(${repository.username})value="${repository.username}"#end size="15"/></div>                                                           
+                  <div>Password: <input type="password" name="password" size="15"/></div>                                                           
+                  <input type="submit" value="Update"/>
+                </form>
+                <a class="tabaction" href="./?cmd=managecontexts&operation=deleterepository&name=${repository.name}&selectedtab=tab1">Delete ${repository.name}</a>
               #end
-            #end  
-          </table>
+              </div>
+            </details>  
+          #end  
         </div>
       </li>
       
@@ -65,40 +60,35 @@
         <input type="radio" name="tabs" id="tab2" #if($tab=="tab2")checked="true"#end/>
         <label for="tab2">Contexts</label>
         <div id="tab-content2" class="tab-content">
-          <table>
-            #foreach($context in $contexts)
-              #if($context.immutable)
-                <tr>
-                  <th><h3>${context.name}</h3></th>
-                  <th>Immutable</th>
-                </tr>
-              #else
-                <tr>
-                  <th><h3>${context.name}</h3></th>
-                  <th><a href="./?cmd=managecontexts&operation=deletecontext&name=${context.name}&selectedtab=tab2">Delete</a></th>
-                </tr>
-                <tr>
-                    <td>
-                        <form action="./?cmd=managecontexts&operation=updatecontext&name=${context.name}&selectedtab=tab2" method="post">                                 
-                          <div>Name: <input type="text" name="newname" value="${context.name}" size="30"/></div>      
-                          <div>Repository: <select name="repositoryname">
-                            #foreach($repository in $repositories)
-                              #if(!$repository.immutable)
-                                <option value="$repository.name"#if($repository.equals($context.repositoryDefinition))selected="true"#end>$repository.name</option>
-                              #end  
-                            #end  
-                          </select></div>
-                          <div>Branch: <input type="text" name="branch" #if(${context.branch})value="${context.branch}"#end size="30"/></div>                                                           
-                          <div>Library root: <input type="text" name="libraryroot" #if(${context.libraryRoot})value="${context.libraryRoot}"#end size="50"/></div>                                                           
-                          <div>Refresh interval: <input type="text" name="refreshinterval" #if(${context.refreshInterval}!=0)value="${context.refreshInterval}"#end size="10"/> (seconds)</div>                                                           
-                          <input type="submit" value="Update"/>
-                        </form>
-                    </td>
-                    <td></td>
-                </tr>
-              #end  
-            #end  
-          </table>
+          #foreach($context in $contexts)
+            <details>
+              <summary>
+                ${context.name}
+                #if($context.immutable)(Immutable)#end
+              </summary>
+              <div class="tabdetails">
+                #if($context.immutable)
+                  Cannot change
+                #else
+                  <form action="./?cmd=managecontexts&operation=updatecontext&name=${context.name}&selectedtab=tab2" method="post">                                 
+                    <div>Name: <input type="text" name="newname" value="${context.name}" size="30"/></div>      
+                    <div>Repository: <select name="repositoryname">
+                      #foreach($repository in $repositories)
+                        #if(!$repository.immutable)
+                          <option value="$repository.name"#if($repository.equals($context.repositoryDefinition))selected="true"#end>$repository.name</option>
+                        #end  
+                      #end  
+                    </select></div>
+                    <div>Branch: <input type="text" name="branch" #if(${context.branch})value="${context.branch}"#end size="30"/></div>                                                           
+                    <div>Library root: <input type="text" name="libraryroot" #if(${context.libraryRoot})value="${context.libraryRoot}"#end size="50"/></div>                                                           
+                    <div>Refresh interval: <input type="text" name="refreshinterval" #if(${context.refreshInterval}!=0)value="${context.refreshInterval}"#end size="10"/> (seconds)</div>                                                           
+                    <input type="submit" value="Update"/>
+                  </form>
+                  <a class="tabaction" href="./?cmd=managecontexts&operation=deletecontext&name=${context.name}&selectedtab=tab2">Delete ${context.name}</a>
+                #end
+              </div>
+            </details>    
+          #end  
         </div>
       </li>
     
