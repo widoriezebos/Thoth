@@ -420,8 +420,14 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     if (ssoToken != null) {
       try {
         Identity identity = getThothEnvironment().getUserManager().getIdentityForToken(ssoToken);
-        if (identity != null)
+        if (identity != null) {
+          // We will start a new session here; but we mark it for a short life since this
+          // is meant for a single render request only.
+          HttpSession session = request.getSession(true);
+          session.setAttribute(SESSION_USER_KEY, identity);
+          session.setMaxInactiveInterval(30);
           return identity;
+        }
       } catch (ContentManagerException e) {
         LOG.error(e.getMessage());
       }
