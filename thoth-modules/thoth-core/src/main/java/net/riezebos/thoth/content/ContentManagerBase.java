@@ -293,26 +293,28 @@ public abstract class ContentManagerBase implements ContentManager {
   protected void collectBooks(String contextFolder, FileHandle folder, List<Book> result, List<String> bookExtensions)
       throws IOException, ContextNotFoundException {
     if (folder.isDirectory()) {
-      for (FileHandle file : folder.listFiles()) {
-        if (file.isFile()) {
-          for (String ext : bookExtensions)
-            if (file.getName().endsWith("." + ext)) {
-              String absolutePath = file.getAbsolutePath();
-              IncludeProcessor includeProcessor = getIncludeProcessor(CriticProcessingMode.DO_NOTHING, absolutePath);
-              FileHandle bookFile = getFileHandle(absolutePath);
-              String canonicalPath = bookFile.getCanonicalPath();
-              if (canonicalPath.startsWith(contextFolder))
-                canonicalPath = canonicalPath.substring(contextFolder.length());
-              if (!canonicalPath.startsWith("/"))
-                canonicalPath = "/" + canonicalPath;
-              Book book = new Book(file.getName(), canonicalPath);
-              book.setMetaTags(includeProcessor.getMetaTags(file.getInputStream()));
-              result.add(book);
-              break;
-            }
-        } else if (file.isDirectory())
-          collectBooks(contextFolder, file, result, bookExtensions);
-      }
+      FileHandle[] children = folder.listFiles();
+      if (children != null)
+        for (FileHandle file : children) {
+          if (file.isFile()) {
+            for (String ext : bookExtensions)
+              if (file.getName().endsWith("." + ext)) {
+                String absolutePath = file.getAbsolutePath();
+                IncludeProcessor includeProcessor = getIncludeProcessor(CriticProcessingMode.DO_NOTHING, absolutePath);
+                FileHandle bookFile = getFileHandle(absolutePath);
+                String canonicalPath = bookFile.getCanonicalPath();
+                if (canonicalPath.startsWith(contextFolder))
+                  canonicalPath = canonicalPath.substring(contextFolder.length());
+                if (!canonicalPath.startsWith("/"))
+                  canonicalPath = "/" + canonicalPath;
+                Book book = new Book(file.getName(), canonicalPath);
+                book.setMetaTags(includeProcessor.getMetaTags(file.getInputStream()));
+                result.add(book);
+                break;
+              }
+          } else if (file.isDirectory())
+            collectBooks(contextFolder, file, result, bookExtensions);
+        }
     }
   }
 
@@ -349,10 +351,12 @@ public abstract class ContentManagerBase implements ContentManager {
     if (fileHandle.isFile()) {
       result.add(new ContentNode(fileHandle.getCanonicalPath(), fileHandle));
     } else {
-      for (FileHandle child : fileHandle.listFiles()) {
-        if (!child.getName().startsWith("."))
-          result.add(new ContentNode(child.getCanonicalPath(), child));
-      }
+      FileHandle[] children = fileHandle.listFiles();
+      if (children != null)
+        for (FileHandle child : children) {
+          if (!child.getName().startsWith("."))
+            result.add(new ContentNode(child.getCanonicalPath(), child));
+        }
     }
     Collections.sort(result);
     return result;
@@ -376,8 +380,8 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   protected long traverseFolders(List<ContentNode> result, Predicate<String> matcher, FileHandle currentFolder, boolean recursive) throws IOException {
-    FileHandle[] folderContents = currentFolder.listFiles();
     long hash = 0;
+    FileHandle[] folderContents = currentFolder.listFiles();
     if (folderContents != null) {
       for (FileHandle file : folderContents) {
         if (file.isDirectory()) {
