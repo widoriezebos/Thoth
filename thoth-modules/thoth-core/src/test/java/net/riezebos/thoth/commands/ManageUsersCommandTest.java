@@ -68,6 +68,18 @@ public class ManageUsersCommandTest extends CommandTest {
     assertEquals("TestLast2", user.getLastname());
     assertTrue(user.isValidPassword("Password2"));
 
+    // UPDATE USER
+    args = new HashMap<String, String>();
+    args.put(ManageUsersCommand.OPERATION_ARGUMENT, ManageUsersCommand.UPDATEUSER);
+    args.put(ManageUsersCommand.ARG_IDENTIFIER, "testuser");
+    args.put(ManageUsersCommand.ARG_FIRSTNAME, "TestFirst2");
+    args.put(ManageUsersCommand.ARG_LASTNAME, "TestLast2");
+    renderResult = testCommand(manageUsersCommand, "/", CommandOperation.POST, "manageusers", null, jsonExists, args);
+
+    // Password should not be updated (not present as an argument in the call)
+    user = userManager.getUser("testuser");
+    assertTrue(user.isValidPassword("Password2"));
+
     // CREATE GROUP
     args = new HashMap<String, String>();
     args.put(ManageUsersCommand.OPERATION_ARGUMENT, ManageUsersCommand.CREATEGROUP);
