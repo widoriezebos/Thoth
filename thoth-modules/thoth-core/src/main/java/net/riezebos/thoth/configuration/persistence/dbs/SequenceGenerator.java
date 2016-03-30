@@ -1,11 +1,11 @@
 /* Copyright (c) 2016 W.T.J. Riezebos
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ public class SequenceGenerator {
 
   /**
    * Resets the sequence to the initial value and it does this within the current transaction of the EntityManager
-   * 
+   *
    * @param sequenceName
    * @throws DatabaseException
    */
@@ -62,7 +62,7 @@ public class SequenceGenerator {
   /**
    * Returns the next value of the sequence; without blocking other transactions. NOTE this method does not guarantee the absence of gaps in the numbering!
    * Sessions that fetch a number but do a rollback will cause gaps in the numbering of the sequence.
-   * 
+   *
    * @param sequenceName
    * @return
    * @throws DatabaseException

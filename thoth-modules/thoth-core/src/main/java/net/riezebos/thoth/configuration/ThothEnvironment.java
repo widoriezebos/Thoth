@@ -240,7 +240,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   /**
    * This method is synchronized to make sure there will ever only be one shared ThothEnvironment See
    * http://shipilev.net/blog/2014/safe-public-construction/#_singletons_and_singleton_factories
-   * 
+   *
    * @return
    */
   public static ThothEnvironment getSharedThothContext() {
@@ -258,7 +258,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
 
   /**
    * This method is synchronized to make sure there will ever only be one ThothDB for this environment.
-   * 
+   *
    * @return
    * @throws SQLException
    */
@@ -279,7 +279,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   /**
    * This method is synchronized to make sure there will ever only be one ThothDB for this environment. See
    * http://shipilev.net/blog/2014/safe-public-construction/#_singletons_and_singleton_factories
-   * 
+   *
    * @return
    * @throws SQLException
    */
@@ -304,7 +304,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
 
   /**
    * This method is synchronized to make sure there will ever only be one UserManager for this environment.
-   * 
+   *
    * @return
    * @throws SQLException
    */
@@ -329,7 +329,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
 
   /**
    * This method is synchronized to make sure there will ever only be one ContextManager for this environment.
-   * 
+   *
    * @return
    * @throws DatabaseException
    * @throws SQLException

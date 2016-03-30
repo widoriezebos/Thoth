@@ -22,112 +22,112 @@ public interface Configuration extends Cloneable {
 
   /**
    * Image recognition. Set (comma separated) the extensions (without the '.') below to determine whether a matching resource will be treated as an image
-   * 
+   *
    * @return
    */
   String getImageExtensions();
 
   /**
    * The absolute path to the folder that will contain pulled contexts
-   * 
+   *
    * @return
    */
   String getWorkspaceLocation();
 
   /**
    * The maximum time in ms that a Markdown parse can last
-   * 
+   *
    * @return
    */
   long getParseTimeOut();
 
   /**
    * Validates the configuration
-   * 
+   *
    * @throws ConfigurationException when the configuration is invalid
    */
   void validate() throws ConfigurationException;
 
   /**
    * The extensions of the files that will be recognized as a 'Book' and therefore shown by the auto generated index
-   * 
+   *
    * @return
    */
   List<String> getBookExtensions();
 
   /**
    * The extensions of the files that will be recognized as a 'Document' and therefore can be rendered to html, pdf etc
-   * 
+   *
    * @return
    */
   List<String> getDocumentExtensions();
 
   /**
    * See https://github.com/sirthias/pegdown for a full description
-   * 
+   *
    * @return
    */
   int getMarkdownOptions();
 
   /**
    * The URL for the localhost. Will be used for custom renderer processing
-   * 
+   *
    * @return
    */
   String getLocalHostUrl();
 
   /**
    * Auto number headings up to the specified level. Default is 3, set to 0 to disable
-   * 
+   *
    * @return
    */
   int getMaxHeaderNumberingLevel();
 
   /**
    * Append any link / include error messages at the bottom of the document
-   * 
+   *
    * @return
    */
   boolean appendErrors();
 
   /**
    * The maximum number of revisions to collect / display for latest commits per file (Meta command)
-   * 
+   *
    * @return
    */
   int getFileMaxRevisions();
 
   /**
    * The port to have the (embedded) server listen to (when running standalone). Default is 8080
-   * 
+   *
    * @return
    */
   int getEmbeddedServerPort();
 
   /**
    * The name of the host (when running standalone). Default is localhost
-   * 
+   *
    * @return
    */
   String getEmbeddedServerName();
 
   /**
    * The idle timeout for connections. Note: in specified in seconds
-   * 
+   *
    * @return
    */
   int getEmbeddedIdleTimeout();
 
   /**
    * The maximum number of revisions to collect / display for latest commits for the entire context (Revisions command)
-   * 
+   *
    * @return
    */
   int getContextMaxRevisions();
 
   /**
    * The extensions of file to include in the search index (comma separated; no '.')
-   * 
+   *
    * @return
    */
   String getIndexExtensions();
@@ -135,7 +135,7 @@ public interface Configuration extends Cloneable {
   /**
    * # The skin to use for the main index page (hence not within a context). Must be a valid context name as specified by the 'context.name' property. If left
    * blank then the default skin is used.
-   * 
+   *
    * @return
    */
   String getMainIndexSkinContext();
@@ -143,7 +143,7 @@ public interface Configuration extends Cloneable {
   /**
    * The name of the default skin to use. If not set; it will use the builtin skin named 'Builtin' Note that any skin can come from the classpath as long as the
    * package remains within net/riezebos/thoth/skins/
-   * 
+   *
    * @return
    */
   String getDefaultSkin();
@@ -157,7 +157,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Pretty prent JSON responses. You might want to set this to false in a production environment; small performance benefit
-   * 
+   *
    * @return
    */
   boolean isPrettyPrintJson();
@@ -169,28 +169,28 @@ public interface Configuration extends Cloneable {
 
   /**
    * The date format including the time part mask to use for Thoth pages
-   * 
+   *
    * @return
    */
   SimpleDateFormat getTimestampFormat();
 
   /**
    * The date format excluding the time part mask to use for Thoth pages
-   * 
+   *
    * @return
    */
   SimpleDateFormat getDateFormat();
 
   /**
    * The maximum number of search results to display per page of results
-   * 
+   *
    * @return
    */
   int getMaxSearchResults();
 
   /**
    * Returns true for extensions considered to be for images
-   * 
+   *
    * @param extension
    * @return
    */
@@ -198,7 +198,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Returns true for extensions considered to be for fragments (markdown documents)
-   * 
+   *
    * @param extension
    * @return
    */
@@ -206,7 +206,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Returns true for extensions considered to be for books (markdown books)
-   * 
+   *
    * @param extension
    * @return
    */
@@ -214,7 +214,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Returns true for anything that is considered a resource (not markdown)
-   * 
+   *
    * @param extension
    * @return
    */
@@ -222,7 +222,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Return the value of a property. Will log an error is returns null
-   * 
+   *
    * @param key
    * @return
    */
@@ -230,7 +230,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Return the value of a property. Will return dflt when the value is null
-   * 
+   *
    * @param key
    * @return
    */
@@ -238,14 +238,14 @@ public interface Configuration extends Cloneable {
 
   /**
    * Returns a map of all defined Contexts. The key is the name (in lowercase) of the context.
-   * 
+   *
    * @return
    */
   Map<String, ContextDefinition> getConfiguredContextDefinitions();
 
   /**
    * Returns a map of all defined Repositories. The key is the name (in lowercase) of the repository.
-   * 
+   *
    * @return
    */
   Map<String, RepositoryDefinition> getConfiguredRepositoryDefinitions();
@@ -257,7 +257,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Reloads the configuration, supporting hot configuration changes
-   * 
+   *
    * @throws FileNotFoundException
    * @throws ConfigurationException
    */
@@ -265,7 +265,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * For file based configurations: return the path of the property file. For other configurations this will probably be just an informative name.
-   * 
+   *
    * @return
    */
   public String getPropertyFileName();
@@ -277,7 +277,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Automatically add a newline for every header in the source file. Default is true
-   * 
+   *
    * @return
    */
   boolean addNewlineBeforeheader();
@@ -289,7 +289,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * When true configuration changes will be detected and will cause an automatic reload of the configuration to occur. Default is true
-   * 
+   *
    * @return
    */
   boolean isAutoReload();
@@ -301,7 +301,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Returns the name of the group for the anonymous user.
-   * 
+   *
    * @return
    */
   String getDefaultGroup();
@@ -309,7 +309,7 @@ public interface Configuration extends Cloneable {
   /**
    * Returns the type of database to use for persistent storage. Use 'embedded' if you want to use the built-in database. Supported types are 'embedded',
    * 'oracle' and 'postgres' although others might work depending on the URL used.
-   * 
+   *
    * @return
    */
   public String getDatabaseType();
@@ -318,21 +318,21 @@ public interface Configuration extends Cloneable {
    * Returns the JDBC URL of database to use for persistent storage. When the database type is set to embedded then just enter the path (directory) where you
    * want the database files to be created/stored. When using other database types make sure the driver is on the classpath so that the DriverManager can find
    * the correct JDBC driver.
-   * 
+   *
    * @return
    */
   public String getDatabaseUrl();
 
   /**
    * Returns the database user for persistent storage
-   * 
+   *
    * @return
    */
   public String getDatabaseUser();
 
   /**
    * Returns the database password for persistent storage
-   * 
+   *
    * @return
    */
   public String getDatabasePassword();
@@ -340,14 +340,14 @@ public interface Configuration extends Cloneable {
   /**
    * The master password to encrypt all stored passwords with. NOTE! If you change the master password all passwords that are stored in the database will become
    * invalid!
-   * 
+   *
    * @return
    */
   public String getPasswordEncryptionKey();
 
   /**
    * The name of the server, used in screens (titles). Available in the templates using $servername
-   * 
+   *
    * @return
    */
   public String getServerName();
