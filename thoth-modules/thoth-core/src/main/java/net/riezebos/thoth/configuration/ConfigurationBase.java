@@ -34,6 +34,7 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
   public ConfigurationBase() {
   }
 
+  @Override
   public Configuration clone() {
     try {
       ConfigurationBase clone = (ConfigurationBase) super.clone();

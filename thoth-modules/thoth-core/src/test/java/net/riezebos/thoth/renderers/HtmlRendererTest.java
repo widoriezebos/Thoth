@@ -52,7 +52,8 @@ public class HtmlRendererTest extends RendererTest {
     assertEquals("text/html;charset=UTF-8", renderer.getContentType(new HashMap<String, Object>()));
     assertEquals(HtmlRenderer.TYPE, renderer.getTypeCode());
 
-    RenderResult renderResult = renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", CommandOperation.GET, arguments, testSkin, outputStream);
+    RenderResult renderResult =
+        renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", CommandOperation.GET, arguments, testSkin, outputStream);
     assertEquals(RenderResult.NOT_FOUND, renderResult);
   }
 

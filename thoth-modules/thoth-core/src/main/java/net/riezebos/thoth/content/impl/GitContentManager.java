@@ -53,10 +53,10 @@ import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.Revision;
 import net.riezebos.thoth.content.versioncontrol.Revision.Action;
-import net.riezebos.thoth.context.ContextDefinition;
-import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.content.versioncontrol.SimpleDiffFormatter;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
+import net.riezebos.thoth.context.ContextDefinition;
+import net.riezebos.thoth.context.RepositoryDefinition;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.filehandle.BasicFileSystem;
@@ -372,11 +372,11 @@ public class GitContentManager extends ContentManagerBase {
 
   protected void severe(StringBuilder log, String message) {
     LOG.error(message.trim());
-    log.append(getContextName()+ ": ERROR, " + message + "\n");
+    log.append(getContextName() + ": ERROR, " + message + "\n");
   }
 
   protected void severe(StringBuilder log, Exception e) {
     LOG.error(e.getMessage(), e);
-    log.append(getContextName()+ ": ERROR, " + e.getMessage() + "\n");
+    log.append(getContextName() + ": ERROR, " + e.getMessage() + "\n");
   }
 }

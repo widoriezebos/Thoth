@@ -34,15 +34,15 @@ public class CommentDaoTest extends DatabaseTest {
       comment.setUserName(userName);
       dao.createComment(comment);
 
-      comment.setBody(body+"2");
-      comment.setDocumentPath(documentPath+"2");
-      comment.setTitle(title+"2");
-      comment.setUserName(userName+"2");
+      comment.setBody(body + "2");
+      comment.setDocumentPath(documentPath + "2");
+      comment.setTitle(title + "2");
+      comment.setUserName(userName + "2");
       dao.createComment(comment);
 
       List<Comment> comments = dao.getComments(null, null);
       assertEquals(2, comments.size());
-      
+
       comments = dao.getComments(documentPath, null);
       assertEquals(1, comments.size());
       Comment check = comments.get(0);
@@ -62,7 +62,7 @@ public class CommentDaoTest extends DatabaseTest {
 
       comments = dao.getComments(documentPath, userName);
       assertEquals(1, comments.size());
-      
+
     } finally {
       cleanupTempFolder();
     }

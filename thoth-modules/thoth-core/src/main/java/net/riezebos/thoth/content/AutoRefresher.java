@@ -37,7 +37,7 @@ public class AutoRefresher extends Thread {
   }
 
   public void cancel() {
-    this.cancelRequested = true;
+    cancelRequested = true;
   }
 
   @Override

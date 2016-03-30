@@ -75,6 +75,7 @@ public abstract class ServletBase extends HttpServlet {
     this.thothEnvironment = thothEnvironment;
   }
 
+  @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try {
       handleRequest(request, response, CommandOperation.GET);
@@ -83,6 +84,7 @@ public abstract class ServletBase extends HttpServlet {
     }
   }
 
+  @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try {
       handleRequest(request, response, CommandOperation.POST);

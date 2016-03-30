@@ -239,6 +239,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     commands.put(command.getTypeCode().toLowerCase(), command);
   }
 
+  @Override
   public Renderer getRenderer(String typeCode) {
     Renderer renderer = null;
     if (typeCode != null) {
@@ -414,6 +415,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
       response.setContentType(mimeType);
   }
 
+  @Override
   public Identity getCurrentIdentity(HttpServletRequest request) {
 
     String ssoToken = request.getParameter(UserManager.SSO_TOKEN_NAME);

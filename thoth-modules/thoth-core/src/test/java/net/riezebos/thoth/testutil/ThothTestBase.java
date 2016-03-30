@@ -41,8 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.configuration.Configuration;
@@ -297,31 +295,25 @@ public class ThothTestBase {
   }
 
   protected void recordGetParameter(HttpServletRequest response) throws IOException {
-    doAnswer(new Answer<Object>() {
-      public Object answer(InvocationOnMock invocation) {
-        Object[] args = invocation.getArguments();
-        return ThothTestBase.this.getParameter(args);
-      }
+    doAnswer(invocation -> {
+      Object[] args = invocation.getArguments();
+      return ThothTestBase.this.getParameter(args);
     }).when(response).getParameter(anyString());
   }
 
   protected void recordSendError(HttpServletResponse response) throws IOException {
-    doAnswer(new Answer<Object>() {
-      public Object answer(InvocationOnMock invocation) {
-        Object[] args = invocation.getArguments();
-        ThothTestBase.this.sendError(args);
-        return null;
-      }
+    doAnswer(invocation -> {
+      Object[] args = invocation.getArguments();
+      ThothTestBase.this.sendError(args);
+      return null;
     }).when(response).sendError(anyInt());
   }
 
   protected void recordSetContentType(HttpServletResponse response) throws IOException {
-    doAnswer(new Answer<Object>() {
-      public Object answer(InvocationOnMock invocation) {
-        Object[] args = invocation.getArguments();
-        ThothTestBase.this.setContentType(args);
-        return null;
-      }
+    doAnswer(invocation -> {
+      Object[] args = invocation.getArguments();
+      ThothTestBase.this.setContentType(args);
+      return null;
     }).when(response).setContentType(anyString());
   }
 

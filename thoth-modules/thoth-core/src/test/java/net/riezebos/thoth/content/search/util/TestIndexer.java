@@ -35,8 +35,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 
 import net.riezebos.thoth.content.ContentManager;
@@ -88,12 +86,7 @@ public class TestIndexer extends Indexer {
     IndexReader directoryReader = PowerMockito.mock(IndexReader.class);
 
     // Mock the final method close() (WTF final guys)
-    PowerMockito.doAnswer(new Answer<Object>() {
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return null;
-      }
-    }).when(directoryReader).close();
+    PowerMockito.doAnswer(invocation -> null).when(directoryReader).close();
 
     return directoryReader;
   }
@@ -113,25 +106,21 @@ public class TestIndexer extends Indexer {
 
   @SuppressWarnings("unchecked")
   private void recordUpdateDocument(IndexWriter indexWriter) throws IOException {
-    doAnswer(new Answer<Object>() {
-      public Object answer(InvocationOnMock invocation) {
-        Object[] args = invocation.getArguments();
-        Term term = (Term) args[0];
-        Document document = (Document) args[1];
-        updateDocumentCalls.add(new WriteResult(term, document));
-        return null;
-      }
+    doAnswer(invocation -> {
+      Object[] args = invocation.getArguments();
+      Term term = (Term) args[0];
+      Document document = (Document) args[1];
+      updateDocumentCalls.add(new WriteResult(term, document));
+      return null;
     }).when(indexWriter).updateDocument(any(Term.class), any(Iterable.class));
   }
 
   private void recordAddDocument(IndexWriter indexWriter) throws IOException {
-    doAnswer(new Answer<Object>() {
-      public Object answer(InvocationOnMock invocation) {
-        Object[] args = invocation.getArguments();
-        Document document = (Document) args[0];
-        addDocumentCalls.add(document);
-        return null;
-      }
+    doAnswer(invocation -> {
+      Object[] args = invocation.getArguments();
+      Document document = (Document) args[0];
+      addDocumentCalls.add(document);
+      return null;
     }).when(indexWriter).addDocument(any(Document.class));
   }
 

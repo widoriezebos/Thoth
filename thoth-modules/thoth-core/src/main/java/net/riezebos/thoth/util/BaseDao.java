@@ -30,7 +30,7 @@ public class BaseDao {
     for (CacheListener listener : listeners)
       listener.invalidateCache();
   }
-  
+
   protected void commitReload(Connection connection) throws SQLException {
     connection.commit();
     reloadCaches();

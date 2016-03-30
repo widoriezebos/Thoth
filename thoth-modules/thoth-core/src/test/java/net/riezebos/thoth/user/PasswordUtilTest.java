@@ -33,10 +33,10 @@ public class PasswordUtilTest {
     assertTrue(util.isValidPassword(clearTextPassword, encodedPassword));
     assertTrue(util.isValidPassword(clearTextPassword, encodedPassword2));
     assertFalse(util.isValidPassword(clearTextPassword + "nope", encodedPassword2));
-    
+
     String masterPassword = "secret";
     String encrypted = util.encrypt(masterPassword, clearTextPassword);
-    
+
     assertEquals(clearTextPassword, util.decrypt(masterPassword, encrypted));
   }
 

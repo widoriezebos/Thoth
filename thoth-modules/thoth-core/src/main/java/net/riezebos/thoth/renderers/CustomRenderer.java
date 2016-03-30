@@ -72,6 +72,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
     this.source = source;
   }
 
+  @Override
   public String getTypeCode() {
     return typeCode;
   }
@@ -97,6 +98,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
     this.commandLine = commandLine;
   }
 
+  @Override
   public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {

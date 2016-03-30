@@ -44,8 +44,9 @@ public class RevisionsCommand extends RendererBase implements Command {
     return "revisions";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  @Override
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
     try {
       ContentManager contentManager = getContentManager(context);
       if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.REVISION))

@@ -137,7 +137,7 @@ public class SqlStatement implements AutoCloseable {
         getParameters().add(parName);
         boolean dontAdd = false;
         for (int x = 0; x < getSingleParams().size(); x++) {
-          if (((String) (getSingleParams().get(x))).equalsIgnoreCase(parName)) {
+          if ((getSingleParams().get(x)).equalsIgnoreCase(parName)) {
             dontAdd = true;
             break;
           }
@@ -238,6 +238,7 @@ public class SqlStatement implements AutoCloseable {
     }
   }
 
+  @Override
   public void close() throws SQLException {
     getStatement().close();
   }
@@ -580,6 +581,7 @@ public class SqlStatement implements AutoCloseable {
     return bos.toByteArray();
   }
 
+  @Override
   public String toString() {
     StringBuffer sb = new StringBuffer(500);
     sb.append(fancyStmt());

@@ -84,7 +84,7 @@ public class ContentManagerBaseTest extends ThothTestBase {
     assertTrue(containsNode(unusedFragments, "/main/NotReferenced.md"));
   }
 
-protected boolean containsNode(List<ContentNode> nodes, String path) {
+  protected boolean containsNode(List<ContentNode> nodes, String path) {
     for (ContentNode node : nodes)
       if (node.getPath().equals(path))
         return true;

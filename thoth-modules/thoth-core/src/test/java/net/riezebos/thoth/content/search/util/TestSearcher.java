@@ -11,8 +11,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 
 import net.riezebos.thoth.content.ContentManager;
@@ -39,12 +37,7 @@ public class TestSearcher extends Searcher {
     IndexReader directoryReader = PowerMockito.mock(IndexReader.class);
 
     // Mock the final method close() (WTF final guys)
-    PowerMockito.doAnswer(new Answer<Object>() {
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return null;
-      }
-    }).when(directoryReader).close();
+    PowerMockito.doAnswer(invocation -> null).when(directoryReader).close();
 
     return directoryReader;
   }

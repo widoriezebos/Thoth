@@ -49,8 +49,9 @@ public class SearchCommand extends RendererBase implements Command {
     return "search";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  @Override
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
     try {
 
       ContentManager contentManager = getContentManager(context);

@@ -47,6 +47,7 @@ public class UserProfileCommand extends RendererBase implements Command {
     return "userprofile";
   }
 
+  @Override
   public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {

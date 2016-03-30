@@ -43,8 +43,7 @@ public class ThothDB {
   private Map<String, String> queries = null;
   private Map<String, String> drivers = null;
 
-  public ThothDB(ThothEnvironment thothEnvironment)
-  {
+  public ThothDB(ThothEnvironment thothEnvironment) {
     this.thothEnvironment = thothEnvironment;
     setupDriverClass();
   }
@@ -145,14 +144,14 @@ public class ThothDB {
   }
 
   protected void setupDriverClass() {
-    this.drivers = new HashMap<>();
-
-    drivers.put("embedded", "org.apache.derby.jdbc.EmbeddedDriver");
-    drivers.put("derby", "org.apache.derby.jdbc.ClientDriver");
-    drivers.put("oracle", "oracle.jdbc.OracleDriver");
-    drivers.put("postgr", "org.postgresql.Driver");
-    drivers.put("h2", "org.h2.Driver");
-    drivers.put("hsql", "org.hsqldb.jdbc.JDBCDriver");
-    drivers.put("mysql", "com.mysql.jdbc.Driver");
+    Map<String, String> result = new HashMap<>();
+    result.put("embedded", "org.apache.derby.jdbc.EmbeddedDriver");
+    result.put("derby", "org.apache.derby.jdbc.ClientDriver");
+    result.put("oracle", "oracle.jdbc.OracleDriver");
+    result.put("postgr", "org.postgresql.Driver");
+    result.put("h2", "org.h2.Driver");
+    result.put("hsql", "org.hsqldb.jdbc.JDBCDriver");
+    result.put("mysql", "com.mysql.jdbc.Driver");
+    drivers = result;
   }
 }

@@ -47,8 +47,9 @@ public class MetaCommand extends RendererBase implements Command {
     return "meta";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  @Override
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
 
     try {
       RenderResult result = RenderResult.OK;

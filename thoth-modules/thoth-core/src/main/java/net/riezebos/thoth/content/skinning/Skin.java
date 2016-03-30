@@ -47,10 +47,10 @@ public class Skin extends PropertyLoader {
       InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(SIMPLESKIN);
       load(is);
       setPropertyFileName(SIMPLESKIN);
-      this.skinBaseUrl = "/";
-      this.skinBaseFolder = "/";
-      this.name = getValue("name", UUID.randomUUID().toString());
-      this.context = "/";
+      skinBaseUrl = "/";
+      skinBaseFolder = "/";
+      name = getValue("name", UUID.randomUUID().toString());
+      context = "/";
     } catch (ConfigurationException e) {
       LOG.error("Problem: unable to setup even the most basic Skin. About to panic now");
       LOG.error(e.getMessage(), e);
@@ -78,15 +78,15 @@ public class Skin extends PropertyLoader {
       if (is == null)
         throw new ContentManagerException("Could not find " + resourceName + " on the classpath");
       load(is);
-      this.skinBaseUrl = ThothUtil.getFolder(resourceName);
+      skinBaseUrl = ThothUtil.getFolder(resourceName);
     } else {
       FileHandle fileHandle = contentManager.getFileHandle(skinPropertyFile);
       load(fileHandle.getInputStream());
-      this.skinBaseUrl = context + ThothUtil.prefix(ThothUtil.getFolder(skinPropertyFile), "/");
+      skinBaseUrl = context + ThothUtil.prefix(ThothUtil.getFolder(skinPropertyFile), "/");
     }
-    this.skinBaseFolder = ThothUtil.suffix(ThothUtil.getFolder(skinPropertyFile), "/");
-    this.name = getValue("name", UUID.randomUUID().toString());
-    this.inheritsFrom = getValue("inheritsfrom", null);
+    skinBaseFolder = ThothUtil.suffix(ThothUtil.getFolder(skinPropertyFile), "/");
+    name = getValue("name", UUID.randomUUID().toString());
+    inheritsFrom = getValue("inheritsfrom", null);
     this.context = context;
   }
 

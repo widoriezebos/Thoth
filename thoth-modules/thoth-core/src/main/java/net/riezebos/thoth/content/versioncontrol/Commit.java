@@ -69,7 +69,7 @@ public class Commit {
   }
 
   public void addRevision(Revision fileRevision) {
-    this.revisions.add(fileRevision);
+    revisions.add(fileRevision);
     fileRevision.setCommit(this);
   }
 

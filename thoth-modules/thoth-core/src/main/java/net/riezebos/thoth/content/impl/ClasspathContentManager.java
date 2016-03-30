@@ -68,6 +68,7 @@ public class ClasspathContentManager extends ContentManagerBase {
 
   }
 
+  @Override
   public SourceDiff getDiff(String diffSpec) throws ContentManagerException {
 
     return new SourceDiff("nobody", "", "", new Date(0L));

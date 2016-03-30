@@ -58,6 +58,7 @@ public class DiscardingList<T> implements List<T> {
     return new Object[0];
   }
 
+  @Override
   public <T2> T2[] toArray(T2[] a) {
     return new ArrayList<>().toArray(a);
   }

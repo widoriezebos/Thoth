@@ -47,6 +47,7 @@ public class IndexCommand extends RendererBase implements Command {
     return "index";
   }
 
+  @Override
   public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {
@@ -61,7 +62,7 @@ public class IndexCommand extends RendererBase implements Command {
           if (accessManager.hasPermission(identity, "/", Permission.BASIC_ACCESS))
             contexts.add(ctxt);
         } catch (ContentManagerException e) {
-          problems.add(ctxt+": "+e.getMessage());
+          problems.add(ctxt + ": " + e.getMessage());
           LOG.error(e.getMessage(), e);
         }
       }

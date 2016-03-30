@@ -41,11 +41,11 @@ public class IdentityDao extends BaseDao implements CacheListener {
   public IdentityDao(ThothDB thothDB) {
     this.thothDB = thothDB;
 
-    this.userDao = new UserDao(thothDB);
-    this.userDao.registerCacheListener(this);
+    userDao = new UserDao(thothDB);
+    userDao.registerCacheListener(this);
 
-    this.groupDao = new GroupDao(thothDB);
-    this.groupDao.registerCacheListener(this);
+    groupDao = new GroupDao(thothDB);
+    groupDao.registerCacheListener(this);
   }
 
   public Map<String, Identity> getIdentities() throws UserManagerException {

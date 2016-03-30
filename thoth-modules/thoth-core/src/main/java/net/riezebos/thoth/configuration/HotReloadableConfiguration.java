@@ -78,6 +78,7 @@ public class HotReloadableConfiguration implements Configuration {
    * Reload the configuration using a temporary clone. Only if and when the reload succeeds (and is complete) will the active configuration be replaced
    * atomically. Also notify any listeners of changes to contexts.
    */
+  @Override
   synchronized public void reload() throws FileNotFoundException, ConfigurationException {
     Set<ContextDefinition> originalContextDefinitions = new HashSet<>(activeConfiguration.getConfiguredContextDefinitions().values());
     List<CustomRendererDefinition> originalCustomRenderers = activeConfiguration.getCustomRenderers();
@@ -172,138 +173,172 @@ public class HotReloadableConfiguration implements Configuration {
     }
   }
 
+  @Override
   public String getImageExtensions() {
     return activeConfiguration.getImageExtensions();
   }
 
+  @Override
   public String getWorkspaceLocation() {
     return activeConfiguration.getWorkspaceLocation();
   }
 
+  @Override
   public long getParseTimeOut() {
     return activeConfiguration.getParseTimeOut();
   }
 
+  @Override
   public void validate() throws ConfigurationException {
     activeConfiguration.validate();
   }
 
+  @Override
   public List<String> getBookExtensions() {
     return activeConfiguration.getBookExtensions();
   }
 
+  @Override
   public List<String> getDocumentExtensions() {
     return activeConfiguration.getDocumentExtensions();
   }
 
+  @Override
   public int getMarkdownOptions() {
     return activeConfiguration.getMarkdownOptions();
   }
 
+  @Override
   public String getLocalHostUrl() {
     return activeConfiguration.getLocalHostUrl();
   }
 
+  @Override
   public int getMaxHeaderNumberingLevel() {
     return activeConfiguration.getMaxHeaderNumberingLevel();
   }
 
+  @Override
   public boolean appendErrors() {
     return activeConfiguration.appendErrors();
   }
 
+  @Override
   public int getFileMaxRevisions() {
     return activeConfiguration.getFileMaxRevisions();
   }
 
+  @Override
   public int getEmbeddedServerPort() {
     return activeConfiguration.getEmbeddedServerPort();
   }
 
+  @Override
   public String getEmbeddedServerName() {
     return activeConfiguration.getEmbeddedServerName();
   }
 
+  @Override
   public int getEmbeddedIdleTimeout() {
     return activeConfiguration.getEmbeddedIdleTimeout();
   }
 
+  @Override
   public int getContextMaxRevisions() {
     return activeConfiguration.getContextMaxRevisions();
   }
 
+  @Override
   public String getIndexExtensions() {
     return activeConfiguration.getIndexExtensions();
   }
 
+  @Override
   public String getMainIndexSkinContext() {
     return activeConfiguration.getMainIndexSkinContext();
   }
 
+  @Override
   public String getDefaultSkin() {
     return activeConfiguration.getDefaultSkin();
   }
 
+  @Override
   public List<String> getContextIndexClassifications() {
     return activeConfiguration.getContextIndexClassifications();
   }
 
+  @Override
   public boolean isPrettyPrintJson() {
     return activeConfiguration.isPrettyPrintJson();
   }
 
+  @Override
   public List<CustomRendererDefinition> getCustomRenderers() {
     return activeConfiguration.getCustomRenderers();
   }
 
+  @Override
   public SimpleDateFormat getTimestampFormat() {
     return activeConfiguration.getTimestampFormat();
   }
 
+  @Override
   public SimpleDateFormat getDateFormat() {
     return activeConfiguration.getDateFormat();
   }
 
+  @Override
   public int getMaxSearchResults() {
     return activeConfiguration.getMaxSearchResults();
   }
 
+  @Override
   public boolean isImageExtension(String extension) {
     return activeConfiguration.isImageExtension(extension);
   }
 
+  @Override
   public boolean isFragment(String path) {
     return activeConfiguration.isFragment(path);
   }
 
+  @Override
   public boolean isBook(String path) {
     return activeConfiguration.isBook(path);
   }
 
+  @Override
   public boolean isResource(String path) {
     return activeConfiguration.isResource(path);
   }
 
+  @Override
   public String getValue(String key) {
     return activeConfiguration.getValue(key);
   }
 
+  @Override
   public String getValue(String key, String dflt) {
     return activeConfiguration.getValue(key, dflt);
   }
 
+  @Override
   public Map<String, ContextDefinition> getConfiguredContextDefinitions() {
     return activeConfiguration.getConfiguredContextDefinitions();
   }
 
+  @Override
   public Map<String, RepositoryDefinition> getConfiguredRepositoryDefinitions() {
     return activeConfiguration.getConfiguredRepositoryDefinitions();
   }
 
+  @Override
   public List<String> getOutputFormats() {
     return activeConfiguration.getOutputFormats();
   }
 
+  @Override
   public String getPropertyFileName() {
     return activeConfiguration.getPropertyFileName();
   }

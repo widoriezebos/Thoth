@@ -31,6 +31,7 @@ public class RelaxedParser extends Parser implements Extensions {
     super(options, maxParsingTimeInMillis, parseRunnerProvider, plugins);
   }
 
+  @Override
   public Rule DefListBullet() {
     return Sequence(NonindentSpace(), AnyOf(":~")); // Removed OneOrMore(Spacechar()) as an argument here
   }

@@ -10,7 +10,7 @@ public class DatabaseIdiomFactoryTest {
 
   @Test
   public void test() {
-    
+
     assertEquals(DatabaseFlavour.DERBY, DatabaseIdiomFactory.getDatabaseIdiom("derby").getFlavour());
     assertEquals(DatabaseFlavour.H2, DatabaseIdiomFactory.getDatabaseIdiom("h2").getFlavour());
     assertEquals(DatabaseFlavour.HSQLDB, DatabaseIdiomFactory.getDatabaseIdiom("hsqldb").getFlavour());

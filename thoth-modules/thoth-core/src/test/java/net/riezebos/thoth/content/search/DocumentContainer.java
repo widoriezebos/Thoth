@@ -12,7 +12,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopFieldDocs;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import net.riezebos.thoth.beans.ContentNode;
@@ -55,39 +54,32 @@ public class DocumentContainer {
 
   public Answer<TopFieldDocs> getTopDocs() {
 
-    return new Answer<TopFieldDocs>() {
+    return invocation -> {
+      Object[] args = invocation.getArguments();
+      ScoreDoc[] scoreDocs = new ScoreDoc[0];
+      if (args[0] instanceof TermQuery) {
+        TermQuery query = (TermQuery) args[0];
+        Term term = query.getTerm();
+        String path = term.bytes().utf8ToString();
+        scoreDocs = new ScoreDoc[0];
+        int idx = indexOf(path);
+        if (idx != -1) {
+          scoreDocs = new ScoreDoc[1];
+          scoreDocs[0] = new ScoreDoc(idx, 1);
+        }
 
-      @Override
-      public TopFieldDocs answer(InvocationOnMock invocation) throws Throwable {
-        Object[] args = invocation.getArguments();
-        ScoreDoc[] scoreDocs = new ScoreDoc[0];
-        if (args[0] instanceof TermQuery) {
-          TermQuery query = (TermQuery) args[0];
-          Term term = query.getTerm();
-          String path = term.bytes().utf8ToString();
-          scoreDocs = new ScoreDoc[0];
-          int idx = indexOf(path);
-          if (idx != -1) {
-            scoreDocs = new ScoreDoc[1];
-            scoreDocs[0] = new ScoreDoc(idx, 1);
-          }
-
-        } else
-          throw new IllegalArgumentException("Unsupported query test: " + args[0].getClass().getName());
-        TopFieldDocs topDocs = new TopFieldDocs(scoreDocs.length, scoreDocs, null, 0);
-        return topDocs;
-      }
+      } else
+        throw new IllegalArgumentException("Unsupported query test: " + args[0].getClass().getName());
+      TopFieldDocs topDocs = new TopFieldDocs(scoreDocs.length, scoreDocs, null, 0);
+      return topDocs;
     };
   }
 
   public Answer<Document> getDoc() {
-    return new Answer<Document>() {
-      @Override
-      public Document answer(InvocationOnMock invocation) throws Throwable {
-        Object[] args = invocation.getArguments();
-        Integer index = (Integer) args[0];
-        return docs.get(index);
-      }
+    return invocation -> {
+      Object[] args = invocation.getArguments();
+      Integer index = (Integer) args[0];
+      return docs.get(index);
     };
   }
 

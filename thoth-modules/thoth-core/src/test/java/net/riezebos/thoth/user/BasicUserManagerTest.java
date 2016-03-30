@@ -21,10 +21,6 @@ import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.exceptions.UserManagerException;
 import net.riezebos.thoth.testutil.DatabaseTest;
-import net.riezebos.thoth.user.Group;
-import net.riezebos.thoth.user.Permission;
-import net.riezebos.thoth.user.User;
-import net.riezebos.thoth.user.UserManager;
 
 public class BasicUserManagerTest extends DatabaseTest {
 

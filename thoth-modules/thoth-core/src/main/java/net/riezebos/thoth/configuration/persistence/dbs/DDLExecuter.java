@@ -123,10 +123,10 @@ public class DDLExecuter {
   }
 
   private List<String> parseCommands(StringBuffer commandBuffer) {
-    String[] parsed = commandBuffer.toString().split(";");
+    String[] parsedCommands = commandBuffer.toString().split(";");
     List<String> result = new ArrayList<String>();
-    for (int i = 0; i < parsed.length; i++) {
-      String trimmedCmd = trimCmd(parsed[i]);
+    for (String command : parsedCommands) {
+      String trimmedCmd = trimCmd(command);
       if (!StringUtils.isBlank(trimmedCmd))
         result.add(trimmedCmd);
     }

@@ -51,8 +51,8 @@ public class RawRendererTest extends RendererTest {
     assertEquals("text/plain;charset=UTF-8", renderer.getContentType(new HashMap<String, Object>()));
     assertEquals(RawRenderer.TYPE, renderer.getTypeCode());
 
-    RenderResult renderResult =
-        renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", CommandOperation.GET, arguments, getSkin(contentManager), outputStream);
+    RenderResult renderResult = renderer.execute(getCurrentUser(thothEnvironment), contextName, "/wrong/path.md", CommandOperation.GET, arguments,
+        getSkin(contentManager), outputStream);
     assertEquals(RenderResult.NOT_FOUND, renderResult);
   }
 

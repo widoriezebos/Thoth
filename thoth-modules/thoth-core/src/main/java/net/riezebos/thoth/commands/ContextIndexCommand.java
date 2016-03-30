@@ -47,6 +47,7 @@ public class ContextIndexCommand extends RendererBase implements Command {
     return TYPE;
   }
 
+  @Override
   public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {
@@ -57,8 +58,8 @@ public class ContextIndexCommand extends RendererBase implements Command {
 
       Classifier classifier = new Classifier();
 
-      List<Book> books =
-          contentManager.getBooks().stream().filter(p -> accessManager.hasPermission(identity, p.getPath(), Permission.BASIC_ACCESS)).collect(Collectors.toList());
+      List<Book> books = contentManager.getBooks().stream().filter(p -> accessManager.hasPermission(identity, p.getPath(), Permission.BASIC_ACCESS))
+          .collect(Collectors.toList());
 
       Configuration configuration = getThothEnvironment().getConfiguration();
       List<String> classificationNames = configuration.getContextIndexClassifications();

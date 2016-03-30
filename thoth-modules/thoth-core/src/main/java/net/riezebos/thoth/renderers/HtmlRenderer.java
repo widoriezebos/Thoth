@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.parboiled.Parboiled;
 import org.pegdown.LinkRenderer;
+import org.pegdown.Parser;
 import org.pegdown.RelaxedParser;
 import org.pegdown.ast.RootNode;
 import org.pegdown.plugins.PegDownPlugins;
@@ -44,16 +45,19 @@ public class HtmlRenderer extends RendererBase implements Renderer {
     super(thothEnvironment, rendererProvider);
   }
 
+  @Override
   public String getTypeCode() {
     return TYPE;
   }
 
+  @Override
   public String getContentType(Map<String, Object> arguments) {
     return "text/html;charset=UTF-8";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  @Override
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
     try {
 
       Configuration configuration = getConfiguration();
@@ -74,8 +78,7 @@ public class HtmlRenderer extends RendererBase implements Renderer {
         int extensions = configuration.getMarkdownOptions();
         long parseTimeOut = configuration.getParseTimeOut();
 
-        RelaxedParser parser =
-            Parboiled.createParser(RelaxedParser.class, extensions, parseTimeOut, RelaxedParser.DefaultParseRunnerProvider, PegDownPlugins.NONE);
+        RelaxedParser parser = Parboiled.createParser(RelaxedParser.class, extensions, parseTimeOut, Parser.DefaultParseRunnerProvider, PegDownPlugins.NONE);
         RootNode ast = parser.parse(ThothUtil.wrapWithNewLines(markdownSource.toCharArray()));
 
         CustomHtmlSerializer serializer = new CustomHtmlSerializer(new LinkRenderer());

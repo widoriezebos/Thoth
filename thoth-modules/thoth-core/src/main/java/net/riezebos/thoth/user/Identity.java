@@ -73,9 +73,9 @@ public abstract class Identity implements Cloneable, Serializable, Comparable<Id
   }
 
   public void setIdentifier(String name) {
-    if (this.identifier != null)
+    if (identifier != null)
       throw new IllegalArgumentException("Update of a persisted identity's identifier not allowed");
-    this.identifier = name;
+    identifier = name;
   }
 
   protected void registerMembership(Group group) {

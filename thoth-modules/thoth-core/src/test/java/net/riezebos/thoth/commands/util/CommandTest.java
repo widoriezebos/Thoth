@@ -36,7 +36,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
 
   protected RenderResult testCommand(Command command, String path, CommandOperation commandOperation, String code, String[] htmlExists, String[] jsonExists,
       Map<String, String> args)
-          throws ContextNotFoundException, ContentManagerException, IOException, SkinManagerException, RenderException, UnsupportedEncodingException {
+      throws ContextNotFoundException, ContentManagerException, IOException, SkinManagerException, RenderException, UnsupportedEncodingException {
 
     Skin skin = getSkin(contentManager);
 

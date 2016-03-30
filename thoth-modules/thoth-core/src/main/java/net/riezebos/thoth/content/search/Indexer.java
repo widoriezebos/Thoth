@@ -87,9 +87,9 @@ public class Indexer {
 
   public Indexer(ContentManager contentManager) throws ContextNotFoundException, ContentManagerException {
     this.contentManager = contentManager;
-    this.indexFolder = contentManager.getIndexFolder();
-    this.libraryFolder = contentManager.getFileHandle(contentManager.getLibraryRoot());
-    this.setIndexExtensions(getConfiguration().getIndexExtensions());
+    indexFolder = contentManager.getIndexFolder();
+    libraryFolder = contentManager.getFileHandle(contentManager.getLibraryRoot());
+    setIndexExtensions(getConfiguration().getIndexExtensions());
   }
 
   public void index() throws ContentManagerException {

@@ -48,7 +48,6 @@ public class HotReloadableConfigurationTest implements ConfigurationChangeListen
     hotConfig.discard();
   }
 
-
   @Test
   public void testAutoReload() throws ConfigurationException, FileNotFoundException, InterruptedException {
     String propFile = "net/riezebos/thoth/configuration/test.configuration3.properties";
@@ -70,7 +69,7 @@ public class HotReloadableConfigurationTest implements ConfigurationChangeListen
     renderersChanged = false;
     added = new ArrayList<>();
     removed = new ArrayList<>();
-    
+
     Thread.sleep(1050L);
 
     assertEquals(1, added.size());

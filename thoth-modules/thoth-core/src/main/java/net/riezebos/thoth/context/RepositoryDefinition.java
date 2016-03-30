@@ -66,7 +66,7 @@ public class RepositoryDefinition implements Cloneable, Comparable<RepositoryDef
   }
 
   public void setType(RepositoryType repositoryType) {
-    this.type = repositoryType;
+    type = repositoryType;
   }
 
   public RepositoryType getType() {

@@ -115,6 +115,7 @@ public abstract class ContentManagerBase implements ContentManager {
     }
   }
 
+  @Override
   public String getContextName() {
     return getContextDefinition().getName();
   }
@@ -156,6 +157,7 @@ public abstract class ContentManagerBase implements ContentManager {
     skinManager = null;
 
     Thread indexerThread = new Thread() {
+      @Override
       public void run() {
         try {
           Indexer indexer = new Indexer(ContentManagerBase.this);
@@ -218,6 +220,7 @@ public abstract class ContentManagerBase implements ContentManager {
     return markdown;
   }
 
+  @Override
   public Date getLatestRefresh() {
     return latestRefresh;
   }
@@ -257,7 +260,7 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   public boolean isRefreshing() {
-    return this.refreshing;
+    return refreshing;
   }
 
   protected void markFinishRefreshing() {
@@ -411,6 +414,7 @@ public abstract class ContentManagerBase implements ContentManager {
     return result;
   }
 
+  @Override
   public boolean isFragment(String path) {
     return getConfiguration().isFragment(path);
   }
@@ -429,6 +433,7 @@ public abstract class ContentManagerBase implements ContentManager {
     this.fileSystem = fileSystem;
   }
 
+  @Override
   public FileHandle getFileHandle(String filePath) {
     return fileSystem.getFileHandle(filePath);
   }
@@ -481,6 +486,7 @@ public abstract class ContentManagerBase implements ContentManager {
 
   }
 
+  @Override
   public AccessManager getAccessManager() {
     if (accessManager == null)
       accessManager = new AccessManager(this);

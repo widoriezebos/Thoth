@@ -57,7 +57,7 @@ public class SkinManager {
   public SkinManager(ContentManager contentManager, String defaultSkinName) throws SkinManagerException {
     if (defaultSkinName == null)
       defaultSkinName = SKIN_PARENT_OF_ALL;
-    this.setContentManager(contentManager);
+    setContentManager(contentManager);
     this.defaultSkinName = defaultSkinName;
     try {
       String contextName = contentManager.getContextName();
@@ -245,7 +245,7 @@ public class SkinManager {
    * @return
    */
   public Skin getDefaultSkin() {
-    return this.defaultSkin;
+    return defaultSkin;
   }
 
   protected void setDefaultSkin(Skin defaultSkin) {

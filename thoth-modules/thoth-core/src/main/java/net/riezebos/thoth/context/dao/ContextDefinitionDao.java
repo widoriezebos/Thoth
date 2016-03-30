@@ -43,8 +43,8 @@ public class ContextDefinitionDao extends BaseDao implements CacheListener {
 
   public ContextDefinitionDao(ThothDB thothDB) {
     this.thothDB = thothDB;
-    this.repoDao = new RepositoryDefinitionDao(thothDB);
-    this.registerCacheListener(this);
+    repoDao = new RepositoryDefinitionDao(thothDB);
+    registerCacheListener(this);
     repoDao.registerCacheListener(this);
   }
 

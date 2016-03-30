@@ -41,6 +41,7 @@ public class ReindexCommand extends RendererBase implements Command {
     return "reindex";
   }
 
+  @Override
   public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {

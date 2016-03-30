@@ -90,7 +90,7 @@ public class User extends Identity implements Cloneable {
   @JsonIgnore
   public void setPassword(String clearTextPassword) {
     PasswordUtil util = new PasswordUtil();
-    this.passwordhash = util.hashPassword(clearTextPassword);
+    passwordhash = util.hashPassword(clearTextPassword);
   }
 
   public boolean isValidPassword(String clearTextPassword) {
@@ -118,6 +118,7 @@ public class User extends Identity implements Cloneable {
     this.blockedUntil = blockedUntil;
   }
 
+  @Override
   @JsonIgnore
   public Set<Permission> getEffectivePermissions() {
     return getPermissions();

@@ -22,7 +22,7 @@ public enum RepositoryType {
   private String[] aliases;
 
   private RepositoryType(String... aliases) {
-    this.value = aliases[0];
+    value = aliases[0];
     this.aliases = aliases;
   }
 

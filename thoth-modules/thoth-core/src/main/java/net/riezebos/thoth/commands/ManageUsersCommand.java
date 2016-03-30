@@ -71,6 +71,7 @@ public class ManageUsersCommand extends RendererBase implements Command {
     return "manageusers";
   }
 
+  @Override
   public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {
@@ -90,7 +91,7 @@ public class ManageUsersCommand extends RendererBase implements Command {
       throw new RenderException(e);
     }
   }
-  
+
   protected RenderResult handleRender(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws Exception {
     Map<String, Object> variables = new HashMap<>(arguments);

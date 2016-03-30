@@ -87,6 +87,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
     return getValue("images.extensions", "png,jpeg,jpg,gif,tiff,bmp");
   }
 
+  @Override
   protected void loadDefaults() {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     InputStream is = contextClassLoader.getResourceAsStream(BUILT_PROPERTIES);
@@ -102,7 +103,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public String getWorkspaceLocation() {
-    if (this.workspaceLocation == null) {
+    if (workspaceLocation == null) {
       String deprecated = getValue(WORKSPACELOCATION_DEPRECATED, null);
       String workspaceLocation = getValue(WORKSPACELOCATION, deprecated);
       if (workspaceLocation != null) {
@@ -110,7 +111,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
         this.workspaceLocation = ThothUtil.suffix(workspaceLocation, "/");
       }
     }
-    return this.workspaceLocation;
+    return workspaceLocation;
   }
 
   /*
@@ -165,7 +166,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public int getMarkdownOptions() {
-    if (this.markdownOptions == null) {
+    if (markdownOptions == null) {
       int result = 0;
       if (isOptionOn("SMARTS"))
         result |= Extensions.SMARTS;
@@ -203,9 +204,9 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
         result |= Extensions.TASKLISTITEMS;
       if (isOptionOn("EXTANCHORLINKS"))
         result |= Extensions.EXTANCHORLINKS;
-      this.markdownOptions = result;
+      markdownOptions = result;
     }
-    return this.markdownOptions;
+    return markdownOptions;
   }
 
   private boolean isOptionOn(String key) {
@@ -320,7 +321,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public List<String> getContextIndexClassifications() {
-    if (this.classifications == null) {
+    if (classifications == null) {
       String value = getValue("context.classifications", "category,audience,folder");
       Set<String> classificationSet = new HashSet<>();
       for (String name : value.split("\\,")) {
@@ -328,9 +329,9 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
       }
       List<String> lst = new ArrayList<>(classificationSet);
       Collections.sort(lst);
-      this.classifications = lst;
+      classifications = lst;
     }
-    return this.classifications;
+    return classifications;
   }
 
   /*
@@ -339,15 +340,15 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public List<String> getOutputFormats() {
-    if (this.outputFormats == null) {
+    if (outputFormats == null) {
       List<String> lst = new ArrayList<>();
       lst.add(HtmlRenderer.TYPE);
       lst.add(RawRenderer.TYPE);
       for (CustomRendererDefinition customRenderer : getCustomRenderers())
         lst.add(customRenderer.getExtension());
-      this.outputFormats = lst;
+      outputFormats = lst;
     }
-    return this.outputFormats;
+    return outputFormats;
   }
 
   /*
@@ -451,7 +452,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
    */
   @Override
   public boolean isFragment(String path) {
-    if (this.fragmentExtensions == null) {
+    if (fragmentExtensions == null) {
       Set<String> fragmentExtensions = new HashSet<>();
       fragmentExtensions.addAll(getDocumentExtensions());
       fragmentExtensions.removeAll(getBookExtensions());
@@ -502,6 +503,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
     return Integer.parseInt(getValue("markdown.maxheadernumberlevel", "3"));
   }
 
+  @Override
   public void reload() throws FileNotFoundException, ConfigurationException {
     clear();
     String propertyFileName = getPropertyFileName();

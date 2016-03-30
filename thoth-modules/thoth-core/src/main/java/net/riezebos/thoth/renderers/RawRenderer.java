@@ -39,16 +39,19 @@ public class RawRenderer extends RendererBase implements Renderer {
     super(thothEnvironment, rendererProvider);
   }
 
+  @Override
   public String getTypeCode() {
     return TYPE;
   }
 
+  @Override
   public String getContentType(Map<String, Object> arguments) {
     return "text/plain;charset=UTF-8";
   }
 
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin, OutputStream outputStream)
-      throws RenderException {
+  @Override
+  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream) throws RenderException {
     try {
 
       Configuration configuration = getConfiguration();

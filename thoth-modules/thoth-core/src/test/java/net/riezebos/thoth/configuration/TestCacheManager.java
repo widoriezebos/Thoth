@@ -22,6 +22,7 @@ public class TestCacheManager extends CacheManager {
     super(contentManager);
   }
 
+  @Override
   protected InputStream createInputStream(String resourcePath) throws FileNotFoundException {
     ByteArrayOutputStream byteArrayOutputStream = resources.get(resourcePath);
     if (byteArrayOutputStream == null)
@@ -31,12 +32,14 @@ public class TestCacheManager extends CacheManager {
     return bis;
   }
 
+  @Override
   protected OutputStream createOutputStream(String resourcePath) throws FileNotFoundException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     resources.put(resourcePath, bos);
     return bos;
   }
 
+  @Override
   protected void deleteFile(String fileName) {
     resources.remove(fileName);
   }

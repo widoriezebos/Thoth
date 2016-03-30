@@ -19,7 +19,7 @@ public class RenderResult {
   private Map<String, Object> arguments = null;
 
   private RenderResult(RenderResultCode renderResultCode, Map<String, Object> arguments) {
-    this.code = renderResultCode;
+    code = renderResultCode;
     this.arguments = arguments;
   }
 

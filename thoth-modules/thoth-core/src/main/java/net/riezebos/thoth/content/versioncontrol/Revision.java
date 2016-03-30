@@ -64,7 +64,7 @@ public class Revision {
   }
 
   public void setMessage(String commitMessage) {
-    this.revisionMessage = commitMessage == null ? commitMessage : commitMessage.trim();
+    revisionMessage = commitMessage == null ? commitMessage : commitMessage.trim();
   }
 
   public void setCommitId(String commitId) {
