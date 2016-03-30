@@ -1,11 +1,11 @@
 /* Copyright (c) 2016 W.T.J. Riezebos
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,7 @@ public class ProcessorError implements Serializable, Comparable<ProcessorError> 
   }
 
   public LineInfo getCurrentLineInfo() {
-    return this.currentLineInfo;
+    return currentLineInfo;
   }
 
   public void setErrorMessage(String errorMessage) {
@@ -41,23 +41,23 @@ public class ProcessorError implements Serializable, Comparable<ProcessorError> 
   }
 
   public String getErrorMessage() {
-    return this.errorMessage;
+    return errorMessage;
   }
 
   public String getDescription() {
-    return (this.currentLineInfo == null ? "" : this.currentLineInfo + ": ") + errorMessage;
+    return (currentLineInfo == null ? "" : currentLineInfo + ": ") + errorMessage;
   }
 
   public boolean getFileRelated() {
-    return this.currentLineInfo != null;
+    return currentLineInfo != null;
   }
 
   public String getFile() {
-    return this.currentLineInfo.getFile();
+    return currentLineInfo.getFile();
   }
 
   public int getLine() {
-    return this.currentLineInfo.getLine();
+    return currentLineInfo.getLine();
   }
 
   @Override

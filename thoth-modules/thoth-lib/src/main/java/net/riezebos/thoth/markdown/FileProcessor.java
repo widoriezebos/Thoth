@@ -1,11 +1,11 @@
 /* Copyright (c) 2016 W.T.J. Riezebos
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -116,7 +116,7 @@ public class FileProcessor {
 
   protected String readLine(BufferedReader br) throws IOException {
     String line = br.readLine();
-    if (line != null && this.stripTrailingWhitespace) {
+    if (line != null && stripTrailingWhitespace) {
       int lastChar = line.length() - 1;
       int idx = lastChar;
       while (idx > 0 && Character.isWhitespace(line.charAt(idx)))
@@ -138,8 +138,8 @@ public class FileProcessor {
         if (key.indexOf(' ') != -1)
           return false;
         String value = line.substring(idx + 1).trim();
-        if (!this.metaTags.containsKey(key) && value.length() > 0)
-          this.metaTags.put(key, value);
+        if (!metaTags.containsKey(key) && value.length() > 0)
+          metaTags.put(key, value);
         return true;
       }
     }
@@ -449,7 +449,7 @@ public class FileProcessor {
   /**
    * This tries to find the library root based on the fact that the library root contains a file called 'softlinks.properties' If that file cannot be found then
    * the folder of the root document is taken as a last resort.
-   * 
+   *
    * @return
    */
   protected String determineLibraryFallBack() {
@@ -600,13 +600,13 @@ public class FileProcessor {
   protected void validate() {
     Set<String> validBookmarks = new HashSet<String>();
 
-    for (Bookmark bookmark : this.bookmarks) {
+    for (Bookmark bookmark : bookmarks) {
       validBookmarks.add(bookmark.getId());
       // Also add a bookmark without a numeric prefix; a manually entered bookmark could be without a numeric prefix
       // (Just used the title without the number)
       validBookmarks.add(ThothUtil.stripNumericPrefix(bookmark.getId()));
     }
-    for (BookmarkUsage usage : this.bookmarkUsages) {
+    for (BookmarkUsage usage : bookmarkUsages) {
       if (!validBookmarks.contains(usage.getBookmark())) {
         error("Invalid bookmark: #" + usage.getBookmark());
       }
@@ -631,7 +631,7 @@ public class FileProcessor {
   }
 
   public boolean hasErrors() {
-    return !this.errors.isEmpty();
+    return !errors.isEmpty();
   }
 
   public void setRootFolder(String rootFolder) {
@@ -647,7 +647,7 @@ public class FileProcessor {
   }
 
   public boolean containsToc() {
-    return this.containsToc;
+    return containsToc;
   }
 
   public String getRootFolder() {

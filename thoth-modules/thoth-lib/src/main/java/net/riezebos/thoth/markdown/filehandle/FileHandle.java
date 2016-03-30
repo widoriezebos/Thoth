@@ -1,11 +1,11 @@
 /* Copyright (c) 2016 W.T.J. Riezebos
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -103,14 +103,14 @@ public class FileHandle implements Serializable, Comparable<FileHandle> {
   @Override
   public int compareTo(FileHandle other) {
     if (other instanceof FileHandle)
-      return fullPath.compareTo(((FileHandle) other).fullPath);
+      return fullPath.compareTo(other.fullPath);
     else
       return -1;
   }
 
   public void importTree(FileHandle rootSource) throws IOException {
-    if (!this.isDirectory())
-      throw new IOException("Can only import to a directory; " + this.getAbsolutePath() + " is file");
+    if (!isDirectory())
+      throw new IOException("Can only import to a directory; " + getAbsolutePath() + " is file");
     importTree(rootSource, rootSource, this);
   }
 

@@ -99,6 +99,7 @@ public class ClasspathFileSystem implements FileSystem {
   // the list of that folder.
   // So for now we return false if there is a folder with the same name, and then true
   // if the inputstream is not null
+  @Override
   public boolean isFile(FileHandle fileHandle) {
     if (fileHandle == null || fileHandle.getAbsolutePath() == null || fileHandle.getAbsolutePath().length() == 0)
       return false;
@@ -117,6 +118,7 @@ public class ClasspathFileSystem implements FileSystem {
     return isFile;
   }
 
+  @Override
   public boolean isDirectory(FileHandle fileHandle) {
     return isDirectory(fileHandle.getCanonicalPath());
   }
@@ -130,12 +132,14 @@ public class ClasspathFileSystem implements FileSystem {
     return folders.contains(fileName) || folders.contains(ThothUtil.absoluteFolder(fileName));
   }
 
+  @Override
   public long lastModified(FileHandle fileHandle) {
     String canonicalPath = fileHandle.getCanonicalPath();
     Long lng = modified.get(canonicalPath);
     return lng == null ? 0 : lng;
   }
 
+  @Override
   public long length(FileHandle fileHandle) {
     Long integer = lengths.get(fileHandle.getCanonicalPath());
     return integer == null ? 0 : integer;
@@ -198,6 +202,7 @@ public class ClasspathFileSystem implements FileSystem {
     return arg == null ? 0 : Long.parseLong(arg);
   }
 
+  @Override
   public String[] list(FileHandle fileHandle) {
     List<FileHandle> list = list(fileHandle.getCanonicalPath());
     if (list == null)
@@ -208,6 +213,7 @@ public class ClasspathFileSystem implements FileSystem {
     return result;
   }
 
+  @Override
   public FileHandle[] listFiles(FileHandle fileHandle) {
     List<FileHandle> list = list(fileHandle.getCanonicalPath());
     if (list == null)
@@ -215,6 +221,7 @@ public class ClasspathFileSystem implements FileSystem {
     return list.toArray(new FileHandle[list.size()]);
   }
 
+  @Override
   public InputStream getInputStream(FileHandle fileHandle) throws IOException {
     return getInputStream(fileHandle, true);
   }

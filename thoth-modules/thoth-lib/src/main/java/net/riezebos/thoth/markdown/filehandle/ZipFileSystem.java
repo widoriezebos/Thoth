@@ -68,6 +68,7 @@ public class ZipFileSystem extends ClasspathFileSystem {
     zip.close();
   }
 
+  @Override
   public boolean isFile(FileHandle fileHandle) {
     if (fileHandle == null || fileHandle.getAbsolutePath() == null || fileHandle.getAbsolutePath().length() == 0)
       return false;
@@ -84,6 +85,7 @@ public class ZipFileSystem extends ClasspathFileSystem {
     return folderContents != null && folderContents.contains(fileName);
   }
 
+  @Override
   public InputStream getInputStream(FileHandle fileHandle, boolean throwOnError) throws IOException {
 
     ZipInputStream zip = new ZipInputStream(zipFile.getInputStream());

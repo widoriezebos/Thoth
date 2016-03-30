@@ -1,11 +1,11 @@
 /* Copyright (c) 2016 W.T.J. Riezebos
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import net.riezebos.thoth.markdown.util.ProcessorError;
 
 /**
  * Contains all information about a MarkDown document, including meta tags, document structure and any errors that arose during include and link processing.
- * 
+ *
  * @author wido
  */
 public class MarkDownDocument {
@@ -60,7 +60,7 @@ public class MarkDownDocument {
   }
 
   public boolean hasErrors() {
-    return !this.errors.isEmpty();
+    return !errors.isEmpty();
   }
 
   public List<ProcessorError> getErrors() {
@@ -68,11 +68,11 @@ public class MarkDownDocument {
   }
 
   public String getPath() {
-      return documentStructure.getPath();
+    return documentStructure.getPath();
   }
 
   public String getName() {
-      return documentStructure.getFileName();
+    return documentStructure.getFileName();
   }
 
   public String getTitle() {
@@ -84,13 +84,13 @@ public class MarkDownDocument {
   }
 
   public void setLastModified(Date date) {
-    this.lastModified = date;
+    lastModified = date;
   }
 
   public Date getLastModified() {
     return lastModified;
   }
-  
+
   @Override
   public String toString() {
     return getPath();

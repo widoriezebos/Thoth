@@ -1,11 +1,11 @@
 /* Copyright (c) 2016 W.T.J. Riezebos
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -247,7 +247,7 @@ public class ThothUtil {
 
   /**
    * Strips any prefixing number. Result will be trimmed from whitespace as well
-   * 
+   *
    * @param title
    * @return
    */
@@ -262,7 +262,7 @@ public class ThothUtil {
 
   /**
    * When prefix not found; will return the entire path
-   * 
+   *
    * @param value
    * @param prefix
    * @return
@@ -278,7 +278,7 @@ public class ThothUtil {
 
   /**
    * When prefix not found; will return empty string
-   * 
+   *
    * @param value
    * @param prefix
    * @return
