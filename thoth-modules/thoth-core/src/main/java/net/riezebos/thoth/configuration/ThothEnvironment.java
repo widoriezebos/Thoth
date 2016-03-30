@@ -158,6 +158,8 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   public void shutDown() throws ContentManagerException {
     for (String context : getContextManager().getContexts())
       getContentManager(context).disableAutoRefresh();
+    getThothDB().shutdown();
+    getConfiguration().discard();
   }
 
   public String pullAll() throws ContentManagerException {

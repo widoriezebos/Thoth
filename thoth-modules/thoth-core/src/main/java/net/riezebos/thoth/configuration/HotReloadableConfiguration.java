@@ -38,6 +38,7 @@ import net.riezebos.thoth.renderers.util.CustomRendererDefinition;
  */
 public class HotReloadableConfiguration implements Configuration {
   private static final Logger LOG = LoggerFactory.getLogger(HotReloadableConfiguration.class);
+  private static int SLICE = 100;
 
   private Configuration activeConfiguration;
   private List<ConfigurationChangeListener> listeners = new ArrayList<>();
@@ -138,10 +139,13 @@ public class HotReloadableConfiguration implements Configuration {
         public void run() {
           do {
             try {
-              Thread.sleep(autoReloadInterval);
+              for (int i = 0; i < SLICE && autoRefresh; i++) {
+                sleep(autoReloadInterval / SLICE);
+              }
             } catch (InterruptedException e) {
             }
-            checkForChanges();
+            if (autoRefresh)
+              checkForChanges();
           } while (autoRefresh);
         }
       }.start();

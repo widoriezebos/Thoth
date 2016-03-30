@@ -25,6 +25,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
@@ -37,6 +39,7 @@ import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class ThothDB {
+  private static final Logger LOG = LoggerFactory.getLogger(ThothDB.class);
 
   private ThothEnvironment thothEnvironment;
 
@@ -84,7 +87,7 @@ public class ThothDB {
   public Connection getConnection() throws SQLException {
     Properties properties = new Properties();
     String databaseUrl = getConfiguration().getDatabaseUrl();
-    if ("embedded".equalsIgnoreCase(getConfiguration().getDatabaseType())) {
+    if (isEmbedded()) {
       properties.put("databaseName", databaseUrl);
       properties.put("create", "true");
       databaseUrl = "jdbc:derby:";
@@ -95,6 +98,10 @@ public class ThothDB {
     Connection connection = DriverManager.getConnection(databaseUrl, properties);
     connection.setAutoCommit(false);
     return new ConnectionWrapper(connection);
+  }
+
+  protected boolean isEmbedded() {
+    return "embedded".equalsIgnoreCase(getConfiguration().getDatabaseType());
   }
 
   protected void initializeSchema(Connection connection) throws SQLException, DDLException, IOException {
@@ -153,5 +160,18 @@ public class ThothDB {
     result.put("hsql", "org.hsqldb.jdbc.JDBCDriver");
     result.put("mysql", "com.mysql.jdbc.Driver");
     drivers = result;
+  }
+
+  public void shutdown() {
+    if (isEmbedded()) {
+      try {
+        DriverManager.getConnection("jdbc:derby:;shutdown=true");
+      } catch (SQLException e) {
+        // I don't like this at all; but by design shutting down Derby will throw an java.sql.SQLException stating "Derby system shutdown."
+        // So here comes the dirty code to suppress logging this as an error (because it's not an error)
+        if (e.getMessage() == null || e.getMessage().toLowerCase().indexOf("derby system shutdown") == -1)
+          LOG.error(e.getMessage(), e);
+      }
+    }
   }
 }

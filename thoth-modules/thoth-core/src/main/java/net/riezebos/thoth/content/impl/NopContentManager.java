@@ -14,15 +14,20 @@
  */
 package net.riezebos.thoth.content.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManagerBase;
 import net.riezebos.thoth.content.versioncontrol.Commit;
 import net.riezebos.thoth.content.versioncontrol.SourceDiff;
 import net.riezebos.thoth.context.ContextDefinition;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.util.PagedList;
 
@@ -68,5 +73,27 @@ public class NopContentManager extends ContentManagerBase {
   @Override
   public boolean supportsVersionControl() {
     return false;
+  }
+
+  public InputStream getInputStream(String path) throws IOException {
+    return null;
+  }
+
+  @Override
+  public List<ContentNode> list(String path) throws ContextNotFoundException, IOException {
+    return new ArrayList<>();
+  }
+
+  @Override
+  public List<ContentNode> find(String fileSpec, boolean recursive) throws IOException {
+    return new ArrayList<>();
+  }
+
+  @Override
+  protected void notifyContextContentsChanged() {
+  }
+
+  @Override
+  public void reindex() {
   }
 }

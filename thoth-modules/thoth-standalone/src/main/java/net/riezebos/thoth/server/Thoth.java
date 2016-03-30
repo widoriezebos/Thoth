@@ -20,12 +20,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.session.HashSessionIdManager;
@@ -37,6 +36,11 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.server.commands.LogLevelServerCommand;
+import net.riezebos.thoth.server.commands.PullServerCommand;
+import net.riezebos.thoth.server.commands.ReindexServerCommand;
+import net.riezebos.thoth.server.commands.ReloadServerCommand;
+import net.riezebos.thoth.server.commands.ServerCommand;
 import net.riezebos.thoth.servlets.ThothServlet;
 import net.riezebos.thoth.util.ThothUtil;
 
@@ -45,10 +49,13 @@ import net.riezebos.thoth.util.ThothUtil;
  */
 public class Thoth {
 
+  private List<ServerCommand> serverCommands = new ArrayList<>();
+
   public void start(String args[]) throws Exception {
     ThothEnvironment thothEnvironment = new ThothEnvironment();
     ThothEnvironment.registerSharedContext(thothEnvironment);
 
+    setupServerCommands(thothEnvironment);
     List<String> argumentsList = ThothUtil.getArgumentsList(args);
     Map<String, String> argumentsMap = ThothUtil.getArgumentsMap(args);
     boolean asServer = argumentsMap.containsKey("server");
@@ -108,7 +115,7 @@ public class Thoth {
           + ":" + configuration.getEmbeddedServerPort());
       BufferedReader br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 
-      listCommands();
+      println("Enter 'help' for a list of commands");
 
       boolean stop = false;
       do {
@@ -119,45 +126,39 @@ public class Thoth {
       server.stop();
       server.join();
       thothEnvironment.shutDown();
+      println("Bye!");
     }
   }
 
   protected boolean doCommand(ThothEnvironment thothEnvironment, Configuration configuration, BufferedReader br) {
     boolean stop = false;
     try {
-      print("Command: ");
+      print("\nCommand: ");
       String line = br.readLine();
       line = line == null ? "" : line.trim();
 
-      if ("reload".equalsIgnoreCase(line)) {
-        configuration.reload();
-        println("Configuration reloaded from " + configuration.getPropertyFileName());
-
-      } else if ("pull".equalsIgnoreCase(line)) {
-        println("Pulling...");
-        thothEnvironment.pullAll();
-        println("Done...");
-
-      } else if ("reindex".equalsIgnoreCase(line)) {
-        println("Reindex running in the background");
-        thothEnvironment.reindexAll();
-
+      boolean handled = false;
+      if ("help".equalsIgnoreCase(line)) {
+        listCommands();
+        handled = true;
       } else if ("stop".equalsIgnoreCase(line)) {
         stop = true;
+        handled = true;
+      } else {
+        for (ServerCommand command : serverCommands) {
+          if (command.applies(line)) {
+            handled = true;
+            if (!command.argumentsOk(line)) {
+              println("Invalid argument(s)");
+              listCommands();
+            } else {
+              command.execute(line);
+            }
+          }
+        }
+      }
 
-      } else if ("debug".equalsIgnoreCase(line)) {
-        LogManager.getRootLogger().setLevel(Level.DEBUG);
-        println("Logger level set to DEBUG");
-
-      } else if ("info".equalsIgnoreCase(line)) {
-        LogManager.getRootLogger().setLevel(Level.INFO);
-        println("Logger level set to INFO");
-
-      } else if ("warn".equalsIgnoreCase(line)) {
-        println("Logger level set to WARN");
-        LogManager.getRootLogger().setLevel(Level.WARN);
-
-      } else if (!StringUtils.isBlank(line)) {
+      if (!handled && !StringUtils.isBlank(line)) {
         println("\nDid not recognize command '" + line + "'");
         listCommands();
       }
@@ -169,13 +170,11 @@ public class Thoth {
 
   protected void listCommands() {
     println("\nThe following console commands are supported:");
-    println("reload:  Reload the configuration");
-    println("pull:    Pull all version controlled repositories");
-    println("reindex: Force a reindex of all repositories");
-    println("debug:   Switch to debug log level");
-    println("info:    Switch to info log level");
-    println("warn:    Switch to warn log level");
-    println("stop:    Stop the server");
+    int indent = 18;
+    println(ThothUtil.appendToLength("stop", " ", indent) + ": Stop the server");
+    for (ServerCommand command : serverCommands) {
+      println(ThothUtil.appendToLength(command.getUsage(), " ", indent) + ": " + command.getDescription());
+    }
   }
 
   protected void setupConfiguration(ThothEnvironment thothEnvironment, List<String> argumentsList) throws FileNotFoundException {
@@ -200,6 +199,13 @@ public class Thoth {
       throw new FileNotFoundException("Configuration file " + configurationFile + " not found");
 
     System.setProperty(ThothEnvironment.CONFIGKEY, configurationFile);
+  }
+
+  protected void setupServerCommands(ThothEnvironment thothEnvironment) {
+    serverCommands.add(new ReloadServerCommand(thothEnvironment));
+    serverCommands.add(new PullServerCommand(thothEnvironment));
+    serverCommands.add(new ReindexServerCommand(thothEnvironment));
+    serverCommands.add(new LogLevelServerCommand(thothEnvironment));
   }
 
   protected void println(String message) {

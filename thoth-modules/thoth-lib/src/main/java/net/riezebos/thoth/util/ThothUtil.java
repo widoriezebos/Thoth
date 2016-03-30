@@ -517,4 +517,12 @@ public class ThothUtil {
     }
   }
 
+  public static String appendToLength(String value, String suffix, int length) {
+    if (value == null)
+      value = "";
+    while (value.length() < length)
+      value = value + suffix;
+    return value;
+  }
+
 }
