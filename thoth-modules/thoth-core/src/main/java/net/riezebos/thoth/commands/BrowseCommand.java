@@ -31,6 +31,7 @@ import net.riezebos.thoth.renderers.RendererBase;
 import net.riezebos.thoth.renderers.RendererProvider;
 import net.riezebos.thoth.user.Identity;
 import net.riezebos.thoth.user.Permission;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class BrowseCommand extends RendererBase implements Command {
 
@@ -57,7 +58,7 @@ public class BrowseCommand extends RendererBase implements Command {
 
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("contentNodes", contentNodes);
-      boolean atRoot = StringUtils.isBlank(path);
+      boolean atRoot = StringUtils.isBlank(path) || ThothUtil.suffix(path, "/").equals(ThothUtil.suffix(contentManager.getLibraryRoot(), "/"));
       variables.put("atRoot", atRoot);
 
       if (asJson)
