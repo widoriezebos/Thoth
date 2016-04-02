@@ -16,7 +16,6 @@ package net.riezebos.thoth.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -39,13 +38,9 @@ public abstract class ConfigurationBase extends PropertyLoader implements Config
     try {
       ConfigurationBase clone = (ConfigurationBase) super.clone();
       clone.repositoryDefinitions = new HashMap<>();
-      for (Entry<String, RepositoryDefinition> entry : repositoryDefinitions.entrySet()) {
-        clone.repositoryDefinitions.put(entry.getKey(), entry.getValue().clone());
-      }
       clone.contextDefinitions = new HashMap<>();
-      for (Entry<String, ContextDefinition> entry : contextDefinitions.entrySet()) {
-        clone.contextDefinitions.put(entry.getKey(), entry.getValue().clone());
-      }
+      repositoryDefinitions.entrySet().stream().forEach(entry -> clone.repositoryDefinitions.put(entry.getKey(), entry.getValue().clone()));
+      contextDefinitions.entrySet().stream().forEach(entry -> clone.contextDefinitions.put(entry.getKey(), entry.getValue().clone()));
       return clone;
     } catch (CloneNotSupportedException e) {
       throw new IllegalArgumentException();

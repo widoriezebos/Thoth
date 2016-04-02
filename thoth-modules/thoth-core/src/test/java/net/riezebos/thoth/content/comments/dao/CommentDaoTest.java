@@ -13,6 +13,7 @@ import net.riezebos.thoth.content.comments.Comment;
 import net.riezebos.thoth.exceptions.ConfigurationException;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.testutil.DatabaseTest;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class CommentDaoTest extends DatabaseTest {
 
@@ -47,7 +48,7 @@ public class CommentDaoTest extends DatabaseTest {
       assertEquals(1, comments.size());
       Comment check = comments.get(0);
       assertEquals(userName, check.getUserName());
-      assertEquals(documentPath, check.getDocumentPath());
+      assertEquals(ThothUtil.stripPrefix(documentPath, "/"), check.getDocumentPath());
       assertEquals(title, check.getTitle());
       assertEquals(body, check.getBody());
 

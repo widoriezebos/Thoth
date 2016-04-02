@@ -63,14 +63,16 @@ public class HotReloadableConfigurationTest implements ConfigurationChangeListen
         return System.currentTimeMillis();
       }
     };
-    PropertyBasedConfiguration activeConfiguration = (PropertyBasedConfiguration) hotConfig.getActiveConfiguration();
-    activeConfiguration.setPropertyFileName("classpath:" + propFile2);
-    hotConfig.addConfigurationChangeListener(this);
     renderersChanged = false;
+    
     added = new ArrayList<>();
     removed = new ArrayList<>();
 
-    Thread.sleep(1050L);
+    hotConfig.addConfigurationChangeListener(this);
+    PropertyBasedConfiguration activeConfiguration = (PropertyBasedConfiguration) hotConfig.getActiveConfiguration();
+    activeConfiguration.setPropertyFileName("classpath:" + propFile2);
+
+    Thread.sleep(1500L);
 
     assertEquals(1, added.size());
     assertEquals(1, removed.size());

@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -167,9 +166,7 @@ public class CustomRenderer extends RendererBase implements Renderer {
     LOG.debug("Executing " + command);
 
     List<String> argsList = new ArrayList<>();
-    for (Entry<String, Object> entry : arguments.entrySet()) {
-      argsList.add(entry.getKey() + "=" + entry.getValue());
-    }
+    arguments.entrySet().stream().forEach(entry -> argsList.add(entry.getKey() + "=" + entry.getValue()));
 
     String[] args = argsList.isEmpty() ? null : argsList.toArray(new String[argsList.size()]);
 

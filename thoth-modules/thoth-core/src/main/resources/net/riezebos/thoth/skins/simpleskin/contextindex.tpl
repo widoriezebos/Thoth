@@ -35,6 +35,7 @@
                       <a href="${context}${book.path}?output=$outputFormat">$outputFormat</a>
                     #end
                     #if(${permissions.contains("META")})<a href="${context}${book.path}?cmd=meta">meta</a>#end 
+                    #if(${permissions.contains("COMMENT")})<a href="${context}${book.path}?cmd=comment">comment</a>#end
                     )<br/>
                 #end
             </td>

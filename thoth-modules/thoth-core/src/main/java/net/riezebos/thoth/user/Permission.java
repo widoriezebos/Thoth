@@ -29,7 +29,10 @@ public enum Permission {
   SEARCH(11),
   VALIDATE(12),
   MANAGE_USERS(13),
-  MANAGE_CONTEXTS(14);
+  MANAGE_CONTEXTS(14),
+  COMMENT(15),
+  EDIT_ANY_COMMENT(16),
+  DELETE_ANY_COMMENT(17);
 
   private int value;
 

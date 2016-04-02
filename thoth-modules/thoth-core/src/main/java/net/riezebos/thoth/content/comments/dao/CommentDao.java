@@ -15,6 +15,7 @@ import net.riezebos.thoth.content.comments.Comment;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.util.BaseDao;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class CommentDao extends BaseDao {
   private ThothDB thothDB;
@@ -49,15 +50,15 @@ public class CommentDao extends BaseDao {
     }
   }
 
-  public boolean deleteComment(Comment comment) throws ContentManagerException {
+  public boolean deleteComment(long id) throws ContentManagerException {
     try (Connection connection = thothDB.getConnection(); //
         SqlStatement commentStmt = new SqlStatement(connection, thothDB.getQuery("delete_comment"));
         SqlStatement commentBodyStmt = new SqlStatement(connection, thothDB.getQuery("delete_commentbody"))) {
 
-      commentBodyStmt.setLong("comm_id", comment.getId());
+      commentBodyStmt.setLong("comm_id", id);
       commentBodyStmt.executeUpdate();
 
-      commentStmt.setLong("id", comment.getId());
+      commentStmt.setLong("id", id);
       int count = commentStmt.executeUpdate();
 
       commitReload(connection);
@@ -67,9 +68,13 @@ public class CommentDao extends BaseDao {
     }
   }
 
+  public boolean deleteComment(Comment comment) throws ContentManagerException {
+    return deleteComment(comment.getId());
+  }
+
   public List<Comment> getComments(String documentpath, String userName) throws ContentManagerException {
     try (Connection connection = thothDB.getConnection(); //
-        SqlStatement commentStmt = constructCommentQuery(connection, documentpath, userName)) {
+        SqlStatement commentStmt = constructCommentQuery(connection, ThothUtil.stripPrefix(documentpath, "/"), userName)) {
 
       List<Comment> result = new ArrayList<>();
 
@@ -91,6 +96,32 @@ public class CommentDao extends BaseDao {
       throw new ContentManagerException(e);
     }
   }
+  
+  public Comment getComment(long id) throws ContentManagerException {
+    try (Connection connection = thothDB.getConnection(); //
+        SqlStatement commentStmt = new SqlStatement(connection, thothDB.getQuery("select_comment"))) {
+
+      commentStmt.setLong("id", id);
+
+      Comment comment = null;
+      try (ResultSet rs = commentStmt.executeQuery()) {
+        while (rs.next()) {
+           comment = new Comment();
+          int idx = 1;
+          comment.setId(id);
+          comment.setUserName(rs.getString(idx++));
+          comment.setDocumentPath(rs.getString(idx++));
+          comment.setTimeCreated(rs.getTimestamp(idx++));
+          comment.setTitle(rs.getString(idx++));
+          comment.setDao(this);
+        }
+      }
+      return comment;
+    } catch (SQLException e) {
+      throw new ContentManagerException(e);
+    }
+  }
+
 
   protected SqlStatement constructCommentQuery(Connection connection, String documentpath, String userName) throws SQLException {
     String query = thothDB.getQuery("select_comments");
@@ -107,6 +138,8 @@ public class CommentDao extends BaseDao {
     if (StringUtils.isNotBlank(where))
       query += " where " + where;
 
+    query += " order by timecreated";
+
     SqlStatement sqlStatement = new SqlStatement(connection, query);
     if (StringUtils.isNotBlank(documentpath)) {
       sqlStatement.setString("documentpath", documentpath);
@@ -114,6 +147,7 @@ public class CommentDao extends BaseDao {
     if (userName != null) {
       sqlStatement.setString("username", userName);
     }
+    
     return sqlStatement;
   }
 
@@ -132,5 +166,4 @@ public class CommentDao extends BaseDao {
       throw new ContentManagerException(e);
     }
   }
-
 }

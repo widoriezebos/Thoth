@@ -2,13 +2,17 @@ package net.riezebos.thoth.content.comments;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.content.comments.dao.CommentDao;
 import net.riezebos.thoth.exceptions.ContentManagerException;
+import net.riezebos.thoth.util.ThothUtil;
 
 public class Comment {
+  private static final int MAX_DEDUCE_TITLE_LENGTH = 80;
+
   private static final Logger LOG = LoggerFactory.getLogger(Comment.class);
 
   private Long id;
@@ -32,7 +36,7 @@ public class Comment {
   }
 
   public void setDocumentPath(String documentPath) {
-    this.documentPath = documentPath;
+    this.documentPath = ThothUtil.stripPrefix(documentPath, "/");
   }
 
   public String getBody() {
@@ -60,6 +64,23 @@ public class Comment {
   }
 
   public String getTitle() {
+    if (title == null)
+      return deduceTitle();
+    return title;
+  }
+
+  private String deduceTitle() {
+    String body = getBody();
+    if (StringUtils.isBlank(body))
+      return null;
+
+    String title = body.trim();
+    int idx = title.indexOf("\n");
+    if (idx != -1) {
+      title = title.substring(0, idx);
+    }
+    if (title.length() > MAX_DEDUCE_TITLE_LENGTH)
+      title = title.substring(0, MAX_DEDUCE_TITLE_LENGTH) + "...";
     return title;
   }
 

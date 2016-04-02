@@ -1,13 +1,15 @@
 Second Book
 
 
-[//]: # "Include ../main/Second.md"
+[//]: # "Include begin: /main/Second.md"
 
 #The second big chapter
 
 With some addition text
 
-[//]: # "Include /main/Fourth.md"
+[//]: # "Include end: /main/Second.md"
+
+[//]: # "Include begin: /main/Fourth.md"
 
 #Someother chapter
 
@@ -18,3 +20,4 @@ That is just fine
 
 With some other text
 
+[//]: # "Include end: /main/Fourth.md"

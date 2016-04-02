@@ -122,6 +122,10 @@ public class Skin extends PropertyLoader {
     return getPathProperty("template.meta");
   }
 
+  public String getCommentTemplate() {
+    return getPathProperty("template.comment");
+  }
+
   public String getRevisionTemplate() {
     return getPathProperty("template.revisions");
   }

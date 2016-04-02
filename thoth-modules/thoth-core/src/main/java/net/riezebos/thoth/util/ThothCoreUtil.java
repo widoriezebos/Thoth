@@ -22,9 +22,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.parboiled.Parboiled;
+import org.pegdown.LinkRenderer;
+import org.pegdown.Parser;
+import org.pegdown.RelaxedParser;
+import org.pegdown.ast.RootNode;
+import org.pegdown.plugins.PegDownPlugins;
 
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.context.RepositoryType;
+import net.riezebos.thoth.renderers.util.CustomHtmlSerializer;
 import net.riezebos.thoth.user.Permission;
 
 public class ThothCoreUtil extends ThothUtil {
@@ -33,6 +40,16 @@ public class ThothCoreUtil extends ThothUtil {
 
   public ThothCoreUtil(Configuration configuration) {
     this.configuration = configuration;
+  }
+
+  public String markdown2html(String markdownSource) {
+    int extensions = configuration.getMarkdownOptions();
+    long parseTimeOut = configuration.getParseTimeOut();
+    RelaxedParser parser = Parboiled.createParser(RelaxedParser.class, extensions, parseTimeOut, Parser.DefaultParseRunnerProvider, PegDownPlugins.NONE);
+    RootNode ast = parser.parse(ThothUtil.wrapWithNewLines(markdownSource.toCharArray()));
+    CustomHtmlSerializer serializer = new CustomHtmlSerializer(new LinkRenderer());
+    String body = serializer.toHtml(ast);
+    return body;
   }
 
   public static String escapeHtml(String html) {

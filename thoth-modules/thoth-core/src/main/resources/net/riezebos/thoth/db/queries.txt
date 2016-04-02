@@ -173,6 +173,12 @@ select_comments =
     from   thoth_comments
 ;
     
+select_comment = 
+    select username, documentpath, timecreated, title
+    from   thoth_comments
+    where  id = :id
+;
+    
 insert_comment =
     insert into thoth_comments(id, username, documentpath, timecreated, title) 
     values (:id, :username, :documentpath, :timecreated, :title) 

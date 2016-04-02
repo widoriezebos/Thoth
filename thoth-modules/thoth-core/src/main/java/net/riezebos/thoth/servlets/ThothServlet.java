@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import net.riezebos.thoth.commands.BrowseCommand;
 import net.riezebos.thoth.commands.Command;
 import net.riezebos.thoth.commands.CommandOperation;
+import net.riezebos.thoth.commands.CommentCommand;
 import net.riezebos.thoth.commands.ContextIndexCommand;
 import net.riezebos.thoth.commands.DiffCommand;
 import net.riezebos.thoth.commands.ErrorPageCommand;
@@ -193,6 +194,7 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     registerCommand(new DiffCommand(thothEnvironment, this));
     registerCommand(indexCommand);
     registerCommand(new MetaCommand(thothEnvironment, this));
+    registerCommand(new CommentCommand(thothEnvironment, this));
     registerCommand(new LoginCommand(thothEnvironment, this));
     registerCommand(new LogoutCommand(thothEnvironment, this));
     registerCommand(new PullCommand(thothEnvironment, this));

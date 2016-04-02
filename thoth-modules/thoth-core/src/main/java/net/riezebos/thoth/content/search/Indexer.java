@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
@@ -183,8 +182,7 @@ public class Indexer {
   }
 
   protected void sortIndexLists(Map<String, List<String>> map) {
-    for (Entry<String, List<String>> entry : map.entrySet())
-      Collections.sort(entry.getValue());
+    map.entrySet().stream().forEach(entry -> Collections.sort(entry.getValue()));
   }
 
   protected void indexDirectory(IndexWriter writer, FileHandle fileHandle, IndexingContext context) throws IOException, ContextNotFoundException {
@@ -255,9 +253,8 @@ public class Indexer {
     document.add(new TextField(INDEX_CONTENTS, contents, Store.NO));
     document.add(new TextField(INDEX_USED, "true", Store.NO));
     document.add(new TextField(INDEX_EXTENSION, extension.toLowerCase(), Store.NO));
-    for (Entry<String, String> entry : metaTags.entrySet()) {
-      document.add(new TextField(entry.getKey().toLowerCase(), String.valueOf(entry.getValue()), Store.NO));
-    }
+
+    metaTags.entrySet().stream().forEach(entry -> document.add(new TextField(entry.getKey().toLowerCase(), String.valueOf(entry.getValue()), Store.NO)));
 
     if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
       // New index, so we just add the document (no old document can be there):

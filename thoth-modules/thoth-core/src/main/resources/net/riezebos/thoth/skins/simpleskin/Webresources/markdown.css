@@ -207,6 +207,40 @@ pre>code {
     padding: 0;
 }
 
+.documentsection {
+	background-color: #f0f0f0;
+}
+
+.commentsection {
+    background-color: #f0f0f0;
+    padding: 0px 17px;
+}
+
+.comment {
+	background-color: #fafafa;
+    border-radius: 3px;
+    padding: 5px 34px;
+    border: 1px solid #f0f0f0;
+}
+
+.commentaction {
+	float: right;
+    margin: 0px 10px 0px 0px;
+    display: block;
+    text-align: center;
+    padding: 6px 5px 5px 6px;
+    text-decoration: none;
+    border-radius: .25em;
+    background-color: #f0f0f0;
+}
+
+.commentbox {
+	width:100%;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
 #ws {
     background-color: #f8f8f8;
 }

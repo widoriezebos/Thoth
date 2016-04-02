@@ -132,7 +132,7 @@ public class HotReloadableConfiguration implements Configuration {
 
   protected void configureAutoReload() {
     if (activeConfiguration.isAutoReload()) {
-
+      autoRefresh = true;
       final int autoReloadInterval = activeConfiguration.getAutoReloadInterval() * 1000;
       new Thread() {
         @Override
@@ -144,8 +144,7 @@ public class HotReloadableConfiguration implements Configuration {
               }
             } catch (InterruptedException e) {
             }
-            if (autoRefresh)
-              checkForChanges();
+            checkForChanges();
           } while (autoRefresh);
         }
       }.start();
@@ -396,5 +395,4 @@ public class HotReloadableConfiguration implements Configuration {
   public String getServerName() {
     return activeConfiguration.getServerName();
   }
-
 }

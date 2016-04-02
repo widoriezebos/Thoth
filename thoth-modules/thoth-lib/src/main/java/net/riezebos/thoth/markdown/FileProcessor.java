@@ -366,7 +366,7 @@ public class FileProcessor {
    */
   protected void comment(PrintStream out, String message) {
     if (addComments)
-      out.println("\n[//]: # \"" + message + "\"");
+      out.println("\n[//]: # \"" + message.replaceAll("\\\"", "'") + "\"");
   }
 
   /**

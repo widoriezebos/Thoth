@@ -122,8 +122,8 @@ public class IncludeProcessor extends FileProcessor {
           if (idx != -1) {
             indentStr = fileName.substring(idx + 1).trim();
             fileName = fileName.substring(0, idx);
-
           }
+
           int headerIncrement = asInt(indentStr);
 
           include(currentFolder, fileName, out, includeStack, headerIndent + headerIncrement);
@@ -349,8 +349,9 @@ public class IncludeProcessor extends FileProcessor {
       includeStack.peek().addChild(includeUsage);
       includeStack.push(includeUsage);
       startNewFile(pathname);
-      comment(out, "Include " + fileToInclude);
+      comment(out, "Include begin: " + includeUsage.getPath());
       processFile(newFolder, file.getInputStream(), out, includeStack, headerIndent);
+      comment(out, "Include end: " + includeUsage.getPath());
       endFile();
       includeStack.pop();
     }

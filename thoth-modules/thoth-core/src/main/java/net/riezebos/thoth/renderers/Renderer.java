@@ -28,6 +28,7 @@ public interface Renderer {
   String CONTEXTURL_PARAMETER = "contexturl";
   String CONTEXT_PARAMETER = "context";
   String PATH_PARAMETER = "path";
+  String URI_PARAMETER = "documenturi";
   String TITLE_PARAMETER = "title";
   String BODY_PARAMETER = "body";
   String SKINBASE_PARAMETER = "skinbase";

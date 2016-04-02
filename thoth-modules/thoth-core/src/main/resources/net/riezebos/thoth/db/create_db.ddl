@@ -69,6 +69,7 @@ insert into thoth_permissions(id, grou_id, permission) values (11, 1, 11);
 insert into thoth_permissions(id, grou_id, permission) values (12, 1, 12);
 insert into thoth_permissions(id, grou_id, permission) values (13, 1, 13);
 insert into thoth_permissions(id, grou_id, permission) values (14, 1, 14);
+insert into thoth_permissions(id, grou_id, permission) values (15, 1, 14);
 
 -- Grant rights to writers group
 insert into thoth_permissions(id, grou_id, permission) values (30, 2, 1);
@@ -81,6 +82,7 @@ insert into thoth_permissions(id, grou_id, permission) values (36, 2, 7);
 insert into thoth_permissions(id, grou_id, permission) values (37, 2, 10);
 insert into thoth_permissions(id, grou_id, permission) values (38, 2, 11);
 insert into thoth_permissions(id, grou_id, permission) values (39, 2, 12);
+insert into thoth_permissions(id, grou_id, permission) values (40, 2, 15);
 
 -- Grant rights to readers group
 insert into thoth_permissions(id, grou_id, permission) values (50, 3, 1);

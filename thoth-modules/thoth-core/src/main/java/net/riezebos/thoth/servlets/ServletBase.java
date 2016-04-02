@@ -203,11 +203,14 @@ public abstract class ServletBase extends HttpServlet {
     Configuration configuration = getConfiguration();
     Date now = new Date();
     String path = ThothUtil.prefix(getPath(request), "/");
+    String contextUrl = getContextUrl(request);
+    String documentUri = ThothUtil.suffix(contextUrl, "/") +  ThothUtil.stripPrefix(path, "/");
     result.put(Renderer.CONTEXT_PARAMETER, contextName);
     result.put(Renderer.SKINBASE_PARAMETER, skinBase);
-    result.put(Renderer.CONTEXTURL_PARAMETER, getContextUrl(request));
+    result.put(Renderer.CONTEXTURL_PARAMETER, contextUrl);
     result.put(Renderer.CONTEXTPATH_PARAMETER, request.getContextPath());
     result.put(Renderer.PATH_PARAMETER, path);
+    result.put(Renderer.URI_PARAMETER, documentUri);
     result.put(Renderer.TITLE_PARAMETER, getTitle(request));
     result.put(Renderer.SKIN, skin == null ? null : skin.getName());
     result.put(Renderer.TODAY, configuration.getDateFormat().format(now));
