@@ -36,7 +36,7 @@ public class RawRendererTest extends RendererTest {
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
     String contextName = "TestContext";
 
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
 
     RawRenderer renderer = new RawRenderer(thothEnvironment, this);
@@ -59,7 +59,7 @@ public class RawRendererTest extends RendererTest {
   @Test
   public void testBase() throws ContextNotFoundException, ContentManagerException, IOException {
 
-    ThothEnvironment thothEnvironment = createThothContext("TestContext");
+    ThothEnvironment thothEnvironment = createThothTestEnvironment("TestContext");
     RawRenderer renderer = new RawRenderer(thothEnvironment, this);
     Map<String, Object> map = new HashMap<>();
     map.put("num", "123");

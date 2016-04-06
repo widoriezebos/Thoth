@@ -50,7 +50,7 @@ public class IndexerTest extends ThothTestBase {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
     String contextName = "indextest";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
     TestIndexer indexer = new TestIndexer(contentManager);
     indexer.index();

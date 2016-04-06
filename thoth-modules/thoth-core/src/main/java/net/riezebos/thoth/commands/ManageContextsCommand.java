@@ -46,7 +46,7 @@ public class ManageContextsCommand extends RendererBase implements Command {
 
   public static final String CREATEREPOSITORY = "createrepository";
   public static final String UPDATEEPOSITORY = "updaterepository";
-  public static final String DELETEEPOSITORY = "deleterepository";
+  public static final String DELETEREPOSITORY = "deleterepository";
   public static final String CREATECONTEXT = "createcontext";
   public static final String UPDATECONTEXT = "updatecontext";
   public static final String DELETECONTEXT = "deletecontext";
@@ -129,7 +129,7 @@ public class ManageContextsCommand extends RendererBase implements Command {
       case UPDATEEPOSITORY:
         updateRepository(arguments);
         break;
-      case DELETEEPOSITORY:
+      case DELETEREPOSITORY:
         deleteRepository(arguments);
         break;
       case CREATECONTEXT:
@@ -184,7 +184,8 @@ public class ManageContextsCommand extends RendererBase implements Command {
       ContextManager contextManager = getThothEnvironment().getContextManager();
       RepositoryDefinition repositoryDefinition = contextManager.getRepositoryDefinition(name);
       if (repositoryDefinition != null) {
-        repositoryDefinition.setName(newname);
+        if (StringUtils.isNotBlank(newname))
+          repositoryDefinition.setName(newname);
         repositoryDefinition.setType(RepositoryType.convert(type));
         repositoryDefinition.setLocation(location);
         repositoryDefinition.setUsername(username);
@@ -283,7 +284,8 @@ public class ManageContextsCommand extends RendererBase implements Command {
       ContextDefinition contextDefinition = contextManager.getContextDefinition(contextName);
       if (contextDefinition != null) {
         RepositoryDefinition repositoryDefinition = contextManager.getRepositoryDefinition(repositoryName);
-        contextDefinition.setName(newContextName);
+        if (StringUtils.isNotBlank(newContextName))
+          contextDefinition.setName(newContextName);
         contextDefinition.setBranch(branch);
         contextDefinition.setLibraryRoot(libraryRoot);
         contextDefinition.setRefreshInterval(refreshIntervalSeconds);

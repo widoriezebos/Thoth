@@ -8,7 +8,7 @@ public class RendererTest extends ThothTestBase implements RendererProvider {
   @Override
   public Renderer getRenderer(String typeCode) {
     try {
-      return new HtmlRenderer(createThothContext("dummy"), this);
+      return new HtmlRenderer(createThothTestEnvironment("dummy"), this);
     } catch (ContentManagerException e) {
       throw new IllegalArgumentException(e);
     }

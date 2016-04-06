@@ -16,6 +16,8 @@ package net.riezebos.thoth.context;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.riezebos.thoth.util.ThothUtil;
 
 public class ContextDefinition implements Cloneable, Comparable<ContextDefinition> {
@@ -47,8 +49,13 @@ public class ContextDefinition implements Cloneable, Comparable<ContextDefinitio
     this.id = id;
   }
 
+  @JsonIgnore
   public RepositoryDefinition getRepositoryDefinition() {
     return repositoryDefinition;
+  }
+
+  public String getRepositoryName() {
+    return repositoryDefinition == null ? null : repositoryDefinition.getName();
   }
 
   public String getName() {

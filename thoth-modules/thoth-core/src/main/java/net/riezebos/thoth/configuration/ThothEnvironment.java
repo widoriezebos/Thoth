@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.configuration.persistence.ThothDB;
 import net.riezebos.thoth.content.ContentManager;
+import net.riezebos.thoth.content.comments.CommentManager;
+import net.riezebos.thoth.content.comments.dao.CommentDao;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
 import net.riezebos.thoth.content.impl.FSContentManager;
 import net.riezebos.thoth.content.impl.GitContentManager;
@@ -49,6 +51,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
 
   private volatile FinalWrapper<ThothDB> thothDbWrapper = null;
   private volatile FinalWrapper<UserManager> userManagerWrapper = null;
+  private volatile FinalWrapper<CommentManager> commentManagerWrapper = null;
   private volatile FinalWrapper<ContextManager> contextManagerWrapper = null;
   private volatile FinalWrapper<ExpiringCache<String, Integer>> expiringCacheWrapper = null;
 
@@ -330,6 +333,31 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   }
 
   /**
+   * This method is synchronized to make sure there will ever only be one CommentManager for this environment.
+   *
+   * @return
+   * @throws SQLException
+   */
+  public CommentManager getCommentManager() throws ContentManagerException {
+    FinalWrapper<CommentManager> wrapper = commentManagerWrapper;
+    if (wrapper == null) {
+      synchronized (this) {
+        wrapper = commentManagerWrapper;
+        if (wrapper == null) {
+          wrapper = setCommentManager(new CommentDao(getThothDB()));
+        }
+      }
+    }
+    return wrapper.value;
+  }
+
+  public FinalWrapper<CommentManager> setCommentManager(CommentManager commentManager) {
+    FinalWrapper<CommentManager> result = new FinalWrapper<CommentManager>(commentManager);
+    commentManagerWrapper = result;
+    return result;
+  }
+
+  /**
    * This method is synchronized to make sure there will ever only be one ContextManager for this environment.
    *
    * @return
@@ -358,5 +386,4 @@ public class ThothEnvironment implements ConfigurationChangeListener {
     contextManagerWrapper = result;
     return result;
   }
-
 }

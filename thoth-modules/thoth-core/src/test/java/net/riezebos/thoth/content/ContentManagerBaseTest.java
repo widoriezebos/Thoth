@@ -38,7 +38,7 @@ public class ContentManagerBaseTest extends ThothTestBase {
     String BUILT_IN_CSS_MARKER = "Avenir Next";
 
     String contextName = "MockedContext";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
 
     Skin testReposSkin2 = contentManager.getSkinManager().getSkinByName("TestReposSkin2");

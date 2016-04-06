@@ -49,6 +49,7 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.AccessManager;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.ContentManagerBase;
+import net.riezebos.thoth.content.comments.CommentManager;
 import net.riezebos.thoth.content.impl.ClasspathContentManager;
 import net.riezebos.thoth.content.impl.FSContentManager;
 import net.riezebos.thoth.content.impl.util.TestFSContentManager;
@@ -77,11 +78,12 @@ public class ThothTestBase {
   private String latestContentType;
   private Integer latestError;
 
-  protected ThothEnvironment createThothContext(String contextName) throws ContextNotFoundException, ContentManagerException {
+  protected ThothEnvironment createThothTestEnvironment(String contextName) throws ContextNotFoundException, ContentManagerException {
     ThothEnvironment thothEnvironment = new ThothEnvironment();
     Configuration mockedConfiguration = mockConfiguration(contextName);
     thothEnvironment.setConfiguration(mockedConfiguration);
     thothEnvironment.setUserManager(getTestUserManager());
+    thothEnvironment.setCommentManager(getTestCommentManager());
     thothEnvironment.setContextManager(getTestContextManager(thothEnvironment));
     return thothEnvironment;
   }
@@ -94,6 +96,10 @@ public class ThothTestBase {
 
   protected UserManager getTestUserManager() {
     return new TestUserManager();
+  }
+
+  protected CommentManager getTestCommentManager() {
+    return new TestCommentManager();
   }
 
   protected ContentManager createTestContentManager(ThothEnvironment thothEnvironment, String contextName) throws IOException, ContentManagerException {
@@ -113,7 +119,7 @@ public class ThothTestBase {
   }
 
   protected FSContentManager createTempFSContentManager(String contextName) throws IOException, ContentManagerException {
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     File tmpFile = File.createTempFile("thoth", "test");
     tmpFile.deleteOnExit();
     String fsroot = ThothUtil.suffix(ThothUtil.normalSlashes(tmpFile.getParent()), "/") + "fstestroot/";
@@ -140,16 +146,12 @@ public class ThothTestBase {
   }
 
   protected ContextDefinition mockContextDefinition(String contextName) {
-    RepositoryDefinition mockedRepos = mock(RepositoryDefinition.class);
-    when(mockedRepos.getLocation()).thenReturn("/");
-    when(mockedRepos.getName()).thenReturn("MockedRepos");
-    when(mockedRepos.getType()).thenReturn(RepositoryType.NOP);
+    RepositoryDefinition repositoryDefinition = new RepositoryDefinition();
+    repositoryDefinition.setLocation("/");
+    repositoryDefinition.setName("MockedRepos");
+    repositoryDefinition.setType(RepositoryType.NOP);
 
-    ContextDefinition mockedContext = mock(ContextDefinition.class);
-    when(mockedContext.getRepositoryDefinition()).thenReturn(mockedRepos);
-    when(mockedContext.getName()).thenReturn(contextName);
-    when(mockedContext.getRefreshInterval()).thenReturn(0L);
-    return mockedContext;
+    return new ContextDefinition(repositoryDefinition, contextName, "branch", "/", 0);
   }
 
   protected Configuration mockConfiguration(String contextName) throws ContextManagerException {

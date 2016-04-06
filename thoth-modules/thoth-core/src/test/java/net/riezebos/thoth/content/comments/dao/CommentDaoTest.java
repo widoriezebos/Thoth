@@ -1,6 +1,6 @@
 package net.riezebos.thoth.content.comments.dao;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -63,6 +63,14 @@ public class CommentDaoTest extends DatabaseTest {
 
       comments = dao.getComments(documentPath, userName);
       assertEquals(1, comments.size());
+
+      Long id = comment.getId();
+      Comment comment2 = dao.getComment(id);
+      assertEquals(title+"2", comment2.getTitle());
+
+      dao.deleteComment(id);
+      comment = dao.getComment(id);
+      assertNull(comment);
 
     } finally {
       cleanupTempFolder();

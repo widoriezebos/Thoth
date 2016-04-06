@@ -72,7 +72,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
   }
 
   protected ThothEnvironment setupContentManager() throws ContextNotFoundException, ContentManagerException, IOException {
-    thothEnvironment = createThothContext(contextName);
+    thothEnvironment = createThothTestEnvironment(contextName);
     contentManager = createTestContentManager(thothEnvironment, contextName);
     thothEnvironment.registerContentManager(contentManager);
     return thothEnvironment;
@@ -81,7 +81,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
   @Override
   public Renderer getRenderer(String typeCode) {
     try {
-      return new HtmlRenderer(createThothContext("dummy"), this);
+      return new HtmlRenderer(createThothTestEnvironment("dummy"), this);
     } catch (ContentManagerException e) {
       throw new IllegalArgumentException(e);
     }

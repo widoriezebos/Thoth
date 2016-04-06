@@ -32,7 +32,7 @@ public class AutoRefresherTest extends ThothTestBase {
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
 
     String contextName = "RefreshContext";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
 
     AutoRefresher refresher = new AutoRefresher(0, contentManager);

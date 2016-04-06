@@ -36,7 +36,7 @@ public class HtmlRendererTest extends RendererTest {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
     String contextName = "TestContext";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
     Skin testSkin = getSkin(contentManager);
 
@@ -61,7 +61,7 @@ public class HtmlRendererTest extends RendererTest {
   public void testTable() throws ContextNotFoundException, ContentManagerException, IOException {
 
     String contextName = "TestContext";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
 
     HtmlRenderer renderer = new HtmlRenderer(thothEnvironment, this);

@@ -37,7 +37,7 @@ public class ThothContextTest extends ThothTestBase {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException, ConfigurationException {
     Date now = new Date();
-    ThothEnvironment thothEnvironment = createThothContext("indextest");
+    ThothEnvironment thothEnvironment = createThothTestEnvironment("indextest");
 
     PropertyBasedConfiguration configuration = new PropertyBasedConfiguration();
     configuration.load(getClassPathResource(CONFIG_FILE));

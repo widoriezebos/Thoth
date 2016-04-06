@@ -3,6 +3,8 @@ package net.riezebos.thoth.content.sections;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.riezebos.thoth.content.comments.Comment;
 
 public class Section {
@@ -52,6 +54,7 @@ public class Section {
     parent = section;
   }
 
+  @JsonIgnore
   public Section getParent() {
     return parent;
   }

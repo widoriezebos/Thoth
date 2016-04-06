@@ -12,18 +12,20 @@ import net.riezebos.thoth.configuration.persistence.ThothDB;
 import net.riezebos.thoth.configuration.persistence.dbs.SequenceGenerator;
 import net.riezebos.thoth.configuration.persistence.dbs.SqlStatement;
 import net.riezebos.thoth.content.comments.Comment;
+import net.riezebos.thoth.content.comments.CommentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.util.BaseDao;
 import net.riezebos.thoth.util.ThothUtil;
 
-public class CommentDao extends BaseDao {
+public class CommentDao extends BaseDao implements CommentManager {
   private ThothDB thothDB;
 
   public CommentDao(ThothDB thothDB) {
     this.thothDB = thothDB;
   }
 
+  @Override
   public Comment createComment(Comment comment) throws ContentManagerException {
     try (Connection connection = thothDB.getConnection(); //
         SqlStatement commentStmt = new SqlStatement(connection, thothDB.getQuery("insert_comment"));
@@ -50,6 +52,7 @@ public class CommentDao extends BaseDao {
     }
   }
 
+  @Override
   public boolean deleteComment(long id) throws ContentManagerException {
     try (Connection connection = thothDB.getConnection(); //
         SqlStatement commentStmt = new SqlStatement(connection, thothDB.getQuery("delete_comment"));
@@ -68,10 +71,12 @@ public class CommentDao extends BaseDao {
     }
   }
 
+  @Override
   public boolean deleteComment(Comment comment) throws ContentManagerException {
     return deleteComment(comment.getId());
   }
 
+  @Override
   public List<Comment> getComments(String documentpath, String userName) throws ContentManagerException {
     try (Connection connection = thothDB.getConnection(); //
         SqlStatement commentStmt = constructCommentQuery(connection, ThothUtil.stripPrefix(documentpath, "/"), userName)) {
@@ -97,6 +102,7 @@ public class CommentDao extends BaseDao {
     }
   }
   
+  @Override
   public Comment getComment(long id) throws ContentManagerException {
     try (Connection connection = thothDB.getConnection(); //
         SqlStatement commentStmt = new SqlStatement(connection, thothDB.getQuery("select_comment"))) {

@@ -21,7 +21,7 @@ public class GitContentManagerTest extends ThothTestBase {
   public void test() throws ContentManagerException {
     String contextName = "testgit";
 
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     RepositoryDefinition repodef = new RepositoryDefinition();
     repodef.setLocation("http://someserver/somerepos.git");
     repodef.setName("testrepos");

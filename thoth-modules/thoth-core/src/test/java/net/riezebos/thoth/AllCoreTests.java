@@ -19,11 +19,13 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import net.riezebos.thoth.commands.BrowseCommandTest;
+import net.riezebos.thoth.commands.CommentCommandTest;
 import net.riezebos.thoth.commands.ContextIndexCommandTest;
 import net.riezebos.thoth.commands.DiffCommandTest;
 import net.riezebos.thoth.commands.ErrorPageCommandTest;
 import net.riezebos.thoth.commands.IndexCommandTest;
 import net.riezebos.thoth.commands.LoginCommandTest;
+import net.riezebos.thoth.commands.ManageContextsCommandTest;
 import net.riezebos.thoth.commands.ManageUsersCommandTest;
 import net.riezebos.thoth.commands.MetaCommandTest;
 import net.riezebos.thoth.commands.PullCommandTest;
@@ -74,7 +76,7 @@ import net.riezebos.thoth.util.diff_match_patchTest;
     ZipContentManagerTest.class, ThothCoreUtilTest.class, diff_match_patchTest.class, //
     HotReloadableConfigurationTest.class, BasicUserManagerTest.class, PasswordUtilTest.class, DatabaseIdiomFactoryTest.class, //
     SqlStatementTest.class, LoginCommandTest.class, ManageUsersCommandTest.class, UserProfileCommandTest.class, //
-    BasicContextManagerTest.class, CommentDaoTest.class})
+    BasicContextManagerTest.class, CommentDaoTest.class, CommentCommandTest.class, ManageContextsCommandTest.class})
 
 public class AllCoreTests {
 

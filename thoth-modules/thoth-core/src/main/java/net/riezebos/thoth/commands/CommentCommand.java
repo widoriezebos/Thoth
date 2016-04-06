@@ -41,7 +41,7 @@ import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.content.comments.Comment;
-import net.riezebos.thoth.content.comments.dao.CommentDao;
+import net.riezebos.thoth.content.comments.CommentManager;
 import net.riezebos.thoth.content.sections.Section;
 import net.riezebos.thoth.content.skinning.Skin;
 import net.riezebos.thoth.exceptions.ContentManagerException;
@@ -57,10 +57,14 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class CommentCommand extends RendererBase implements Command {
 
-  private static final String DOCPATH_ARGUMENT = "docpath";
-  private static final String COMMENTTEXT_ARGUMENT = "commenttext";
-  private static final String COMMENTID_ARGUMENT = "commentid";
   public static final String OPERATION_ARGUMENT = "operation";
+  public static final String CREATE = "create";
+  public static final String COPY = "copy";
+  public static final String DELETE = "delete";
+  public static final String DOCPATH_ARGUMENT = "docpath";
+  public static final String COMMENTTEXT_ARGUMENT = "commenttext";
+  public static final String COMMENTID_ARGUMENT = "commentid";
+  public static final String EDIT_TEXT = "editText";
 
   public CommentCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
     super(thothEnvironment, rendererProvider);
@@ -91,86 +95,6 @@ public class CommentCommand extends RendererBase implements Command {
     } catch (Exception e) {
       throw new RenderException(e);
     }
-  }
-
-  protected RenderResult handleOperation(String operationCode, Identity identity, String contextName, String path, Map<String, Object> arguments, Skin skin,
-      OutputStream outputStream, ContentManager contentManager)
-      throws ContextNotFoundException, UnsupportedEncodingException, IOException, ContentManagerException, ServletException {
-
-    RenderResult result = RenderResult.OK;
-
-    switch (operationCode) {
-    case "create":
-      result = createComment(identity, path, arguments, contentManager);
-      break;
-    case "delete":
-      result = deleteComment(identity, path, arguments, contentManager);
-      break;
-    case "copy":
-      result = copyComment(identity, path, arguments, contentManager);
-      break;
-    default:
-      break;
-    }
-
-    if (!result.equals(RenderResult.OK))
-      return result;
-    else
-      return handleRender(identity, contextName, path, arguments, skin, outputStream, contentManager);
-  }
-
-  protected RenderResult createComment(Identity identity, String path, Map<String, Object> arguments, ContentManager contentManager)
-      throws ContentManagerException {
-    String text = (String) arguments.get(COMMENTTEXT_ARGUMENT);
-    String docpath = (String) arguments.get(DOCPATH_ARGUMENT);
-    if (!StringUtils.isBlank(text) && !StringUtils.isBlank(docpath)) {
-      CommentDao commentDao = new CommentDao(getThothEnvironment().getThothDB());
-      Comment comment = new Comment();
-      comment.setDocumentPath(docpath);
-      comment.setUserName(identity.getIdentifier());
-      comment.setBody(text);
-      commentDao.createComment(comment);
-    }
-    return RenderResult.OK;
-  }
-
-  protected RenderResult deleteComment(Identity identity, String path, Map<String, Object> arguments, ContentManager contentManager)
-      throws ContentManagerException {
-
-    String text = (String) arguments.get(COMMENTID_ARGUMENT);
-    if (!StringUtils.isBlank(text)) {
-      long id = Long.parseLong(text);
-      CommentDao commentDao = new CommentDao(getThothEnvironment().getThothDB());
-      Comment comment = commentDao.getComment(id);
-      if (comment != null) {
-        boolean isCreator = comment != null && comment.getUserName().equals(identity.getIdentifier());
-
-        if (isCreator && contentManager.getAccessManager().hasPermission(identity, path, Permission.DELETE_ANY_COMMENT))
-          commentDao.deleteComment(comment);
-        else
-          return RenderResult.FORBIDDEN;
-      }
-    }
-    return RenderResult.OK;
-  }
-
-  protected RenderResult copyComment(Identity identity, String path, Map<String, Object> arguments, ContentManager contentManager)
-      throws ContentManagerException {
-
-    String text = (String) arguments.get(COMMENTID_ARGUMENT);
-    if (!StringUtils.isBlank(text)) {
-      long id = Long.parseLong(text);
-      CommentDao commentDao = new CommentDao(getThothEnvironment().getThothDB());
-      Comment comment = commentDao.getComment(id);
-      boolean isCreator = comment != null && comment.getUserName().equals(identity.getIdentifier());
-
-      if (isCreator && contentManager.getAccessManager().hasPermission(identity, path, Permission.EDIT_ANY_COMMENT)) {
-        String body = comment.getBody();
-        arguments.put("editText", body);
-      } else
-        return RenderResult.FORBIDDEN;
-    }
-    return RenderResult.OK;
   }
 
   protected RenderResult handleRender(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream,
@@ -208,14 +132,94 @@ public class CommentCommand extends RendererBase implements Command {
     return RenderResult.OK;
   }
 
+  protected RenderResult handleOperation(String operationCode, Identity identity, String contextName, String path, Map<String, Object> arguments, Skin skin,
+      OutputStream outputStream, ContentManager contentManager)
+      throws ContextNotFoundException, UnsupportedEncodingException, IOException, ContentManagerException, ServletException {
+
+    RenderResult result = RenderResult.OK;
+
+    switch (operationCode) {
+    case CREATE:
+      result = createComment(identity, path, arguments, contentManager);
+      break;
+    case DELETE:
+      result = deleteComment(identity, path, arguments, contentManager);
+      break;
+    case COPY:
+      result = copyComment(identity, path, arguments, contentManager);
+      break;
+    default:
+      break;
+    }
+
+    if (!result.equals(RenderResult.OK))
+      return result;
+    else
+      return handleRender(identity, contextName, path, arguments, skin, outputStream, contentManager);
+  }
+
+  protected RenderResult createComment(Identity identity, String path, Map<String, Object> arguments, ContentManager contentManager)
+      throws ContentManagerException {
+    String text = (String) arguments.get(COMMENTTEXT_ARGUMENT);
+    String docpath = (String) arguments.get(DOCPATH_ARGUMENT);
+    if (!StringUtils.isBlank(text) && !StringUtils.isBlank(docpath)) {
+      CommentManager commentManager = getThothEnvironment().getCommentManager();
+      Comment comment = new Comment();
+      comment.setDocumentPath(docpath);
+      comment.setUserName(identity.getIdentifier());
+      comment.setBody(text);
+      commentManager.createComment(comment);
+    }
+    return RenderResult.OK;
+  }
+
+  protected RenderResult deleteComment(Identity identity, String path, Map<String, Object> arguments, ContentManager contentManager)
+      throws ContentManagerException {
+
+    String text = (String) arguments.get(COMMENTID_ARGUMENT);
+    if (!StringUtils.isBlank(text)) {
+      long id = Long.parseLong(text);
+      CommentManager commentManager = getThothEnvironment().getCommentManager();
+      Comment comment = commentManager.getComment(id);
+      if (comment != null) {
+        boolean isCreator = comment != null && comment.getUserName().equals(identity.getIdentifier());
+
+        if (isCreator && contentManager.getAccessManager().hasPermission(identity, path, Permission.DELETE_ANY_COMMENT))
+          commentManager.deleteComment(comment);
+        else
+          return RenderResult.FORBIDDEN;
+      }
+    }
+    return RenderResult.OK;
+  }
+
+  protected RenderResult copyComment(Identity identity, String path, Map<String, Object> arguments, ContentManager contentManager)
+      throws ContentManagerException {
+
+    String text = (String) arguments.get(COMMENTID_ARGUMENT);
+    if (!StringUtils.isBlank(text)) {
+      long id = Long.parseLong(text);
+      CommentManager commentManager = getThothEnvironment().getCommentManager();
+      Comment comment = commentManager.getComment(id);
+      boolean isCreator = comment != null && comment.getUserName().equals(identity.getIdentifier());
+
+      if (isCreator && contentManager.getAccessManager().hasPermission(identity, path, Permission.EDIT_ANY_COMMENT)) {
+        String body = comment.getBody();
+        arguments.put(EDIT_TEXT, body);
+      } else
+        return RenderResult.FORBIDDEN;
+    }
+    return RenderResult.OK;
+  }
+
   protected Section parseSections(String body, String fileName) throws ContentManagerException {
-    CommentDao commentDao = new CommentDao(getThothEnvironment().getThothDB());
+    CommentManager commentManager = getThothEnvironment().getCommentManager();
     Pattern sectionStartPattern = Pattern.compile("@@@detailstart@@@(.*?)@@@");
     Pattern sectionEndPattern = Pattern.compile("@@@detailend@@@");
 
     Stack<Section> sections = new Stack<>();
     Section main = new Section(fileName);
-    main.setComments(commentDao.getComments(fileName, null));
+    main.setComments(commentManager.getComments(fileName, null));
     sections.push(main);
 
     for (String line : body.split("\n")) {
@@ -223,7 +227,7 @@ public class CommentCommand extends RendererBase implements Command {
       if (matcher.find()) {
         String path = matcher.group(1);
         Section subSection = new Section(path);
-        List<Comment> comments = commentDao.getComments(path, null);
+        List<Comment> comments = commentManager.getComments(path, null);
         subSection.setComments(comments);
         sections.peek().addSection(subSection);
         sections.push(subSection);

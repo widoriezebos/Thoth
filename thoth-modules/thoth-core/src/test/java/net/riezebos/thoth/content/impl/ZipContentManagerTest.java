@@ -27,7 +27,7 @@ public class ZipContentManagerTest extends ThothTestBase {
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
 
     String contextName = "testzip";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
 
     ClasspathFileSystem cpFS = new ClasspathFileSystem("/net/riezebos/thoth");
     cpFS.registerFile("/markdown.zip", 0L, 0L);

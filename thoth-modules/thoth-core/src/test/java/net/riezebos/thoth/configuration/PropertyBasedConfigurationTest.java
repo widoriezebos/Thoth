@@ -93,7 +93,7 @@ public class PropertyBasedConfigurationTest extends ThothTestBase {
     assertTrue(config.isResource("nothing.properties"));
 
     String contextName = "justatest";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     ContentManager testContentManager = createTestContentManager(thothEnvironment, contextName);
     CacheManager cacheManager = testContentManager.getCacheManager();
     ArrayList<ProcessorError> errors = new ArrayList<>();

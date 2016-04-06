@@ -40,7 +40,7 @@ public class CustomRendererTest extends RendererTest {
     String source = "html";
     String commandLine = "output={${output}} url={${url}}";
 
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     ContentManager contentManager = createTestContentManager(thothEnvironment, contextName);
 
     TestRendererProvider testRendererProvider = new TestRendererProvider(thothEnvironment);

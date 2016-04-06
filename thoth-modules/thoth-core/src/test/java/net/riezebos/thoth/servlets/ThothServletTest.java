@@ -50,7 +50,7 @@ public class ThothServletTest extends ThothTestBase {
     String path = "/main/Fourth.md";
 
     setRequestParameter("output", "raw");
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     createTestContentManager(thothEnvironment, contextName);
 
     HttpServletRequest request = createHttpRequest(contextName, path);
@@ -139,7 +139,7 @@ public class ThothServletTest extends ThothTestBase {
 
     String contextName = "TestContext";
     String path = "/main/Fourth.md";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     createTestContentManager(thothEnvironment, contextName);
 
     HttpServletRequest request = createHttpRequest(contextName, path);
@@ -162,7 +162,7 @@ public class ThothServletTest extends ThothTestBase {
 
     String contextName = "TestContext";
     String path = "/";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     createTestContentManager(thothEnvironment, contextName);
 
     setRequestParameter("mode", "json");

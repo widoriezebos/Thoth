@@ -50,7 +50,7 @@ public class SearcherTest extends ThothTestBase {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
     String contextName = "searchtest";
-    ThothEnvironment thothEnvironment = createThothContext(contextName);
+    ThothEnvironment thothEnvironment = createThothTestEnvironment(contextName);
     UserManager userManager = thothEnvironment.getUserManager();
     User user = userManager.getUser("administrator");
 
