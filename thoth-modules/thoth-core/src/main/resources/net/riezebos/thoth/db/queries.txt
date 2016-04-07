@@ -1,3 +1,9 @@
+get_schema_version = 
+    select version 
+    from   thoth_version
+    where  name = 'thoth' 
+;
+
 insert_identity =
     insert into thoth_identities(id, identifier) 
     values (:id, :identifier)
@@ -169,19 +175,19 @@ delete_repository =
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 select_comments = 
-    select id, username, documentpath, timecreated, title
+    select id, username, contextname, documentpath, timecreated, title
     from   thoth_comments
 ;
     
 select_comment = 
-    select username, documentpath, timecreated, title
+    select username, contextname, documentpath, timecreated, title
     from   thoth_comments
     where  id = :id
 ;
     
 insert_comment =
-    insert into thoth_comments(id, username, documentpath, timecreated, title) 
-    values (:id, :username, :documentpath, :timecreated, :title) 
+    insert into thoth_comments(id, username, contextname, documentpath, timecreated, title) 
+    values (:id, :username, :contextname, :documentpath, :timecreated, :title) 
 ;
 
 delete_comment =

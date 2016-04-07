@@ -7,10 +7,6 @@ public class UserManagerException extends ContentManagerException {
     super(e);
   }
 
-  public UserManagerException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
   public UserManagerException(String message) {
     super(message);
   }

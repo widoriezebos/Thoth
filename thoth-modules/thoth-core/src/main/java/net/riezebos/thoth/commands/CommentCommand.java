@@ -66,6 +66,10 @@ public class CommentCommand extends RendererBase implements Command {
   public static final String COMMENTID_ARGUMENT = "commentid";
   public static final String EDIT_TEXT = "editText";
 
+  private static final String MARKER = "@@@";
+  private static final String DETAILSTART = MARKER + "detailstart" + MARKER;
+  private static final String DETAILEND = MARKER + "detailend" + MARKER;
+
   public CommentCommand(ThothEnvironment thothEnvironment, RendererProvider rendererProvider) {
     super(thothEnvironment, rendererProvider);
   }
@@ -97,7 +101,7 @@ public class CommentCommand extends RendererBase implements Command {
     }
   }
 
-  protected RenderResult handleRender(Identity identity, String context, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream,
+  protected RenderResult handleRender(Identity identity, String contextName, String path, Map<String, Object> arguments, Skin skin, OutputStream outputStream,
       ContentManager contentManager) throws IOException, ContextNotFoundException, ContentManagerException, ServletException, UnsupportedEncodingException {
     MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(path, suppressErrors(arguments), getCriticProcessingMode(arguments));
     String markdownSource = annotateSections(markDownDocument.getMarkdown());
@@ -111,7 +115,7 @@ public class CommentCommand extends RendererBase implements Command {
     CustomHtmlSerializer serializer = new CustomHtmlSerializer(new LinkRenderer());
     String body = serializer.toHtml(ast);
 
-    Section section = parseSections(body, markDownDocument.getPath());
+    Section section = parseSections(body, contextName, markDownDocument.getPath());
 
     Map<String, String> metatags = markDownDocument.getMetatags();
     List<String> metaTagKeys = new ArrayList<>(metatags.keySet());
@@ -127,7 +131,7 @@ public class CommentCommand extends RendererBase implements Command {
       executeJson(variables, outputStream);
     else {
       String metaInformationTemplate = skin.getCommentTemplate();
-      renderTemplate(metaInformationTemplate, context, variables, outputStream);
+      renderTemplate(metaInformationTemplate, contextName, variables, outputStream);
     }
     return RenderResult.OK;
   }
@@ -140,7 +144,7 @@ public class CommentCommand extends RendererBase implements Command {
 
     switch (operationCode) {
     case CREATE:
-      result = createComment(identity, path, arguments, contentManager);
+      result = createComment(identity, contextName, path, arguments, contentManager);
       break;
     case DELETE:
       result = deleteComment(identity, path, arguments, contentManager);
@@ -158,13 +162,14 @@ public class CommentCommand extends RendererBase implements Command {
       return handleRender(identity, contextName, path, arguments, skin, outputStream, contentManager);
   }
 
-  protected RenderResult createComment(Identity identity, String path, Map<String, Object> arguments, ContentManager contentManager)
+  protected RenderResult createComment(Identity identity, String contextName, String path, Map<String, Object> arguments, ContentManager contentManager)
       throws ContentManagerException {
     String text = (String) arguments.get(COMMENTTEXT_ARGUMENT);
     String docpath = (String) arguments.get(DOCPATH_ARGUMENT);
     if (!StringUtils.isBlank(text) && !StringUtils.isBlank(docpath)) {
       CommentManager commentManager = getThothEnvironment().getCommentManager();
       Comment comment = new Comment();
+      comment.setContextName(contextName);
       comment.setDocumentPath(docpath);
       comment.setUserName(identity.getIdentifier());
       comment.setBody(text);
@@ -212,14 +217,14 @@ public class CommentCommand extends RendererBase implements Command {
     return RenderResult.OK;
   }
 
-  protected Section parseSections(String body, String fileName) throws ContentManagerException {
+  protected Section parseSections(String body, String contextName, String fileName) throws ContentManagerException {
     CommentManager commentManager = getThothEnvironment().getCommentManager();
-    Pattern sectionStartPattern = Pattern.compile("@@@detailstart@@@(.*?)@@@");
-    Pattern sectionEndPattern = Pattern.compile("@@@detailend@@@");
+    Pattern sectionStartPattern = Pattern.compile(DETAILSTART + "(.*?)" + MARKER);
+    Pattern sectionEndPattern = Pattern.compile(DETAILEND);
 
     Stack<Section> sections = new Stack<>();
     Section main = new Section(fileName);
-    main.setComments(commentManager.getComments(fileName, null));
+    main.setComments(commentManager.getComments(contextName, fileName, null));
     sections.push(main);
 
     for (String line : body.split("\n")) {
@@ -227,7 +232,7 @@ public class CommentCommand extends RendererBase implements Command {
       if (matcher.find()) {
         String path = matcher.group(1);
         Section subSection = new Section(path);
-        List<Comment> comments = commentManager.getComments(path, null);
+        List<Comment> comments = commentManager.getComments(contextName, path, null);
         subSection.setComments(comments);
         sections.peek().addSection(subSection);
         sections.push(subSection);
@@ -241,8 +246,8 @@ public class CommentCommand extends RendererBase implements Command {
   }
 
   protected String annotateSections(String markdown) {
-    String result = markdown.replaceAll("\\[//\\]\\: \\# \"Include begin\\: ([^\"]*)\"", "@@@detailstart@@@$1@@@\n");
-    result = result.replaceAll("\\[//\\]\\: \\# \"Include end\\: .*?\"", "@@@detailend@@@\n");
+    String result = markdown.replaceAll("\\[//\\]\\: \\# \"Include begin\\: ([^\"]*)\"", DETAILSTART + "$1" + MARKER + "\n");
+    result = result.replaceAll("\\[//\\]\\: \\# \"Include end\\: .*?\"", DETAILEND + "\n");
     return result;
   }
 

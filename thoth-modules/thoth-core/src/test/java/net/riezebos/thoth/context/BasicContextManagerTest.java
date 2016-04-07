@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -64,6 +65,10 @@ public class BasicContextManagerTest extends DatabaseTest {
         ContextDefinition contextDefinition3 = contextManager.getContextDefinition("contextname");
         assertEquals("branch2", contextDefinition3.getBranch());
 
+        List<String> contexts = contextManager.getContextNames();
+        assertTrue(contexts.contains("contextname"));
+
+        assertTrue(contextManager.isValidContext("contextname"));
         assertTrue(contextManager.isInUse(repoDef));
         assertNotNull(contextManager.getContextDefinitions().get("contextname"));
         contextManager.deleteContextDefinition(contextDefinition3);

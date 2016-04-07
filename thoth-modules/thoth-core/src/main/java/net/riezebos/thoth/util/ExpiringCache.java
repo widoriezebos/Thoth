@@ -42,15 +42,7 @@ public class ExpiringCache<K, T> implements Serializable {
   public T get(K key) {
     purgeExpired();
     synchronized (this) {
-      T result = cache.get(key);
-      if (result != null) {
-        long maxAge = maximumAge.get(key);
-        if (maxAge < System.currentTimeMillis()) {
-          result = null;
-          doRemove(key);
-        }
-      }
-      return result;
+      return cache.get(key);
     }
   }
 

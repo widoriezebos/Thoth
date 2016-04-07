@@ -85,7 +85,7 @@ public class TestContextManager implements ContextManager {
   }
 
   @Override
-  public List<String> getContexts() throws ContextManagerException {
+  public List<String> getContextNames() throws ContextManagerException {
     List<String> result = new ArrayList<>();
     for (ContextDefinition def : getContextDefinitions().values())
       result.add(def.getName());

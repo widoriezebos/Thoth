@@ -50,6 +50,9 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/markdown.css">
   </head>
   <body>
+    <h1>Comment on ${title}<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
+    <a href="${contexturl}">Back to Index</a>
+
     #displaySection($mainsection)
     
     #if($scrollto)

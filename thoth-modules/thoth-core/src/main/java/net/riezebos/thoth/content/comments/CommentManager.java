@@ -12,7 +12,7 @@ public interface CommentManager {
 
   boolean deleteComment(Comment comment) throws ContentManagerException;
 
-  List<Comment> getComments(String documentpath, String userName) throws ContentManagerException;
+  List<Comment> getComments(String contextName, String documentpath, String userName) throws ContentManagerException;
 
   Comment getComment(long id) throws ContentManagerException;
 

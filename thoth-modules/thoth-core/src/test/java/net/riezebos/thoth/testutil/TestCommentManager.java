@@ -39,7 +39,7 @@ public class TestCommentManager implements CommentManager {
   }
 
   @Override
-  public List<Comment> getComments(String documentpath, String userName) throws ContentManagerException {
+  public List<Comment> getComments(String contextName, String documentpath, String userName) throws ContentManagerException {
     String searchPath = ThothUtil.stripPrefix(documentpath, "/");
     return comments.stream() //
         .filter(c -> (searchPath == null || c.getDocumentPath().equals(searchPath)) //

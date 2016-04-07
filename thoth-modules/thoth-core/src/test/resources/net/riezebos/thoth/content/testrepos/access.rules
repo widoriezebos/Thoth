@@ -1,0 +1,8 @@
+/public/path/* RequireNone
+
+/private/readers/* Require readers
+/private/writers/* Require writers
+/private/admin/* Require administrators
+/private/trusted/* RequireAll administrators, writers
+
+* RequireAny readers, writers, administrators

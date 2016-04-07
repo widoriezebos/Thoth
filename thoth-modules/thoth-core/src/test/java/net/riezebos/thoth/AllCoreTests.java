@@ -39,9 +39,12 @@ import net.riezebos.thoth.configuration.HotReloadableConfigurationTest;
 import net.riezebos.thoth.configuration.PropertyBasedConfigurationTest;
 import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiomFactoryTest;
 import net.riezebos.thoth.configuration.persistence.dbs.SqlStatementTest;
+import net.riezebos.thoth.content.AccessManagerTest;
+import net.riezebos.thoth.content.AccessRuleTest;
 import net.riezebos.thoth.content.AutoRefresherTest;
 import net.riezebos.thoth.content.ContentManagerBaseTest;
 import net.riezebos.thoth.content.ThothContextTest;
+import net.riezebos.thoth.content.comments.CommentTest;
 import net.riezebos.thoth.content.comments.dao.CommentDaoTest;
 import net.riezebos.thoth.content.impl.FSContentManagerTest;
 import net.riezebos.thoth.content.impl.GitContentManagerTest;
@@ -57,10 +60,12 @@ import net.riezebos.thoth.exceptions.ExceptionTest;
 import net.riezebos.thoth.renderers.CustomRendererTest;
 import net.riezebos.thoth.renderers.HtmlRendererTest;
 import net.riezebos.thoth.renderers.RawRendererTest;
+import net.riezebos.thoth.renderers.util.CustomRendererDefinitionTest;
 import net.riezebos.thoth.servlets.ThothServletTest;
 import net.riezebos.thoth.user.BasicUserManagerTest;
 import net.riezebos.thoth.user.PasswordUtilTest;
 import net.riezebos.thoth.util.DiscardingListTest;
+import net.riezebos.thoth.util.ExpiringCacheTest;
 import net.riezebos.thoth.util.ThothCoreUtilTest;
 import net.riezebos.thoth.util.diff_match_patchTest;
 
@@ -76,7 +81,9 @@ import net.riezebos.thoth.util.diff_match_patchTest;
     ZipContentManagerTest.class, ThothCoreUtilTest.class, diff_match_patchTest.class, //
     HotReloadableConfigurationTest.class, BasicUserManagerTest.class, PasswordUtilTest.class, DatabaseIdiomFactoryTest.class, //
     SqlStatementTest.class, LoginCommandTest.class, ManageUsersCommandTest.class, UserProfileCommandTest.class, //
-    BasicContextManagerTest.class, CommentDaoTest.class, CommentCommandTest.class, ManageContextsCommandTest.class})
+    BasicContextManagerTest.class, CommentDaoTest.class, CommentCommandTest.class, ManageContextsCommandTest.class, //
+    AccessRuleTest.class, AccessManagerTest.class, ExpiringCacheTest.class, CustomRendererDefinitionTest.class, //
+    CommentTest.class})
 
 public class AllCoreTests {
 

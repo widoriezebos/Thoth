@@ -256,3 +256,8 @@ pre>code {
 .error {
     color: #AA0000;
 }
+
+.logo {
+    height: 80px;
+    float: right;
+}

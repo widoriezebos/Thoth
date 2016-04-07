@@ -24,27 +24,30 @@ public class CommentDaoTest extends DatabaseTest {
       CommentDao dao = new CommentDao(thothDB);
 
       String body = "This is a comment";
+      String contextName = "ctxtName";
       String documentPath = "/some/path";
       String title = "Some title";
       String userName = "Wido";
 
       Comment comment = new Comment();
       comment.setBody(body);
+      comment.setContextName(contextName);
       comment.setDocumentPath(documentPath);
       comment.setTitle(title);
       comment.setUserName(userName);
       dao.createComment(comment);
 
       comment.setBody(body + "2");
+      comment.setContextName(contextName);
       comment.setDocumentPath(documentPath + "2");
       comment.setTitle(title + "2");
       comment.setUserName(userName + "2");
       dao.createComment(comment);
 
-      List<Comment> comments = dao.getComments(null, null);
+      List<Comment> comments = dao.getComments(null, null, null);
       assertEquals(2, comments.size());
 
-      comments = dao.getComments(documentPath, null);
+      comments = dao.getComments(contextName, documentPath, null);
       assertEquals(1, comments.size());
       Comment check = comments.get(0);
       assertEquals(userName, check.getUserName());
@@ -52,16 +55,16 @@ public class CommentDaoTest extends DatabaseTest {
       assertEquals(title, check.getTitle());
       assertEquals(body, check.getBody());
 
-      comments = dao.getComments("invalid", null);
+      comments = dao.getComments(contextName, "invalid", null);
       assertEquals(0, comments.size());
 
-      comments = dao.getComments(null, userName);
+      comments = dao.getComments(null, null, userName);
       assertEquals(1, comments.size());
 
-      comments = dao.getComments(null, "invalid");
+      comments = dao.getComments(null, null, "invalid");
       assertEquals(0, comments.size());
 
-      comments = dao.getComments(documentPath, userName);
+      comments = dao.getComments(contextName, documentPath, userName);
       assertEquals(1, comments.size());
 
       Long id = comment.getId();

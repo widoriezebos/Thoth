@@ -21,7 +21,7 @@ import net.riezebos.thoth.exceptions.ContextManagerException;
 
 public interface ContextManager {
 
-  public List<String> getContexts() throws ContextManagerException;
+  public List<String> getContextNames() throws ContextManagerException;
 
   public Map<String, ContextDefinition> getContextDefinitions() throws ContextManagerException;
 

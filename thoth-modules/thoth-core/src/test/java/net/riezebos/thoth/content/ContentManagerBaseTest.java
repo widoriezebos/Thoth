@@ -74,7 +74,7 @@ public class ContentManagerBaseTest extends ThothTestBase {
     markdown = markDownDocument.getMarkdown().replaceAll("\t", "    ");
     expected = getExpected("Second.book.expected.md");
     assertTrue(stringsEqual(expected.trim(), markdown.trim()));
-    assertEquals(39022364121L, contentManager.getContextChecksum());
+    assertEquals(40110664447L, contentManager.getContextChecksum());
     assertEquals(2, contentManager.list("/books").size());
     assertEquals(1, contentManager.list("/images").size());
     assertEquals(1, contentManager.list("/images/tip.png").size());

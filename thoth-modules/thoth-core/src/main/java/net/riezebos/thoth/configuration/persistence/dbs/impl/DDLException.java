@@ -17,10 +17,6 @@ package net.riezebos.thoth.configuration.persistence.dbs.impl;
 public class DDLException extends Exception {
   private static final long serialVersionUID = 1L;
 
-  public DDLException() {
-    super();
-  }
-
   public DDLException(String message) {
     super(message);
   }

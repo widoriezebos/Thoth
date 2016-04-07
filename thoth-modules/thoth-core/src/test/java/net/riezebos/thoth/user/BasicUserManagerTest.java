@@ -2,6 +2,7 @@ package net.riezebos.thoth.user;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -83,6 +84,35 @@ public class BasicUserManagerTest extends DatabaseTest {
       newList = userManager.listUsers();
       collected = newList.stream().filter(p -> p.getIdentifier().equals("wido")).collect(Collectors.toList());
       assertTrue(collected.size() == 0);
+
+      Group someGroup = userManager.createGroup(new Group("somegroup"));
+      someGroup.grantPermission(Permission.BASIC_ACCESS);
+      someGroup.grantPermission(Permission.BROWSE);
+      someGroup.grantPermission(Permission.COMMENT);
+      userManager.updatePermissions(someGroup);
+
+      // This is tricky; but to make sure we check a real round trip through the DB we need to make
+      // sure we get caching out of the loop. Hence: use another (new) userManager
+
+      BasicUserManager otherUserManager = new BasicUserManager(getThothEnvironment());
+      Group check = otherUserManager.getGroup("somegroup");
+      assertTrue(check.getPermissions().contains(Permission.BASIC_ACCESS));
+      assertTrue(check.getPermissions().contains(Permission.BROWSE));
+      assertTrue(check.getPermissions().contains(Permission.COMMENT));
+
+      someGroup.revokePermission(Permission.COMMENT);
+      userManager.updatePermissions(someGroup);
+
+      otherUserManager = new BasicUserManager(getThothEnvironment());
+      check = otherUserManager.getGroup("somegroup");
+      assertTrue(check.getPermissions().contains(Permission.BASIC_ACCESS));
+      assertTrue(check.getPermissions().contains(Permission.BROWSE));
+      assertFalse(check.getPermissions().contains(Permission.COMMENT));
+
+      userManager.deleteIdentity(someGroup);
+      otherUserManager = new BasicUserManager(getThothEnvironment());
+      assertNull(otherUserManager.getGroup("somegroup"));
+
     } finally {
       cleanupTempFolder();
     }

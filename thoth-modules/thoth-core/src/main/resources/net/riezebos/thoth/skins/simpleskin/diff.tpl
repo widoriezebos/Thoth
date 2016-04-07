@@ -10,6 +10,7 @@
   
   <body>
     <h1>Changes to ${title}<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
+    <a href="${contexturl}">Back to Index</a>
     <br/>
     <commitmessage>
     <div>${author}, ${timestamp}</div><br/>

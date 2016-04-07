@@ -11,12 +11,13 @@ import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class Comment {
-  private static final int MAX_DEDUCE_TITLE_LENGTH = 80;
+  public static final int MAX_DEDUCE_TITLE_LENGTH = 80;
 
   private static final Logger LOG = LoggerFactory.getLogger(Comment.class);
 
   private Long id;
   private String userName;
+  private String contextName;
   private String documentPath;
   private String body;
   private String title;
@@ -29,6 +30,14 @@ public class Comment {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getContextName() {
+    return contextName;
+  }
+
+  public void setContextName(String contextName) {
+    this.contextName = contextName;
   }
 
   public String getDocumentPath() {
@@ -80,7 +89,7 @@ public class Comment {
       title = title.substring(0, idx);
     }
     if (title.length() > MAX_DEDUCE_TITLE_LENGTH)
-      title = title.substring(0, MAX_DEDUCE_TITLE_LENGTH) + "...";
+      title = title.substring(0, MAX_DEDUCE_TITLE_LENGTH - 3) + "...";
     return title;
   }
 

@@ -65,6 +65,10 @@ public class TestUserManager implements UserManager {
     readers.grantPermission(Permission.SEARCH);
     registerGroup(readers);
 
+    Group anonymous = new Group("anonymous");
+    anonymous.grantPermission(Permission.BASIC_ACCESS);
+    registerGroup(anonymous);
+
     User administrator = new User("administrator");
     administrator.setPassword(ADMINISTRATORPW);
     administrators.addMember(administrator);

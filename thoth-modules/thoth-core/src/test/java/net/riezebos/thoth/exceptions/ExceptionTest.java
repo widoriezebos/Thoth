@@ -16,6 +16,8 @@ package net.riezebos.thoth.exceptions;
 
 import org.junit.Test;
 
+import net.riezebos.thoth.configuration.persistence.dbs.impl.DDLException;
+
 public class ExceptionTest {
 
   @Test(expected = CachemanagerException.class)
@@ -121,6 +123,22 @@ public class ExceptionTest {
   @Test(expected = SearchException.class)
   public void testSearchException2() throws SearchException {
     throw new SearchException("Test");
+  }
+
+  ////////////////
+  @Test(expected = DatabaseException.class)
+  public void testDatabaseException() throws DatabaseException {
+    throw new DatabaseException("Test");
+  }
+
+  @Test(expected = DDLException.class)
+  public void testDDLException() throws DDLException {
+    throw new DDLException("Test");
+  }
+
+  @Test(expected = UserManagerException.class)
+  public void testUserManagerException() throws UserManagerException {
+    throw new UserManagerException("Test");
   }
 
   ////////////////

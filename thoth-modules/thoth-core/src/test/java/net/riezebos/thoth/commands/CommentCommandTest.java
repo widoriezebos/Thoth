@@ -44,7 +44,7 @@ public class CommentCommandTest extends CommandTest {
     args.put(CommentCommand.DOCPATH_ARGUMENT, "/some/path");
     renderResult = testCommand(commentCommand, "/", CommandOperation.POST, "comment", null, jsonExists, args);
 
-    List<Comment> comments = commentManager.getComments("/some/path", null);
+    List<Comment> comments = commentManager.getComments(TEST_CONTEXT_NAME, "/some/path", null);
     assertTrue(comments.size() == 1);
     Comment comment = comments.get(0);
 
@@ -61,7 +61,7 @@ public class CommentCommandTest extends CommandTest {
     args.put(CommentCommand.OPERATION_ARGUMENT, CommentCommand.DELETE);
     args.put(CommentCommand.COMMENTID_ARGUMENT, String.valueOf(comment.getId()));
     renderResult = testCommand(commentCommand, "/", CommandOperation.POST, "comment", null, jsonExists, args);
-    comments = commentManager.getComments("/some/path", null);
+    comments = commentManager.getComments(TEST_CONTEXT_NAME, "/some/path", null);
     assertTrue(comments.size() == 0);
 
   }

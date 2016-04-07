@@ -8,7 +8,7 @@ create table thoth_permissions (id bigint not null, grou_id bigint not null, per
 create table thoth_repositories (id bigint not null, name varchar(200), repotype varchar(30) not null, location varchar(400) not null, username varchar(400), password varchar(400), primary key (id));
 create table thoth_contexts (id bigint not null, name varchar(200), repo_id bigint not null, branch varchar(400), library varchar(400), refreshinterval int, primary key (id));
 
-create table thoth_comments (id bigint not null, username varchar(80) not null, documentpath varchar(400), timecreated timestamp not null, title varchar(400), primary key (id));
+create table thoth_comments (id bigint not null, username varchar(80) not null, contextname varchar(200) not null, documentpath varchar(400) not null, timecreated timestamp not null, title varchar(400), primary key (id));
 create table thoth_commentbodies (comm_id bigint not null, commentbody clob, primary key (comm_id));
 
 create table thoth_version (name varchar(200), version int not null, primary key (name));
@@ -33,9 +33,12 @@ create index ix_thoth_perm_grou on thoth_permissions (grou_id);
 create index ix_thoth_cont_repo on thoth_contexts (repo_id);
 create index ix_thoth_memb_iden on thoth_memberships (iden_id);
 create index ix_thoth_memb_grou on thoth_memberships (grou_id);
+create index ix_thoth_cobo_comm on thoth_commentbodies (comm_id);
+
+-- Create indexes for lookup
 create index ix_thoth_comm_user on thoth_comments (username);
 create index ix_thoth_comm_path on thoth_comments (documentpath);
-create index ix_thoth_cobo_comm on thoth_commentbodies (comm_id);
+create index ix_thoth_comm_ctxt on thoth_comments (contextname);
 
 -- Create groups administators, writers, readers
 insert into thoth_identities(id, identifier) values (1, 'thoth_administrators');
@@ -98,4 +101,4 @@ insert into thoth_sequences (sequence_name, next_val) values ('thoth_contexts', 
 insert into thoth_sequences (sequence_name, next_val) values ('thoth_comments', 1);
 
 -- Mark the version of this particular schema
-insert into thoth_version(name, version) values('thoth', 1);
+insert into thoth_version(name, version) values('thoth', 2);

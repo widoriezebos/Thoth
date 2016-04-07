@@ -21,7 +21,7 @@ public class AccessRule {
     String absPathSpec = ThothUtil.stripPrefix(pathPatternSpec, "/");
 
     pathPattern = Pattern.compile("^" + ThothUtil.fileSpec2regExp(absPathSpec) + "$");
-    String commaSeparated = groupSpec.replaceAll("\\;\\:", ",");
+    String commaSeparated = groupSpec.replaceAll("[\\;\\:]", ",");
     for (String group : commaSeparated.split(",")) {
       requires.add(group.trim());
     }

@@ -35,6 +35,7 @@ public class CommentDao extends BaseDao implements CommentManager {
       long id = sequenceGenerator.getNextValue();
       commentStmt.setLong("id", id);
       commentStmt.setString("username", comment.getUserName());
+      commentStmt.setString("contextname", comment.getContextName());
       commentStmt.setString("documentpath", comment.getDocumentPath());
       commentStmt.setString("title", comment.getTitle());
       commentStmt.setTimestamp("timecreated", comment.getTimeCreated());
@@ -77,9 +78,9 @@ public class CommentDao extends BaseDao implements CommentManager {
   }
 
   @Override
-  public List<Comment> getComments(String documentpath, String userName) throws ContentManagerException {
+  public List<Comment> getComments(String contextName, String documentpath, String userName) throws ContentManagerException {
     try (Connection connection = thothDB.getConnection(); //
-        SqlStatement commentStmt = constructCommentQuery(connection, ThothUtil.stripPrefix(documentpath, "/"), userName)) {
+        SqlStatement commentStmt = constructCommentQuery(connection, contextName, ThothUtil.stripPrefix(documentpath, "/"), userName)) {
 
       List<Comment> result = new ArrayList<>();
 
@@ -89,6 +90,7 @@ public class CommentDao extends BaseDao implements CommentManager {
           int idx = 1;
           comment.setId(rs.getLong(idx++));
           comment.setUserName(rs.getString(idx++));
+          comment.setContextName(rs.getString(idx++));
           comment.setDocumentPath(rs.getString(idx++));
           comment.setTimeCreated(rs.getTimestamp(idx++));
           comment.setTitle(rs.getString(idx++));
@@ -101,7 +103,7 @@ public class CommentDao extends BaseDao implements CommentManager {
       throw new ContentManagerException(e);
     }
   }
-  
+
   @Override
   public Comment getComment(long id) throws ContentManagerException {
     try (Connection connection = thothDB.getConnection(); //
@@ -112,10 +114,11 @@ public class CommentDao extends BaseDao implements CommentManager {
       Comment comment = null;
       try (ResultSet rs = commentStmt.executeQuery()) {
         while (rs.next()) {
-           comment = new Comment();
+          comment = new Comment();
           int idx = 1;
           comment.setId(id);
           comment.setUserName(rs.getString(idx++));
+          comment.setContextName(rs.getString(idx++));
           comment.setDocumentPath(rs.getString(idx++));
           comment.setTimeCreated(rs.getTimestamp(idx++));
           comment.setTitle(rs.getString(idx++));
@@ -128,12 +131,16 @@ public class CommentDao extends BaseDao implements CommentManager {
     }
   }
 
-
-  protected SqlStatement constructCommentQuery(Connection connection, String documentpath, String userName) throws SQLException {
+  protected SqlStatement constructCommentQuery(Connection connection, String contextName, String documentpath, String userName) throws SQLException {
     String query = thothDB.getQuery("select_comments");
     String where = "";
 
+    if (StringUtils.isNotBlank(contextName)) {
+      where += " contextname = :contextname ";
+    }
     if (StringUtils.isNotBlank(documentpath)) {
+      if (StringUtils.isNotBlank(where))
+        where += " and ";
       where += " documentpath = :documentpath ";
     }
     if (userName != null) {
@@ -147,13 +154,16 @@ public class CommentDao extends BaseDao implements CommentManager {
     query += " order by timecreated";
 
     SqlStatement sqlStatement = new SqlStatement(connection, query);
+    if (StringUtils.isNotBlank(contextName)) {
+      sqlStatement.setString("contextname", contextName);
+    }
     if (StringUtils.isNotBlank(documentpath)) {
       sqlStatement.setString("documentpath", documentpath);
     }
     if (userName != null) {
       sqlStatement.setString("username", userName);
     }
-    
+
     return sqlStatement;
   }
 

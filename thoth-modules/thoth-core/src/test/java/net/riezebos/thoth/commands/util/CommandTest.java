@@ -25,9 +25,10 @@ import net.riezebos.thoth.testutil.ThothTestBase;
 
 public class CommandTest extends ThothTestBase implements RendererProvider {
 
+  protected static String TEST_CONTEXT_NAME = "TestContext";
+
   private ContentManager contentManager;
   private ThothEnvironment thothEnvironment;
-  private String contextName = "TestContext";
 
   protected void testCommand(Command command, String path, String code, String[] htmlExists, String[] jsonExists)
       throws ContextNotFoundException, ContentManagerException, IOException, SkinManagerException, RenderException, UnsupportedEncodingException {
@@ -49,7 +50,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
 
     RenderResult renderResult = RenderResult.OK;
     if (htmlExists != null) {
-      renderResult = command.execute(getCurrentUser(thothEnvironment), contextName, path, commandOperation, arguments, skin, outputStream);
+      renderResult = command.execute(getCurrentUser(thothEnvironment), TEST_CONTEXT_NAME, path, commandOperation, arguments, skin, outputStream);
       String result = outputStream.toString("UTF-8").trim();
       for (String check : htmlExists) {
         boolean condition = result.indexOf(check) != -1;
@@ -61,7 +62,7 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
     if (jsonExists != null) {
       arguments.put("mode", "json");
       outputStream = new ByteArrayOutputStream();
-      renderResult = command.execute(getCurrentUser(thothEnvironment), contextName, path, commandOperation, arguments, skin, outputStream);
+      renderResult = command.execute(getCurrentUser(thothEnvironment), TEST_CONTEXT_NAME, path, commandOperation, arguments, skin, outputStream);
       String result = outputStream.toString("UTF-8").trim();
       assertTrue(result, result.startsWith("{\"") && result.endsWith("}"));
 
@@ -72,8 +73,8 @@ public class CommandTest extends ThothTestBase implements RendererProvider {
   }
 
   protected ThothEnvironment setupContentManager() throws ContextNotFoundException, ContentManagerException, IOException {
-    thothEnvironment = createThothTestEnvironment(contextName);
-    contentManager = createTestContentManager(thothEnvironment, contextName);
+    thothEnvironment = createThothTestEnvironment(TEST_CONTEXT_NAME);
+    contentManager = createTestContentManager(thothEnvironment, TEST_CONTEXT_NAME);
     thothEnvironment.registerContentManager(contentManager);
     return thothEnvironment;
   }

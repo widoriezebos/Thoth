@@ -137,7 +137,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
 
   // Touches all the contexts. Can be used to warm up a server
   public void touch() throws ContentManagerException {
-    for (String context : getContextManager().getContexts())
+    for (String context : getContextManager().getContextNames())
       try {
         getContentManager(context);
       } catch (ContentManagerException e) {
@@ -159,7 +159,7 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   }
 
   public void shutDown() throws ContentManagerException {
-    for (String context : getContextManager().getContexts())
+    for (String context : getContextManager().getContextNames())
       getContentManager(context).disableAutoRefresh();
     getThothDB().shutdown();
     getConfiguration().discard();
@@ -168,13 +168,13 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   public String pullAll() throws ContentManagerException {
     StringBuilder report = new StringBuilder();
 
-    for (String context : getContextManager().getContexts())
+    for (String context : getContextManager().getContextNames())
       report.append(getContentManager(context).refresh() + "\n");
     return report.toString();
   }
 
   public void reindexAll() throws ContentManagerException {
-    for (String context : getContextManager().getContexts())
+    for (String context : getContextManager().getContextNames())
       getContentManager(context).reindex();
   }
 

@@ -15,14 +15,18 @@
 package net.riezebos.thoth.configuration.persistence;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -33,12 +37,16 @@ import net.riezebos.thoth.configuration.ThothEnvironment;
 import net.riezebos.thoth.configuration.persistence.dbs.DDLExecuter;
 import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiom;
 import net.riezebos.thoth.configuration.persistence.dbs.DatabaseIdiomFactory;
+import net.riezebos.thoth.configuration.persistence.dbs.SqlStatement;
 import net.riezebos.thoth.configuration.persistence.dbs.impl.ConnectionWrapper;
 import net.riezebos.thoth.configuration.persistence.dbs.impl.DDLException;
 import net.riezebos.thoth.exceptions.DatabaseException;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class ThothDB {
+  private static final String CREATE_SCRIPT = "net/riezebos/thoth/db/create_db.ddl";
+  private static final String UPGRADE_SCRIPT_PREFIX = "net/riezebos/thoth/db/upgrade_to_";
+
   private static final Logger LOG = LoggerFactory.getLogger(ThothDB.class);
 
   private ThothEnvironment thothEnvironment;
@@ -109,9 +117,47 @@ public class ThothDB {
     DDLExecuter executer = new DDLExecuter(connection, idiom);
     boolean tableExists = executer.tableExists("thoth_users", getConfiguration().getDatabaseUser());
     if (!tableExists) {
-      executer.execute("net/riezebos/thoth/db/create_db.ddl");
+      executer.execute(CREATE_SCRIPT);
       connection.commit();
     }
+
+    performUpgrades(connection);
+  }
+
+  protected void performUpgrades(Connection connection) throws SQLException, IOException, DDLException {
+
+    int latestVersion = determineCurrentVersion();
+    int currentVersion = latestVersion;
+
+    try (SqlStatement commentStmt = new SqlStatement(connection, getQuery("get_schema_version")); //
+        ResultSet rs = commentStmt.executeQuery()) {
+      if (rs.next()) {
+        currentVersion = rs.getInt(1);
+      }
+    }
+
+    DatabaseIdiom idiom = DatabaseIdiomFactory.getDatabaseIdiom(connection);
+    DDLExecuter executer = new DDLExecuter(connection, idiom);
+
+    for (int i = currentVersion + 1; i <= latestVersion; i++) {
+      LOG.info("Upgrading schema to version " + i);
+      String upgradeScript = UPGRADE_SCRIPT_PREFIX + String.format("%03d", i) + ".ddl";
+      executer.execute(upgradeScript);
+      connection.commit();
+    }
+  }
+
+  private int determineCurrentVersion() throws IOException {
+    int result = 0;
+    InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(CREATE_SCRIPT);
+    String script = ThothUtil.readInputStream(is);
+    Pattern versionPattern = Pattern.compile("thoth_version.*values.*\\'thoth\\'\\,\\s*(\\d+)\\s*\\)", Pattern.MULTILINE);
+    Matcher matcher = versionPattern.matcher(script);
+    if (matcher.find()) {
+      String group = matcher.group(1);
+      result = Integer.parseInt(group);
+    }
+    return result;
   }
 
   public Configuration getConfiguration() {

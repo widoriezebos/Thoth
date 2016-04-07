@@ -55,7 +55,7 @@ public class IndexCommand extends RendererBase implements Command {
       List<String> contexts = new ArrayList<String>();
       List<String> problems = new ArrayList<String>();
 
-      for (String ctxt : getThothEnvironment().getContextManager().getContexts()) {
+      for (String ctxt : getThothEnvironment().getContextManager().getContextNames()) {
         try {
           ContentManager contentManager = getThothEnvironment().getContentManager(ctxt);
           AccessManager accessManager = contentManager.getAccessManager();
