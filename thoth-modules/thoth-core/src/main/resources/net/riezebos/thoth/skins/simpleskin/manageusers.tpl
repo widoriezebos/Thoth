@@ -34,10 +34,10 @@
                   ${identity.identifier}
                 </summary>
                 <div class="tabdetails" id="$here">
-                  <form action="./?cmd=manageusers&operation=updateuser&identifier=${identity.identifier}&${pointer}" method="post">                                 
+                  <form action="./?cmd=manageusers&operation=updateuser&identifier=${identity.identifier}&${pointer}" method="post" autocomplete="off">
                     First name: <input type="text" name="firstname" #if(${identity.firstname})value="${identity.firstname}"#end size="10"/>         
                     Last name: <input type="text" name="lastname"  #if(${identity.lastname})value="${identity.lastname}"#end size="10"/>            
-                    Password: <input type="password" name="password" value="" size="10"/>                                                           
+                    Password: <input type="password" name="password" autocomplete="off" value="" size="10"/>                                                           
                     Blocked: <input type="checkbox" name="blocked" #if(${identity.blockedUntil})checked="true"#end size="10"/>                           
                     <input type="submit" value="Update"/>
                   </form>
@@ -123,11 +123,11 @@
         <input type="radio" name="tabs" id="tab3" #if($tab=="tab3")checked="true"#end/>
         <label for="tab3">Create user</label>
         <div id="tab-content3" class="tab-content">
-          <form action="./?cmd=manageusers&operation=createuser&selectedtab=tab3" method="post">
+          <form action="./?cmd=manageusers&operation=createuser&selectedtab=tab3" method="post" autocomplete="off">
             Identifier: <input type="text" name="identifier" value="" size="15" autofocus="true"/>                                       
             First name: <input type="text" name="firstname" value="" size="10"/>         
             Last name: <input type="text" name="lastname"  value="" size="10"/>            
-            Password: <input type="password" name="password" value="" size="10"/>                                                           
+            Password: <input type="password" name="password" autocomplete="off" value="" size="10"/>                                                           
             <input type="submit" value="Create"/>
           </form>
       

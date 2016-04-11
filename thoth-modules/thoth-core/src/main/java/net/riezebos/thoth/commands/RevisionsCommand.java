@@ -45,10 +45,10 @@ public class RevisionsCommand extends RendererBase implements Command {
   }
 
   @Override
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+  public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {
-      ContentManager contentManager = getContentManager(context);
+      ContentManager contentManager = getContentManager(contextName);
       if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.REVISION))
         return RenderResult.FORBIDDEN;
 
@@ -67,12 +67,7 @@ public class RevisionsCommand extends RendererBase implements Command {
       variables.put("page", pageNumber);
       variables.put("hasmore", hasMore);
 
-      if (asJson(arguments))
-        executeJson(variables, outputStream);
-      else {
-        String revisionTemplate = skin.getRevisionTemplate();
-        renderTemplate(revisionTemplate, context, variables, outputStream);
-      }
+      render(skin.getRevisionTemplate(), contextName, arguments, variables, outputStream);
 
       return RenderResult.OK;
     } catch (Exception e) {

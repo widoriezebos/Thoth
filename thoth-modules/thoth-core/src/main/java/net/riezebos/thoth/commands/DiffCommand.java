@@ -46,10 +46,10 @@ public class DiffCommand extends RendererBase implements Command {
   }
 
   @Override
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+  public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {
-      ContentManager contentManager = getContentManager(context);
+      ContentManager contentManager = getContentManager(contextName);
       if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.DIFF))
         return RenderResult.FORBIDDEN;
 
@@ -83,11 +83,8 @@ public class DiffCommand extends RendererBase implements Command {
       variables.put("commitMessage", commitMessage);
       variables.put("diffs", diffs);
 
-      if (asJson)
-        executeJson(variables, outputStream);
-      else {
-        renderTemplate(skin.getDiffTemplate(), context, variables, outputStream);
-      }
+      render(skin.getDiffTemplate(), contextName, arguments, variables, outputStream);
+
       return result;
     } catch (Exception e) {
       throw new RenderException(e);

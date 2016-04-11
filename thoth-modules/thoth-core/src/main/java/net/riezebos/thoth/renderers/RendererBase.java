@@ -44,6 +44,12 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public abstract class RendererBase implements Renderer {
 
+  public static final String MODE_JSON = "json";
+  public static final String MODE_SILENT = "silent";
+
+  public static final String OPERATION_ARGUMENT = "operation";
+  public static final String MODE_ARGUMENT = "mode";
+
   public static final String SUPPRESS_ERRORS = "suppresserrors";
   public static final String CRITICS = "critics";
   private static final String VELOCITY_HELPER = "thothutil";
@@ -95,9 +101,24 @@ public abstract class RendererBase implements Renderer {
     return Integer.parseInt(stringValue);
   }
 
+  protected void render(String template, String contextName, Map<String, Object> arguments, Map<String, Object> variables, OutputStream outputStream)
+      throws ServletException, UnsupportedEncodingException, ContentManagerException, IOException {
+
+    if (asJson(arguments))
+      executeJson(variables, outputStream);
+    else if (!silent(arguments))
+      renderTemplate(template, contextName, variables, outputStream);
+  }
+
+  protected boolean silent(Map<String, Object> arguments) {
+    String mode = getString(arguments, MODE_ARGUMENT);
+    boolean silent = MODE_SILENT.equals(mode);
+    return silent;
+  }
+
   protected boolean asJson(Map<String, Object> arguments) {
-    String mode = getString(arguments, "mode");
-    boolean asJson = "json".equals(mode);
+    String mode = getString(arguments, MODE_ARGUMENT);
+    boolean asJson = MODE_JSON.equals(mode);
     return asJson;
   }
 

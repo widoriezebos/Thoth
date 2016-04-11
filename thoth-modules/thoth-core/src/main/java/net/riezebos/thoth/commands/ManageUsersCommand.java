@@ -42,7 +42,6 @@ import net.riezebos.thoth.user.UserManager;
 public class ManageUsersCommand extends RendererBase implements Command {
   private static final Logger LOG = LoggerFactory.getLogger(ManageUsersCommand.class);
 
-  public static final String OPERATION_ARGUMENT = "operation";
   public static final String REMOVEMEMBER = "removemember";
   public static final String ADDMEMBER = "addmember";
   public static final String REVOKEPERMISSION = "revokepermission";
@@ -107,12 +106,8 @@ public class ManageUsersCommand extends RendererBase implements Command {
     variables.put("groups", groups);
     variables.put("identities", identities);
 
-    if (asJson(arguments))
-      executeJson(variables, outputStream);
-    else {
-      String manageUsersTemplate = skin.getManageUsersTemplate();
-      renderTemplate(manageUsersTemplate, null, variables, outputStream);
-    }
+    render(skin.getManageUsersTemplate(), contextName, arguments, variables, outputStream);
+
     return RenderResult.OK;
   }
 

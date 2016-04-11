@@ -112,12 +112,8 @@ public class UserProfileCommand extends RendererBase implements Command {
     User user = userManager.getUser(identifier);
 
     variables.put("user", user);
-    if (asJson(arguments))
-      executeJson(variables, outputStream);
-    else {
-      String userProfileTemplate = skin.getUserProfileTemplate();
-      renderTemplate(userProfileTemplate, null, variables, outputStream);
-    }
+    render(skin.getUserProfileTemplate(), contextName, arguments, variables, outputStream);
+
     return RenderResult.OK;
   }
 }

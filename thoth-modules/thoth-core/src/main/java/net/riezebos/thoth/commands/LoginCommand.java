@@ -103,12 +103,7 @@ public class LoginCommand extends RendererBase implements Command {
       variables.put("message", message);
       variables.put("loggedin", loggedin);
       if (!loggedin) {
-        if (asJson(arguments))
-          executeJson(variables, outputStream);
-        else {
-          String loginTemplate = skin.getLoginTemplate();
-          renderTemplate(loginTemplate, null, variables, outputStream);
-        }
+        render(skin.getLoginTemplate(), contextName, arguments, variables, outputStream);
       } else {
         Map<String, Object> args = new HashMap<>();
         args.put(USER_ARGUMENT, user);

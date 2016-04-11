@@ -48,12 +48,12 @@ public class MetaCommand extends RendererBase implements Command {
   }
 
   @Override
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+  public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
 
     try {
       RenderResult result = RenderResult.OK;
-      ContentManager contentManager = getContentManager(context);
+      ContentManager contentManager = getContentManager(contextName);
       if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.META))
         return RenderResult.FORBIDDEN;
 
@@ -93,12 +93,8 @@ public class MetaCommand extends RendererBase implements Command {
       variables.put("errors", markDownDocument.getErrors());
       variables.put("versioncontrolled", contentManager.supportsVersionControl());
 
-      if (asJson(arguments))
-        executeJson(variables, outputStream);
-      else {
-        String metaInformationTemplate = skin.getMetaInformationTemplate();
-        renderTemplate(metaInformationTemplate, context, variables, outputStream);
-      }
+      render(skin.getMetaInformationTemplate(), contextName, arguments, variables, outputStream);
+      
       return result;
     } catch (Exception e) {
       throw new RenderException(e);

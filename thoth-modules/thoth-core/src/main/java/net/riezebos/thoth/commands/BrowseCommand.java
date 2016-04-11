@@ -45,27 +45,22 @@ public class BrowseCommand extends RendererBase implements Command {
   }
 
   @Override
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+  public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
 
     try {
-      ContentManager contentManager = getContentManager(context);
+      ContentManager contentManager = getContentManager(contextName);
       if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.BROWSE))
         return RenderResult.FORBIDDEN;
       RenderResult result = RenderResult.OK;
       List<ContentNode> contentNodes = contentManager.list(path);
-      boolean asJson = asJson(arguments);
 
       Map<String, Object> variables = new HashMap<>(arguments);
       variables.put("contentNodes", contentNodes);
       boolean atRoot = StringUtils.isBlank(path) || ThothUtil.suffix(path, "/").equals(ThothUtil.suffix(contentManager.getLibraryRoot(), "/"));
       variables.put("atRoot", atRoot);
 
-      if (asJson)
-        executeJson(variables, outputStream);
-      else {
-        renderTemplate(skin.getBrowseTemplate(), context, variables, outputStream);
-      }
+      render(skin.getBrowseTemplate(), contextName, arguments, variables, outputStream);
 
       return result;
     } catch (Exception e) {

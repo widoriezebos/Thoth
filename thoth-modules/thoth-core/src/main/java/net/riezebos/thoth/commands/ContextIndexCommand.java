@@ -48,10 +48,10 @@ public class ContextIndexCommand extends RendererBase implements Command {
   }
 
   @Override
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+  public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {
-      ContentManager contentManager = getContentManager(context);
+      ContentManager contentManager = getContentManager(contextName);
       AccessManager accessManager = contentManager.getAccessManager();
       if (!accessManager.hasPermission(identity, path, Permission.BASIC_ACCESS))
         return RenderResult.FORBIDDEN;
@@ -76,12 +76,7 @@ public class ContextIndexCommand extends RendererBase implements Command {
       variables.put("versioncontrolled", contentManager.supportsVersionControl());
       variables.put("classifications", classificationNames);
 
-      if (asJson(arguments))
-        executeJson(variables, outputStream);
-      else {
-        String indexTemplate = skin.getContextIndexTemplate();
-        renderTemplate(indexTemplate, context, variables, outputStream);
-      }
+      render(skin.getContextIndexTemplate(), contextName, arguments, variables, outputStream);
 
       return RenderResult.OK;
     } catch (Exception e) {

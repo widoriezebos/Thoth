@@ -51,8 +51,6 @@ public class ManageContextsCommand extends RendererBase implements Command {
   public static final String UPDATECONTEXT = "updatecontext";
   public static final String DELETECONTEXT = "deletecontext";
 
-  public static final String OPERATION_ARGUMENT = "operation";
-
   public static final String ARG_NAME = "name";
   public static final String ARG_NEWNAME = "newname";
   public static final String ARG_TYPE = "type";
@@ -110,12 +108,8 @@ public class ManageContextsCommand extends RendererBase implements Command {
     variables.put("contexts", contexts);
     variables.put("repositories", repositories);
 
-    if (asJson(arguments))
-      executeJson(variables, outputStream);
-    else {
-      String manageContextsTemplate = skin.getManageContextsTemplate();
-      renderTemplate(manageContextsTemplate, null, variables, outputStream);
-    }
+    render(skin.getManageContextsTemplate(), contextName, arguments, variables, outputStream);
+
     return RenderResult.OK;
   }
 

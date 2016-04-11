@@ -28,6 +28,7 @@ public class IndexingContext {
   private Map<String, List<String>> directReverseIndex = new HashMap<>();
   private List<ProcessorError> errors = new ArrayList<>();
   private Set<String> referencedLocalResources = new HashSet<>();
+  private Set<String> allPaths = new HashSet<>();
 
   public Map<String, List<String>> getIndirectReverseIndex() {
     return indirectReverseIndex;
@@ -43,6 +44,9 @@ public class IndexingContext {
 
   public Set<String> getReferencedLocalResources() {
     return referencedLocalResources;
-
+  }
+  
+  public Set<String> getAllPaths() {
+    return allPaths;
   }
 }

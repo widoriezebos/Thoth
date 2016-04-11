@@ -50,11 +50,11 @@ public class SearchCommand extends RendererBase implements Command {
   }
 
   @Override
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+  public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {
 
-      ContentManager contentManager = getContentManager(context);
+      ContentManager contentManager = getContentManager(contextName);
       AccessManager accessManager = contentManager.getAccessManager();
       if (!accessManager.hasPermission(identity, path, Permission.SEARCH))
         return RenderResult.FORBIDDEN;
@@ -72,7 +72,7 @@ public class SearchCommand extends RendererBase implements Command {
           errorMessage = "Do you feel lucky?";
         else {
           int pageSize = getThothEnvironment().getConfiguration().getMaxSearchResults();
-          PagedList<SearchResult> pagedList = search(identity, context, query, pageNumber, pageSize);
+          PagedList<SearchResult> pagedList = search(identity, contextName, query, pageNumber, pageSize);
           searchResults.addAll(pagedList.getList());
           hasMore = pagedList.hasMore();
         }
@@ -91,12 +91,8 @@ public class SearchCommand extends RendererBase implements Command {
       variables.put("searchResults", searchResults);
       variables.put("query", query);
 
-      if (asJson(arguments))
-        executeJson(variables, outputStream);
-      else {
-        String searchTemplate = skin.getSearchTemplate();
-        renderTemplate(searchTemplate, context, variables, outputStream);
-      }
+      render(skin.getSearchTemplate(), contextName, arguments, variables, outputStream);
+
       return RenderResult.OK;
     } catch (Exception e) {
       throw new RenderException(e);

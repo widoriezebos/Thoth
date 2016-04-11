@@ -40,10 +40,10 @@ public class PullCommand extends RendererBase implements Command {
   }
 
   @Override
-  public RenderResult execute(Identity identity, String context, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
+  public RenderResult execute(Identity identity, String contextName, String path, CommandOperation operation, Map<String, Object> arguments, Skin skin,
       OutputStream outputStream) throws RenderException {
     try {
-      ContentManager contentManager = getContentManager(context);
+      ContentManager contentManager = getContentManager(contextName);
       if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.PULL))
         return RenderResult.FORBIDDEN;
 
@@ -52,12 +52,7 @@ public class PullCommand extends RendererBase implements Command {
       variables.put("title", "Pull report");
       variables.put("log", log);
 
-      if (asJson(arguments))
-        executeJson(variables, outputStream);
-      else {
-        String logTemplate = skin.getLogTemplate();
-        renderTemplate(logTemplate, context, variables, outputStream);
-      }
+      render(skin.getLogTemplate(), contextName, arguments, variables, outputStream);
 
       return RenderResult.OK;
     } catch (Exception e) {

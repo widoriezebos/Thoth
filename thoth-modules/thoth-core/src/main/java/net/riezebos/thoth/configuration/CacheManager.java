@@ -44,6 +44,7 @@ public class CacheManager {
   private Map<String, List<ProcessorError>> errorMap = new HashMap<>();
   private ContentManager contentManager;
   private List<Book> books = null;
+  private List<String> allPaths = null;
 
   public CacheManager(ContentManager contentManager) {
     this.contentManager = contentManager;
@@ -170,6 +171,14 @@ public class CacheManager {
     }
   }
 
+  public List<String> getAllPaths() {
+    return allPaths;
+  }
+
+  public void setAllPaths(List<String> allPaths) {
+    this.allPaths = allPaths;
+  }
+
   public List<Book> getBooks() {
     return books;
   }
@@ -196,5 +205,4 @@ public class CacheManager {
   public String toString() {
     return "Cache for " + getContextName();
   }
-
 }

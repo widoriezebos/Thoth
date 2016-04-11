@@ -71,13 +71,8 @@ public class IndexCommand extends RendererBase implements Command {
       variables.put("contexts", contexts);
       variables.put("problems", problems);
 
-      if (asJson(arguments))
-        executeJson(variables, outputStream);
-      else {
-        String indexTemplate = skin.getIndexTemplate();
-        String context = contexts.isEmpty() ? null : contexts.get(0);
-        renderTemplate(indexTemplate, context, variables, outputStream);
-      }
+      render(skin.getIndexTemplate(), contexts.isEmpty() ? null : contexts.get(0), arguments, variables, outputStream);
+
       return result;
     } catch (Exception e) {
       throw new RenderException(e);

@@ -180,9 +180,15 @@ select_comments =
 ;
     
 select_comment = 
-    select username, contextname, documentpath, timecreated, title
+    select id, username, contextname, documentpath, timecreated, title
     from   thoth_comments
     where  id = :id
+;
+    
+select_commentpaths = 
+    select distinct documentpath
+    from   thoth_comments
+    where  contextname = :contextname
 ;
     
 insert_comment =

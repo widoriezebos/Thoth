@@ -469,6 +469,27 @@ public abstract class ContentManagerBase implements ContentManager {
   }
 
   @Override
+  public List<String> getAllPaths() throws ContentManagerException {
+    try {
+      CacheManager cacheManager = getCacheManager();
+      List<String> allPaths = cacheManager.getAllPaths();
+      if (allPaths == null) {
+        String searchRoot = ThothUtil.suffix(getLibraryRoot(), "/");
+        List<ContentNode> collectedPaths = new ArrayList<>();
+        traverseFolders(collectedPaths, value -> true, getFileHandle(searchRoot), true);
+
+        List<String> paths = new ArrayList<>();
+        collectedPaths.stream().forEach(c->paths.add(c.getPath()));
+        allPaths = paths;
+        cacheManager.setAllPaths(allPaths);
+      }
+      return allPaths;
+    } catch (IOException e) {
+      throw new ContentManagerException(e);
+    }
+  }
+
+  @Override
   public List<ProcessorError> getValidationErrors() throws ContentManagerException {
     try {
       CacheManager cacheManager = getCacheManager();

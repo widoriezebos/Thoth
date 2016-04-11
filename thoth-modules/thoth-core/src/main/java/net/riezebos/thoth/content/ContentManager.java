@@ -101,4 +101,6 @@ public interface ContentManager {
 
   AccessManager getAccessManager();
 
+  List<String> getAllPaths() throws ContentManagerException;
+
 }

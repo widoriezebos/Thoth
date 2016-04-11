@@ -57,7 +57,8 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class CommentCommand extends RendererBase implements Command {
 
-  public static final String OPERATION_ARGUMENT = "operation";
+  public static final String TYPE_CODE = "comment";
+
   public static final String CREATE = "create";
   public static final String COPY = "copy";
   public static final String DELETE = "delete";
@@ -76,7 +77,7 @@ public class CommentCommand extends RendererBase implements Command {
 
   @Override
   public String getTypeCode() {
-    return "comment";
+    return TYPE_CODE;
   }
 
   @Override
@@ -86,7 +87,7 @@ public class CommentCommand extends RendererBase implements Command {
     try {
       RenderResult result = RenderResult.OK;
       ContentManager contentManager = getContentManager(contextName);
-      if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.META))
+      if (!contentManager.getAccessManager().hasPermission(identity, path, Permission.COMMENT))
         return RenderResult.FORBIDDEN;
 
       String operationCode = (String) arguments.get(OPERATION_ARGUMENT);
@@ -127,12 +128,7 @@ public class CommentCommand extends RendererBase implements Command {
     variables.put("metatags", metatags);
     variables.put("mainsection", section);
 
-    if (asJson(arguments))
-      executeJson(variables, outputStream);
-    else {
-      String metaInformationTemplate = skin.getCommentTemplate();
-      renderTemplate(metaInformationTemplate, contextName, variables, outputStream);
-    }
+    render(skin.getCommentTemplate(), contextName, arguments, variables, outputStream);
     return RenderResult.OK;
   }
 
@@ -156,7 +152,7 @@ public class CommentCommand extends RendererBase implements Command {
       break;
     }
 
-    if (!result.equals(RenderResult.OK))
+    if (!result.equals(RenderResult.OK) || silent(arguments))
       return result;
     else
       return handleRender(identity, contextName, path, arguments, skin, outputStream, contentManager);
@@ -189,7 +185,7 @@ public class CommentCommand extends RendererBase implements Command {
       if (comment != null) {
         boolean isCreator = comment != null && comment.getUserName().equals(identity.getIdentifier());
 
-        if (isCreator && contentManager.getAccessManager().hasPermission(identity, path, Permission.DELETE_ANY_COMMENT))
+        if (isCreator || contentManager.getAccessManager().hasPermission(identity, path, Permission.DELETE_ANY_COMMENT))
           commentManager.deleteComment(comment);
         else
           return RenderResult.FORBIDDEN;
@@ -208,7 +204,7 @@ public class CommentCommand extends RendererBase implements Command {
       Comment comment = commentManager.getComment(id);
       boolean isCreator = comment != null && comment.getUserName().equals(identity.getIdentifier());
 
-      if (isCreator && contentManager.getAccessManager().hasPermission(identity, path, Permission.EDIT_ANY_COMMENT)) {
+      if (isCreator || contentManager.getAccessManager().hasPermission(identity, path, Permission.EDIT_ANY_COMMENT)) {
         String body = comment.getBody();
         arguments.put(EDIT_TEXT, body);
       } else
