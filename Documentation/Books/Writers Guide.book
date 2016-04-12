@@ -18,6 +18,7 @@ Thoth Writer's Guide<br/>
 \include{/Writers/The Thoth Toolset.md}
 \include{/Overview/Setup.md,1}
 \include{/Writers/Thoth Markdown basics.md}
+\include{/Writers/Review process.md}
 \include{/Writers/Git Primer.md}
 \include{/Writers/Skins.md}
 \include{/Writers/WYSIWYG.md}
