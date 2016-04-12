@@ -4,6 +4,7 @@ Simple yet powerful Markdown based Documentation System for professional documen
 ## In a hurry?
 - Markdown (text based) editing helps you focus on content and structure so you can ignore layout while writing
 - Supports version control, revisions and branching
+- Plays nice with formal review processes. Just use Crucible!
 - Multiple writers can work on the same document simultaneously
 - A document can include any other document as a fragment, so reuse across documents for different audiences is not causing a headache
 - Supports the notion of a library; referencing documents or images using an absolute or relative path
@@ -41,7 +42,7 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 6. Your branches pulled to to local Git repositories in your workspace and they will be indexed automatically. When this is done you can connect  
 	with your browser and get going!
 
-## Not in a hurry? 
+## Not in a hurry?
 **There is actually proper documentation** so why don't you head on to [the full documentation of Thoth][1]?
 
 ## Copyright
