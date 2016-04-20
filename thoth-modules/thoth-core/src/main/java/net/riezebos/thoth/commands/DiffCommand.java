@@ -83,7 +83,7 @@ public class DiffCommand extends RendererBase implements Command {
       variables.put("commitMessage", commitMessage);
       variables.put("diffs", diffs);
 
-      render(skin.getDiffTemplate(), contextName, arguments, variables, outputStream);
+      render(skin.getSkinBaseFolder(), skin.getDiffTemplate(), contextName, arguments, variables, outputStream);
 
       return result;
     } catch (Exception e) {

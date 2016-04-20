@@ -128,7 +128,7 @@ public class CommentCommand extends RendererBase implements Command {
     variables.put("metatags", metatags);
     variables.put("mainsection", section);
 
-    render(skin.getCommentTemplate(), contextName, arguments, variables, outputStream);
+    render(skin.getSkinBaseFolder(), skin.getCommentTemplate(), contextName, arguments, variables, outputStream);
     return RenderResult.OK;
   }
 

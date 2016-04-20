@@ -24,6 +24,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +120,9 @@ public class CacheManager {
           oos.writeObject(indexingContext.getIndirectReverseIndex());
         }
         try (ObjectOutputStream oos = new ObjectOutputStream(createOutputStream(errorFile))) {
-          oos.writeObject(indexingContext.getErrors());
+          ArrayList<ProcessorError> list = new ArrayList<>(indexingContext.getErrors());
+          Collections.sort(list);
+          oos.writeObject(list);
         }
       }
     } catch (Exception e) {

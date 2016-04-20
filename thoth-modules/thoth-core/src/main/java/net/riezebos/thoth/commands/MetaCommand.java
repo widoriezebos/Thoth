@@ -93,7 +93,7 @@ public class MetaCommand extends RendererBase implements Command {
       variables.put("errors", markDownDocument.getErrors());
       variables.put("versioncontrolled", contentManager.supportsVersionControl());
 
-      render(skin.getMetaInformationTemplate(), contextName, arguments, variables, outputStream);
+      render(skin.getSkinBaseFolder(), skin.getMetaInformationTemplate(), contextName, arguments, variables, outputStream);
       
       return result;
     } catch (Exception e) {

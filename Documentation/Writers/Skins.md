@@ -241,7 +241,9 @@ The template that is used to display all the revisions of changes committed to t
 #### template.validationreport
 The page that shows all errors that were detected by Thoth in the current repository.
 
+- **documents** is the list of documents (paths) with errors. Type: List\<String\>
 - **errors** is the list of errors that occurred during (include) processing of the document concerned. Type: List\<ProcessorError\>
+- **errorsByDocument** is a map of errors by document. The key of the map is the value found in **documents**. Type: Map\<String, ProcessorError\>
 
 #### template.search
 The search (engine) page, displaying the results of a query.

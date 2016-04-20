@@ -60,6 +60,7 @@ import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.markdown.util.DocumentNode;
+import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class Indexer {
@@ -112,8 +113,6 @@ public class Indexer {
 
       sortIndexLists(indexingContext.getIndirectReverseIndex());
       sortIndexLists(indexingContext.getDirectReverseIndex());
-      Collections.sort(indexingContext.getErrors());
-
       cacheResults(indexingContext);
 
       // NOTE: if you want to maximize search performance,
@@ -166,7 +165,9 @@ public class Indexer {
     CacheManager cacheManager = getCacheManager();
     cacheManager.cacheReverseIndex(true, indexingContext.getIndirectReverseIndex());
     cacheManager.cacheReverseIndex(false, indexingContext.getDirectReverseIndex());
-    cacheManager.cacheErrors(indexingContext.getErrors());
+    List<ProcessorError> errors = new ArrayList<>(indexingContext.getErrors());
+    Collections.sort(errors);
+    cacheManager.cacheErrors(errors);
   }
 
   protected void persistCaches(IndexingContext indexingContext) throws CachemanagerException {
@@ -206,6 +207,7 @@ public class Indexer {
       try {
         String resourcePath = fileHandle.getAbsolutePath();
         MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(resourcePath, true, CriticProcessingMode.DO_NOTHING);
+
         indexingContext.getErrors().addAll(markDownDocument.getErrors());
 
         // Also index non-documents if referenced and stored locally

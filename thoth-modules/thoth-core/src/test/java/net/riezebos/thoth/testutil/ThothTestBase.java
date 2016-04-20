@@ -187,9 +187,9 @@ public class ThothTestBase {
   protected HttpServletRequest createHttpRequest(String contextName, String path) throws IOException {
     String fullPath = ThothUtil.prefix(contextName, "/") + path;
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.getRequestURI()).thenReturn(fullPath);
+    when(request.getRequestURI()).thenReturn(path);
     when(request.getContextPath()).thenReturn(ThothUtil.prefix(contextName, "/"));
-    when(request.getServletPath()).thenReturn(fullPath);
+    when(request.getServletPath()).thenReturn(path);
     when(request.getPathInfo()).thenReturn(fullPath);
     when(request.getParameterNames()).thenReturn(getParameterNames());
     recordGetParameter(request);

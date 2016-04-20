@@ -49,5 +49,5 @@ It's all about the *includes*!
 
 **The following problems occurred during generation of this document:**
 
-    Include not found: yup/thisoneis/problematic.md
-    /books/../main/subs/SubOne.md(8): Link invalid: imagenotthere/either.png
+    /main/subs/SubOne.md(5): Include not found: yup/thisoneis/problematic.md
+    /main/subs/SubOne.md(8): Link invalid: imagenotthere/either.png

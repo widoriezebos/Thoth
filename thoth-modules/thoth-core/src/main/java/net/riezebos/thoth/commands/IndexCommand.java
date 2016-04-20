@@ -71,7 +71,7 @@ public class IndexCommand extends RendererBase implements Command {
       variables.put("contexts", contexts);
       variables.put("problems", problems);
 
-      render(skin.getIndexTemplate(), contexts.isEmpty() ? null : contexts.get(0), arguments, variables, outputStream);
+      render(skin.getSkinBaseFolder(), skin.getIndexTemplate(), contexts.isEmpty() ? null : contexts.get(0), arguments, variables, outputStream);
 
       return result;
     } catch (Exception e) {

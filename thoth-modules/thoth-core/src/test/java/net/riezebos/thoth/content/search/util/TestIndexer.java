@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,8 @@ public class TestIndexer extends Indexer {
   protected void persistCaches(IndexingContext indexingContext) {
     directReverseIndex = indexingContext.getDirectReverseIndex();
     indirectReverseIndex = indexingContext.getIndirectReverseIndex();
-    errors = indexingContext.getErrors();
+    errors = new ArrayList<>(indexingContext.getErrors());
+    Collections.sort(errors);
   }
 
   @Override

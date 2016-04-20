@@ -60,7 +60,7 @@ public class BrowseCommand extends RendererBase implements Command {
       boolean atRoot = StringUtils.isBlank(path) || ThothUtil.suffix(path, "/").equals(ThothUtil.suffix(contentManager.getLibraryRoot(), "/"));
       variables.put("atRoot", atRoot);
 
-      render(skin.getBrowseTemplate(), contextName, arguments, variables, outputStream);
+      render(skin.getSkinBaseFolder(), skin.getBrowseTemplate(), contextName, arguments, variables, outputStream);
 
       return result;
     } catch (Exception e) {

@@ -30,6 +30,8 @@ public class TemplateResourceLoader extends ResourceLoader {
   private static final Logger LOG = LoggerFactory.getLogger(TemplateResourceLoader.class);
 
   private static ThreadLocal<ContentManager> contentManager = new ThreadLocal<ContentManager>();
+  private static ThreadLocal<String> baseFolder = new ThreadLocal<String>();
+  private static ThreadLocal<String> baseFile = new ThreadLocal<String>();
 
   @Override
   public void init(ExtendedProperties configuration) {
@@ -37,18 +39,37 @@ public class TemplateResourceLoader extends ResourceLoader {
 
   @Override
   public InputStream getResourceStream(String sourcePath) throws ResourceNotFoundException {
+    InputStream is = resolveStream(sourcePath);
+    if (is == null) {
+      String folder = baseFolder.get();
+      String relativePath = ThothUtil.suffix(folder, "/") + ThothUtil.stripSuffix(sourcePath, "/");
+      is = resolveStream(relativePath);
+    }
+    if (is == null) {
+      String file = baseFile.get();
+      String relativePath = ThothUtil.suffix(ThothUtil.getFolder(file), "/") + ThothUtil.stripSuffix(sourcePath, "/");
+      is = resolveStream(relativePath);
+    }
+
+    if (is == null)
+      throw new ResourceNotFoundException("Could not find " + sourcePath);
+    return is;
+  }
+
+  protected InputStream resolveStream(String sourcePath) {
     sourcePath = ThothUtil.stripPrefix(sourcePath, CLASSPATH_PREFIX);
     sourcePath = ThothUtil.stripPrefix(sourcePath, "/");
+
     InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(sourcePath);
     if (is != null)
       return is;
     try {
-      return getContentManager().getInputStream(sourcePath);
-
+      is = getContentManager().getInputStream(sourcePath);
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
       throw new ResourceNotFoundException(e);
     }
+    return is;
   }
 
   @Override
@@ -70,5 +91,13 @@ public class TemplateResourceLoader extends ResourceLoader {
 
   public static void setContentManager(ContentManager mgr) {
     contentManager.set(mgr);
+  }
+
+  public static void setSkinBase(String folder) {
+    baseFolder.set(folder);
+  }
+
+  public static void setBaseFile(String template) {
+    baseFile.set(template);
   }
 }

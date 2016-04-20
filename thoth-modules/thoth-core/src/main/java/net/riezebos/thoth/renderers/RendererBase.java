@@ -101,13 +101,13 @@ public abstract class RendererBase implements Renderer {
     return Integer.parseInt(stringValue);
   }
 
-  protected void render(String template, String contextName, Map<String, Object> arguments, Map<String, Object> variables, OutputStream outputStream)
+  protected void render(String skinBaseFolder, String template, String contextName, Map<String, Object> arguments, Map<String, Object> variables, OutputStream outputStream)
       throws ServletException, UnsupportedEncodingException, ContentManagerException, IOException {
 
     if (asJson(arguments))
       executeJson(variables, outputStream);
     else if (!silent(arguments))
-      renderTemplate(template, contextName, variables, outputStream);
+      renderTemplate(skinBaseFolder, template, contextName, variables, outputStream);
   }
 
   protected boolean silent(Map<String, Object> arguments) {
@@ -133,7 +133,7 @@ public abstract class RendererBase implements Renderer {
     }
   }
 
-  protected void renderTemplate(String template, String context, Map<String, Object> variables, OutputStream outputStream)
+  protected void renderTemplate(String skinBaseFolder, String template, String context, Map<String, Object> variables, OutputStream outputStream)
       throws ContentManagerException, IOException, UnsupportedEncodingException {
 
     try (PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8")), true)) {
@@ -149,8 +149,10 @@ public abstract class RendererBase implements Renderer {
       VelocityEngine engine = new VelocityEngine();
       Properties properties = new Properties();
       properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(VELOCITY_PROPERTIES));
-      engine.init(properties);
       TemplateResourceLoader.setContentManager(contentManager);
+      TemplateResourceLoader.setBaseFile(template);
+      TemplateResourceLoader.setSkinBase(skinBaseFolder);
+      engine.init(properties);
       engine.getTemplate(template).merge(velocityContext, writer);
     } catch (Exception e) {
       throw new RenderException(e);

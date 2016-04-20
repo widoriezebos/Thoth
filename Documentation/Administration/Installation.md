@@ -1,6 +1,9 @@
 # Installing Thoth
 There are two ways you can run Thoth. For server environments there is a WAR that you can deploy in a Web Container like tomcat and for desktop environments there is a standalone version that requires almost no setup.
 
+## Getting hold of the software
+You can find the software on Github: [https://github.com/widoriezebos/Thoth](https://github.com/widoriezebos/Thoth)
+
 ## Configuration
 Create a configuration.properties file as described in the [Configuration](Configuration.md) section.
 

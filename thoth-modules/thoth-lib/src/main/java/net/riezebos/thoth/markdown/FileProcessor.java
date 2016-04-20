@@ -110,7 +110,10 @@ public class FileProcessor {
   }
 
   protected void error(String message) {
-    LineInfo currentLineInfo = getCurrentLineInfo();
+    error(getCurrentLineInfo(), message);
+  }
+
+  protected void error(LineInfo currentLineInfo, String message) {
     errors.add(new ProcessorError(currentLineInfo, message));
   }
 
@@ -509,7 +512,8 @@ public class FileProcessor {
   protected void startNewFile(String fileName) throws IOException {
     if (getLibrary().length() != 0 && fileName.startsWith(getLibrary()))
       fileName = fileName.substring(getLibrary().length() - 1);
-    currentInfo.push(new LineInfo(ThothUtil.stripPrefix(fileName, "/"), 0));
+    String normalized = createFileHandle(ThothUtil.stripPrefix(fileName, "/")).getAbsolutePath();
+    currentInfo.push(new LineInfo(normalized, 0));
   }
 
   /**
@@ -595,7 +599,7 @@ public class FileProcessor {
   }
 
   /**
-   * Will validate the bookmarks specifications and add errors for any bookmarks that are invalid
+   * Will validate the bookmark specifications and add errors for invalid bookmarks
    */
   protected void validate() {
     Set<String> validBookmarks = new HashSet<String>();
@@ -608,7 +612,7 @@ public class FileProcessor {
     }
     for (BookmarkUsage usage : bookmarkUsages) {
       if (!validBookmarks.contains(usage.getBookmark())) {
-        error("Invalid bookmark: #" + usage.getBookmark());
+        error(usage.getCurrentLineInfo(), "Invalid bookmark: #" + usage.getBookmark());
       }
     }
   }
