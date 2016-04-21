@@ -10,6 +10,6 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/tabs.css"/>
 #else
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/menu.css"/>
-#end        
+#end     
   </head>
   <body>
