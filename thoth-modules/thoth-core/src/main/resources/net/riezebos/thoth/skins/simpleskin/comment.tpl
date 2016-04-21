@@ -41,6 +41,7 @@
 #end
 
 #set($page_title = $title)
+#set($markdown_mode = true)
 #parse ("header.tpl")
 
   <h1>Comment on ${title}<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>

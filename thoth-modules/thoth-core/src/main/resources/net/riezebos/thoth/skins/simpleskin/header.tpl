@@ -6,7 +6,10 @@
     <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/style.css">
-#if($use_tabs)##
+
+#if($markdown_mode)##
+    <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/markdown.css">
+#elseif($use_tabs)##
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/tabs.css"/>
 #else
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/menu.css"/>
