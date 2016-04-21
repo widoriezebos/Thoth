@@ -45,13 +45,5 @@
       <li class="floatright"><a href=".?cmd=login">Login</a></li> 
     #end
   </ul>
-
-  <footer>
-    #if($loggedin)
-      Logged in as ${identity}.<br/>
-    #end  
-    Latest successfull Pull request was at ${refresh}.
-    Powered by Thoth core version ${thothutil.getVersion()}
-  </footer>
 #parse ("footer.tpl")
     
