@@ -10,6 +10,8 @@
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/tabs.css"/>
 #else
     <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/menu.css"/>
-#end     
+#end
+    <script type="text/javascript" src="${skinbase}/Webresources/details-shim.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/details-shim.min.css">
   </head>
   <body>
