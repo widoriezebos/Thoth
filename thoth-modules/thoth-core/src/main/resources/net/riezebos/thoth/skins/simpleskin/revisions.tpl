@@ -2,19 +2,21 @@
 #parse ("header.tpl")
   <h1>Latest changes<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
   <a href="${contexturl}">Back to Index</a>
-  Showing page ${page}<br/>
+  <span class="floatright">Showing page ${page}</span><br/>
   #set($prevpage=${page}+-1)
   #if($prevpage > 0)
     <a href="${contexturl}?cmd=revisions&amp;page=${prevpage}">Previous page</a>
   #else
     (First page)
   #end
+  <span class="floatright">
   #if($hasmore)
     #set($nextpage=${page}+1)
     <a href="${contexturl}?cmd=revisions&amp;page=${nextpage}">Next page</a>
   #else
     (last page)
   #end
+  </span>
   &nbsp;
   
   <table>
@@ -23,10 +25,13 @@
       <tr>
         <td>${thothutil.formatTimestamp($commit.timestamp)}</td>
         <td>${commit.author}</td>
-        <td>     
-          #foreach($revision in $commit.revisions)
-            ${revision.action} ${thothutil.addHtmlBreaks(${revision.path})} (<a href="${contexturl}${revision.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
-          #end
+        <td>
+          <details class="revisiondetail">
+            <summary>Actions</summary>
+            #foreach($revision in $commit.revisions)
+              ${revision.action} ${thothutil.addHtmlBreaks(${revision.path})} (<a href="${contexturl}${revision.path}?cmd=diff&commitId=${thothutil.encodeUrl($revision.commitId)}">Diff</a>)<br/>
+            #end
+          </details>
         </td>
         <td>${commit.message}</td>
       </tr>    

@@ -8,7 +8,7 @@
     <input type="submit" value="Search"/> <input type="hidden" name="cmd" value="search" />
   </form>
   
-  Showing page ${page}<br/>
+  <span class="floatright">Showing page ${page}</span><br/>
   
   #set($prevpage=${page}+-1)
   #if($prevpage > 0)
@@ -17,12 +17,14 @@
     (First page)
   #end
   
-  #if($hasmore)
-    #set($nextpage=${page}+1)
-    <a href="${contexturl}?cmd=search&amp;query=${thothutil.encodeUrl($query)}&amp;page=${nextpage}">Next page</a>
-  #else
-    (last page)
-  #end
+  <span class="floatright">
+    #if($hasmore)
+      #set($nextpage=${page}+1)
+      <a href="${contexturl}?cmd=search&amp;query=${thothutil.encodeUrl($query)}&amp;page=${nextpage}">Next page</a>
+    #else
+      (last page)
+    #end
+  </span>
   
   &nbsp;
   #if($query)
