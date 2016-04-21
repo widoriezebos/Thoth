@@ -264,6 +264,7 @@ public class FileProcessor {
 
     String title = line.substring(level).trim();
     String id = ThothUtil.encodeBookmark(title, true);
+    String idOriginal = ThothUtil.encodeBookmark(title, false);
 
     // Make sure we do not get into trouble with HTML tags in the title
     title = title.replaceAll("\\<", "\\\\<");
@@ -271,6 +272,8 @@ public class FileProcessor {
 
     if (isValidBookmark(id)) {
       bookmarks.add(new Bookmark(level, id, title));
+      if (!idOriginal.equals(id))
+        bookmarks.add(new Bookmark(level, idOriginal, title));
     }
     return (addNewlineBeforeheader ? "\n" : "") + line + "\n";
   }

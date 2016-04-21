@@ -166,6 +166,8 @@ public class FileProcessorTest extends LibraryTestBase {
     assertEquals("1header", bookmark.getId());
     processor.createBookmark("##Header2", 0);
     bookmark = processor.getBookmarks().get(1);
+    assertEquals("1Header", bookmark.getId());
+    bookmark = processor.getBookmarks().get(2);
     assertEquals("11header2", bookmark.getId());
   }
 
@@ -246,23 +248,36 @@ public class FileProcessorTest extends LibraryTestBase {
     processor.createBookmark("#Chapter3", 0);
     String doc = processor.createToc("Title\n\\tableofcontents\n\nFirst line");
 
-    String expected = "Title\n" + //
-        "<tableofcontents>\n" + //
-        "###[1 Chapter1](#1chapter1)\n" + //
-        "\n" + //
-        "  - [1.1 Paragraph11](#11paragraph11)\n" + //
-        "  - [1.2 Paragraph12](#12paragraph12)\n" + //
-        "\n" + //
-        "###[2 Chapter2](#2chapter2)\n" + //
-        "\n" + //
-        "  - [2.1 Paragraph21](#21paragraph21)\n" + //
-        "\n" + //
-        "###[3 Chapter3](#3chapter3)\n" + //
-        "\n" + //
-        "</tableofcontents>\n" + //
-        "\n" + //
+    String expected = "Title\n" + // 
+        "<tableofcontents>\n" + // 
+        "###[1 Chapter1](#1chapter1)\n" + // 
+        "\n" + // 
+        "\n" + // 
+        "###[1 Chapter1](#1Chapter1)\n" + // 
+        "\n" + // 
+        "  - [1.1 Paragraph11](#11paragraph11)\n" + // 
+        "  - [1.1 Paragraph11](#11Paragraph11)\n" + // 
+        "  - [1.2 Paragraph12](#12paragraph12)\n" + // 
+        "  - [1.2 Paragraph12](#12Paragraph12)\n" + // 
+        "\n" + // 
+        "###[2 Chapter2](#2chapter2)\n" + // 
+        "\n" + // 
+        "\n" + // 
+        "###[2 Chapter2](#2Chapter2)\n" + // 
+        "\n" + // 
+        "  - [2.1 Paragraph21](#21paragraph21)\n" + // 
+        "  - [2.1 Paragraph21](#21Paragraph21)\n" + // 
+        "\n" + // 
+        "###[3 Chapter3](#3chapter3)\n" + // 
+        "\n" + // 
+        "\n" + // 
+        "###[3 Chapter3](#3Chapter3)\n" + // 
+        "\n" + // 
+        "</tableofcontents>\n" + // 
+        "\n" + // 
         "First line";
 
+    System.out.println(doc);
     assertEquals(expected, doc);
   }
 
