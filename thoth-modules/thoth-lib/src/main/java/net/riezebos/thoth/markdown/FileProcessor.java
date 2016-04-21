@@ -68,6 +68,7 @@ public class FileProcessor {
   private Map<String, String> softLinkMappings = new HashMap<String, String>();
   private List<SoftLinkTranslation> softLinkTranslations = new ArrayList<SoftLinkTranslation>();
   private List<BookmarkUsage> bookmarkUsages = new ArrayList<BookmarkUsage>();
+  private List<BookmarkUsage> externalBookmarkUsages = new ArrayList<BookmarkUsage>();
   private FileSystem fileSystem = new BasicFileSystem();
   private PrintStream out = System.out;
 
@@ -106,6 +107,7 @@ public class FileProcessor {
     metaTags = new HashMap<String, String>();
     headerCounters = new int[20];
     bookmarkUsages = new ArrayList<BookmarkUsage>();
+    externalBookmarkUsages = new ArrayList<BookmarkUsage>();
     loadSoftLinks();
   }
 
@@ -176,6 +178,10 @@ public class FileProcessor {
 
   protected void registerBookMarkUsage(BookmarkUsage usage) {
     bookmarkUsages.add(usage);
+  }
+
+  protected void registerExternalBookMark(BookmarkUsage usage) {
+    externalBookmarkUsages.add(usage);
   }
 
   /**
@@ -599,7 +605,8 @@ public class FileProcessor {
   }
 
   /**
-   * Will validate the bookmark specifications and add errors for invalid bookmarks
+   * Will validate the bookmark specifications and add errors for invalid bookmarks. Note that we do not validate bookmarks that reference an external document
+   * because that would be too expensive. Checking these is left to the caller; use getExternalBookmarkUsages() to get hold of them
    */
   protected void validate() {
     Set<String> validBookmarks = new HashSet<String>();
@@ -619,6 +626,10 @@ public class FileProcessor {
 
   public List<BookmarkUsage> getBookmarkUsages() {
     return bookmarkUsages;
+  }
+
+  public List<BookmarkUsage> getExternalBookmarkUsages() {
+    return externalBookmarkUsages;
   }
 
   public Map<String, String> getMetaTags() {

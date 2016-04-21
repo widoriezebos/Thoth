@@ -25,7 +25,7 @@ public class BookmarkUsageTest {
   @Test
   public void test() {
     BookmarkUsage usage = new BookmarkUsage();
-    usage.setBookMark("mark1");
+    usage.setBookMark("#mark1");
     usage.setCurrentLineInfo(new LineInfo("file", 1));
     assertEquals(1, usage.getCurrentLineInfo().getLine());
     assertEquals("/file", usage.getCurrentLineInfo().getFile());

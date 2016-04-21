@@ -49,6 +49,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.beans.BookmarkUsage;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.CacheManager;
@@ -210,6 +211,9 @@ public class Indexer {
 
         indexingContext.getErrors().addAll(markDownDocument.getErrors());
 
+        // Validate any bookmarks that reference external files
+        validateExternalBookmarks(fileHandle.getParentFile(), markDownDocument.getExternalBookmarkUsages(), indexingContext.getErrors());
+
         // Also index non-documents if referenced and stored locally
         for (DocumentNode node : markDownDocument.getDocumentStructure().flatten(true)) {
           String path = node.getPath();
@@ -237,6 +241,29 @@ public class Indexer {
         addToIndex(writer, resourcePath, resourceType, markDownDocument.getTitle(), body, markDownDocument.getMetatags());
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
+      }
+    }
+  }
+
+  protected void validateExternalBookmarks(FileHandle documentFolder, List<BookmarkUsage> bookmarkUsages, Set<ProcessorError> errors)
+      throws IOException, ContextNotFoundException {
+    for (BookmarkUsage bookmarkUsage : bookmarkUsages) {
+      String rootFolder = documentFolder.getAbsolutePath();
+      String externalRefSpec = ThothUtil.suffix(rootFolder, "/") + ThothUtil.stripPrefix(bookmarkUsage.getBookmark(), "/");
+      String externalFile = ThothUtil.getPartBeforeFirst(externalRefSpec, "#");
+      String externalBookmark = ThothUtil.getPartAfterFirst(externalRefSpec, "#");
+
+      MarkDownDocument referencedDocument = contentManager.getMarkDownDocument(externalFile, true, CriticProcessingMode.DO_NOTHING);
+      Set<String> validBookmarks = new HashSet<>();
+      referencedDocument.getBookmarks().stream().forEach(bm -> {
+        validBookmarks.add(bm.getId());
+        validBookmarks.add(ThothUtil.stripNumericPrefix(bm.getId()));
+      });
+
+      if (!validBookmarks.contains(externalBookmark)) {
+        ProcessorError error =
+            new ProcessorError(bookmarkUsage.getCurrentLineInfo(), "Bookmark #" + externalBookmark + " is not defined in file " + externalFile);
+        errors.add(error);
       }
     }
   }

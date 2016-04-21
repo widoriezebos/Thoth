@@ -212,20 +212,22 @@ public class IncludeProcessor extends FileProcessor {
             String pathname = getRootFolder() + actualLocation;
             if (pathSpec.startsWith("#")) {
               String bookmark = pathSpec.substring(1);
-              BookmarkUsage usage = new BookmarkUsage();
-              usage.setCurrentLineInfo(getCurrentLineInfo());
-              usage.setBookMark(bookmark);
-              registerBookMarkUsage(usage);
+              registerBookMarkUsage(createBookMarkUsage(bookmark));
+
             } else {
-              // Do not check http:// or mailto: kind of links
-              // TODO: check the actual bookmark (if the link contains a bookmark)
               checkExistence(pathSpec, pathname);
             }
 
             if (embed)
               createDocumentNode(pathname, description, includeStack);
 
-            String newLink = "[" + description + "](" + actualLocation + (afterPath != null ? " " + afterPath : "") + ")";
+            String linkSpec = actualLocation + (afterPath != null ? " " + afterPath : "");
+
+            // Register any bookmarks to local files
+            if (!linkSpec.contains(":") && linkSpec.contains("#") && !linkSpec.startsWith("#")) {
+              registerExternalBookMark(createBookMarkUsage(linkSpec));
+            }
+            String newLink = "[" + description + "](" + linkSpec + ")";
             line = line.substring(0, start) + newLink + line.substring(end);
             idx = start + newLink.length();
             matcher = hyperlink.matcher(line);
@@ -234,6 +236,13 @@ public class IncludeProcessor extends FileProcessor {
       }
     }
     return line;
+  }
+
+  private BookmarkUsage createBookMarkUsage(String bookmark) {
+    BookmarkUsage usage = new BookmarkUsage();
+    usage.setCurrentLineInfo(getCurrentLineInfo());
+    usage.setBookMark(bookmark);
+    return usage;
   }
 
   protected void checkExistence(String pathSpec, String pathname) {

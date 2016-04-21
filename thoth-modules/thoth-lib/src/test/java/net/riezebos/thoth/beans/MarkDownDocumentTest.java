@@ -40,7 +40,9 @@ public class MarkDownDocumentTest {
     ProcessorError processorError = new ProcessorError(new LineInfo("file", 0), "errorMessage");
     Map<String, String> metatags = new HashMap<String, String>();
     String markdown = "#title\nSometext";
-    MarkDownDocument markDownDocument = new MarkDownDocument(markdown, metatags, errors, documentStructure);
+    List<BookmarkUsage> bookMarkUsages = new ArrayList<BookmarkUsage>();
+    List<Bookmark> bookmarks = new ArrayList<Bookmark>();
+    MarkDownDocument markDownDocument = new MarkDownDocument(markdown, metatags, errors, documentStructure, bookMarkUsages, bookMarkUsages, bookmarks);
 
     markDownDocument.setLastModified(now);
     assertEquals("/a/b/c", markDownDocument.getPath());
