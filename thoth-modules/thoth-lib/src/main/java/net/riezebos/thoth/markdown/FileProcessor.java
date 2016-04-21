@@ -271,9 +271,9 @@ public class FileProcessor {
     title = title.replaceAll("\\>", "\\\\>");
 
     if (isValidBookmark(id)) {
-      bookmarks.add(new Bookmark(level, id, title));
+      bookmarks.add(new Bookmark(level, id, title, true));
       if (!idOriginal.equals(id))
-        bookmarks.add(new Bookmark(level, idOriginal, title));
+        bookmarks.add(new Bookmark(level, idOriginal, title, false));
     }
     return (addNewlineBeforeheader ? "\n" : "") + line + "\n";
   }
@@ -396,6 +396,9 @@ public class FileProcessor {
 
     boolean first = true;
     for (Bookmark bookmark : bookmarks) {
+      if (!bookmark.isUseForToc())
+        continue;
+
       if (first)
         toc.append("<" + TABLEOFCONTENTS_TAG + ">");
       first = false;
@@ -564,9 +567,7 @@ public class FileProcessor {
       showErrorNoNotFound = false;
     }
 
-    if (softLinkFileName.startsWith("/"))
-      softLinkFileName = softLinkFileName.substring(1);
-    String fileName = getLibrary() + softLinkFileName;
+    String fileName = ThothUtil.stripSuffix(getLibrary(), "/") + ThothUtil.prefix(softLinkFileName, "/");
 
     FileHandle file = createFileHandle(fileName);
     if (file.isFile()) {
