@@ -38,7 +38,5 @@
     #end
   </table>
   
-  <br/><br/>
-  Latest successfull Pull request was at ${refresh} 
 #parse ("footer.tpl")
     

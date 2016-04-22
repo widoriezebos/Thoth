@@ -228,8 +228,11 @@ footer {
 	min-width: 100px;
 }	
 
+.alignright {
+	float: right;
+}
+
 .floatright {
 	clear: both;
 	float: right;
-	display: inline;
 }

@@ -59,9 +59,9 @@
     #end
     #if($loggedin)
       <li><a href=".?cmd=userprofile">Edit profile</a></li>
-      <li class="floatright"><a href=".?cmd=logout">Log out</a></li>
+      <li class="alignright"><a href=".?cmd=logout">Log out</a></li>
     #else
-      <li class="floatright"><a href=".?cmd=login">Login</a></li> 
+      <li class="alignright"><a href=".?cmd=login">Login</a></li> 
     #end
   </ul>
 
