@@ -190,6 +190,8 @@ public class IncludeProcessor extends FileProcessor {
           if (pathSpec.startsWith("/")) {
 
             String actualLocation = resolveLibraryPath(pathSpec);
+            String pathname = getRootFolder() + actualLocation;
+            checkExistence(pathSpec, pathname);
 
             if (embed)
               createDocumentNode(pathSpec, description, includeStack);
@@ -210,24 +212,22 @@ public class IncludeProcessor extends FileProcessor {
             String pathname = getRootFolder() + actualLocation;
             if (pathSpec.startsWith("#")) {
               String bookmark = pathSpec.substring(1);
-              BookmarkUsage usage = new BookmarkUsage();
-              usage.setCurrentLineInfo(getCurrentLineInfo());
-              usage.setBookMark(bookmark);
-              registerBookMarkUsage(usage);
+              registerBookMarkUsage(createBookMarkUsage(bookmark));
+
             } else {
-              // Do not check http:// or mailto: kind of links
-              // TODO: check the actual bookmark (if the link contains a bookmark)
-              if (pathname.indexOf(':') == -1) {
-                FileHandle check = createFileHandle(ThothUtil.getPartBeforeFirst(pathname.replaceAll("%20", " "), "#"));
-                if (!check.exists())
-                  error(getCurrentLineInfo() + ": Link invalid: " + pathSpec);
-              }
+              checkExistence(pathSpec, pathname);
             }
 
             if (embed)
               createDocumentNode(pathname, description, includeStack);
 
-            String newLink = "[" + description + "](" + actualLocation + (afterPath != null ? " " + afterPath : "") + ")";
+            String linkSpec = actualLocation + (afterPath != null ? " " + afterPath : "");
+
+            // Register any bookmarks to local files
+            if (!linkSpec.contains(":") && linkSpec.contains("#") && !linkSpec.startsWith("#")) {
+              registerExternalBookMark(createBookMarkUsage(linkSpec));
+            }
+            String newLink = "[" + description + "](" + linkSpec + ")";
             line = line.substring(0, start) + newLink + line.substring(end);
             idx = start + newLink.length();
             matcher = hyperlink.matcher(line);
@@ -236,6 +236,21 @@ public class IncludeProcessor extends FileProcessor {
       }
     }
     return line;
+  }
+
+  private BookmarkUsage createBookMarkUsage(String bookmark) {
+    BookmarkUsage usage = new BookmarkUsage();
+    usage.setCurrentLineInfo(getCurrentLineInfo());
+    usage.setBookMark(bookmark);
+    return usage;
+  }
+
+  protected void checkExistence(String pathSpec, String pathname) {
+    if (pathname.indexOf(':') == -1) {
+      FileHandle check = createFileHandle(ThothUtil.getPartBeforeFirst(pathname.replaceAll("%20", " "), "#"));
+      if (!check.exists())
+        error("Link invalid: " + pathSpec);
+    }
   }
 
   protected void createDocumentNode(String actualLocation, String description, Stack<DocumentNode> includeStack) {
@@ -470,9 +485,8 @@ public class IncludeProcessor extends FileProcessor {
       List<ProcessorError> errors = getErrors();
       if (!errors.isEmpty() && !noErrors) {
         result += "\n**The following problems occurred during generation of this document:**\n\n";
-        result += "\n\tThe following problems occurred during generation of this document:\n";
         for (ProcessorError error : errors)
-          result += "\t" + (error.getErrorMessage().replaceAll("\n", "\n\t").trim()) + "\n";
+          result += "\t" + (error.getDescription().replaceAll("\n", "\n\t").trim()) + "\n";
       }
 
       String target = arguments.get("target");

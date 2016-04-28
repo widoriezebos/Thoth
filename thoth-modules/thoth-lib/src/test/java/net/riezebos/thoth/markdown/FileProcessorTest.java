@@ -166,6 +166,8 @@ public class FileProcessorTest extends LibraryTestBase {
     assertEquals("1header", bookmark.getId());
     processor.createBookmark("##Header2", 0);
     bookmark = processor.getBookmarks().get(1);
+    assertEquals("1Header", bookmark.getId());
+    bookmark = processor.getBookmarks().get(2);
     assertEquals("11header2", bookmark.getId());
   }
 

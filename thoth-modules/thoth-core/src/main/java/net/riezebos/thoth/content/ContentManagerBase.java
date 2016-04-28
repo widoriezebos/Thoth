@@ -190,7 +190,8 @@ public abstract class ContentManagerBase implements ContentManager {
       Map<String, String> metaTags = processor.getMetaTags();
       List<ProcessorError> errors = processor.getErrors();
       DocumentNode documentStructure = processor.getDocumentStructure();
-      MarkDownDocument markDownDocument = new MarkDownDocument(markdown, metaTags, errors, documentStructure);
+      MarkDownDocument markDownDocument = new MarkDownDocument(markdown, metaTags, errors, documentStructure, processor.getBookmarkUsages(),
+          processor.getExternalBookmarkUsages(), processor.getBookmarks());
       long latestMod = Math.max(file.lastModified(), processor.getLatestIncludeModificationDate());
       markDownDocument.setLastModified(new Date(latestMod));
       return markDownDocument;
@@ -216,7 +217,7 @@ public abstract class ContentManagerBase implements ContentManager {
   protected String appendErrors(IncludeProcessor processor, String markdown) {
     markdown += "\n**The following problems occurred during generation of this document:**\n\n";
     for (ProcessorError error : processor.getErrors())
-      markdown += "\t" + (error.getErrorMessage().replaceAll("\n", "\n\t").trim()) + "\n";
+      markdown += "\t" + (error.getDescription().replaceAll("\n", "\n\t").trim()) + "\n";
     return markdown;
   }
 
@@ -479,7 +480,7 @@ public abstract class ContentManagerBase implements ContentManager {
         traverseFolders(collectedPaths, value -> true, getFileHandle(searchRoot), true);
 
         List<String> paths = new ArrayList<>();
-        collectedPaths.stream().forEach(c->paths.add(c.getPath()));
+        collectedPaths.stream().forEach(c -> paths.add(c.getPath()));
         allPaths = paths;
         cacheManager.setAllPaths(allPaths);
       }

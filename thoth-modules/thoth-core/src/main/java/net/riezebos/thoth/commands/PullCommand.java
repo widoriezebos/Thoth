@@ -52,7 +52,7 @@ public class PullCommand extends RendererBase implements Command {
       variables.put("title", "Pull report");
       variables.put("log", log);
 
-      render(skin.getLogTemplate(), contextName, arguments, variables, outputStream);
+      render(skin.getSkinBaseFolder(), skin.getLogTemplate(), contextName, arguments, variables, outputStream);
 
       return RenderResult.OK;
     } catch (Exception e) {

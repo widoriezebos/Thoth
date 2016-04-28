@@ -224,3 +224,15 @@ footer {
 	font-size: 10px;	
 }
 
+.revisiondetail {
+	min-width: 100px;
+}	
+
+.alignright {
+	float: right;
+}
+
+.floatright {
+	clear: both;
+	float: right;
+}

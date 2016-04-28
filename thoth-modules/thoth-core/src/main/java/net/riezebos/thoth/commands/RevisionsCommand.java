@@ -67,7 +67,7 @@ public class RevisionsCommand extends RendererBase implements Command {
       variables.put("page", pageNumber);
       variables.put("hasmore", hasMore);
 
-      render(skin.getRevisionTemplate(), contextName, arguments, variables, outputStream);
+      render(skin.getSkinBaseFolder(), skin.getRevisionTemplate(), contextName, arguments, variables, outputStream);
 
       return RenderResult.OK;
     } catch (Exception e) {

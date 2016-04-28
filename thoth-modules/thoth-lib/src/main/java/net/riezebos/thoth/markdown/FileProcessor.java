@@ -68,6 +68,7 @@ public class FileProcessor {
   private Map<String, String> softLinkMappings = new HashMap<String, String>();
   private List<SoftLinkTranslation> softLinkTranslations = new ArrayList<SoftLinkTranslation>();
   private List<BookmarkUsage> bookmarkUsages = new ArrayList<BookmarkUsage>();
+  private List<BookmarkUsage> externalBookmarkUsages = new ArrayList<BookmarkUsage>();
   private FileSystem fileSystem = new BasicFileSystem();
   private PrintStream out = System.out;
 
@@ -106,11 +107,15 @@ public class FileProcessor {
     metaTags = new HashMap<String, String>();
     headerCounters = new int[20];
     bookmarkUsages = new ArrayList<BookmarkUsage>();
+    externalBookmarkUsages = new ArrayList<BookmarkUsage>();
     loadSoftLinks();
   }
 
   protected void error(String message) {
-    LineInfo currentLineInfo = getCurrentLineInfo();
+    error(getCurrentLineInfo(), message);
+  }
+
+  protected void error(LineInfo currentLineInfo, String message) {
     errors.add(new ProcessorError(currentLineInfo, message));
   }
 
@@ -173,6 +178,10 @@ public class FileProcessor {
 
   protected void registerBookMarkUsage(BookmarkUsage usage) {
     bookmarkUsages.add(usage);
+  }
+
+  protected void registerExternalBookMark(BookmarkUsage usage) {
+    externalBookmarkUsages.add(usage);
   }
 
   /**
@@ -255,13 +264,16 @@ public class FileProcessor {
 
     String title = line.substring(level).trim();
     String id = ThothUtil.encodeBookmark(title, true);
+    String idOriginal = ThothUtil.encodeBookmark(title, false);
 
     // Make sure we do not get into trouble with HTML tags in the title
     title = title.replaceAll("\\<", "\\\\<");
     title = title.replaceAll("\\>", "\\\\>");
 
     if (isValidBookmark(id)) {
-      bookmarks.add(new Bookmark(level, id, title));
+      bookmarks.add(new Bookmark(level, id, title, true));
+      if (!idOriginal.equals(id))
+        bookmarks.add(new Bookmark(level, idOriginal, title, false));
     }
     return (addNewlineBeforeheader ? "\n" : "") + line + "\n";
   }
@@ -384,6 +396,9 @@ public class FileProcessor {
 
     boolean first = true;
     for (Bookmark bookmark : bookmarks) {
+      if (!bookmark.isUseForToc())
+        continue;
+
       if (first)
         toc.append("<" + TABLEOFCONTENTS_TAG + ">");
       first = false;
@@ -509,7 +524,8 @@ public class FileProcessor {
   protected void startNewFile(String fileName) throws IOException {
     if (getLibrary().length() != 0 && fileName.startsWith(getLibrary()))
       fileName = fileName.substring(getLibrary().length() - 1);
-    currentInfo.push(new LineInfo(ThothUtil.stripPrefix(fileName, "/"), 0));
+    String normalized = createFileHandle(ThothUtil.stripPrefix(fileName, "/")).getAbsolutePath();
+    currentInfo.push(new LineInfo(normalized, 0));
   }
 
   /**
@@ -551,9 +567,7 @@ public class FileProcessor {
       showErrorNoNotFound = false;
     }
 
-    if (softLinkFileName.startsWith("/"))
-      softLinkFileName = softLinkFileName.substring(1);
-    String fileName = getLibrary() + softLinkFileName;
+    String fileName = ThothUtil.stripSuffix(getLibrary(), "/") + ThothUtil.prefix(softLinkFileName, "/");
 
     FileHandle file = createFileHandle(fileName);
     if (file.isFile()) {
@@ -595,7 +609,8 @@ public class FileProcessor {
   }
 
   /**
-   * Will validate the bookmarks specifications and add errors for any bookmarks that are invalid
+   * Will validate the bookmark specifications and add errors for invalid bookmarks. Note that we do not validate bookmarks that reference an external document
+   * because that would be too expensive. Checking these is left to the caller; use getExternalBookmarkUsages() to get hold of them
    */
   protected void validate() {
     Set<String> validBookmarks = new HashSet<String>();
@@ -608,13 +623,17 @@ public class FileProcessor {
     }
     for (BookmarkUsage usage : bookmarkUsages) {
       if (!validBookmarks.contains(usage.getBookmark())) {
-        error("Invalid bookmark: #" + usage.getBookmark());
+        error(usage.getCurrentLineInfo(), "Invalid bookmark: #" + usage.getBookmark());
       }
     }
   }
 
   public List<BookmarkUsage> getBookmarkUsages() {
     return bookmarkUsages;
+  }
+
+  public List<BookmarkUsage> getExternalBookmarkUsages() {
+    return externalBookmarkUsages;
   }
 
   public Map<String, String> getMetaTags() {

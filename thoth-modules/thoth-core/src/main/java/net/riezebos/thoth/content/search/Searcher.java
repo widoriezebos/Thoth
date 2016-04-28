@@ -14,6 +14,7 @@
  */
 package net.riezebos.thoth.content.search;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TextFragment;
 import org.apache.lucene.store.FSDirectory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.Configuration;
@@ -55,6 +58,7 @@ import net.riezebos.thoth.util.ThothCoreUtil;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class Searcher {
+  private static final Logger LOG = LoggerFactory.getLogger(Searcher.class);
 
   private ContentManager contentManager;
 
@@ -102,21 +106,26 @@ public class Searcher {
           String type = document.get(Indexer.INDEX_TYPE);
           if (Indexer.TYPE_DOCUMENT.equals(type) || Indexer.TYPE_FRAGMENT.equals(type)) {
             searchResult.setResource(false);
-            MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(documentPath, true, CriticProcessingMode.DO_NOTHING);
-            String contents = markDownDocument.getMarkdown();
 
-            SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
-            Highlighter highlighter = new Highlighter(htmlFormatter, new QueryScorer(query, Indexer.INDEX_CONTENTS));
-            highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
+            try {
+              MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(documentPath, true, CriticProcessingMode.DO_NOTHING);
+              String contents = markDownDocument.getMarkdown();
 
-            TokenStream tokenStream = analyzer.tokenStream(Indexer.INDEX_CONTENTS, contents);
+              SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
+              Highlighter highlighter = new Highlighter(htmlFormatter, new QueryScorer(query, Indexer.INDEX_CONTENTS));
+              highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
 
-            TextFragment[] frags = highlighter.getBestTextFragments(tokenStream, contents, false, 99999);
-            for (TextFragment frag : frags) {
-              if ((frag != null) && (frag.getScore() > 0)) {
-                String fragmentText = frag.toString();
-                searchResult.addFragment(new Fragment(ThothCoreUtil.escapeHtmlExcept("B", fragmentText)));
+              TokenStream tokenStream = analyzer.tokenStream(Indexer.INDEX_CONTENTS, contents);
+
+              TextFragment[] frags = highlighter.getBestTextFragments(tokenStream, contents, false, 99999);
+              for (TextFragment frag : frags) {
+                if ((frag != null) && (frag.getScore() > 0)) {
+                  String fragmentText = frag.toString();
+                  searchResult.addFragment(new Fragment(ThothCoreUtil.escapeHtmlExcept("B", fragmentText)));
+                }
               }
+            } catch (FileNotFoundException e) {
+              LOG.warn("Index contains an invalid file reference); probably need to reindex to get rid of this. File: " + e.getMessage());
             }
           } else {
             searchResult.setResource(true);

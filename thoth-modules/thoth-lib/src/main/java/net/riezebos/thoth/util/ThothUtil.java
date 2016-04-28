@@ -525,4 +525,15 @@ public class ThothUtil {
     return value;
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  public static int safeCompare(Comparable  c1, Comparable c2) {
+    if (c1 == null && c2 != null)
+      return -1;
+    if (c1 != null && c2 == null)
+      return 1;
+    if (c1 == null && c2 == null)
+      return 0;
+
+    return c1.compareTo(c2);
+  }
 }

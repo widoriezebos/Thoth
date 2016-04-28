@@ -34,13 +34,20 @@ public class MarkDownDocument {
   private DocumentNode documentStructure;
   private String markdown;
   private Date lastModified;
+  private List<BookmarkUsage> bookmarkUsages;
+  private List<BookmarkUsage> externalBookmarkUsages;
+  private List<Bookmark> bookmarks;
 
-  public MarkDownDocument(String markdown, Map<String, String> metatags, List<ProcessorError> errors, DocumentNode documentStructure) {
+  public MarkDownDocument(String markdown, Map<String, String> metatags, List<ProcessorError> errors, DocumentNode documentStructure,
+      List<BookmarkUsage> bookmarkUsages, List<BookmarkUsage> externalBookmarkUsages, List<Bookmark> bookmarks) {
     super();
     this.markdown = markdown;
     this.metatags = metatags;
     this.errors = errors;
     this.documentStructure = documentStructure;
+    this.bookmarkUsages = bookmarkUsages;
+    this.externalBookmarkUsages = externalBookmarkUsages;
+    this.bookmarks = bookmarks;
   }
 
   public DocumentNode getDocumentStructure() {
@@ -89,6 +96,18 @@ public class MarkDownDocument {
 
   public Date getLastModified() {
     return lastModified;
+  }
+
+  public List<BookmarkUsage> getBookmarkUsages() {
+    return bookmarkUsages;
+  }
+
+  public List<BookmarkUsage> getExternalBookmarkUsages() {
+    return externalBookmarkUsages;
+  }
+
+  public List<Bookmark> getBookmarks() {
+    return bookmarks;
   }
 
   @Override

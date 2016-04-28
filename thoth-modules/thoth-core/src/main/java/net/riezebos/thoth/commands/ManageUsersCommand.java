@@ -106,7 +106,7 @@ public class ManageUsersCommand extends RendererBase implements Command {
     variables.put("groups", groups);
     variables.put("identities", identities);
 
-    render(skin.getManageUsersTemplate(), contextName, arguments, variables, outputStream);
+    render(skin.getSkinBaseFolder(), skin.getManageUsersTemplate(), contextName, arguments, variables, outputStream);
 
     return RenderResult.OK;
   }

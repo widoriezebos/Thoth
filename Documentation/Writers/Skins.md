@@ -18,6 +18,8 @@ In this example any path that matches \*/Datamodel/\* will be rendered using the
 ## Creating your own Skin
 Of course you can use the builtin Skins (SimpleSkin and Bootstrap) but you can define as many as you like yourself. You do this by creating a Skin descriptor file and placing this file anywhere in your library. Thoth will find all your Skin descriptors and enable them for use within your library.
 
+Note: if you only intend to change the header or footer of pages rendered by the SimpleSkin template, you just need to change the `header.tpl` or `footer.tpl` templates that are included by all pages (except the markdown template that is).
+
 ### Creating the Skin descriptor file
 The Skin descriptor file is a property file with the name `skin.properties`. Inside this file you must at least have one property that defines the name of the Skin. If you leave out everything else you have effectively defined a new Skin that inherits everything from SimpleSKin. So the minimal skin.properties file looks like 
 
@@ -241,7 +243,9 @@ The template that is used to display all the revisions of changes committed to t
 #### template.validationreport
 The page that shows all errors that were detected by Thoth in the current repository.
 
+- **documents** is the list of documents (paths) with errors. Type: List\<String\>
 - **errors** is the list of errors that occurred during (include) processing of the document concerned. Type: List\<ProcessorError\>
+- **errorsByDocument** is a map of errors by document. The key of the map is the value found in **documents**. Type: Map\<String, ProcessorError\>
 
 #### template.search
 The search (engine) page, displaying the results of a query.

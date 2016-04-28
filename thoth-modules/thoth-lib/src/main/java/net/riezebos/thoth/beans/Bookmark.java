@@ -18,11 +18,17 @@ public class Bookmark {
   private int level;
   private String id;
   private String title;
+  private boolean useForToc;
 
-  public Bookmark(int level, String id, String title) {
+  public Bookmark(int level, String id, String title, boolean useForToc) {
     this.level = level;
     this.id = id;
     this.title = title.trim();
+    this.useForToc = useForToc;
+  }
+
+  public boolean isUseForToc() {
+    return useForToc;
   }
 
   public int getLevel() {

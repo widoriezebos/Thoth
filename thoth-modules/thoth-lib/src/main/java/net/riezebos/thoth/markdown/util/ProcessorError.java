@@ -16,6 +16,8 @@ package net.riezebos.thoth.markdown.util;
 
 import java.io.Serializable;
 
+import net.riezebos.thoth.util.ThothUtil;
+
 public class ProcessorError implements Serializable, Comparable<ProcessorError> {
 
   private static final long serialVersionUID = 1L;
@@ -67,7 +69,14 @@ public class ProcessorError implements Serializable, Comparable<ProcessorError> 
 
   @Override
   public int compareTo(ProcessorError o) {
-    return getDescription().compareTo(o.getDescription());
+    int result = ThothUtil.safeCompare(getFile(), o.getFile());
+    if (result != 0)
+      return result;
+    result = ThothUtil.safeCompare(getLine(), o.getLine());
+    if (result != 0)
+      return result;
+    result = ThothUtil.safeCompare(getDescription(), o.getDescription());
+    return result;
   }
 
   @Override

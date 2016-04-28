@@ -46,7 +46,7 @@ public class ErrorPageCommand extends RendererBase implements Command {
     try {
       RenderResult result = RenderResult.OK;
       Map<String, Object> variables = new HashMap<>(arguments);
-      renderTemplate(skin.getErrorTemplate(), context, variables, outputStream);
+      renderTemplate(skin.getSkinBaseFolder(), skin.getErrorTemplate(), context, variables, outputStream);
       return result;
     } catch (Exception e) {
       throw new RenderException(e);

@@ -40,27 +40,21 @@
   #end    
 #end
 
-<!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8">
-    <title>${title}</title>
-    <link rel="icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
-    <link rel="shortcut icon" href="${skinbase}/Webresources/favicon.png" type="image/png" />
-    <link rel="stylesheet" type="text/css" href="${skinbase}/Webresources/markdown.css">
-  </head>
-  <body>
-    <h1>Comment on ${title}<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
-    <a href="${contexturl}">Back to Index</a>
+#set($page_title = $title)
+#set($markdown_mode = true)
+#parse ("header.tpl")
 
-    #displaySection($mainsection)
+  <h1>Comment on ${title}<img class="logo" src="${skinbase}/Webresources/logo.png"/></h1>
+  <a href="${contexturl}">Back to Index</a>
+
+  #displaySection($mainsection)
+  
+  #if($scrollto)
+    <script>
+      window.onload = function(){
+          document.getElementById('$scrollto').scrollIntoView(true);
+      };
+    </script>
+  #end
+#parse ("footer.tpl")
     
-    #if($scrollto)
-      <script>
-        window.onload = function(){
-            document.getElementById('$scrollto').scrollIntoView(true);
-        };
-      </script>
-    #end
-  </body>
-</html>

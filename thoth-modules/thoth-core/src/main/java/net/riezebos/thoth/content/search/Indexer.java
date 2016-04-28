@@ -49,6 +49,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.riezebos.thoth.beans.BookmarkUsage;
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.beans.MarkDownDocument;
 import net.riezebos.thoth.configuration.CacheManager;
@@ -60,6 +61,7 @@ import net.riezebos.thoth.exceptions.ContextNotFoundException;
 import net.riezebos.thoth.markdown.critics.CriticProcessingMode;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
 import net.riezebos.thoth.markdown.util.DocumentNode;
+import net.riezebos.thoth.markdown.util.ProcessorError;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class Indexer {
@@ -112,8 +114,6 @@ public class Indexer {
 
       sortIndexLists(indexingContext.getIndirectReverseIndex());
       sortIndexLists(indexingContext.getDirectReverseIndex());
-      Collections.sort(indexingContext.getErrors());
-
       cacheResults(indexingContext);
 
       // NOTE: if you want to maximize search performance,
@@ -166,7 +166,9 @@ public class Indexer {
     CacheManager cacheManager = getCacheManager();
     cacheManager.cacheReverseIndex(true, indexingContext.getIndirectReverseIndex());
     cacheManager.cacheReverseIndex(false, indexingContext.getDirectReverseIndex());
-    cacheManager.cacheErrors(indexingContext.getErrors());
+    List<ProcessorError> errors = new ArrayList<>(indexingContext.getErrors());
+    Collections.sort(errors);
+    cacheManager.cacheErrors(errors);
   }
 
   protected void persistCaches(IndexingContext indexingContext) throws CachemanagerException {
@@ -206,7 +208,11 @@ public class Indexer {
       try {
         String resourcePath = fileHandle.getAbsolutePath();
         MarkDownDocument markDownDocument = contentManager.getMarkDownDocument(resourcePath, true, CriticProcessingMode.DO_NOTHING);
+
         indexingContext.getErrors().addAll(markDownDocument.getErrors());
+
+        // Validate any bookmarks that reference external files
+        validateExternalBookmarks(fileHandle.getParentFile(), markDownDocument.getExternalBookmarkUsages(), indexingContext.getErrors());
 
         // Also index non-documents if referenced and stored locally
         for (DocumentNode node : markDownDocument.getDocumentStructure().flatten(true)) {
@@ -235,6 +241,29 @@ public class Indexer {
         addToIndex(writer, resourcePath, resourceType, markDownDocument.getTitle(), body, markDownDocument.getMetatags());
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
+      }
+    }
+  }
+
+  protected void validateExternalBookmarks(FileHandle documentFolder, List<BookmarkUsage> bookmarkUsages, Set<ProcessorError> errors)
+      throws IOException, ContextNotFoundException {
+    for (BookmarkUsage bookmarkUsage : bookmarkUsages) {
+      String rootFolder = documentFolder.getAbsolutePath();
+      String externalRefSpec = ThothUtil.suffix(rootFolder, "/") + ThothUtil.stripPrefix(bookmarkUsage.getBookmark(), "/");
+      String externalFile = ThothUtil.getPartBeforeFirst(externalRefSpec, "#");
+      String externalBookmark = ThothUtil.getPartAfterFirst(externalRefSpec, "#");
+
+      MarkDownDocument referencedDocument = contentManager.getMarkDownDocument(externalFile, true, CriticProcessingMode.DO_NOTHING);
+      Set<String> validBookmarks = new HashSet<>();
+      referencedDocument.getBookmarks().stream().forEach(bm -> {
+        validBookmarks.add(bm.getId());
+        validBookmarks.add(ThothUtil.stripNumericPrefix(bm.getId()));
+      });
+
+      if (!validBookmarks.contains(externalBookmark)) {
+        ProcessorError error =
+            new ProcessorError(bookmarkUsage.getCurrentLineInfo(), "Bookmark #" + externalBookmark + " is not defined in file " + externalFile);
+        errors.add(error);
       }
     }
   }

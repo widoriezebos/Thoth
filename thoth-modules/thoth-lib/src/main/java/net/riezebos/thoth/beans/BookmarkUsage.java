@@ -46,6 +46,6 @@ public class BookmarkUsage {
 
   @Override
   public String toString() {
-    return currentLineInfo + ": #" + getBookmark();
+    return currentLineInfo + ": " + getBookmark();
   }
 }

@@ -91,7 +91,7 @@ public class SearchCommand extends RendererBase implements Command {
       variables.put("searchResults", searchResults);
       variables.put("query", query);
 
-      render(skin.getSearchTemplate(), contextName, arguments, variables, outputStream);
+      render(skin.getSkinBaseFolder(), skin.getSearchTemplate(), contextName, arguments, variables, outputStream);
 
       return RenderResult.OK;
     } catch (Exception e) {

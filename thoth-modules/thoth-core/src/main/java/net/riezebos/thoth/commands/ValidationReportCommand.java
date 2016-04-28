@@ -17,6 +17,8 @@ package net.riezebos.thoth.commands;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,10 +89,28 @@ public class ValidationReportCommand extends RendererBase implements Command {
     List<String> allPaths = contentManager.getAllPaths();
     List<Comment> orphanedComments = commentManager.getOrphanedComments(contextName, allPaths);
     Map<String, Object> variables = new HashMap<>(arguments);
+
+    Map<String, List<ProcessorError>> errorsByDocument = new HashMap<>();
+    errors.stream().forEach(pe -> {
+      List<ProcessorError> list = errorsByDocument.get(pe.getFile());
+      if (list == null) {
+        list = new ArrayList<>();
+        errorsByDocument.put(pe.getFile(), list);
+      }
+      list.add(pe);
+    });
+
+    errorsByDocument.entrySet().stream().forEach(l -> Collections.sort(l.getValue()));
+
+    List<String> documents = new ArrayList<>(errorsByDocument.keySet());
+    Collections.sort(documents);
+
+    variables.put("documents", documents);
+    variables.put("errorsByDocument", errorsByDocument);
     variables.put("errors", errors);
     variables.put("orphanedComments", orphanedComments);
 
-    render(skin.getValidationTemplate(), contextName, arguments, variables, outputStream);
+    render(skin.getSkinBaseFolder(), skin.getValidationTemplate(), contextName, arguments, variables, outputStream);
 
     return RenderResult.OK;
   }

@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,11 @@ public class CacheManagerTest extends ThothTestBase {
     TestCacheManager mgr2 = new TestCacheManager(contentManager);
     mgr2.setMockReverseIndexes(false);
     mgr2.setResources(mgr.getResources());
-    assertEquals(mgr2.getValidationErrors(), indexingContext.getErrors());
+
+    List<ProcessorError> errorList = new ArrayList<>(indexingContext.getErrors());
+    Collections.sort(errorList);
+
+    assertEquals(mgr2.getValidationErrors(), errorList);
     assertEquals(mgr2.getReverseIndex(true), indexingContext.getIndirectReverseIndex());
     assertEquals(mgr2.getReverseIndex(false), indexingContext.getDirectReverseIndex());
 

@@ -76,7 +76,7 @@ public class ContextIndexCommand extends RendererBase implements Command {
       variables.put("versioncontrolled", contentManager.supportsVersionControl());
       variables.put("classifications", classificationNames);
 
-      render(skin.getContextIndexTemplate(), contextName, arguments, variables, outputStream);
+      render(skin.getSkinBaseFolder(), skin.getContextIndexTemplate(), contextName, arguments, variables, outputStream);
 
       return RenderResult.OK;
     } catch (Exception e) {

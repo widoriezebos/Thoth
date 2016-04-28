@@ -82,11 +82,10 @@ import net.riezebos.thoth.util.MimeTypeUtil;
 import net.riezebos.thoth.util.ThothUtil;
 
 public class ThothServlet extends ServletBase implements RendererProvider, RendererChangeListener {
-  private static final String SESSION_USER_KEY = "user";
-
-  private static final Logger LOG = LoggerFactory.getLogger(ThothServlet.class);
-
   private static final long serialVersionUID = 1L;
+  private static final Logger LOG = LoggerFactory.getLogger(ThothServlet.class);
+  private static final String REDIRECT_AFTER_LOGIN = "redirect_after_login";
+  private static final String SESSION_USER_KEY = "user";
 
   private Map<String, Renderer> renderers = new HashMap<>();
   private Map<String, Command> commands = new HashMap<>();
@@ -300,6 +299,12 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
     if (isLoggedIn(request))
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
     else {
+      String queryString = request.getQueryString();
+      String originalRequest = request.getRequestURI() + (queryString == null ? "" : "?" + queryString);
+
+      HttpSession session = request.getSession(true);
+      session.setAttribute(REDIRECT_AFTER_LOGIN, originalRequest);
+
       String loginRedirect = getRootRedirect(request);
       loginRedirect += "?cmd=" + LoginCommand.TYPE_CODE;
       response.sendRedirect(loginRedirect);
@@ -343,12 +348,21 @@ public class ThothServlet extends ServletBase implements RendererProvider, Rende
         response.sendRedirect(rootRedirect);
         break;
       case LOGGED_IN:
+
+        HttpSession session = request.getSession(true);
+        String redirect = (String) session.getAttribute(REDIRECT_AFTER_LOGIN);
+
         User user = renderResult.getArgument(LoginCommand.USER_ARGUMENT);
         setCurrentUser(request, user);
-        if (StringUtils.isBlank(context))
-          response.sendRedirect(rootRedirect);
-        else
-          response.sendRedirect(getContextUrl(request));
+
+        if (redirect == null) {
+          if (StringUtils.isBlank(context))
+            redirect = rootRedirect;
+          else
+            redirect = getContextUrl(request);
+        }
+        response.sendRedirect(redirect);
+
         break;
       default:
         response.sendError(HttpServletResponse.SC_NOT_FOUND);

@@ -176,7 +176,7 @@ public class ThothServletTest extends ThothTestBase {
     thothServlet.doGet(request, response);
     MockServletOutputStream sos = (MockServletOutputStream) response.getOutputStream();
     String result = sos.getContentsAsString();
-    assertTrue(result.indexOf("\"skinbase\":\"/TestContext/library/TestReposSkin\"") != -1);
+    assertTrue(result.indexOf("\"skinbase\":\"/TestContext/TestContext/library/TestReposSkin\"") != -1);
   }
 
   protected Command getFailingCommand() {

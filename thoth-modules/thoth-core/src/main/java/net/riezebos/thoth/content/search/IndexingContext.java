@@ -14,7 +14,6 @@
  */
 package net.riezebos.thoth.content.search;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +25,7 @@ import net.riezebos.thoth.markdown.util.ProcessorError;
 public class IndexingContext {
   private Map<String, List<String>> indirectReverseIndex = new HashMap<>();
   private Map<String, List<String>> directReverseIndex = new HashMap<>();
-  private List<ProcessorError> errors = new ArrayList<>();
+  private Set<ProcessorError> errors = new HashSet<>();
   private Set<String> referencedLocalResources = new HashSet<>();
   private Set<String> allPaths = new HashSet<>();
 
@@ -38,14 +37,14 @@ public class IndexingContext {
     return directReverseIndex;
   }
 
-  public List<ProcessorError> getErrors() {
+  public Set<ProcessorError> getErrors() {
     return errors;
   }
 
   public Set<String> getReferencedLocalResources() {
     return referencedLocalResources;
   }
-  
+
   public Set<String> getAllPaths() {
     return allPaths;
   }

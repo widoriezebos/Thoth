@@ -108,7 +108,7 @@ public class ManageContextsCommand extends RendererBase implements Command {
     variables.put("contexts", contexts);
     variables.put("repositories", repositories);
 
-    render(skin.getManageContextsTemplate(), contextName, arguments, variables, outputStream);
+    render(skin.getSkinBaseFolder(), skin.getManageContextsTemplate(), contextName, arguments, variables, outputStream);
 
     return RenderResult.OK;
   }
