@@ -29,7 +29,8 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 	`repository.1.password=mysecret`  
 	`context.1.name=HelloThoth`  
 	`context.1.repository=MyRepository`  
-	`context.1.branch=master`
+	`context.1.branch=master`  
+	`context.1.library=Documentation`
 5. Decide how you want to run Thoth.  
 	If you want to use the **simplest approach** (i.e. running just on your desktop) then just place the configuration.properties in your working folder and from there launch Thoth standalone (or pass the path to your property file as an argument) i.e.  
 	`java -jar <path-to-thoth-standalone.jar>` and off you go.
