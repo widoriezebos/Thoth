@@ -4,7 +4,7 @@
   <parent>
     <groupId>net.riezebos.toth</groupId>
     <artifactId>thoth-modules</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
 
   <artifactId>thoth-core</artifactId>
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>net.riezebos.toth</groupId>
       <artifactId>thoth-lib</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
     </dependency>
 
     <dependency>

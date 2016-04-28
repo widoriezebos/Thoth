@@ -7,9 +7,8 @@ The underlying method of implementing and accepting changes (basically the arrow
 
 ![](images/GitPullRequest.png)
 
-Basically it comes down to what is depicted in the diagram above, where in a formal process the branches would also be on separate repositories to implement access control (i.e. the product owner is allowed to do accept the pull request and nobody else).
+Basically it comes down to what is depicted in the diagram above, where in a formal process the branches have access control so that only the product owner is allowed to accept the pull request and merge the feature branch back into the main branch.
 
 # Using comments
 If there is no need for a formal review process you could also use the (light weight) commenting feature. Users who are allowed to comment on a document (not necessarily writers) can then add comments to the fragments of a book directly in Thoth. 
-
 
