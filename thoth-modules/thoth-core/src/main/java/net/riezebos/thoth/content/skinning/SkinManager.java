@@ -216,15 +216,15 @@ public class SkinManager {
   }
 
   public Skin getSkinByName(String name) {
+    Configuration configuration = getContentManager().getConfiguration();
+    String substitute = configuration.getSkinSubstitution(name);
+    if (substitute != null)
+      name = substitute;
     return skinsByName == null ? null : skinsByName.get(name.toLowerCase());
   }
 
   public List<SkinMapping> getSkinMappings() {
     return skinMappings;
-  }
-
-  public List<Skin> getSkins() {
-    return skins;
   }
 
   protected void registerSkin(Skin skin) {
@@ -267,8 +267,11 @@ public class SkinManager {
         skin = mapping.getSkin();
         break;
       }
+
     if (skin == null)
       skin = getDefaultSkin();
+    else
+      skin = getSkinByName(skin.getName()); // We need to support skin substitution which is handled by getSkinByName()
     return skin;
   }
 }

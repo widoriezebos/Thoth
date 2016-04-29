@@ -78,4 +78,8 @@ public class PropertyLoader {
     }
     return result == null ? dflt : result;
   }
+
+  protected Properties getProperties() {
+    return properties;
+  }
 }
