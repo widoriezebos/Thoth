@@ -19,12 +19,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
-import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
