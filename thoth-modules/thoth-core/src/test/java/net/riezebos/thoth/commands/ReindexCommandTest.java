@@ -27,8 +27,8 @@ public class ReindexCommandTest extends CommandTest {
   @Test
   public void test() throws ContextNotFoundException, ContentManagerException, IOException {
 
-    String[] htmlExists = new String[] {"Reindex reuested. Running in the background"};
-    String[] jsonExists = new String[] {"\"log\":\"Reindex reuested. Running in the background\""};
+    String[] htmlExists = new String[] {"Reindex requested. Running in the background"};
+    String[] jsonExists = new String[] {"\"log\":\"Reindex requested. Running in the background\""};
 
     testCommand(new TestReindexCommand(setupContentManager(), this), "/", "reindex", htmlExists, jsonExists);
   }

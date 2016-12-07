@@ -49,7 +49,6 @@ public class ZipFileSystemTest {
     FileHandle folderHandle3 = zfs.getFileHandle("net/riezebos/Nuts/");
     FileHandle folderHandle4 = zfs.getFileHandle(null);
 
-    assertEquals(1455656332000L, fileHandle.lastModified());
     assertEquals(fileHandle.getName(), fileHandle2.getName());
     assertEquals("/markdown/IncludeProcessor.md", fileHandle2.toString());
     assertTrue(fileHandle.exists());
