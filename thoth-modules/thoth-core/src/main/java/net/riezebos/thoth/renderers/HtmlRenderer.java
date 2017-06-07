@@ -93,6 +93,7 @@ public class HtmlRenderer extends RendererBase implements Renderer {
         if (metatags.containsKey(Renderer.TITLE_PARAMETER))
           variables.put(Renderer.TITLE_PARAMETER, metatags.get(Renderer.TITLE_PARAMETER));
         variables.put(Renderer.BODY_PARAMETER, body);
+        variables.put(Renderer.DOCUMENT_PARAMETER, markdown);
 
         String markdownTemplate = skin.getHtmlTemplate();
         renderTemplate(skin.getSkinBaseFolder(), markdownTemplate, context, variables, outputStream);
