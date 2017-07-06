@@ -47,7 +47,7 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 **There is actually proper documentation** so why don't you head on to [the full documentation of Thoth][1]?
 
 ## Copyright
-Copyright (c) 2016 W.T.J. Riezebos
+Copyright (c) 2017 W.T.J. Riezebos
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ Thoth would not have been possible without the great help of the following proje
 - Apache Lucene, [https://lucene.apache.org/core/][7]
 - And of course many many other open source projects. Check the pom.xml for a complete list. 
 
-[1]:	http://thoth.riezebos.net/Thoth
+[1]:	Thoth-Documentation.pdf
 [2]:	http://www.apache.org/licenses/LICENSE-2.0
 [3]:	https://daringfireball.net/projects/markdown/
 [4]:	https://github.com/sirthias/pegdown
