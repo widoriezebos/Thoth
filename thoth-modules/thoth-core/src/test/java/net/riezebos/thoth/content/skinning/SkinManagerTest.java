@@ -19,18 +19,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
-import net.riezebos.thoth.beans.ContentNode;
+import net.riezebos.thoth.configuration.Configuration;
 import net.riezebos.thoth.content.ContentManager;
 import net.riezebos.thoth.exceptions.ContentManagerException;
 import net.riezebos.thoth.markdown.filehandle.ClasspathFileSystem;
 import net.riezebos.thoth.markdown.filehandle.FileHandle;
+import net.riezebos.thoth.testutil.ThothTestBase;
 
-public class SkinManagerTest {
+public class SkinManagerTest extends ThothTestBase {
 
   @Test
   public void test() throws IOException, ContentManagerException {
@@ -50,12 +50,14 @@ public class SkinManagerTest {
     FileHandle skinHandle1 = factory.getFileHandle(skin1);
     FileHandle skinHandle2 = factory.getFileHandle(skin2);
 
+    Configuration mockConfiguration = mockConfiguration("test");
     ContentManager mockedContentManager = mock(ContentManager.class);
     when(mockedContentManager.getContextName()).thenReturn("testcontext");
     when(mockedContentManager.getFileHandle("/skins.properties")).thenReturn(skinsHandle);
     when(mockedContentManager.getFileHandle(skin1)).thenReturn(skinHandle1);
     when(mockedContentManager.getFileHandle(skin2)).thenReturn(skinHandle2);
     when(mockedContentManager.find("skin.properties", true)).thenReturn(getNodes(factory, skin1, skin2));
+    when(mockedContentManager.getConfiguration()).thenReturn(mockConfiguration);
 
     SkinManager skinManager = new SkinManager(mockedContentManager, null);
     Skin simpleSkin = skinManager.getSkinByName("SimpleSkin");
@@ -112,14 +114,4 @@ public class SkinManagerTest {
     assertEquals(1, skinMappings.size());
     assertEquals("(.*?)", skinMappings.get(0).getPattern().toString());
   }
-
-  private List<ContentNode> getNodes(ClasspathFileSystem factory, String... paths) {
-    List<ContentNode> result = new ArrayList<>();
-    for (String path : paths) {
-      FileHandle fileHandle = factory.getFileHandle(path);
-      result.add(new ContentNode(fileHandle.getAbsolutePath(), fileHandle));
-    }
-    return result;
-  }
-
 }

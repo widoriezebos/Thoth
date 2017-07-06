@@ -20,8 +20,10 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +40,8 @@ import net.riezebos.thoth.util.ThothUtil;
 
 public class PropertyBasedConfiguration extends ConfigurationBase implements Configuration {
 
+  private static final String SKINSUBSTITUTION_PREFIX = "skinsubstitution.";
+
   private static final String CLASSPATH_PREFIX = "classpath:";
 
   private static final String DEFAULT_DATE_FMT = "dd-MM-yyyy";
@@ -50,6 +54,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   private Set<String> imageExtensions = new HashSet<>();
   private Set<String> fragmentExtensions = null;
   private Set<String> bookExtensions = null;
+  private Map<String, String> skinSubstitutions = null;
   private List<String> classifications = null;
   private List<String> outputFormats = null;
 
@@ -64,6 +69,7 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
     imageExtensions = new HashSet<>();
     fragmentExtensions = null;
     bookExtensions = null;
+    skinSubstitutions = null;
     classifications = null;
     outputFormats = null;
   }
@@ -562,4 +568,21 @@ public class PropertyBasedConfiguration extends ConfigurationBase implements Con
   public String getServerName() {
     return getValue("servername", "Thoth");
   }
+
+  @Override
+  public String getSkinSubstitution(String original) {
+    return getSkinSubstitutions().get(original);
+  }
+
+  protected Map<String, String> getSkinSubstitutions() {
+    if (skinSubstitutions == null) {
+      Map<String, String> subst = new HashMap<String, String>();
+      getProperties().entrySet().stream()//
+          .filter(e -> e.getKey().toString().startsWith(SKINSUBSTITUTION_PREFIX))//
+          .forEach(e -> subst.put(e.getKey().toString().substring(SKINSUBSTITUTION_PREFIX.length()), e.getValue().toString()));
+      skinSubstitutions = subst;
+    }
+    return skinSubstitutions;
+  }
+
 }

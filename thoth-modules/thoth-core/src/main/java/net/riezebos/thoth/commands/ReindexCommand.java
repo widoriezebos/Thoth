@@ -55,7 +55,7 @@ public class ReindexCommand extends RendererBase implements Command {
         reindex(contentManager);
       }
       Map<String, Object> variables = new HashMap<>(arguments);
-      String log = "Reindex reuested. Running in the background";
+      String log = "Reindex requested. Running in the background";
       variables.put("title", "Reindex report");
       variables.put("log", log);
 

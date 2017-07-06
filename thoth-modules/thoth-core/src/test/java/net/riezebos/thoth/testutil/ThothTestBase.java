@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.mockito.Mock;
 
 import net.riezebos.thoth.beans.ContentNode;
 import net.riezebos.thoth.configuration.Configuration;
@@ -181,6 +182,7 @@ public class ThothTestBase {
     when(mockedConfiguration.getDatabasePassword()).thenReturn("thoth");
     when(mockedConfiguration.getDatabaseUrl()).thenReturn("/some/workspace/db");
     when(mockedConfiguration.getDatabaseType()).thenReturn("embedded");
+    when(mockedConfiguration.getSkinSubstitution(anyString())).thenReturn(null);
     return mockedConfiguration;
   }
 

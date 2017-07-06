@@ -365,4 +365,11 @@ public interface Configuration extends Cloneable {
    */
   public String getServerName();
 
+  /**
+   * Return any substition for a named skin
+   * @param original
+   * @return
+   */
+  public String getSkinSubstitution(String original);
+
 }

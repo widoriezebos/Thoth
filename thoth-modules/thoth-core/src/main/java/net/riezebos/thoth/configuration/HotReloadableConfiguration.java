@@ -395,4 +395,9 @@ public class HotReloadableConfiguration implements Configuration {
   public String getServerName() {
     return activeConfiguration.getServerName();
   }
+
+  @Override
+  public String getSkinSubstitution(String original) {
+    return activeConfiguration.getSkinSubstitution(original);
+  }
 }
