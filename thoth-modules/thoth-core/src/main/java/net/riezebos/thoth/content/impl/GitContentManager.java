@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.PullResult;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
@@ -111,7 +112,9 @@ public class GitContentManager extends ContentManagerBase {
 
           if (target.isDirectory()) {
             try (Git repos = getRepository()) {
-
+              // To avoid merge conflicts keeping us from successfully pulling we will reset any changes first.
+              repos.clean().call();
+              repos.reset().setMode(ResetType.HARD).call();
               Repository repository = repos.getRepository();
               ObjectId oldHead = repository.resolve(HEAD_TREE);
 
@@ -331,7 +334,7 @@ public class GitContentManager extends ContentManagerBase {
     RepositoryDefinition repositoryDefinition = getContextDefinition().getRepositoryDefinition();
     String username = repositoryDefinition.getUsername();
     String password = repositoryDefinition.getPassword();
-    return new UsernamePasswordCredentialsProvider(username, password);
+    return new UsernamePasswordCredentialsProvider(username, password == null ? null : password.toCharArray());
   }
 
   protected Action translateAction(ChangeType changeType) {
@@ -350,10 +353,7 @@ public class GitContentManager extends ContentManagerBase {
 
   protected void validateContextDefinition(ContextDefinition contextDefinition) throws ContentManagerException {
     RepositoryDefinition repositoryDefinition = contextDefinition.getRepositoryDefinition();
-    if (StringUtils.isBlank(repositoryDefinition.getUsername()))
-      throw new ContentManagerException("Username not set for repositiory " + repositoryDefinition.getName());
-    if (StringUtils.isBlank(repositoryDefinition.getPassword()))
-      throw new ContentManagerException("Password not set for repositiory " + repositoryDefinition.getName());
+    // We allow for anonymous Git access; so we cannot check nulls for user/pw
     if (StringUtils.isBlank(repositoryDefinition.getLocation()))
       throw new ContentManagerException("Location not set for repositiory " + repositoryDefinition.getName());
     if (StringUtils.isBlank(contextDefinition.getBranch()))
