@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="thoth-server-1.0.2-SNAPSHOT">
+    <wb-module deploy-name="thoth-server-1.0.3-SNAPSHOT">
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
-        <dependent-module archiveName="thoth-core-1.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/thoth-core/thoth-core">
+        <dependent-module archiveName="thoth-core-1.0.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/thoth-core/thoth-core">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="thoth-lib-1.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/thoth-lib/thoth-lib">
+        <dependent-module archiveName="thoth-lib-1.0.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/thoth-lib/thoth-lib">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="thoth-server"/>
