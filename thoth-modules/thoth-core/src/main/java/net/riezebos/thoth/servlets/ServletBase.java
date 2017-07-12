@@ -148,7 +148,7 @@ public abstract class ServletBase extends HttpServlet {
 
       if (StringUtils.isBlank(context)) {
         context = configuration.getMainIndexSkinContext();
-        if (!getContextManager().isValidContext(context)) {
+        if (context != null && !getContextManager().isValidContext(context)) {
           LOG.warn("Invalid setting for skin.mainindexcontext=" + context + "; invalid context name. Ignoring.");
           context = null;
         }
