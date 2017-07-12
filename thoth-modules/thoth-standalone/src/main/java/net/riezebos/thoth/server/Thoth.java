@@ -59,21 +59,26 @@ public class Thoth {
     List<String> argumentsList = ThothUtil.getArgumentsList(args);
     Map<String, String> argumentsMap = ThothUtil.getArgumentsMap(args);
     boolean asServer = argumentsMap.containsKey("server");
+    boolean initOnly = argumentsMap.containsKey("initonly");
 
     setupConfiguration(thothEnvironment, argumentsList);
 
     if (argumentsMap.containsKey("help"))
       printUsage();
     else {
-      runServer(thothEnvironment, asServer);
+      runServer(thothEnvironment, asServer, initOnly);
     }
   }
 
-  protected void runServer(ThothEnvironment thothEnvironment, boolean asServer)
+  protected void runServer(ThothEnvironment thothEnvironment, boolean asServer, boolean initOnly)
       throws Exception, ContentManagerException, InterruptedException, UnsupportedEncodingException, IOException {
 
     println("Thoth standalone v" + ThothUtil.getVersion(ThothUtil.Version.STANDALONE));
-    println("Server is firing up. Please hang on...");
+
+    if (initOnly)
+      println("Initializing repositories. Please hang on...");
+    else
+      println("Server is firing up. Please hang on...");
 
     Configuration configuration = thothEnvironment.getConfiguration();
     Server server = new Server(configuration.getEmbeddedServerPort());
@@ -103,31 +108,34 @@ public class Thoth {
     println("Setting up content managers...");
     // Warm up the server
     thothEnvironment.touch();
+    println("Content managers set up");
 
-    server.start();
-    println("Thoth server started.");
-
-    if (asServer) {
-      server.join();
-    } else {
+    if (!initOnly) {
+      server.start();
+      println("Thoth server started");
       println("You can now access Thoth at http://"//
           + configuration.getEmbeddedServerName() //
           + ":" + configuration.getEmbeddedServerPort());
-      BufferedReader br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 
-      println("Enter 'help' for a list of commands");
+      if (asServer) {
+        server.join();
+      } else {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 
-      boolean stop = false;
-      do {
-        stop = doCommand(thothEnvironment, configuration, br);
-      } while (!stop);
+        println("Enter 'help' for a list of commands");
 
-      println("Stopping server...");
-      server.stop();
-      server.join();
-      thothEnvironment.shutDown();
-      println("Bye!");
+        boolean stop = false;
+        do {
+          stop = doCommand(thothEnvironment, configuration, br);
+        } while (!stop);
+
+        println("Stopping server...");
+        server.stop();
+        server.join();
+      }
     }
+    thothEnvironment.shutDown();
+    println("Bye!");
   }
 
   protected boolean doCommand(ThothEnvironment thothEnvironment, Configuration configuration, BufferedReader br) {
@@ -228,8 +236,9 @@ public class Thoth {
     println("           As a last resort Thoth will try the working folder for a file");
     println("           named 'configuration.properties'");
     println("Flags:");
-    println("  -server: (Optional) run Thoth as a server. By default thoth will be interactive");
-    println("  -help:   (Optional) show this message");
+    println("  -initonly: (Optional) only initialize (pull) the repositories, exit when done");
+    println("  -server:   (Optional) run Thoth as a server. By default thoth will be interactive");
+    println("  -help:     (Optional) show this message");
   }
 
   protected String validateConfigFile(String defaultConfigFileName) {
@@ -241,8 +250,14 @@ public class Thoth {
   }
 
   public static void main(String[] args) throws Exception {
-    Thoth thoth = new Thoth();
-    thoth.start(args);
+    try {
+      Thoth thoth = new Thoth();
+      thoth.start(args);
+    } catch (Exception e) {
+      // Lets terminate when something bad happens during startup
+      e.printStackTrace();
+      System.exit(0);
+    }
   }
 
 }
