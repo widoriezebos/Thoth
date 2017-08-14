@@ -39,15 +39,17 @@ To preview your changes you run Thoth-Standalone on your desktop, with a browser
 
 \includecode{thoth-standalone.properties}
 
-Then launch Thoth-Standalone. The easies way is to open a terminal / console window and change to the same folder where you stored your configuration file. Reason for this is simple: if the working directory of Thoth contains a file called `configuration.properties` then it will use that if no arguments were provided. SO
+Then launch Thoth-Standalone. The easies way is to open a terminal / console window and change to the same folder where you stored your configuration file. Reason for this is simple: if the working directory of Thoth contains a file called `configuration.properties` then it will use that if no arguments were provided.
 
 With the current directory changed to where you stored `configuration.properties` you simply type
 
 	java -jar /pathto/thoth-standalone-1.0.0.jar
 
-If you wan to be more specific about starting Thoth then you would do something like
+If you want to be more specific about starting Thoth then you would do something like
 
 	java -jar /pathto/thoth-standalone-1.0.0.jar /pathto/configuration.properties
+
+Note that the property file argument is actually a URL; default is file. So you could specify http://myserver/configuration.properties or file://pathto/configuration.properties
 
 Thoth will start and display something similar to
 

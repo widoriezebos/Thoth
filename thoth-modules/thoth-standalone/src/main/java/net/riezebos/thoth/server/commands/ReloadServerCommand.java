@@ -31,7 +31,7 @@ public class ReloadServerCommand extends ServerCommand {
   public void execute(String commandLine) throws Exception {
     Configuration configuration = getThothEnvironment().getConfiguration();
     configuration.reload();
-    println("Configuration reloaded from " + configuration.getPropertyFileName());
+    println("Configuration reloaded from " + configuration.getSourceSpec());
   }
 
   @Override

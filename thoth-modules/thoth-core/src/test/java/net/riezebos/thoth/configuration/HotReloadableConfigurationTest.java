@@ -36,8 +36,8 @@ public class HotReloadableConfigurationTest implements ConfigurationChangeListen
   public void test() throws ConfigurationException, FileNotFoundException {
     String propFile = "net/riezebos/thoth/configuration/test.configuration.properties";
     String propFile2 = "net/riezebos/thoth/configuration/test.configuration2.properties";
-    PropertyBasedConfiguration config = new PropertyBasedConfiguration();
-    config.setPropertyFileName("classpath:" + propFile);
+    ConfigurationBase config = new PropertyBasedConfiguration();
+    config.setSourceSpec("classpath:" + propFile);
     config.reload();
     config.validate();
 
@@ -52,8 +52,8 @@ public class HotReloadableConfigurationTest implements ConfigurationChangeListen
     assertTrue(added.isEmpty());
     assertTrue(removed.isEmpty());
 
-    PropertyBasedConfiguration activeConfiguration = (PropertyBasedConfiguration) hotConfig.getActiveConfiguration();
-    activeConfiguration.setPropertyFileName("classpath:" + propFile2);
+    ConfigurationBase activeConfiguration = (ConfigurationBase) hotConfig.getActiveConfiguration();
+    activeConfiguration.setSourceSpec("classpath:" + propFile2);
     hotConfig.reload();
     assertEquals(1, added.size());
     assertEquals(1, removed.size());
@@ -65,8 +65,8 @@ public class HotReloadableConfigurationTest implements ConfigurationChangeListen
   public void testAutoReload() throws ConfigurationException, FileNotFoundException, InterruptedException {
     String propFile = "net/riezebos/thoth/configuration/test.configuration3.properties";
     String propFile2 = "net/riezebos/thoth/configuration/test.configuration2.properties";
-    PropertyBasedConfiguration config = new PropertyBasedConfiguration();
-    config.setPropertyFileName("classpath:" + propFile);
+    ConfigurationBase config = new PropertyBasedConfiguration();
+    config.setSourceSpec("classpath:" + propFile);
     config.reload();
     config.validate();
 
@@ -82,8 +82,8 @@ public class HotReloadableConfigurationTest implements ConfigurationChangeListen
     removed = new ArrayList<>();
 
     hotConfig.addConfigurationChangeListener(this);
-    PropertyBasedConfiguration activeConfiguration = (PropertyBasedConfiguration) hotConfig.getActiveConfiguration();
-    activeConfiguration.setPropertyFileName("classpath:" + propFile2);
+    ConfigurationBase activeConfiguration = (ConfigurationBase) hotConfig.getActiveConfiguration();
+    activeConfiguration.setSourceSpec("classpath:" + propFile2);
 
     Thread.sleep(1500L);
 

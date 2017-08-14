@@ -195,15 +195,15 @@ public class ThothEnvironment implements ConfigurationChangeListener {
   public Configuration getConfiguration() {
     try {
       if (configuration == null) {
-        String propertyPath = determinePropertyPath();
-        if (propertyPath == null) {
+        String sourceSpec = determinePropertyPath();
+        if (sourceSpec == null) {
           String msg = "There is no configuration defined. Please set either environment or system property '" + CONFIGKEY + "' and restart";
           LOG.error(msg);
           throw new IllegalArgumentException(msg);
         } else {
-          LOG.info("Using " + propertyPath + " for configuration");
-          PropertyBasedConfiguration propertyBasedConfiguration = new PropertyBasedConfiguration();
-          propertyBasedConfiguration.setPropertyFileName(propertyPath);
+          LOG.info("Using " + sourceSpec + " for configuration");
+          ConfigurationBase propertyBasedConfiguration = new PropertyBasedConfiguration();
+          propertyBasedConfiguration.setSourceSpec(sourceSpec);
           propertyBasedConfiguration.reload();
           setConfiguration(propertyBasedConfiguration);
         }

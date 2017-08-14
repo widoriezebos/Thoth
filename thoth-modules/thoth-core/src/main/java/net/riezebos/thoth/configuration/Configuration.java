@@ -27,7 +27,7 @@ public interface Configuration extends Cloneable {
 
   public static final String DEFAULT_TIMESTAMP_FMT = "dd-MM-yyyy HH:mm:ss";
 
-  public static final String BUILT_PROPERTIES = "net/riezebos/thoth/default.configuration.properties";
+  public static final String BUILTIN_PROPERTIES = "net/riezebos/thoth/default.configuration.properties";
   public static final String WORKSPACELOCATION = "workspacelocation";
   public static final String REQUIRED_PREFIX = "net/riezebos/thoth/skins/";
   public static final String CLASSPATH_PREFIX = "classpath:";
@@ -281,7 +281,7 @@ public interface Configuration extends Cloneable {
    *
    * @return
    */
-  public String getPropertyFileName();
+  public String getSourceSpec();
 
   /**
    * @return a clone of the configuration

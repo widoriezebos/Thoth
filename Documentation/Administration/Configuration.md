@@ -1,5 +1,5 @@
 # The configuration file
-In this section you will find the settings Thoth supports. The configuration of Thoth is placed in a property file which is read during startup. Without the minimal configuration (which is about where to store working files and where to find content) Thoth will not be able to start
+In this section you will find the settings Thoth supports. The configuration of Thoth is placed in a property file which is read during startup. Without the minimal configuration (which is about where to store working files and where to find content) Thoth will not be able to start. Note that the argument to the configuration file is actually a URL (if you leave out the protocol then file:// is used). 
 
 ## Required settings
 workspacelocation
@@ -141,10 +141,10 @@ Note that it is possible to replace the default Markdown rendering engine (based
 
 ### Format masks
 formatmask.timestamp
-: The format mask to use for timestamps. Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html) for more information about this mask). Default value = dd-MM-yyyy HH:mm:ss
+: The format mask to use for timestamps. Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter][1] for more information about this mask). Default value = dd-MM-yyyy HH:mm:ss
 
 formatmask.date
-: The format mask to use for dates (without the time part). Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html) for more information about this mask). Default value = dd-MM-yyyy
+: The format mask to use for dates (without the time part). Note that this is a Java based format mask (i.e. MM is for month, mm for minutes. Check [SimpleDateFormatter][2] for more information about this mask). Default value = dd-MM-yyyy
 
 ### File classification
 context.classifications
@@ -177,25 +177,25 @@ markdown.option.QUOTES
 : Pretty single and double quotes. Default = on
 
 markdown.option.ABBREVIATIONS
-: PHP Markdown Extra style abbreviations. See [http://michelf.com/projects/php-markdown/extra/#abbr](http://michelf.com/projects/php-markdown/extra/#abbr). Default = on
+: PHP Markdown Extra style abbreviations. See [http://michelf.com/projects/php-markdown/extra/#abbr][3]. Default = on
 
 markdown.option.HARDWRAPS
-: Enables the parsing of hard wraps as HTML linebreaks. Similar to what github does. See [http://github.github.com/github-flavored-markdown](http://github.github.com/github-flavored-markdown). Default = on
+: Enables the parsing of hard wraps as HTML linebreaks. Similar to what github does. See [http://github.github.com/github-flavored-markdown][4]. Default = on
 
 markdown.option.AUTOLINKS
-: Enables plain autolinks the way github flavoured markdown implements them. With this extension enabled pegdown will intelligently recognize URLs and email addresses without any further delimiters and mark them as the respective link type. See [http://github.github.com/github-flavored-markdown](http://github.github.com/github-flavored-markdown). Default = off
+: Enables plain autolinks the way github flavoured markdown implements them. With this extension enabled pegdown will intelligently recognize URLs and email addresses without any further delimiters and mark them as the respective link type. See [http://github.github.com/github-flavored-markdown][5]. Default = off
 
 markdown.option.TABLES
-: Table support similar to what Multimarkdown offers. See [http://fletcherpenney.net/multimarkdown/users\_guide/](http://fletcherpenney.net/multimarkdown/users_guide/). Default = on
+: Table support similar to what Multimarkdown offers. See [http://fletcherpenney.net/multimarkdown/users\_guide/][6]. Default = on
 
 markdown.option.DEFINITIONS
-: PHP Markdown Extra style definition lists. Additionally supports the small extension proposed in the article referenced below. See [http://michelf.com/projects/php-markdown/extra/#def-list](http://michelf.com/projects/php-markdown/extra/#def-list) and [http://www.justatheory.com/computers/markup/modest-markdown-proposal.html](http://www.justatheory.com/computers/markup/modest-markdown-proposal.html) Default = on
+: PHP Markdown Extra style definition lists. Additionally supports the small extension proposed in the article referenced below. See [http://michelf.com/projects/php-markdown/extra/#def-list][7] and [http://www.justatheory.com/computers/markup/modest-markdown-proposal.html][8] Default = on
 
 markdown.option.FENCED\_CODE\_BLOCKS
-: PHP Markdown Extra style fenced code blocks. See [http://michelf.com/projects/php-markdown/extra/#fenced-code-blocks](http://michelf.com/projects/php-markdown/extra/#fenced-code-blocks). Default = on
+: PHP Markdown Extra style fenced code blocks. See [http://michelf.com/projects/php-markdown/extra/#fenced-code-blocks][9]. Default = on
 
 markdown.option.WIKILINKS
-: Support Wiki Style links. See [http://github.github.com/github-flavored-markdown](http://github.github.com/github-flavored-markdown). Default = on
+: Support Wiki Style links. See [http://github.github.com/github-flavored-markdown][10]. Default = on
 
 markdown.option.STRIKETHROUGH
 : Support strikethroughs as supported in Pandoc and Github. Default = on
@@ -242,3 +242,14 @@ parsetimeout
 
 ## Sample configuration file
 \includecode{sample.configuration.properties}
+
+[1]:	https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
+[2]:	https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
+[3]:	http://michelf.com/projects/php-markdown/extra/#abbr
+[4]:	http://github.github.com/github-flavored-markdown
+[5]:	http://github.github.com/github-flavored-markdown
+[6]:	http://fletcherpenney.net/multimarkdown/users_guide/
+[7]:	http://michelf.com/projects/php-markdown/extra/#def-list
+[8]:	http://www.justatheory.com/computers/markup/modest-markdown-proposal.html
+[9]:	http://michelf.com/projects/php-markdown/extra/#fenced-code-blocks
+[10]:	http://github.github.com/github-flavored-markdown

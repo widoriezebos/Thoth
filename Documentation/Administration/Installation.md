@@ -2,13 +2,13 @@
 There are two ways you can run Thoth. For server environments there is a WAR that you can deploy in a Web Container like tomcat and for desktop environments there is a standalone version that requires almost no setup.
 
 ## Getting hold of the software
-You can find the software on Github: [https://github.com/widoriezebos/Thoth](https://github.com/widoriezebos/Thoth)
+You can find the software on Github: [https://github.com/widoriezebos/Thoth][1]
 
 ## Configuration
-Create a configuration.properties file as described in the [Configuration](Configuration.md) section.
+Create a configuration.properties file as described in the [Configuration][2] section.
 
 ## Running standalone
-For desktop environments you can run Thoth without a Web Container using the Thoth-standalone version which has an embedded web server. First make sure you have Java8 installed, so [grab a JRE or JDK version 8](https://www.java.com/en/download/) and install it. Then you can start ‘standalone Thoth’ if you either have an environment or JVM variable set (as describe above) or simply provide the location of the configuration.properties file as an argument. Not even any of this is required if you have the configuration.properties file in the working folder when starting the Thoth standalone
+For desktop environments you can run Thoth without a Web Container using the Thoth-standalone version which has an embedded web server. First make sure you have Java8 installed, so [grab a JRE or JDK version 8][3] and install it. Then you can start ‘standalone Thoth’ if you either have an environment or JVM variable set (as describe above) or simply provide the location of the configuration.properties file as an argument (in the form of a filename or a URL). Not even any of this is required if you have the configuration.properties file in the working folder when starting the Thoth standalone
 
 	java -jar thoth-standalone-1.0.3.jar
 
@@ -18,9 +18,13 @@ By default the Thoth-standalone server is running in interactive mode (listening
 
 It is also possible to just initialize the repositories (pull) without starting the server by using the `-initonly` flag:
 
-    java -jar thoth-standalone-1.0.3.jar -initonly
+	java -jar thoth-standalone-1.0.3.jar -initonly
 
 ## WAR installation
 Have your Web Container and JDK8 ready and then just drop the Thoth WAR inside the web apps folder of your Web Container. And then the only requirement is that the configuration can be found through an environment variable (or -D provided JVM argument) called `thoth_configuration`. On servers with an init script for Tomcat (/etc/init.d/tomcat) you could add a script line stating 
 
 	export thoth_configuration=/opt/conf/configuration.properties
+
+[1]:	https://github.com/widoriezebos/Thoth
+[2]:	Configuration.md
+[3]:	https://www.java.com/en/download/

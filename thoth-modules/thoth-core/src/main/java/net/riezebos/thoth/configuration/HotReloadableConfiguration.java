@@ -52,9 +52,9 @@ public class HotReloadableConfiguration implements Configuration {
   }
 
   protected long getModificationTime(Configuration configuration) {
-    if (configuration.getPropertyFileName() == null)
+    if (configuration.getSourceSpec() == null)
       return 0L;
-    return new File(configuration.getPropertyFileName()).lastModified();
+    return new File(configuration.getSourceSpec()).lastModified();
   }
 
   protected Configuration getActiveConfiguration() {
@@ -342,8 +342,8 @@ public class HotReloadableConfiguration implements Configuration {
   }
 
   @Override
-  public String getPropertyFileName() {
-    return activeConfiguration.getPropertyFileName();
+  public String getSourceSpec() {
+    return activeConfiguration.getSourceSpec();
   }
 
   @Override

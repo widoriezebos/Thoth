@@ -33,21 +33,14 @@ public class PropertyLoader {
     properties = new Properties();
   }
 
-  protected void load(InputStream inStream) throws ConfigurationException {
-    loadDefaults();
+  public void load(InputStream inStream) throws ConfigurationException {
     readInputStream(inStream);
-  }
-
-  /**
-   * Override this method to set default before actually loading any properties
-   */
-  protected void loadDefaults() {
-
   }
 
   protected void readInputStream(InputStream inStream) {
     try {
       properties.load(inStream);
+      inStream.close();
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
@@ -64,7 +57,7 @@ public class PropertyLoader {
   public String getValue(String key) {
     String value = getValue(key, null);
     if (value == null)
-      LOG.error("Property " + key + " is not set in the configuration");
+      LOG.error("Property " + key + " is not set in configuration " + propertyFileName);
     return value;
   }
 
@@ -79,7 +72,7 @@ public class PropertyLoader {
     return result == null ? dflt : result;
   }
 
-  protected Properties getProperties() {
+  public Properties getProperties() {
     return properties;
   }
 }

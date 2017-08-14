@@ -338,11 +338,11 @@ public class ThothUtil {
     return value;
   }
 
-  public static String suffix(String value, String prefix) {
+  public static String suffix(String value, String suffix) {
     if (value == null)
-      return prefix;
-    if (!value.endsWith(prefix))
-      value += prefix;
+      return suffix;
+    if (!value.endsWith(suffix))
+      value += suffix;
     return value;
   }
 
