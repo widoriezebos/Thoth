@@ -1,5 +1,5 @@
 # Thoth
-Simple yet powerful Markdown based Documentation System for professional documentation writers. (Although serious bloggers might like Thoth too)
+Simple yet powerful Markdown based Documentation System for professional documentation writers. (Although serious bloggers might like Thoth too). Sort of on-premise Gitbooks.
 
 ## In a hurry?
 - Markdown (text based) editing helps you focus on content and structure so you can ignore layout while writing
