@@ -31,6 +31,7 @@ public interface Renderer {
   String URI_PARAMETER = "documenturi";
   String TITLE_PARAMETER = "title";
   String BODY_PARAMETER = "body";
+  String DOCUMENT_PARAMETER = "document";
   String SKINBASE_PARAMETER = "skinbase";
   String IDENTITY = "identity";
   String USER_FULL_NAME = "userfullname";

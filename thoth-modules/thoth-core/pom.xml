@@ -3,7 +3,7 @@
   <parent>
     <groupId>net.riezebos.toth</groupId>
     <artifactId>thoth-modules</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>thoth-core</artifactId>
@@ -13,7 +13,7 @@
     <dependency>
       <groupId>net.riezebos.toth</groupId>
       <artifactId>thoth-lib</artifactId>
-      <version>1.0.3-SNAPSHOT</version>
+      <version>1.0.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -39,27 +39,27 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.7.0</version>
+      <version>2.9.10.3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
-      <version>5.4.0</version>
+      <version>8.4.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-queryparser</artifactId>
-      <version>5.4.0</version>
+      <version>8.4.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-analyzers-common</artifactId>
-      <version>5.4.0</version>
+      <version>8.4.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-highlighter</artifactId>
-      <version>5.4.0</version>
+      <version>8.4.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.velocity</groupId>
@@ -110,17 +110,17 @@
       <scope>test</scope>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>1.10.19</version>
+      <version>3.3.0</version>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
-      <version>1.6.4</version>
+      <version>2.0.5</version>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito</artifactId>
-      <version>1.6.4</version>
+      <artifactId>powermock-api-mockito2</artifactId>
+      <version>2.0.5</version>
     </dependency>
 
   </dependencies>

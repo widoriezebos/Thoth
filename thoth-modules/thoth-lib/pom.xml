@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>net.riezebos.toth</groupId>
-		<artifactId>thoth-modules</artifactId>
-		<version>1.0.3-SNAPSHOT</version>
+		<artifactId>thoth-modules</artifactId><<<<<<< HEAD
+		<version>1.0.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>thoth-lib</artifactId>
@@ -15,7 +15,7 @@
 			<scope>test</scope>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>1.10.19</version>
+			<version>3.3.0</version>
 		</dependency>
 	</dependencies>
 

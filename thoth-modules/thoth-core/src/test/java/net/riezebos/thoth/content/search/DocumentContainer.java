@@ -11,7 +11,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package net.riezebos.thoth.content.search;
+ */
+package net.riezebos.thoth.content.search;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,8 +24,11 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopFieldDocs;
+import org.apache.lucene.search.TotalHits;
+import org.apache.lucene.search.TotalHits.Relation;
 import org.mockito.stubbing.Answer;
 
 import net.riezebos.thoth.beans.ContentNode;
@@ -83,7 +87,9 @@ public class DocumentContainer {
 
       } else
         throw new IllegalArgumentException("Unsupported query test: " + args[0].getClass().getName());
-      TopFieldDocs topDocs = new TopFieldDocs(scoreDocs.length, scoreDocs, null, 0);
+      SortField[] fields = null;
+      TotalHits totalHits = new TotalHits(scoreDocs.length, Relation.EQUAL_TO);
+      TopFieldDocs topDocs = new TopFieldDocs(totalHits, scoreDocs, fields);
       return topDocs;
     };
   }
