@@ -27,8 +27,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.session.HashSessionIdManager;
-import org.eclipse.jetty.server.session.HashSessionManager;
+import org.eclipse.jetty.server.SessionIdManager;
+import org.eclipse.jetty.server.session.DefaultSessionIdManager;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -76,6 +76,7 @@ public class Thoth {
     println("Server is firing up. Please hang on...");
 
     Configuration configuration = thothEnvironment.getConfiguration();
+
     Server server = new Server(configuration.getEmbeddedServerPort());
     ServerConnector httpConnector = new ServerConnector(server);
     httpConnector.setHost(configuration.getEmbeddedServerName());
@@ -85,20 +86,16 @@ public class Thoth {
     ServletHandler handler = new ServletHandler();
     handler.addServletWithMapping(ThothServlet.class, "/");
     handler.initialize();
+    handler.insertHandler(new SessionHandler());
 
     ServletContextHandler context = new ServletContextHandler();
     context.setContextPath("/");
-    context.setHandler(handler);
+    context.insertHandler(handler);
+    context.setResourceBase(System.getProperty("java.io.tmpdir"));
+    server.setHandler(handler);
 
-    HashSessionIdManager sessionIdManager = new HashSessionIdManager();
-    server.setSessionIdManager(sessionIdManager);
-
-    HashSessionManager sessionManager = new HashSessionManager();
-    SessionHandler sessionHandler = new SessionHandler(sessionManager);
-
-    sessionHandler.setHandler(context);
-
-    server.setHandler(sessionHandler);
+    SessionIdManager idmanager = new DefaultSessionIdManager(server);
+    server.setSessionIdManager(idmanager);
 
     println("Setting up content managers...");
     // Warm up the server

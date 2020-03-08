@@ -133,7 +133,7 @@ public class BasicContextManager implements ContextManager {
 
   @Override
   public boolean isValidContext(String context) throws ContextManagerException {
-    return getContextDefinitions().containsKey(context.toLowerCase());
+    return context != null && getContextDefinitions().containsKey(context.toLowerCase());
   }
 
 }

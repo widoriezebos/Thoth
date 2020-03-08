@@ -119,7 +119,7 @@ public abstract class ServletBase extends HttpServlet {
   }
 
   protected String getContextUrl(HttpServletRequest request) {
-    return request.getContextPath() + "/" + getContext(request);
+    return getContextPath(request) + "/" + getContext(request);
   }
 
   // Handle some differences between servlet mappings like '/' and '/*'
@@ -203,7 +203,7 @@ public abstract class ServletBase extends HttpServlet {
       } else {
         skinBase = baseUrl;
       }
-      skinBase = request.getContextPath() + ThothUtil.prefix(skinBase, "/");
+      skinBase = getContextPath(request) + ThothUtil.prefix(skinBase, "/");
     }
     Configuration configuration = getConfiguration();
     Date now = new Date();
@@ -213,7 +213,7 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.CONTEXT_PARAMETER, contextName);
     result.put(Renderer.SKINBASE_PARAMETER, skinBase);
     result.put(Renderer.CONTEXTURL_PARAMETER, contextUrl);
-    result.put(Renderer.CONTEXTPATH_PARAMETER, request.getContextPath());
+    result.put(Renderer.CONTEXTPATH_PARAMETER, getContextPath(request));
     result.put(Renderer.PATH_PARAMETER, path);
     result.put(Renderer.URI_PARAMETER, documentUri);
     result.put(Renderer.TITLE_PARAMETER, getTitle(request));
@@ -239,6 +239,13 @@ public abstract class ServletBase extends HttpServlet {
     result.put(Renderer.PERMISSIONS, permissions);
 
     return result;
+  }
+
+  private String getContextPath(HttpServletRequest request) {
+    String contextPath = request.getContextPath();
+    if (contextPath == null)
+      return "";
+    return contextPath;
   }
 
   protected boolean isLoggedIn(HttpServletRequest request) {
