@@ -526,7 +526,7 @@ public class ThothUtil {
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public static int safeCompare(Comparable  c1, Comparable c2) {
+  public static int safeCompare(Comparable c1, Comparable c2) {
     if (c1 == null && c2 != null)
       return -1;
     if (c1 != null && c2 == null)

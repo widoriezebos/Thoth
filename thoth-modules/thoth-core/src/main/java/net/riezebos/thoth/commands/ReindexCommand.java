@@ -60,7 +60,7 @@ public class ReindexCommand extends RendererBase implements Command {
       variables.put("log", log);
 
       render(skin.getSkinBaseFolder(), skin.getLogTemplate(), contextName, arguments, variables, outputStream);
-      
+
       return RenderResult.OK;
     } catch (Exception e) {
       throw new RenderException(e);

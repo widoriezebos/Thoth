@@ -11,7 +11,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package net.riezebos.thoth.content.comments.dao;
+ */
+package net.riezebos.thoth.content.comments.dao;
 
 import static org.junit.Assert.*;
 
@@ -82,7 +83,7 @@ public class CommentDaoTest extends DatabaseTest {
 
       Long id = comment.getId();
       Comment comment2 = dao.getComment(id);
-      assertEquals(title+"2", comment2.getTitle());
+      assertEquals(title + "2", comment2.getTitle());
 
       dao.deleteComment(id);
       comment = dao.getComment(id);

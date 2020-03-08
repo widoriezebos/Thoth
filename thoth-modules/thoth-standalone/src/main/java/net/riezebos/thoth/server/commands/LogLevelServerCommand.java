@@ -11,7 +11,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package net.riezebos.thoth.server.commands;
+ */
+package net.riezebos.thoth.server.commands;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;

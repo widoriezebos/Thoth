@@ -215,12 +215,11 @@ public class IncludeProcessorTest {
 
     includeProcessor.setFileSystem(getFileHandleFactory());
     includeProcessor.setLibrary("/net/riezebos/thoth/");
-    outMessage = execMain(includeProcessor,
-        new String[] {"-file", "/net/riezebos/thoth/markdown/IncludeProcessor.md"//
-            , "-library", "/net/riezebos/thoth"//
-            , "-softlinkFile", "softlinks.properties"//
-            , "-numbering", "0"//
-        });
+    outMessage = execMain(includeProcessor, new String[] {"-file", "/net/riezebos/thoth/markdown/IncludeProcessor.md"//
+        , "-library", "/net/riezebos/thoth"//
+        , "-softlinkFile", "softlinks.properties"//
+        , "-numbering", "0"//
+    });
     assertTrue(outMessage.indexOf("##Paragraph one of chapter one") != -1);
   }
 
@@ -231,12 +230,11 @@ public class IncludeProcessorTest {
     includeProcessor.setLibrary("/net/riezebos/thoth/");
     File tempFile = File.createTempFile("tmp", "tmp");
     tempFile.deleteOnExit();
-    execMain(includeProcessor,
-        new String[] {"-file", "/net/riezebos/thoth/markdown/IncludeProcessor.md"//
-            , "-library", "/net/riezebos/thoth"//
-            , "-softlinkFile", "softlinks.properties"//
-            , "-target", tempFile.getAbsolutePath()//
-        });
+    execMain(includeProcessor, new String[] {"-file", "/net/riezebos/thoth/markdown/IncludeProcessor.md"//
+        , "-library", "/net/riezebos/thoth"//
+        , "-softlinkFile", "softlinks.properties"//
+        , "-target", tempFile.getAbsolutePath()//
+    });
     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(tempFile), "UTF-8"));
     String line = br.readLine();
     assertTrue(line != null && line.equals("MARKDOWN TESTS"));

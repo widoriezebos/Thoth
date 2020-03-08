@@ -101,8 +101,8 @@ public abstract class RendererBase implements Renderer {
     return Integer.parseInt(stringValue);
   }
 
-  protected void render(String skinBaseFolder, String template, String contextName, Map<String, Object> arguments, Map<String, Object> variables, OutputStream outputStream)
-      throws ServletException, UnsupportedEncodingException, ContentManagerException, IOException {
+  protected void render(String skinBaseFolder, String template, String contextName, Map<String, Object> arguments, Map<String, Object> variables,
+      OutputStream outputStream) throws ServletException, UnsupportedEncodingException, ContentManagerException, IOException {
 
     if (asJson(arguments))
       executeJson(variables, outputStream);

@@ -11,7 +11,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package net.riezebos.thoth.configuration;
+ */
+package net.riezebos.thoth.configuration;
 
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
@@ -367,6 +368,7 @@ public interface Configuration extends Cloneable {
 
   /**
    * Return any substition for a named skin
+   * 
    * @param original
    * @return
    */

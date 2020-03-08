@@ -68,11 +68,9 @@ public class IdentityDao extends BaseDao implements CacheListener {
       for (Identity identity : allIdentities)
         identityMap.put(identity.getId(), identity);
 
-      try (Connection connection = thothDB.getConnection();
-          SqlStatement permissionStmt = new SqlStatement(connection,
-              "select memb.iden_id " + //
-                  "from thoth_memberships memb " + //
-                  "where memb.grou_id = :groupId")) {
+      try (Connection connection = thothDB.getConnection(); SqlStatement permissionStmt = new SqlStatement(connection, "select memb.iden_id " + //
+          "from thoth_memberships memb " + //
+          "where memb.grou_id = :groupId")) {
         for (Group group : groups) {
           permissionStmt.set("groupId", group.getId());
           try (ResultSet permRs = permissionStmt.executeQuery()) {
