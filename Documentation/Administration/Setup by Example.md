@@ -43,17 +43,17 @@ Then launch Thoth-Standalone. The easies way is to open a terminal / console win
 
 With the current directory changed to where you stored `configuration.properties` you simply type
 
-	java -jar /pathto/thoth-standalone-1.0.0.jar
+	java -jar /pathto/thoth-standalone-1.0.3.jar
 
 If you want to be more specific about starting Thoth then you would do something like
 
-	java -jar /pathto/thoth-standalone-1.0.0.jar /pathto/configuration.properties
+	java -jar /pathto/thoth-standalone-1.0.3.jar /pathto/configuration.properties
 
 Note that the property file argument is actually a URL; default is file. So you could specify http://myserver/configuration.properties or file://pathto/configuration.properties
 
 Thoth will start and display something similar to
 
-	Thoth standalone v1.0.0
+	Thoth standalone v1.0.3
 	Server is firing up. Please hang on...
 	Setting up content managers...
 	Thoth server started.
@@ -66,7 +66,7 @@ Then start your browser and visit http://localhost:8080 to find your content. Ju
 In this scenario you most likely will use a Markdown editor with does not do any WYSIWYG but you have Marked2 for that. You have Marked2 setup with Thoth as a pre-processor so that all of the Thoth features are available to Marked2. You will not have to trigger refreshes for files that are opened in Marked2 since Marked2 will detect that for you. If the file you are editing is however nested deep, Marked2 will not auto detect and you will have to refresh manually just like you would with a regular browser.
 
 ### Settings in Marked2
-In the preferences of Marked2 you go to Advanced, and then select the Preprocessor tab. There you check the ‘Enable Custom Preprocessor’ and enter `/usr/bin/java` in the Path field and something similar to `-cp /Users/wido/Applications/thoth-lib-1.0.0.jar net.riezebos.thoth.markdown.IncludeProcessor` in the Args field.
+In the preferences of Marked2 you go to Advanced, and then select the Preprocessor tab. There you check the ‘Enable Custom Preprocessor’ and enter `/usr/bin/java` in the Path field and something similar to `-cp /Users/wido/Applications/thoth-lib-1.0.3.jar net.riezebos.thoth.markdown.IncludeProcessor` in the Args field.
 Note that the Thoth IncludeProcessor detects the root of your library by trying to locate the `softlinks.properties` file. If you do not have such a file (why not?) then you need to specify the location of your library with an extra argument: `-library /path/to/libroot`
 
 ## Editing locally, render on a remote server
