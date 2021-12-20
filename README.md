@@ -47,7 +47,7 @@ Thoth runs inside a web container like Tomcat or Jetty. To be able to launch Tho
 **There is actually proper documentation** so why don't you head on to [the full documentation of Thoth][1]?
 
 ## Copyright
-Copyright (c) 2017 W.T.J. Riezebos
+Copyright (c) 2022 W.T.J. Riezebos
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
